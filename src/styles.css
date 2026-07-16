@@ -139,6 +139,10 @@
     border-color: var(--color-border);
   }
 
+  html {
+    font-family: "Inter", system-ui, sans-serif;
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
