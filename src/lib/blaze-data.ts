@@ -41,8 +41,7 @@ export function generateMockHistory(count = 100): BlazeResult[] {
 
 export function computeStats(results: BlazeResult[]) {
   const multipliers = results.map((r) => r.multiplier);
-  const avg =
-    multipliers.reduce((sum, m) => sum + m, 0) / (multipliers.length || 1);
+  const avg = multipliers.reduce((sum, m) => sum + m, 0) / (multipliers.length || 1);
   const highest = multipliers.length ? Math.max(...multipliers) : 0;
   const lowest = multipliers.length ? Math.min(...multipliers) : 0;
 

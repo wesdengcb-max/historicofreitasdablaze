@@ -32,22 +32,15 @@ function Index() {
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <History className="h-6 w-6 text-primary" />
-              <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-                Histórico Blaze
-              </h1>
+              <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Histórico Blaze</h1>
             </div>
             <p className="text-sm text-muted-foreground">
-              Visualize estatísticas, multiplicadores e distribuição de cores das
-              rodadas registradas.
+              Visualize estatísticas, multiplicadores e distribuição de cores das rodadas
+              registradas.
             </p>
           </div>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRefresh}
-            className="gap-2"
-          >
+          <Button variant="outline" size="sm" onClick={handleRefresh} className="gap-2">
             <RefreshCw className="h-4 w-4" />
             Atualizar dados
           </Button>
@@ -57,9 +50,9 @@ function Index() {
           <AlertTriangle className="h-4 w-4 text-amber-500" />
           <AlertTitle>Aviso importante</AlertTitle>
           <AlertDescription>
-            Este projeto é apenas um visualizador de dados históricos. Resultados
-            anteriores não garantem resultados futuros. Apostas envolvem risco e não
-            há ferramenta capaz de prever o resultado de jogos de azar.
+            Este projeto é apenas um visualizador de dados históricos. Resultados anteriores não
+            garantem resultados futuros. Apostas envolvem risco e não há ferramenta capaz de prever
+            o resultado de jogos de azar.
           </AlertDescription>
         </Alert>
 

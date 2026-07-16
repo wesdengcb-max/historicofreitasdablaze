@@ -78,10 +78,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Histórico Blaze | Análise de resultados" },
-      { name: "description", content: "Acompanhe o histórico de rodadas, multiplicadores e estatísticas de forma organizada." },
+      {
+        name: "description",
+        content:
+          "Acompanhe o histórico de rodadas, multiplicadores e estatísticas de forma organizada.",
+      },
       { name: "author", content: "Lovable" },
       { property: "og:title", content: "Histórico Blaze | Análise de resultados" },
-      { property: "og:description", content: "Acompanhe o histórico de rodadas, multiplicadores e estatísticas de forma organizada." },
+      {
+        property: "og:description",
+        content:
+          "Acompanhe o histórico de rodadas, multiplicadores e estatísticas de forma organizada.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },

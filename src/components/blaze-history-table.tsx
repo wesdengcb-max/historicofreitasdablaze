@@ -61,9 +61,7 @@ export function BlazeHistoryTable({ results }: BlazeHistoryTableProps) {
               </TableCell>
               <TableCell>{result.multiplier.toFixed(2)}x</TableCell>
               <TableCell>
-                <Badge variant={colorBadgeVariant(result.color)}>
-                  {colorLabel(result.color)}
-                </Badge>
+                <Badge variant={colorBadgeVariant(result.color)}>{colorLabel(result.color)}</Badge>
               </TableCell>
             </TableRow>
           ))}
