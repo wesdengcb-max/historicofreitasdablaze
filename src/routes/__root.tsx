@@ -77,42 +77,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Histórico Blaze | Análise de resultados" },
-      {
-        name: "description",
-        content:
-          "Acompanhe o histórico de rodadas, multiplicadores e estatísticas de forma organizada.",
-      },
+      { title: "Lovable App" },
+      { name: "description", content: "Design Studio Pro helps users create professional, beautiful website designs." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Histórico Blaze | Análise de resultados" },
-      {
-        property: "og:description",
-        content:
-          "Acompanhe o histórico de rodadas, multiplicadores e estatísticas de forma organizada.",
-      },
+      { property: "og:title", content: "Lovable App" },
+      { property: "og:description", content: "Design Studio Pro helps users create professional, beautiful website designs." },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Lovable App" },
+      { name: "twitter:description", content: "Design Studio Pro helps users create professional, beautiful website designs." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a0dc311e-0c4c-4acf-a732-8abc99c716c5/id-preview-fa451f9c--737d9ce4-bc3f-45f9-a474-1d1e493fe771.lovable.app-1782700764377.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a0dc311e-0c4c-4acf-a732-8abc99c716c5/id-preview-fa451f9c--737d9ce4-bc3f-45f9-a474-1d1e493fe771.lovable.app-1782700764377.png" },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
       },
-      {
-        rel: "preconnect",
-        href: "https://fonts.googleapis.com",
-      },
-      {
-        rel: "preconnect",
-        href: "https://fonts.gstatic.com",
-        crossOrigin: "anonymous",
-      },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
-      },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
   }),
   shellComponent: RootShell,
@@ -140,8 +122,11 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <div className="flex min-h-screen w-full flex-col">
+        <main className="flex-1 min-w-0">
+          <Outlet />
+        </main>
+      </div>
     </QueryClientProvider>
   );
 }
