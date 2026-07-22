@@ -43,7 +43,7 @@ import { EstrategiasSection } from "@/components/sections/EstrategiasSection";
 
 
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/app")({
   head: () => ({
     meta: [
       { title: "Freitas da Blaze — Análise do Histórico da Blaze" },
