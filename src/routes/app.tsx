@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
-import { memo, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { lazy, memo, Suspense, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Activity,
@@ -37,9 +37,23 @@ import brancoTile from "@/assets/branco-tile.png.asset.json";
 import { getSignals, subscribeSignals, type StoredSignal } from "@/lib/signalsStore";
 import { TopNav } from "@/components/TopNav";
 import { useSection } from "@/lib/sectionStore";
-import { SinaisPage } from "@/components/sections/SinaisSection";
-import { AnaliseSection } from "@/components/sections/AnaliseSection";
-import { EstrategiasSection } from "@/components/sections/EstrategiasSection";
+const SinaisPage = lazy(() =>
+  import("@/components/sections/SinaisSection").then((m) => ({ default: m.SinaisPage })),
+);
+const AnaliseSection = lazy(() =>
+  import("@/components/sections/AnaliseSection").then((m) => ({ default: m.AnaliseSection })),
+);
+const EstrategiasSection = lazy(() =>
+  import("@/components/sections/EstrategiasSection").then((m) => ({ default: m.EstrategiasSection })),
+);
+
+function SectionFallback() {
+  return (
+    <div className="mx-auto flex w-full max-w-[1366px] items-center justify-center px-3 py-24 sm:px-8">
+      <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+    </div>
+  );
+}
 
 
 
