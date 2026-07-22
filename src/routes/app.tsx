@@ -716,9 +716,6 @@ function Index() {
         </aside>
 
         <section className="space-y-6">
-          <StrategyTabs spins={visibleSpins} />
-
-
           <Card delay={0}>
 
             <div className="grid gap-6 sm:grid-cols-[1fr_auto] sm:items-center">
@@ -765,6 +762,8 @@ function Index() {
               <ProgressMeter label="Branco" count={whites} pct={whitePct} color="primary" />
             </div>
           </Card>
+
+          <StrategyTabs spins={visibleSpins} />
 
           <Card
             title="Histórico"
