@@ -1,0 +1,1320 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+
+import { memo, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Activity,
+  Bell,
+  Flame,
+  Loader2,
+  Moon,
+  Settings,
+  Sparkles,
+  Sun,
+  TrendingUp,
+  Wifi,
+  WifiOff,
+  Maximize2,
+  X,
+  Clock,
+  ChevronDown,
+} from "lucide-react";
+
+import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
+import { Card } from "@/components/double/Card";
+import { ResultCircle } from "@/components/double/ResultCircle";
+import { Switch } from "@/components/double/Switch";
+import { WhiteAlert } from "@/components/double/WhiteAlert";
+import { ProgressBar } from "@/components/double/ProgressBar";
+import { StrategyTabs } from "@/components/double/StrategyTabs";
+
+
+import { colorOf, fmtTime, type Spin } from "@/components/double/types";
+import brancoVip from "@/assets/branco-vip.png.asset.json";
+import brancoTile from "@/assets/branco-tile.png.asset.json";
+
+import { getSignals, subscribeSignals, type StoredSignal } from "@/lib/signalsStore";
+import { TopNav } from "@/components/TopNav";
+import { useSection } from "@/lib/sectionStore";
+import { SinaisPage } from "@/components/sections/SinaisSection";
+import { AnaliseSection } from "@/components/sections/AnaliseSection";
+import { EstrategiasSection } from "@/components/sections/EstrategiasSection";
+
+
+
+export const Route = createFileRoute("/app")({
+  head: () => ({
+    meta: [
+      { title: "Freitas da Blaze — Análise do Histórico da Blaze" },
+      {
+        name: "description",
+        content:
+          "Freitas da Blaze: análise do histórico da Blaze em tempo real, sequências, frequência e alerta de branco.",
+      },
+      { property: "og:title", content: "Freitas da Blaze — Análise do Histórico da Blaze" },
+      { property: "og:description", content: "Freitas da Blaze: análise do histórico da Blaze em tempo real, sequências, frequência e alerta de branco." },
+    ],
+  }),
+  component: Index,
+});
+
+const POLL_MS = 5000;
+const PAGE_SIZE = 300;
+
+type Row = {
+  id: number;
+  roll: string;
+  color: string;
+  created_at: string;
+};
+
+type FilterId = "hoje" | "ontem" | "7d" | "30d" | "custom";
+
+
+function normalizeColor(v: string): Spin["color"] | null {
+  const s = (v ?? "").toString().trim().toLowerCase();
+  if (["red", "vermelho", "vermelha", "r"].includes(s)) return "red";
+  if (["black", "preto", "preta", "b"].includes(s)) return "black";
+  if (["white", "branco", "branca", "w"].includes(s)) return "white";
+  return null;
+}
+
+function rowToSpin(r: Row): Spin {
+  const rollNumber = Number(r.roll);
+  const colorNumber = Number(r.color);
+  const hasRollNumber = Number.isFinite(rollNumber);
+  const hasColorNumber = Number.isFinite(colorNumber);
+  const n = hasRollNumber ? rollNumber : hasColorNumber ? colorNumber : 0;
+  const color = normalizeColor(r.color) ?? normalizeColor(r.roll) ?? colorOf(n);
+  return {
+    id: String(r.id),
+    n,
+    color,
+    time: fmtTime(r.created_at),
+    createdAt: r.created_at,
+  };
+}
+
+function dedupeById<T extends { id: number | string }>(items: T[]): T[] {
+  const byId = new Map<string, T>();
+  for (const item of items) {
+    const key = String(item.id);
+    if (!key || key === "undefined" || key === "null") continue;
+    if (!byId.has(key)) byId.set(key, item);
+  }
+  return Array.from(byId.values());
+}
+
+// Retorna YYYY-MM-DD para uma data no fuso America/Sao_Paulo.
+function spYmd(d: Date = new Date()): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Sao_Paulo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(d);
+}
+
+// Constrói um instante ISO UTC a partir de uma data (YYYY-MM-DD) e hora (HH:mm[:ss]) no fuso SP (UTC-3, sem DST).
+function spToUtcIso(ymd: string, hms: string): string {
+  const time = hms.length === 5 ? `${hms}:00` : hms;
+  return new Date(`${ymd}T${time}-03:00`).toISOString();
+}
+
+function addDaysYmd(ymd: string, delta: number): string {
+  const [y, m, d] = ymd.split("-").map(Number);
+  const base = new Date(Date.UTC(y, m - 1, d));
+  base.setUTCDate(base.getUTCDate() + delta);
+  return base.toISOString().slice(0, 10);
+}
+
+function computeRange(
+  filter: FilterId,
+  customStart: string,
+  customEnd: string,
+  timeStart: string,
+  timeEnd: string,
+): { start: string | null; end: string | null; includesNow: boolean } {
+  const today = spYmd();
+  const now = new Date().toISOString();
+  const tStart = timeStart || "00:00";
+  const tEnd = timeEnd || "23:59:59.999";
+
+  if (filter === "hoje") {
+    return {
+      start: spToUtcIso(today, tStart),
+      end: spToUtcIso(today, tEnd),
+      includesNow: true,
+    };
+  }
+  if (filter === "ontem") {
+    const y = addDaysYmd(today, -1);
+    return { start: spToUtcIso(y, tStart), end: spToUtcIso(y, tEnd), includesNow: false };
+  }
+  if (filter === "7d") {
+    return { start: spToUtcIso(addDaysYmd(today, -6), tStart), end: now, includesNow: true };
+  }
+  if (filter === "30d") {
+    return { start: spToUtcIso(addDaysYmd(today, -29), tStart), end: now, includesNow: true };
+  }
+  // custom
+  if (!customStart && !customEnd) return { start: null, end: null, includesNow: true };
+  const s = customStart || customEnd;
+  const e = customEnd || customStart;
+  return {
+    start: spToUtcIso(s, tStart),
+    end: spToUtcIso(e, tEnd),
+    includesNow: new Date(spToUtcIso(e, tEnd)).getTime() >= Date.now(),
+  };
+}
+
+function Index() {
+  const section = useSection();
+  const [inverse, setInverse] = useState(false);
+  const [viewMode, setViewMode] = useState<"colunas" | "lista">("colunas");
+  const [whiteAlert, setWhiteAlert] = useState(true);
+  const [fullscreen, setFullscreen] = useState(false);
+  const [futureSlots, setFutureSlots] = useState<0 | 10 | 20 | 30>(0);
+  const [highlightN, setHighlightN] = useState<number | null>(null);
+  const [slotPredictions, setSlotPredictions] = useState<Record<string, "white" | "red" | "black">>({});
+  const cycleSlotPrediction = (key: string) =>
+    setSlotPredictions((prev) => {
+      const cur = prev[key];
+      const next = cur === undefined ? "white" : cur === "white" ? "red" : cur === "red" ? "black" : undefined;
+      const copy = { ...prev };
+      if (next === undefined) delete copy[key];
+      else copy[key] = next;
+      return copy;
+    });
+
+  const [spins, setSpins] = useState<Spin[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [status, setStatus] = useState<"loading" | "live" | "error">("loading");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [whiteFlash, setWhiteFlash] = useState<Spin | null>(null);
+  const [countdown, setCountdown] = useState(15);
+
+  // Filtros
+  const [filter, setFilter] = useState<FilterId>("hoje");
+  const today = useMemo(() => spYmd(), []);
+  const [customStart, setCustomStart] = useState(today);
+  const [customEnd, setCustomEnd] = useState(today);
+  const [timeStart, setTimeStart] = useState("");
+  const [timeEnd, setTimeEnd] = useState("");
+  const [appliedTick, setAppliedTick] = useState(0);
+
+  const range = useMemo(
+    () => computeRange(filter, customStart, customEnd, timeStart, timeEnd),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [filter, appliedTick],
+  );
+
+  const seen = useRef<Set<string>>(new Set());
+  const lastWhiteId = useRef<string | null>(null);
+  const isFirstLoad = useRef(true);
+
+  useEffect(() => {
+    if (!fullscreen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setFullscreen(false);
+    };
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [fullscreen]);
+
+  const buildQuery = useCallback(
+    (from: number, to: number) => {
+      let q = supabase
+        .from("blaze_results")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .range(from, to);
+      if (range.start) q = q.gte("created_at", range.start);
+      if (range.end) q = q.lte("created_at", range.end);
+      return q;
+    },
+    [range.start, range.end],
+  );
+
+  const loadInitial = useCallback(async () => {
+    const { data, error } = await buildQuery(0, PAGE_SIZE - 1);
+    if (error) throw error;
+    return (data ?? []) as Row[];
+  }, [buildQuery]);
+
+  // Carga inicial ao trocar filtro.
+  useEffect(() => {
+    let alive = true;
+    setLoading(true);
+    setHasMore(true);
+    seen.current = new Set();
+    isFirstLoad.current = true;
+    (async () => {
+      try {
+        const rows = await loadInitial();
+        if (!alive) return;
+        const uniq = dedupeById(rows);
+        seen.current = new Set(uniq.map((r) => String(r.id)));
+        setSpins(uniq.map(rowToSpin));
+        setHasMore(rows.length === PAGE_SIZE);
+        setStatus("live");
+        setErrorMsg("");
+      } catch (error) {
+        setStatus("error");
+        setErrorMsg(error instanceof Error ? error.message : "Falha ao carregar histórico");
+      } finally {
+        if (alive) setLoading(false);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [loadInitial]);
+
+  const loadMore = useCallback(async () => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    try {
+      const offset = spins.length;
+      const { data, error } = await buildQuery(offset, offset + PAGE_SIZE - 1);
+      if (error) throw error;
+      const rows = (data ?? []) as Row[];
+      setSpins((prev) => {
+        const merged = dedupeById([...prev, ...rows.map(rowToSpin)]);
+        seen.current = new Set(merged.map((s) => s.id));
+        return merged;
+      });
+      setHasMore(rows.length === PAGE_SIZE);
+    } catch (error) {
+      setStatus("error");
+      setErrorMsg(error instanceof Error ? error.message : "Falha ao carregar mais");
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [buildQuery, hasMore, loadingMore, spins.length]);
+
+  // Realtime — só insere se a nova rodada está no intervalo ativo.
+  useEffect(() => {
+    const channel = supabase
+      .channel("blaze_results_inserts")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "blaze_results" },
+        (payload) => {
+          const r = payload.new as Row;
+          const key = String(r?.id);
+          if (!r || seen.current.has(key)) return;
+          const t = new Date(r.created_at).getTime();
+          if (range.start && t < new Date(range.start).getTime()) return;
+          if (range.end && t > new Date(range.end).getTime()) return;
+          seen.current.add(key);
+          setSpins((prev) => {
+            if (prev.some((s) => s.id === key)) return prev;
+            return dedupeById([rowToSpin(r), ...prev]);
+          });
+        },
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [range.start, range.end]);
+
+  // Polling leve — só refresca o topo quando o intervalo inclui o "agora".
+  useEffect(() => {
+    if (!range.includesNow) return;
+    let alive = true;
+
+    const poll = async () => {
+      if (!alive) return;
+      if (typeof document !== "undefined" && document.hidden) return;
+      try {
+        const { data, error } = await buildQuery(0, PAGE_SIZE - 1);
+        if (error) throw error;
+        if (!alive) return;
+        const rows = (data ?? []) as Row[];
+        const fresh = rows.filter((r) => !seen.current.has(String(r.id)));
+        if (fresh.length === 0) return;
+        setSpins((prev) => {
+          const merged = dedupeById([...fresh.map(rowToSpin), ...prev]);
+          seen.current = new Set(merged.map((s) => s.id));
+          return merged;
+        });
+        setStatus("live");
+      } catch (error) {
+        if (!alive) return;
+        setStatus("error");
+        setErrorMsg(error instanceof Error ? error.message : "Falha ao atualizar");
+      }
+    };
+
+    const timer = setInterval(poll, POLL_MS);
+    const onVisible = () => {
+      if (!document.hidden) void poll();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", onVisible);
+
+    return () => {
+      alive = false;
+      clearInterval(timer);
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", onVisible);
+    };
+  }, [buildQuery, range.includesNow]);
+
+  // Countdown estético
+  useEffect(() => {
+    const t = setInterval(() => setCountdown((c) => (c <= 1 ? 15 : c - 1)), 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  // White alert.
+  useEffect(() => {
+    if (spins.length === 0) return;
+    const newestWhite = spins.find((s) => s.color === "white");
+    if (!newestWhite) return;
+    if (isFirstLoad.current) {
+      lastWhiteId.current = newestWhite.id;
+      isFirstLoad.current = false;
+      return;
+    }
+    if (newestWhite.id === lastWhiteId.current) return;
+    lastWhiteId.current = newestWhite.id;
+    if (!whiteAlert) return;
+    setWhiteFlash(newestWhite);
+    try {
+      const AC =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      const ctx = new AC();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "sine";
+      o.frequency.value = 880;
+      g.gain.value = 0.08;
+      o.connect(g).connect(ctx.destination);
+      o.start();
+      o.frequency.exponentialRampToValueAtTime(1320, ctx.currentTime + 0.25);
+      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.6);
+      o.stop(ctx.currentTime + 0.65);
+    } catch {
+      /* noop */
+    }
+    const t = setTimeout(() => setWhiteFlash(null), 6000);
+    return () => clearTimeout(t);
+  }, [spins, whiteAlert]);
+
+  const visibleSpins = useMemo(() => dedupeById(spins), [spins]);
+
+  // Stats
+  const total = visibleSpins.length;
+  const counts = useMemo(
+    () =>
+      visibleSpins.reduce(
+        (acc, spin) => {
+          acc[spin.color] += 1;
+          acc.byNumber[spin.n] = (acc.byNumber[spin.n] ?? 0) + 1;
+          return acc;
+        },
+        { red: 0, black: 0, white: 0, byNumber: {} as Record<number, number> },
+      ),
+    [visibleSpins],
+  );
+  const reds = counts.red;
+  const blacks = counts.black;
+  const whites = counts.white;
+  const redPct = total ? (reds / total) * 100 : 0;
+  const blackPct = total ? (blacks / total) * 100 : 0;
+  const whitePct = total ? (whites / total) * 100 : 0;
+  const last = visibleSpins[0];
+  const lastWhiteIdx = visibleSpins.findIndex((s) => s.color === "white");
+  const lastWhiteAgo = lastWhiteIdx >= 0 ? lastWhiteIdx : visibleSpins.length;
+
+  const freq = useMemo(
+    () => Array.from({ length: 15 }, (_, n) => ({ n, count: counts.byNumber[n] ?? 0 })),
+    [counts.byNumber],
+  );
+
+  const storedSignals = useSyncExternalStore(subscribeSignals, getSignals, getSignals);
+
+  type GridRow = { key: string; label: string; order: number; cells: Spin[][] };
+
+  const gridRows: GridRow[] = useMemo(() => {
+    const formatter = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/Sao_Paulo",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+    const rowMap = new Map<string, GridRow>();
+    for (const s of visibleSpins) {
+      const raw = (s.createdAt ?? "").trim();
+      if (!raw) continue;
+      const hasTz = /Z$|[+-]\d{2}:?\d{2}$/.test(raw);
+      const d = new Date(hasTz ? raw : `${raw.replace(" ", "T")}Z`);
+      if (Number.isNaN(d.getTime())) continue;
+      const parts = formatter.formatToParts(d);
+      const hour = Number(parts.find((p) => p.type === "hour")?.value ?? "0");
+      const minute = Number(parts.find((p) => p.type === "minute")?.value ?? "0");
+      const tens = Math.floor(minute / 10);
+      const unit = minute % 10;
+      const key = `${hour}:${tens}`;
+      let row = rowMap.get(key);
+      if (!row) {
+        row = {
+          key,
+          label: `${String(hour).padStart(2, "0")}:${tens}0`,
+          order: hour * 6 + tens,
+          cells: Array.from({ length: 10 }, () => []),
+        };
+        rowMap.set(key, row);
+      }
+      row.cells[unit].push(s);
+    }
+    // Garante que blocos com sinais pendentes/verdes apareçam mesmo sem spins ainda.
+    for (const s of storedSignals) {
+      const d = new Date(s.targetIso);
+      if (Number.isNaN(d.getTime())) continue;
+      const parts = formatter.formatToParts(d);
+      const hour = Number(parts.find((p) => p.type === "hour")?.value ?? "0");
+      const minute = Number(parts.find((p) => p.type === "minute")?.value ?? "0");
+      const tens = Math.floor(minute / 10);
+      const key = `${hour}:${tens}`;
+      if (!rowMap.has(key)) {
+        rowMap.set(key, {
+          key,
+          label: `${String(hour).padStart(2, "0")}:${tens}0`,
+          order: hour * 6 + tens,
+          cells: Array.from({ length: 10 }, () => []),
+        });
+      }
+    }
+    // Adiciona blocos futuros vazios (+10/+20/+30 minutos à frente do agora).
+    if (futureSlots > 0) {
+      const now = new Date(Date.now() + futureSlots * 60_000);
+      const start = new Date();
+      // gera todos os blocos de 10min entre agora e agora+futureSlots
+      const stepMs = 10 * 60_000;
+      for (let t = start.getTime(); t <= now.getTime(); t += stepMs) {
+        const d = new Date(t);
+        const parts = formatter.formatToParts(d);
+        const hour = Number(parts.find((p) => p.type === "hour")?.value ?? "0");
+        const minute = Number(parts.find((p) => p.type === "minute")?.value ?? "0");
+        const tens = Math.floor(minute / 10);
+        const key = `${hour}:${tens}`;
+        if (!rowMap.has(key)) {
+          rowMap.set(key, {
+            key,
+            label: `${String(hour).padStart(2, "0")}:${tens}0`,
+            order: hour * 6 + tens,
+            cells: Array.from({ length: 10 }, () => []),
+          });
+        }
+      }
+    }
+    return Array.from(rowMap.values()).sort((a, b) => b.order - a.order);
+  }, [visibleSpins, storedSignals, futureSlots]);
+
+
+  const applyCustom = () => setAppliedTick((v) => v + 1);
+  const historyGridTemplate = "repeat(10, calc((var(--stone-size, 44px) * 2) + 2px))";
+
+  const signalsByHM = useMemo(() => {
+
+    const fmt = new Intl.DateTimeFormat("en-GB", {
+      timeZone: "America/Sao_Paulo",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+    const map = new Map<string, StoredSignal[]>();
+    for (const s of storedSignals) {
+      const d = new Date(s.targetIso);
+      if (Number.isNaN(d.getTime())) continue;
+      const key = fmt.format(d); // "HH:MM"
+      const arr = map.get(key) ?? [];
+      arr.push(s);
+      map.set(key, arr);
+    }
+    return map;
+  }, [storedSignals]);
+
+
+  return (
+    <div
+      className="min-h-dvh overflow-x-hidden"
+      style={{ ["--stone-size" as never]: "44px" }}
+    >
+      <header className="sticky top-0 z-30 border-b border-white/5 bg-background/70 backdrop-blur-xl">
+        <div className="mx-auto grid h-16 max-w-[1366px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-3 sm:gap-4 sm:px-8">
+          <div className="flex min-w-0 items-center gap-3">
+            <div
+              className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-xl bg-white ring-1 ring-white/40"
+              style={{ boxShadow: "var(--shadow-glow)" }}
+            >
+              <img src={brancoVip.url} alt="Branco" className="h-full w-full object-cover" />
+            </div>
+            <div className="min-w-0 leading-tight">
+              <p className="truncate text-sm font-semibold tracking-tight">Freitas da Blaze</p>
+              <p className="truncate text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                Análise do Histórico da Blaze
+              </p>
+            </div>
+          </div>
+
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+            <StatusPill status={status} message={errorMsg} />
+            <ThemeToggle />
+            <button
+              className="hidden h-11 w-11 place-items-center rounded-xl border border-white/5 bg-white/5 text-muted-foreground transition-colors duration-200 hover:bg-white/[0.08] hover:text-foreground sm:grid"
+              aria-label="Notificações"
+            >
+              <Bell className="h-4 w-4" />
+            </button>
+            <button
+              className="hidden h-11 w-11 place-items-center rounded-xl border border-white/5 bg-white/5 text-muted-foreground transition-colors duration-200 hover:bg-white/[0.08] hover:text-foreground sm:grid"
+              aria-label="Configurações"
+            >
+              <Settings className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <TopNav />
+
+      {section === "sinais" ? (
+        <SinaisPage />
+      ) : section === "analise" ? (
+        <AnaliseSection />
+      ) : section === "estrategias" ? (
+        <EstrategiasSection />
+      ) : section !== "dashboard" ? (
+        <main className="mx-auto flex w-full max-w-[1366px] flex-col gap-5 px-3 py-10 sm:gap-6 sm:px-8 sm:py-16">
+          <Card delay={0.05}>
+            <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                Seção
+              </div>
+              <h2 className="text-2xl font-semibold text-foreground capitalize">{section}</h2>
+              <p className="max-w-md text-sm text-muted-foreground">
+                Conteúdo desta seção em construção. Em breve você verá aqui os dados
+                específicos de <span className="capitalize text-foreground">{section}</span>.
+              </p>
+            </div>
+          </Card>
+        </main>
+      ) : (
+      <main className="mx-auto flex w-full max-w-[1366px] flex-col gap-5 px-3 py-5 sm:gap-6 sm:px-8 sm:py-10">
+
+        <aside>
+          <Card delay={0.05}>
+            <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+              Status da Rodada
+            </div>
+            <div className="mb-5 flex items-center justify-between gap-3">
+              <h2 className="text-lg font-semibold text-foreground sm:text-xl">Rodada Finalizada</h2>
+              <span className="text-xs tabular-nums text-muted-foreground">{total}</span>
+            </div>
+
+            {(() => {
+              const items = [
+                { key: "red" as const, color: "red" as const, count: reds, pct: redPct, tint: "#DE2143" },
+                { key: "white" as const, color: "white" as const, count: whites, pct: whitePct, tint: "#ffffff" },
+                { key: "black" as const, color: "black" as const, count: blacks, pct: blackPct, tint: "#16171d" },
+              ];
+              const leader = items.reduce((a, b) => (b.count > a.count ? b : a), items[0]);
+              return (
+                <div className="grid gap-3 sm:grid-cols-3">
+                  {items.map((it) => {
+                    const isLeader = it.key === leader.key && it.count > 0;
+                    return (
+                      <div
+                        key={it.key}
+                        className={`rounded-xl border p-3 transition-colors ${
+                          isLeader
+                            ? "border-emerald-400/70 shadow-[0_0_0_1px_rgba(16,185,129,0.35),0_8px_24px_-12px_rgba(16,185,129,0.45)]"
+                            : "border-white/5 bg-white/[0.02]"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <ResultCircle color={it.color} n={it.color === "white" ? undefined : 0} size="sm" animate={false} />
+                          <div className="min-w-0 flex-1">
+                            <div className={`text-sm font-semibold tabular-nums ${isLeader ? "text-emerald-400" : "text-foreground"}`}>
+                              {it.pct.toFixed(1)}%
+                            </div>
+                            <div className="text-[11px] tabular-nums text-muted-foreground">
+                              {it.count} apostas
+                            </div>
+                          </div>
+                        </div>
+                        <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-white/[0.06]">
+                          <div
+                            className="h-full rounded-full transition-[width] duration-500"
+                            style={{
+                              width: `${Math.min(100, it.pct)}%`,
+                              background: isLeader
+                                ? "linear-gradient(90deg,#10b981,#34d399)"
+                                : it.tint,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
+
+            <div className="mt-5 grid gap-4 border-t border-white/5 pt-4 sm:grid-cols-[1fr_auto] sm:items-center">
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-muted-foreground">
+                <span className="inline-flex items-center gap-2">
+                  <Flame className="h-3.5 w-3.5" />
+                  Último branco há <b className="text-foreground">{lastWhiteAgo}</b> rodadas
+                </span>
+                <span className="inline-flex items-center gap-2">
+                  <Activity className="h-3.5 w-3.5" />
+                  Brancos seguidos <b className="text-foreground">{countConsecutive(visibleSpins, "white")}</b>
+                </span>
+              </div>
+              <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                  Frequência
+                </span>
+                {freq.map((f) => (
+                  <div key={f.n} className="flex items-center gap-1">
+                    <ResultCircle color={colorOf(f.n)} n={f.n} size="sm" animate={false} />
+                    <span className="text-[10px] tabular-nums text-muted-foreground">{f.count}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Card>
+        </aside>
+
+        <section className="space-y-6">
+          <StrategyTabs spins={visibleSpins} />
+
+
+          <Card delay={0}>
+
+            <div className="grid gap-6 sm:grid-cols-[1fr_auto] sm:items-center">
+              <div className="min-w-0">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                  Status da rodada
+                </p>
+                <h1 className="mt-1 truncate text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+                  {countdown > 3 ? "Apostas abertas" : "Rodando…"}
+                </h1>
+                <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+                  <span className="relative inline-flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-positive/70" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-positive" />
+                  </span>
+                  Próximo giro em{" "}
+                  <b className="tabular-nums text-foreground">{String(countdown).padStart(2, "0")}s</b>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-5 sm:justify-self-end">
+                <div className="text-right">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    Último número
+                  </p>
+                  <div className="mt-2 flex justify-end">
+                    <AnimatePresence mode="popLayout">
+                      {last ? (
+                        <motion.div key={last.id}>
+                          <ResultCircle color={last.color} n={last.n} size="md" glow />
+                        </motion.div>
+                      ) : (
+                        <div className="h-9 w-9 rounded-full border border-dashed border-white/10 sm:h-10 sm:w-10" />
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-7 grid gap-4 sm:grid-cols-3">
+              <ProgressMeter label="Vermelho" count={reds} pct={redPct} color="red" />
+              <ProgressMeter label="Preto" count={blacks} pct={blackPct} color="black" />
+              <ProgressMeter label="Branco" count={whites} pct={whitePct} color="primary" />
+            </div>
+          </Card>
+
+          <Card
+            title="Histórico"
+            subtitle={`${total} rodadas · horário de Brasília`}
+            icon={<TrendingUp className="h-3.5 w-3.5" />}
+            delay={0.08}
+            action={
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="inline-flex rounded-full border border-white/10 bg-white/5 p-0.5 text-[11px] font-medium">
+                  <button
+                    type="button"
+                    onClick={() => setViewMode("colunas")}
+                    className={`rounded-full px-3 py-1.5 transition-colors ${viewMode === "colunas" ? "bg-white/10 text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                  >
+                    Colunas Fixas
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setViewMode("lista")}
+                    className={`rounded-full px-3 py-1.5 transition-colors ${viewMode === "lista" ? "bg-white/10 text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                  >
+                    Lista
+                  </button>
+                </div>
+                <Switch checked={inverse} onChange={setInverse} label="Sentido inverso" />
+                <Switch checked={whiteAlert} onChange={setWhiteAlert} label="Alerta de branco" />
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-white/[0.09] hover:text-foreground"
+                      title="Slots futuros"
+                    >
+                      <Clock className="h-3.5 w-3.5" />
+                      <span>{futureSlots === 0 ? "Off" : `+${futureSlots} min`}</span>
+                      <ChevronDown className="h-3 w-3 opacity-70" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="min-w-[7rem]">
+                    {([0, 10, 20, 30] as const).map((v) => (
+                      <DropdownMenuItem
+                        key={v}
+                        onSelect={() => setFutureSlots(v)}
+                        className={futureSlots === v ? "bg-white/10" : ""}
+                      >
+                        {v === 0 ? "Off" : `+${v} min`}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <button
+                  type="button"
+                  onClick={() => setFullscreen(true)}
+                  className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 bg-white/5 text-muted-foreground transition-colors hover:bg-white/[0.09] hover:text-foreground"
+                  aria-label="Tela cheia"
+                  title="Tela cheia"
+                >
+                  <Maximize2 className="h-4 w-4" />
+                </button>
+              </div>
+            }
+          >
+            {/* Filtros de período */}
+            <div className="mb-4 space-y-3">
+              <div className="flex flex-wrap gap-1.5">
+                {([
+                  ["hoje", "Hoje"],
+                  ["ontem", "Ontem"],
+                  ["7d", "Últimos 7 dias"],
+                  ["30d", "Últimos 30 dias"],
+                  ["custom", "Personalizado"],
+                ] as [FilterId, string][]).map(([id, label]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setFilter(id)}
+                    className={`rounded-full border px-3 py-1.5 text-[11px] font-medium transition-colors ${
+                      filter === id
+                        ? "border-white/20 bg-white/10 text-foreground"
+                        : "border-white/5 bg-white/[0.03] text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              {filter === "custom" && (
+                <div className="grid gap-2 rounded-xl border border-white/5 bg-white/[0.02] p-3 sm:grid-cols-[repeat(4,1fr)_auto] sm:items-end">
+                  <FieldInput label="Data inicial" type="date" value={customStart} onChange={setCustomStart} />
+                  <FieldInput label="Data final" type="date" value={customEnd} onChange={setCustomEnd} />
+                  <FieldInput label="Hora inicial" type="time" value={timeStart} onChange={setTimeStart} placeholder="00:00" />
+                  <FieldInput label="Hora final" type="time" value={timeEnd} onChange={setTimeEnd} placeholder="23:59" />
+                  <button
+                    type="button"
+                    onClick={applyCustom}
+                    className="h-9 rounded-lg bg-primary px-4 text-[12px] font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+                  >
+                    Pesquisar
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div
+              className={
+                fullscreen
+                  ? "fixed inset-0 z-50 flex flex-col bg-background/95 p-4 backdrop-blur-md sm:p-6"
+                  : "rounded-2xl border border-white/5 bg-black/15"
+              }
+            >
+              {fullscreen && (
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                      Histórico — tela cheia
+                    </p>
+                    <h2 className="truncate text-lg font-semibold">{total} rodadas · horário de Brasília</h2>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setFullscreen(false)}
+                    className="grid h-10 w-10 place-items-center rounded-xl border border-white/10 bg-white/5 text-muted-foreground transition-colors hover:bg-white/[0.09] hover:text-foreground"
+                    aria-label="Fechar tela cheia"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              )}
+              <div
+                className={
+                  fullscreen
+                    ? "min-h-0 flex-1 overflow-auto rounded-2xl border border-white/5 bg-black/20"
+                    : ""
+                }
+                style={{ direction: inverse && viewMode === "colunas" ? "rtl" : "ltr" }}
+              >
+
+
+                {loading ? (
+                  <div className="flex items-center justify-center py-16 text-sm text-muted-foreground">
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Carregando histórico…
+                  </div>
+                ) : visibleSpins.length === 0 ? (
+                  <div className="py-16 text-center text-sm text-muted-foreground">
+                    {status === "error"
+                      ? `Erro ao buscar histórico: ${errorMsg}`
+                      : "Nenhum resultado no período selecionado."}
+                  </div>
+                ) : viewMode === "colunas" ? (
+                  <div className="w-full overflow-x-auto p-3 sm:p-4">
+                    {/* Cabeçalho fixo dos minutos 00–09 */}
+                    <div className="sticky top-0 z-10 -mx-3 mb-2 border-b border-white/10 bg-background/95 px-3 py-2 backdrop-blur sm:-mx-4 sm:px-4">
+                      <div
+                        className="grid"
+                        style={{ gridTemplateColumns: historyGridTemplate, columnGap: "2px", justifyContent: "center", direction: inverse ? "rtl" : "ltr" }}
+                      >
+                        {Array.from({ length: 10 }, (_, i) => (
+                          <div
+                            key={`h-${i}`}
+                            className="flex h-6 items-center justify-center rounded-md bg-white/5 text-[11px] font-semibold tabular-nums text-muted-foreground"
+                          >
+                            {String(i).padStart(2, "0")}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-3">
+                      {gridRows.map((row) => (
+                        <div
+                          key={row.key}
+                          className="grid items-start"
+                          style={{ gridTemplateColumns: historyGridTemplate, columnGap: "2px", justifyContent: "center", direction: inverse ? "rtl" : "ltr" }}
+                        >
+                          {row.cells.map((cell, ci) => {
+                            const [hh, mmPrefix] = row.label.split(":");
+                            const hm = `${hh}:${mmPrefix[0]}${ci}`;
+                            const cellSignals = signalsByHM.get(hm) ?? [];
+                            const green = cellSignals.find((s) => s.outcome === "green");
+                            const pending = cellSignals.find((s) => s.outcome === "pending");
+                            const red = cellSignals.find((s) => s.outcome === "red");
+                            let badge: null | { label: string; tone: "exato" | "margem" | "pending" | "loss" } = null;
+                            if (green) {
+                              const diff = green.matchedIso
+                                ? Math.abs(new Date(green.matchedIso).getTime() - new Date(green.targetIso).getTime())
+                                : 0;
+                              badge = diff <= 15_000
+                                ? { label: "EXATO", tone: "exato" }
+                                : { label: "MARGEM", tone: "margem" };
+                            } else if (pending) {
+                              badge = { label: "SINAL", tone: "pending" };
+                            } else if (red) {
+                              badge = { label: "LOSS", tone: "loss" };
+                            }
+                            const badgeCls =
+                              badge?.tone === "exato" || badge?.tone === "pending"
+                                ? "bg-emerald-500 text-black border border-emerald-300 shadow-[0_2px_8px_rgba(16,185,129,0.35)]"
+                                : badge?.tone === "margem"
+                                  ? "bg-amber-400 text-black border border-amber-200 shadow-[0_2px_8px_rgba(245,158,11,0.35)]"
+                                  : "bg-red-500 text-white border border-red-300 shadow-[0_2px_8px_rgba(239,68,68,0.35)]";
+                            return (
+                              <div key={ci} className="flex flex-col items-center gap-1 min-h-[60px]" style={{ direction: inverse ? "rtl" : "ltr" }}>
+                                <span className={`inline-flex h-4 items-center rounded-full px-2 text-[9px] font-black tracking-widest ${badge ? badgeCls : "opacity-0"}`}>
+                                  {badge?.label ?? "·"}
+                                </span>
+                                <div className="flex items-start justify-center gap-0.5">
+                                  {(() => {
+                                    const orderedCell = [...cell].sort((a, b) => {
+                                      const aTime = new Date(a.createdAt ?? "").getTime();
+                                      const bTime = new Date(b.createdAt ?? "").getTime();
+                                      return (Number.isFinite(aTime) ? aTime : 0) - (Number.isFinite(bTime) ? bTime : 0);
+                                    });
+                                    const slots: (Spin | undefined)[] = orderedCell.slice(0, 2);
+                                    while (slots.length < 2) slots.push(undefined);
+                                    return slots;
+                                  })().map((spin, i) => {
+                                    if (spin) {
+                                      return (
+                                        <TipMinerCard
+                                          key={(spin as Spin).id}
+                                          spin={spin as Spin}
+                                          highlightN={highlightN}
+                                          onClick={() =>
+                                            setHighlightN((h) => (h === (spin as Spin).n ? null : (spin as Spin).n))
+                                          }
+                                        />
+                                      );
+                                    }
+                                    if (pending) {
+                                      return (
+                                        <div key={`p-${ci}-${i}`} className="flex flex-col items-center gap-1" style={{ direction: "ltr" }}>
+                                          <div
+                                            className="relative flex h-[var(--stone-size,44px)] w-[var(--stone-size,44px)] items-center justify-center overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-emerald-400/40"
+                                          >
+                                            <div
+                                              className="absolute top-0 left-0 right-0 h-2.5 md:h-3 flex items-center justify-center flex-shrink-0 text-[5px] md:text-[6px] font-black leading-none tracking-wide z-10 cursor-default bg-emerald-500 text-white"
+                                              style={{ pointerEvents: "auto" }}
+                                            >
+                                              SINAL
+                                            </div>
+                                            <img
+                                              src={brancoTile.url}
+                                              alt="Sinal"
+                                              className="h-full w-full object-cover"
+                                              draggable={false}
+                                            />
+                                          </div>
+                                          <span className="text-[10px] font-mono tabular-nums text-muted-foreground">{hm}</span>
+                                        </div>
+                                      );
+                                    }
+                                    const slotKey = `${hm}-${i}`;
+                                    return (
+                                      <EmptySlot
+                                        key={`e-${ci}-${i}`}
+                                        prediction={slotPredictions[slotKey]}
+                                        onClick={() => cycleSlotPrediction(slotKey)}
+                                      />
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            );
+                          })}
+
+
+
+
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  (() => {
+                    return (
+                      <div
+                        className="grid justify-center gap-x-2 gap-y-3 p-3 sm:p-4"
+                        style={{
+                          gridTemplateColumns: "repeat(auto-fill, var(--stone-size, 44px))",
+                          direction: inverse ? "rtl" : "ltr",
+                        }}
+                      >
+                        {visibleSpins.map((spin, i) => (
+                          <div key={spin.id} style={{ direction: "ltr" }}>
+                            <TipMinerCard
+                              spin={spin}
+                              delay={i < 20 ? i * 0.015 : 0}
+                              highlightN={highlightN}
+                              onClick={() =>
+                                setHighlightN((h) => (h === spin.n ? null : spin.n))
+                              }
+                            />
+
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()
+                )}
+
+                {!loading && visibleSpins.length > 0 && (
+                  <div className="mt-5 flex justify-center pb-4">
+                    {hasMore ? (
+                      <button
+                        type="button"
+                        onClick={loadMore}
+                        disabled={loadingMore}
+                        className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-2 text-[12px] font-semibold text-foreground transition-colors hover:bg-white/[0.09] disabled:opacity-60"
+                      >
+                        {loadingMore ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" /> Carregando…
+                          </>
+                        ) : (
+                          <>+ Carregar mais {PAGE_SIZE} resultados</>
+                        )}
+                      </button>
+                    ) : (
+                      <span className="text-[11px] text-muted-foreground">
+                        Fim do histórico do período.
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </Card>
+        </section>
+      </main>
+      )}
+
+
+
+      <WhiteAlert spin={whiteFlash} onClose={() => setWhiteFlash(null)} />
+    </div>
+  );
+}
+
+const TipMinerCard = memo(function TipMinerCard({
+  spin,
+  delay = 0,
+  showTime = true,
+  highlightN = null,
+  onClick,
+}: {
+  spin: Spin;
+  delay?: number;
+  showTime?: boolean;
+  highlightN?: number | null;
+  onClick?: () => void;
+}) {
+  const isWhite = spin.color === "white";
+  const bg =
+    spin.color === "red"
+      ? "#DE2143"
+      : spin.color === "black"
+        ? "#16171d"
+        : "#ffffff";
+  const ring = isWhite ? "#16171d" : "#ffffff";
+  const fg = isWhite ? "#16171d" : "#ffffff";
+  const isActive = highlightN === null || highlightN === spin.n;
+  const isHit = highlightN !== null && highlightN === spin.n;
+
+  return (
+    <div className="flex flex-col items-center gap-1">
+      <motion.button
+        type="button"
+        onClick={onClick}
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: isActive ? 1 : 0.25 }}
+        transition={{ duration: 0.22, delay, ease: [0.22, 1, 0.36, 1] }}
+        className={`flex h-[var(--stone-size,44px)] w-[var(--stone-size,44px)] items-center justify-center overflow-hidden rounded-md shadow-sm transition-transform duration-200 hover:-translate-y-0.5 ${
+          isHit ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : ""
+        }`}
+        style={{ background: isWhite ? "#ffffff" : bg }}
+      >
+        {isWhite ? (
+          <img
+            src={brancoTile.url}
+            alt="Branco"
+            className="h-full w-full object-cover"
+            draggable={false}
+          />
+        ) : (
+          <div
+            className="flex h-[calc(var(--stone-size,44px)*0.75)] w-[calc(var(--stone-size,44px)*0.75)] items-center justify-center overflow-hidden rounded-full text-[13px] font-bold leading-none tabular-nums"
+            style={{ border: `2px solid ${ring}`, color: fg }}
+          >
+            {spin.n}
+          </div>
+        )}
+      </motion.button>
+
+      {showTime && (
+        <span className="text-[12px] leading-none tabular-nums text-muted-foreground">
+          {spin.time}
+        </span>
+      )}
+    </div>
+  );
+});
+
+const EmptySlot = memo(function EmptySlot({
+  prediction,
+  onClick,
+}: {
+  prediction?: "white" | "red" | "black";
+  onClick?: () => void;
+}) {
+  const isWhite = prediction === "white";
+  const bg =
+    prediction === "red" ? "#DE2143" : prediction === "black" ? "#16171d" : "#ffffff";
+  const ring = isWhite ? "#16171d" : "#ffffff";
+  return (
+    <div className="flex flex-col items-center gap-1">
+      <button
+        type="button"
+        onClick={onClick}
+        aria-label="Marcar previsão"
+        className={`flex h-[var(--stone-size,44px)] w-[var(--stone-size,44px)] items-center justify-center overflow-hidden rounded-md transition-colors ${
+          prediction
+            ? "shadow-sm hover:-translate-y-0.5"
+            : "border border-dashed border-white/10 bg-white/[0.02] hover:bg-white/[0.06]"
+        }`}
+        style={prediction ? { background: isWhite ? "#ffffff" : bg } : undefined}
+      >
+        {prediction ? (
+          isWhite ? (
+            <img
+              src={brancoTile.url}
+              alt="Branco"
+              className="h-full w-full object-cover"
+              draggable={false}
+            />
+          ) : (
+            <div
+              className="h-[calc(var(--stone-size,44px)*0.75)] w-[calc(var(--stone-size,44px)*0.75)] rounded-full"
+              style={{ border: `2px solid ${ring}` }}
+            />
+          )
+        ) : null}
+      </button>
+      <span className="select-none text-[12px] leading-none text-transparent">--:--</span>
+    </div>
+  );
+});
+
+
+
+
+function ThemeToggle() {
+  const [dark, setDark] = useState(true);
+  useEffect(() => {
+    const saved = typeof localStorage !== "undefined" ? localStorage.getItem("theme") : null;
+    const isDark = saved ? saved === "dark" : true;
+    setDark(isDark);
+    document.documentElement.classList.toggle("light", !isDark);
+  }, []);
+  const toggle = () => {
+    const next = !dark;
+    setDark(next);
+    document.documentElement.classList.toggle("light", !next);
+    try {
+      localStorage.setItem("theme", next ? "dark" : "light");
+    } catch {
+      /* noop */
+    }
+  };
+  return (
+    <button
+      type="button"
+      onClick={toggle}
+      className="grid h-11 w-11 place-items-center rounded-xl border border-white/10 bg-white/5 text-muted-foreground transition-colors duration-200 hover:bg-white/[0.09] hover:text-foreground"
+      aria-label={dark ? "Ativar tema claro" : "Ativar tema escuro"}
+    >
+      {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+    </button>
+  );
+}
+
+
+const FieldInput = memo(function FieldInput({
+  label,
+  type,
+  value,
+  onChange,
+  placeholder,
+}: {
+  label: string;
+  type: "date" | "time";
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+}) {
+  return (
+    <label className="flex flex-col gap-1">
+      <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+        {label}
+      </span>
+      <input
+        type={type}
+        value={value}
+        placeholder={placeholder}
+        onChange={(e) => onChange(e.target.value)}
+        className="h-9 rounded-lg border border-white/10 bg-black/30 px-3 text-[12px] text-foreground outline-none transition-colors focus:border-white/25"
+      />
+    </label>
+  );
+});
+
+function countConsecutive(spins: Spin[], color: Spin["color"]): number {
+  let n = 0;
+  for (const s of spins) {
+    if (s.color === color) n += 1;
+    else break;
+  }
+  return n;
+}
+
+const StatusPill = memo(function StatusPill({
+  status,
+  message,
+}: {
+  status: "loading" | "live" | "error";
+  message: string;
+}) {
+  const cls =
+    status === "live"
+      ? "border-positive/25 bg-positive/10 text-positive"
+      : status === "error"
+        ? "border-destructive/30 bg-destructive/10 text-destructive"
+        : "border-white/10 bg-white/5 text-muted-foreground";
+  const label =
+    status === "live" ? "Análise em Tempo Real" : status === "error" ? "Sem conexão" : "Carregando…";
+  return (
+    <span
+      title={message}
+      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-medium ${cls}`}
+    >
+      {status === "error" ? <WifiOff className="h-3.5 w-3.5" /> : <Wifi className="h-3.5 w-3.5" />}
+      <span className="hidden sm:inline">{label}</span>
+    </span>
+  );
+});
+
+const ProgressMeter = memo(function ProgressMeter({
+  label,
+  count,
+  pct,
+  color,
+}: {
+  label: string;
+  count: number;
+  pct: number;
+  color: "red" | "black" | "primary";
+}) {
+  return (
+    <div>
+      <div className="mb-2 flex items-baseline justify-between">
+        <span className="text-xs font-medium text-muted-foreground">{label}</span>
+        <span className="text-xs tabular-nums text-foreground">
+          {count} <span className="text-muted-foreground">· {pct.toFixed(1)}%</span>
+        </span>
+      </div>
+      <ProgressBar value={pct} color={color} />
+    </div>
+  );
+});

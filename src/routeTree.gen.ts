@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SinaisRouteImport } from './routes/sinais'
 import { Route as EstrategiasRouteImport } from './routes/estrategias'
+import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiPublicRecentRouteImport } from './routes/api/public/recent'
 import { Route as ApiPublicCollectRouteImport } from './routes/api/public/collect'
@@ -23,6 +24,11 @@ const SinaisRoute = SinaisRouteImport.update({
 const EstrategiasRoute = EstrategiasRouteImport.update({
   id: '/estrategias',
   path: '/estrategias',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -43,6 +49,7 @@ const ApiPublicCollectRoute = ApiPublicCollectRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/app': typeof AppRoute
   '/estrategias': typeof EstrategiasRoute
   '/sinais': typeof SinaisRoute
   '/api/public/collect': typeof ApiPublicCollectRoute
@@ -50,6 +57,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/app': typeof AppRoute
   '/estrategias': typeof EstrategiasRoute
   '/sinais': typeof SinaisRoute
   '/api/public/collect': typeof ApiPublicCollectRoute
@@ -58,6 +66,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/app': typeof AppRoute
   '/estrategias': typeof EstrategiasRoute
   '/sinais': typeof SinaisRoute
   '/api/public/collect': typeof ApiPublicCollectRoute
@@ -67,6 +76,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/app'
     | '/estrategias'
     | '/sinais'
     | '/api/public/collect'
@@ -74,6 +84,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/app'
     | '/estrategias'
     | '/sinais'
     | '/api/public/collect'
@@ -81,6 +92,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/app'
     | '/estrategias'
     | '/sinais'
     | '/api/public/collect'
@@ -89,6 +101,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRoute
   EstrategiasRoute: typeof EstrategiasRoute
   SinaisRoute: typeof SinaisRoute
   ApiPublicCollectRoute: typeof ApiPublicCollectRoute
@@ -109,6 +122,13 @@ declare module '@tanstack/react-router' {
       path: '/estrategias'
       fullPath: '/estrategias'
       preLoaderRoute: typeof EstrategiasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -137,6 +157,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRoute,
   EstrategiasRoute: EstrategiasRoute,
   SinaisRoute: SinaisRoute,
   ApiPublicCollectRoute: ApiPublicCollectRoute,
@@ -145,13 +166,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
