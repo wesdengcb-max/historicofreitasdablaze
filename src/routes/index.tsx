@@ -100,7 +100,7 @@ function LandingPage() {
           transition={{ duration: 0.6 }}
           className="text-[11px] font-bold uppercase tracking-[0.35em] text-[#c9a84c]"
         >
-          Código da Elite
+          Freitas da Blaze
         </motion.p>
 
         <motion.div
@@ -141,7 +141,7 @@ function LandingPage() {
           transition={{ duration: 0.6, delay: 0.5 }}
           className="mt-6 max-w-md text-base text-white/70 sm:text-lg"
         >
-          A versão 2.0 do Código da Elite está no ar.
+          A versão 2.0 do Freitas da Blaze está no ar.
         </motion.p>
 
         <motion.div
