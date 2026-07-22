@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion } from "framer-motion";
 import { ArrowRight, BarChart3 } from "lucide-react";
 import { useMemo } from "react";
 
@@ -21,7 +20,7 @@ export const Route = createFileRoute("/")({
 function LandingPage() {
   const particles = useMemo(
     () =>
-      Array.from({ length: 40 }).map((_, i) => ({
+      Array.from({ length: 18 }).map((_, i) => ({
         id: i,
         left: Math.random() * 100,
         top: Math.random() * 100,
@@ -64,21 +63,16 @@ function LandingPage() {
 
       {/* Particles */}
       {particles.map((p) => (
-        <motion.span
+        <span
           key={p.id}
-          className={`absolute rounded-full ${p.color}`}
+          className={`absolute rounded-full ${p.color} animate-[floaty_var(--d)_ease-in-out_infinite]`}
           style={{
             left: `${p.left}%`,
             top: `${p.top}%`,
             width: p.size,
             height: p.size,
-          }}
-          animate={{ opacity: [0, 1, 0], y: [0, -20, 0] }}
-          transition={{
-            duration: p.duration,
-            repeat: Infinity,
-            delay: p.delay,
-            ease: "easeInOut",
+            animationDuration: `${p.duration}s`,
+            animationDelay: `${p.delay}s`,
           }}
         />
       ))}
@@ -86,6 +80,7 @@ function LandingPage() {
       {/* Top right icon */}
       <Link
         to="/app"
+        preload="intent"
         className="absolute right-6 top-6 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-[#c9a84c]/40 bg-black/40 text-[#c9a84c] backdrop-blur transition hover:border-[#c9a84c] hover:bg-[#c9a84c]/10"
         aria-label="Abrir painel"
       >
@@ -94,21 +89,11 @@ function LandingPage() {
 
       {/* Content */}
       <main className="relative z-10 flex min-h-screen flex-col items-center justify-center px-6 text-center">
-        <motion.p
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-[11px] font-bold uppercase tracking-[0.35em] text-[#c9a84c]"
-        >
+        <p className="text-[11px] font-bold uppercase tracking-[0.35em] text-[#c9a84c] animate-[fadeIn_0.6s_ease-out_both]">
           Freitas da Blaze
-        </motion.p>
+        </p>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.15 }}
-          className="mt-5 inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-400/5 px-4 py-1.5"
-        >
+        <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-400/5 px-4 py-1.5 animate-[fadeIn_0.6s_ease-out_0.15s_both]">
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
@@ -116,13 +101,10 @@ function LandingPage() {
           <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-emerald-300">
             No Ar
           </span>
-        </motion.div>
+        </div>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.25 }}
-          className="mt-8 text-[clamp(4rem,14vw,10rem)] font-black leading-none tracking-tight"
+        <h1
+          className="mt-8 text-[clamp(4rem,14vw,10rem)] font-black leading-none tracking-tight animate-[fadeUp_0.8s_ease-out_0.25s_both]"
           style={{
             background:
               "linear-gradient(180deg, #b6f4ff 0%, #6fe3f5 45%, #e6fbff 100%)",
@@ -133,25 +115,16 @@ function LandingPage() {
           }}
         >
           LIBERADO
-        </motion.h1>
+        </h1>
 
-        <motion.p
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          className="mt-6 max-w-md text-base text-white/70 sm:text-lg"
-        >
+        <p className="mt-6 max-w-md text-base text-white/70 sm:text-lg animate-[fadeUp_0.6s_ease-out_0.5s_both]">
           A versão 2.0 do Freitas da Blaze está no ar.
-        </motion.p>
+        </p>
 
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.7 }}
-          className="mt-10"
-        >
+        <div className="mt-10 animate-[fadeUp_0.6s_ease-out_0.7s_both]">
           <Link
             to="/app"
+            preload="intent"
             className="group relative inline-flex items-center gap-3 rounded-full px-9 py-4 text-base font-semibold text-black transition-transform hover:scale-[1.03] active:scale-[0.98]"
             style={{
               background:
@@ -163,7 +136,7 @@ function LandingPage() {
             <span>Entrar no sistema</span>
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </Link>
-        </motion.div>
+        </div>
       </main>
     </div>
   );
