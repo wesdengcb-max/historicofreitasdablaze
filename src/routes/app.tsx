@@ -1,8 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
-import { lazy, memo, Suspense, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { lazy, memo, Suspense, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import {
   Activity,
   Bell,
@@ -427,7 +426,10 @@ function Index() {
     return () => clearTimeout(t);
   }, [spins, whiteAlert]);
 
-  const visibleSpins = useMemo(() => dedupeById(spins), [spins]);
+  // spins já é dedup no setter (loadInitial/loadMore/poll/realtime), evita O(n) por render.
+  const visibleSpins = spins;
+  // Rendering de listas longas é deferrable para manter cliques/toggles responsivos.
+  const deferredSpins = useDeferredValue(visibleSpins);
 
   // Stats
   const total = visibleSpins.length;
@@ -470,7 +472,7 @@ function Index() {
       hour12: false,
     });
     const rowMap = new Map<string, GridRow>();
-    for (const s of visibleSpins) {
+    for (const s of deferredSpins) {
       const raw = (s.createdAt ?? "").trim();
       if (!raw) continue;
       const hasTz = /Z$|[+-]\d{2}:?\d{2}$/.test(raw);
@@ -535,8 +537,21 @@ function Index() {
         }
       }
     }
-    return Array.from(rowMap.values()).sort((a, b) => b.order - a.order);
-  }, [visibleSpins, storedSignals, futureSlots]);
+    // Pré-ordena cada célula por tempo (antes era feito por célula em cada render).
+    const rows = Array.from(rowMap.values());
+    for (const row of rows) {
+      for (const cell of row.cells) {
+        if (cell.length > 1) {
+          cell.sort((a, b) => {
+            const at = new Date(a.createdAt ?? "").getTime();
+            const bt = new Date(b.createdAt ?? "").getTime();
+            return (Number.isFinite(at) ? at : 0) - (Number.isFinite(bt) ? bt : 0);
+          });
+        }
+      }
+    }
+    return rows.sort((a, b) => b.order - a.order);
+  }, [deferredSpins, storedSignals, futureSlots]);
 
 
   const applyCustom = () => setAppliedTick((v) => v + 1);
@@ -742,15 +757,13 @@ function Index() {
                     Último número
                   </p>
                   <div className="mt-2 flex justify-end">
-                    <AnimatePresence mode="popLayout">
-                      {last ? (
-                        <motion.div key={last.id}>
-                          <ResultCircle color={last.color} n={last.n} size="md" glow />
-                        </motion.div>
-                      ) : (
-                        <div className="h-9 w-9 rounded-full border border-dashed border-white/10 sm:h-10 sm:w-10" />
-                      )}
-                    </AnimatePresence>
+                    {last ? (
+                      <div key={last.id} className="animate-in fade-in zoom-in-95 duration-200">
+                        <ResultCircle color={last.color} n={last.n} size="md" glow />
+                      </div>
+                    ) : (
+                      <div className="h-9 w-9 rounded-full border border-dashed border-white/10 sm:h-10 sm:w-10" />
+                    )}
                   </div>
                 </div>
               </div>
@@ -969,16 +982,12 @@ function Index() {
                                   {badge?.label ?? "·"}
                                 </span>
                                 <div className="flex items-start justify-center gap-0.5">
-                                  {(() => {
-                                    const orderedCell = [...cell].sort((a, b) => {
-                                      const aTime = new Date(a.createdAt ?? "").getTime();
-                                      const bTime = new Date(b.createdAt ?? "").getTime();
-                                      return (Number.isFinite(aTime) ? aTime : 0) - (Number.isFinite(bTime) ? bTime : 0);
-                                    });
-                                    const slots: (Spin | undefined)[] = orderedCell.slice(0, 2);
-                                    while (slots.length < 2) slots.push(undefined);
-                                    return slots;
-                                  })().map((spin, i) => {
+                                  {(cell.length >= 2
+                                    ? [cell[0], cell[1]]
+                                    : cell.length === 1
+                                      ? [cell[0], undefined]
+                                      : [undefined, undefined]
+                                  ).map((spin, i) => {
                                     if (spin) {
                                       return (
                                         <TipMinerCard
@@ -1126,18 +1135,20 @@ const TipMinerCard = memo(function TipMinerCard({
   const isActive = highlightN === null || highlightN === spin.n;
   const isHit = highlightN !== null && highlightN === spin.n;
 
+  const delayStyle = delay > 0 ? { animationDelay: `${delay}s` } : undefined;
   return (
     <div className="flex flex-col items-center gap-1">
-      <motion.button
+      <button
         type="button"
         onClick={onClick}
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: isActive ? 1 : 0.25 }}
-        transition={{ duration: 0.22, delay, ease: [0.22, 1, 0.36, 1] }}
-        className={`flex h-[var(--stone-size,44px)] w-[var(--stone-size,44px)] items-center justify-center overflow-hidden rounded-md shadow-sm transition-transform duration-200 hover:-translate-y-0.5 ${
+        className={`flex h-[var(--stone-size,44px)] w-[var(--stone-size,44px)] items-center justify-center overflow-hidden rounded-md shadow-sm transition-[transform,opacity] duration-200 hover:-translate-y-0.5 animate-in fade-in zoom-in-95 ${
           isHit ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : ""
         }`}
-        style={{ background: isWhite ? "#ffffff" : bg }}
+        style={{
+          background: isWhite ? "#ffffff" : bg,
+          opacity: isActive ? 1 : 0.25,
+          ...(delayStyle ?? {}),
+        }}
       >
         {isWhite ? (
           <img
@@ -1154,7 +1165,7 @@ const TipMinerCard = memo(function TipMinerCard({
             {spin.n}
           </div>
         )}
-      </motion.button>
+      </button>
 
       {showTime && (
         <span className="text-[12px] leading-none tabular-nums text-muted-foreground">
