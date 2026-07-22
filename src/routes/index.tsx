@@ -53,7 +53,7 @@ export const Route = createFileRoute("/")({
           "Freitas da Blaze: análise do histórico da Blaze em tempo real, sequências, frequência e alerta de branco.",
       },
       { property: "og:title", content: "Freitas da Blaze — Análise do Histórico da Blaze" },
-      { property: "og:description", content: "Análise do histórico da Blaze em tempo real." },
+      { property: "og:description", content: "Freitas da Blaze: análise do histórico da Blaze em tempo real, sequências, frequência e alerta de branco." },
     ],
   }),
   component: Index,
