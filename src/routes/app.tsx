@@ -607,11 +607,11 @@ function Index() {
       <TopNav />
 
       {section === "sinais" ? (
-        <SinaisPage />
+        <Suspense fallback={<SectionFallback />}><SinaisPage /></Suspense>
       ) : section === "analise" ? (
-        <AnaliseSection />
+        <Suspense fallback={<SectionFallback />}><AnaliseSection /></Suspense>
       ) : section === "estrategias" ? (
-        <EstrategiasSection />
+        <Suspense fallback={<SectionFallback />}><EstrategiasSection /></Suspense>
       ) : section !== "dashboard" ? (
         <main className="mx-auto flex w-full max-w-[1366px] flex-col gap-5 px-3 py-10 sm:gap-6 sm:px-8 sm:py-16">
           <Card delay={0.05}>
