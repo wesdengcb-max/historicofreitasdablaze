@@ -757,15 +757,13 @@ function Index() {
                     Último número
                   </p>
                   <div className="mt-2 flex justify-end">
-                    <AnimatePresence mode="popLayout">
-                      {last ? (
-                        <motion.div key={last.id}>
-                          <ResultCircle color={last.color} n={last.n} size="md" glow />
-                        </motion.div>
-                      ) : (
-                        <div className="h-9 w-9 rounded-full border border-dashed border-white/10 sm:h-10 sm:w-10" />
-                      )}
-                    </AnimatePresence>
+                    {last ? (
+                      <div key={last.id} className="animate-in fade-in zoom-in-95 duration-200">
+                        <ResultCircle color={last.color} n={last.n} size="md" glow />
+                      </div>
+                    ) : (
+                      <div className="h-9 w-9 rounded-full border border-dashed border-white/10 sm:h-10 sm:w-10" />
+                    )}
                   </div>
                 </div>
               </div>
@@ -1137,18 +1135,20 @@ const TipMinerCard = memo(function TipMinerCard({
   const isActive = highlightN === null || highlightN === spin.n;
   const isHit = highlightN !== null && highlightN === spin.n;
 
+  const delayStyle = delay > 0 ? { animationDelay: `${delay}s` } : undefined;
   return (
     <div className="flex flex-col items-center gap-1">
-      <motion.button
+      <button
         type="button"
         onClick={onClick}
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: isActive ? 1 : 0.25 }}
-        transition={{ duration: 0.22, delay, ease: [0.22, 1, 0.36, 1] }}
-        className={`flex h-[var(--stone-size,44px)] w-[var(--stone-size,44px)] items-center justify-center overflow-hidden rounded-md shadow-sm transition-transform duration-200 hover:-translate-y-0.5 ${
+        className={`flex h-[var(--stone-size,44px)] w-[var(--stone-size,44px)] items-center justify-center overflow-hidden rounded-md shadow-sm transition-[transform,opacity] duration-200 hover:-translate-y-0.5 animate-in fade-in zoom-in-95 ${
           isHit ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : ""
         }`}
-        style={{ background: isWhite ? "#ffffff" : bg }}
+        style={{
+          background: isWhite ? "#ffffff" : bg,
+          opacity: isActive ? 1 : 0.25,
+          ...(delayStyle ?? {}),
+        }}
       >
         {isWhite ? (
           <img
@@ -1165,7 +1165,7 @@ const TipMinerCard = memo(function TipMinerCard({
             {spin.n}
           </div>
         )}
-      </motion.button>
+      </button>
 
       {showTime && (
         <span className="text-[12px] leading-none tabular-nums text-muted-foreground">
