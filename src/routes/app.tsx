@@ -189,7 +189,7 @@ function Index() {
   const [whiteAlert, setWhiteAlert] = useState(true);
   const [fullscreen, setFullscreen] = useState(false);
   const [futureSlots, setFutureSlots] = useState<0 | 10 | 20 | 30>(0);
-  const [highlightN, setHighlightN] = useState<number | null>(null);
+  const [highlightN, setHighlightN] = useState<Set<number>>(() => new Set());
   const [slotPredictions, setSlotPredictions] = useState<Record<string, "white" | "red" | "black">>({});
   const cycleSlotPrediction = (key: string) =>
     setSlotPredictions((prev) => {
@@ -995,7 +995,13 @@ function Index() {
                                           spin={spin as Spin}
                                           highlightN={highlightN}
                                           onClick={() =>
-                                            setHighlightN((h) => (h === (spin as Spin).n ? null : (spin as Spin).n))
+                                            setHighlightN((h) => {
+                                              const next = new Set(h);
+                                              const n = (spin as Spin).n;
+                                              if (next.has(n)) next.delete(n);
+                                              else next.add(n);
+                                              return next;
+                                            })
                                           }
                                         />
                                       );
@@ -1061,7 +1067,12 @@ function Index() {
                               delay={i < 20 ? i * 0.015 : 0}
                               highlightN={highlightN}
                               onClick={() =>
-                                setHighlightN((h) => (h === spin.n ? null : spin.n))
+                                setHighlightN((h) => {
+                                  const next = new Set(h);
+                                  if (next.has(spin.n)) next.delete(spin.n);
+                                  else next.add(spin.n);
+                                  return next;
+                                })
                               }
                             />
 
@@ -1114,13 +1125,13 @@ const TipMinerCard = memo(function TipMinerCard({
   spin,
   delay = 0,
   showTime = true,
-  highlightN = null,
+  highlightN,
   onClick,
 }: {
   spin: Spin;
   delay?: number;
   showTime?: boolean;
-  highlightN?: number | null;
+  highlightN?: Set<number> | null;
   onClick?: () => void;
 }) {
   const isWhite = spin.color === "white";
@@ -1132,8 +1143,9 @@ const TipMinerCard = memo(function TipMinerCard({
         : "#ffffff";
   const ring = isWhite ? "#16171d" : "#ffffff";
   const fg = isWhite ? "#16171d" : "#ffffff";
-  const isActive = highlightN === null || highlightN === spin.n;
-  const isHit = highlightN !== null && highlightN === spin.n;
+  const hasSelection = !!highlightN && highlightN.size > 0;
+  const isHit = !!highlightN && highlightN.has(spin.n);
+  const isActive = !hasSelection || isHit;
 
   const delayStyle = delay > 0 ? { animationDelay: `${delay}s` } : undefined;
   return (
