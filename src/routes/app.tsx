@@ -1,8 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
-import { lazy, memo, Suspense, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { lazy, memo, Suspense, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import {
   Activity,
   Bell,
@@ -427,7 +426,10 @@ function Index() {
     return () => clearTimeout(t);
   }, [spins, whiteAlert]);
 
-  const visibleSpins = useMemo(() => dedupeById(spins), [spins]);
+  // spins já é dedup no setter (loadInitial/loadMore/poll/realtime), evita O(n) por render.
+  const visibleSpins = spins;
+  // Rendering de listas longas é deferrable para manter cliques/toggles responsivos.
+  const deferredSpins = useDeferredValue(visibleSpins);
 
   // Stats
   const total = visibleSpins.length;
@@ -470,7 +472,7 @@ function Index() {
       hour12: false,
     });
     const rowMap = new Map<string, GridRow>();
-    for (const s of visibleSpins) {
+    for (const s of deferredSpins) {
       const raw = (s.createdAt ?? "").trim();
       if (!raw) continue;
       const hasTz = /Z$|[+-]\d{2}:?\d{2}$/.test(raw);
@@ -535,8 +537,21 @@ function Index() {
         }
       }
     }
-    return Array.from(rowMap.values()).sort((a, b) => b.order - a.order);
-  }, [visibleSpins, storedSignals, futureSlots]);
+    // Pré-ordena cada célula por tempo (antes era feito por célula em cada render).
+    const rows = Array.from(rowMap.values());
+    for (const row of rows) {
+      for (const cell of row.cells) {
+        if (cell.length > 1) {
+          cell.sort((a, b) => {
+            const at = new Date(a.createdAt ?? "").getTime();
+            const bt = new Date(b.createdAt ?? "").getTime();
+            return (Number.isFinite(at) ? at : 0) - (Number.isFinite(bt) ? bt : 0);
+          });
+        }
+      }
+    }
+    return rows.sort((a, b) => b.order - a.order);
+  }, [deferredSpins, storedSignals, futureSlots]);
 
 
   const applyCustom = () => setAppliedTick((v) => v + 1);
@@ -969,16 +984,12 @@ function Index() {
                                   {badge?.label ?? "·"}
                                 </span>
                                 <div className="flex items-start justify-center gap-0.5">
-                                  {(() => {
-                                    const orderedCell = [...cell].sort((a, b) => {
-                                      const aTime = new Date(a.createdAt ?? "").getTime();
-                                      const bTime = new Date(b.createdAt ?? "").getTime();
-                                      return (Number.isFinite(aTime) ? aTime : 0) - (Number.isFinite(bTime) ? bTime : 0);
-                                    });
-                                    const slots: (Spin | undefined)[] = orderedCell.slice(0, 2);
-                                    while (slots.length < 2) slots.push(undefined);
-                                    return slots;
-                                  })().map((spin, i) => {
+                                  {(cell.length >= 2
+                                    ? [cell[0], cell[1]]
+                                    : cell.length === 1
+                                      ? [cell[0], undefined]
+                                      : [undefined, undefined]
+                                  ).map((spin, i) => {
                                     if (spin) {
                                       return (
                                         <TipMinerCard
