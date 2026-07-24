@@ -605,13 +605,13 @@ function Index() {
             </div>
           </div>
 
-          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
             <StatusPill status={status} message={errorMsg} />
             <ThemeToggle />
             <button
               type="button"
               onClick={() => setWhiteAlert((v) => !v)}
-              className="hidden h-11 w-11 place-items-center rounded-xl border border-white/5 bg-white/5 text-muted-foreground transition-colors duration-200 hover:bg-white/[0.08] hover:text-foreground sm:grid"
+              className="grid h-9 w-9 place-items-center rounded-xl border border-white/5 bg-white/5 text-muted-foreground transition-colors duration-200 hover:bg-white/[0.08] hover:text-foreground sm:h-11 sm:w-11"
               aria-label="Notificar branco"
               title={whiteAlert ? "Alerta de branco: ligado" : "Alerta de branco: desligado"}
             >
@@ -620,7 +620,7 @@ function Index() {
             <button
               type="button"
               onClick={() => setStatsOpen((v) => !v)}
-              className="hidden h-11 w-11 place-items-center rounded-xl border border-white/5 bg-white/5 text-muted-foreground transition-colors duration-200 hover:bg-white/[0.08] hover:text-foreground sm:grid"
+              className="grid h-9 w-9 place-items-center rounded-xl border border-white/5 bg-white/5 text-muted-foreground transition-colors duration-200 hover:bg-white/[0.08] hover:text-foreground sm:h-11 sm:w-11"
               aria-label="Abrir estatísticas"
             >
               <BarChart3 className="h-4 w-4" />
@@ -630,7 +630,7 @@ function Index() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Abrir Telegram"
-              className="hidden h-11 w-11 place-items-center rounded-xl text-white transition-transform duration-200 hover:scale-105 sm:grid"
+              className="grid h-9 w-9 place-items-center rounded-xl text-white transition-transform duration-200 hover:scale-105 sm:h-11 sm:w-11"
               style={{ background: "linear-gradient(135deg, #29b6f6, #0288d1)" }}
             >
               <Send className="h-4 w-4 -translate-x-[1px] translate-y-[1px] fill-white" />
