@@ -40,9 +40,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 
 const mainItems = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard },
-  { title: "Apostas", url: "/apostas", icon: DollarSign },
-  { title: "Feed", url: "/feed", icon: Flame, badge: "AO VIVO", badgeClass: "bg-amber-500 text-black" },
+  { title: "Histórico", url: "/", icon: LayoutDashboard },
   { title: "Sinais", url: "/sinais", icon: Radio },
   { title: "Estratégias", url: "/estrategias", icon: Network },
   { title: "Vídeos", url: "/videos", icon: PlayCircle },
