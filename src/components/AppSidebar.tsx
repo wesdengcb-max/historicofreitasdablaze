@@ -15,7 +15,7 @@ import {
   KeyRound,
   Trash2,
 } from "lucide-react";
-import brancoVip from "@/assets/branco-vip.png.asset.json";
+import freitasLogo from "@/assets/freitas-logo.jpg.asset.json";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -63,7 +63,7 @@ export function AppSidebar() {
             className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-xl bg-white ring-1 ring-white/40"
             style={{ boxShadow: "var(--shadow-glow)" }}
           >
-            <img src={brancoVip.url} alt="Freitas Blaze" className="h-full w-full object-cover" />
+            <img src={freitasLogo.url} alt="Freitas Blaze" className="h-full w-full object-cover" />
           </div>
           <div className="flex-1 min-w-0 leading-tight group-data-[collapsible=icon]:hidden">
             <p className="truncate text-sm font-semibold tracking-tight">Freitas da Blaze</p>
