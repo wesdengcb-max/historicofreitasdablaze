@@ -18,6 +18,8 @@ import {
   X,
   Clock,
   ChevronDown,
+  BarChart3,
+  Send,
 } from "lucide-react";
 
 import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
@@ -27,6 +29,7 @@ import { Switch } from "@/components/double/Switch";
 import { WhiteAlert } from "@/components/double/WhiteAlert";
 import { ProgressBar } from "@/components/double/ProgressBar";
 import { StrategyTabs } from "@/components/double/StrategyTabs";
+import { LeftStatsDrawer } from "@/components/double/LeftStatsDrawer";
 
 
 import { colorOf, fmtTime, type Spin } from "@/components/double/types";
@@ -209,6 +212,7 @@ function Index() {
   const [status, setStatus] = useState<"loading" | "live" | "error">("loading");
   const [errorMsg, setErrorMsg] = useState("");
   const [whiteFlash, setWhiteFlash] = useState<Spin | null>(null);
+  const [statsOpen, setStatsOpen] = useState(false);
   const [countdown, setCountdown] = useState(15);
 
   // Filtros
@@ -1118,6 +1122,34 @@ function Index() {
 
 
       <WhiteAlert spin={whiteFlash} onClose={() => setWhiteFlash(null)} />
+
+      <LeftStatsDrawer
+        open={statsOpen}
+        onClose={() => setStatsOpen(false)}
+        spins={visibleSpins}
+      />
+
+      {/* Botões flutuantes à esquerda */}
+      <div className="fixed left-3 top-1/2 z-30 flex -translate-y-1/2 flex-col gap-3 sm:left-5">
+        <button
+          type="button"
+          onClick={() => setStatsOpen((v) => !v)}
+          aria-label="Abrir estatísticas"
+          className="group grid h-12 w-12 place-items-center rounded-full border border-white/10 bg-background/80 text-foreground shadow-lg backdrop-blur transition-all hover:scale-105 hover:bg-white/[0.08] sm:h-14 sm:w-14"
+        >
+          <BarChart3 className="h-5 w-5 sm:h-6 sm:w-6" />
+        </button>
+        <a
+          href="https://t.me/freitaswhite"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Abrir Telegram"
+          className="grid h-12 w-12 place-items-center rounded-full shadow-lg transition-all hover:scale-105 sm:h-14 sm:w-14"
+          style={{ background: "linear-gradient(135deg, #29b6f6, #0288d1)" }}
+        >
+          <Send className="h-5 w-5 -translate-x-[1px] translate-y-[1px] fill-white text-white sm:h-6 sm:w-6" />
+        </a>
+      </div>
     </div>
   );
 }
