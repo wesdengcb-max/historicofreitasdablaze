@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import brancoAsset from "@/assets/branco-vip.png.asset.json";
 import { colorOf, type Color } from "./types";
 
@@ -183,17 +183,16 @@ function TileView({ tile, centered }: { tile: Tile; centered?: boolean }) {
 }
 
 function PreviousResults({ results }: { results: Result[] }) {
-  const last20 = useMemo(() => results.slice(0, 20), [results]);
   return (
     <div className="mt-5">
       <div className="text-[10px] tracking-[0.22em] text-muted-foreground font-mono mb-2">
         GIROS ANTERIORES
       </div>
-      <div className="flex flex-wrap items-center gap-1.5">
-        {last20.map((r) => (
+      <div className="flex flex-row-reverse flex-wrap-reverse items-center justify-end gap-1.5">
+        {results.map((r) => (
           <SmallTile key={r.id} n={r.roll} color={r.color} />
         ))}
-        {last20.length === 0 && (
+        {results.length === 0 && (
           <div className="text-xs text-muted-foreground">Aguardando resultados…</div>
         )}
       </div>
