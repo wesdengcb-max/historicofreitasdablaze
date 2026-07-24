@@ -32,6 +32,7 @@ import { StrategyTabs } from "@/components/double/StrategyTabs";
 import { colorOf, fmtTime, type Spin } from "@/components/double/types";
 import brancoVip from "@/assets/branco-vip.png.asset.json";
 import brancoTile from "@/assets/branco-tile.png.asset.json";
+import freitasLogo from "@/assets/freitas-logo.jpg.asset.json";
 
 import { getSignals, subscribeSignals, type StoredSignal } from "@/lib/signalsStore";
 import { TopNav } from "@/components/TopNav";
@@ -590,7 +591,7 @@ function Index() {
               className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-xl bg-white ring-1 ring-white/40"
               style={{ boxShadow: "var(--shadow-glow)" }}
             >
-              <img src={brancoVip.url} alt="Branco" className="h-full w-full object-cover" />
+              <img src={freitasLogo.url} alt="Freitas Blaze" className="h-full w-full object-cover" />
             </div>
             <div className="min-w-0 leading-tight">
               <p className="truncate text-sm font-semibold tracking-tight">Freitas da Blaze</p>
