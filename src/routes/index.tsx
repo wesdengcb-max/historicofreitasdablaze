@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, BarChart3 } from "lucide-react";
 import { useMemo } from "react";
+import kingImg from "@/assets/freitas-king.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -45,7 +46,7 @@ function LandingPage() {
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 80% 60% at 50% 45%, rgba(34,211,238,0.10), transparent 60%), radial-gradient(ellipse 60% 50% at 50% 100%, rgba(201,168,76,0.08), transparent 70%)",
+            "radial-gradient(ellipse 70% 55% at 50% 40%, rgba(229,57,53,0.20), transparent 65%), radial-gradient(ellipse 60% 50% at 50% 100%, rgba(201,168,76,0.10), transparent 70%)",
         }}
       />
       {/* Grid overlay */}
@@ -103,34 +104,95 @@ function LandingPage() {
           </span>
         </div>
 
+        {/* Hero image — o Rei da Blaze */}
+        <div className="relative mt-8 flex h-[240px] w-[240px] items-center justify-center sm:h-[300px] sm:w-[300px] md:h-[340px] md:w-[340px]">
+          {/* red glow halo */}
+          <span
+            aria-hidden
+            className="pointer-events-none absolute left-1/2 top-1/2 h-[120%] w-[120%] rounded-full"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(229,57,53,0.55) 0%, rgba(229,57,53,0.25) 35%, transparent 70%)",
+              filter: "blur(24px)",
+              animation: "kingGlow 4.5s ease-in-out infinite",
+            }}
+          />
+          {/* rotating ring */}
+          <span
+            aria-hidden
+            className="pointer-events-none absolute left-1/2 top-1/2 h-[108%] w-[108%] rounded-full"
+            style={{
+              border: "1px solid rgba(229,57,53,0.35)",
+              boxShadow:
+                "inset 0 0 30px rgba(229,57,53,0.25), 0 0 30px rgba(229,57,53,0.25)",
+              animation: "ringSpin 22s linear infinite",
+            }}
+          />
+          {/* floating portrait */}
+          <div
+            className="relative h-full w-full overflow-hidden rounded-full ring-1 ring-red-500/40 animate-[fadeUp_0.9s_ease-out_0.3s_both]"
+            style={{
+              boxShadow:
+                "0 30px 80px -20px rgba(229,57,53,0.6), inset 0 0 40px rgba(0,0,0,0.6)",
+            }}
+          >
+            <img
+              src={kingImg.url}
+              alt="Freitas da Blaze"
+              draggable={false}
+              className="h-full w-full select-none object-cover"
+              style={{ animation: "kingFloat 6s ease-in-out infinite" }}
+            />
+            {/* diagonal light sweep */}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-y-0 left-0 w-1/3"
+              style={{
+                background:
+                  "linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent)",
+                animation: "sweep 5.5s ease-in-out infinite",
+              }}
+            />
+            {/* inner vignette to blend with page */}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-0 rounded-full"
+              style={{
+                background:
+                  "radial-gradient(circle at 50% 50%, transparent 55%, rgba(0,0,0,0.55) 100%)",
+              }}
+            />
+          </div>
+        </div>
+
         <h1
-          className="mt-8 text-[clamp(4rem,14vw,10rem)] font-black leading-none tracking-tight animate-[fadeUp_0.8s_ease-out_0.25s_both]"
+          className="mt-8 text-[clamp(3.5rem,12vw,8.5rem)] font-black leading-none tracking-tight animate-[fadeUp_0.8s_ease-out_0.35s_both]"
           style={{
             background:
-              "linear-gradient(180deg, #b6f4ff 0%, #6fe3f5 45%, #e6fbff 100%)",
+              "linear-gradient(180deg, #ffd6d6 0%, #ff5b5b 45%, #ffffff 100%)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             filter:
-              "drop-shadow(0 0 30px rgba(103,232,249,0.45)) drop-shadow(0 0 80px rgba(34,211,238,0.35))",
+              "drop-shadow(0 0 30px rgba(229,57,53,0.55)) drop-shadow(0 0 80px rgba(229,57,53,0.35))",
           }}
         >
           LIBERADO
         </h1>
 
-        <p className="mt-6 max-w-md text-base text-white/70 sm:text-lg animate-[fadeUp_0.6s_ease-out_0.5s_both]">
+        <p className="mt-6 max-w-md text-base text-white/70 sm:text-lg animate-[fadeUp_0.6s_ease-out_0.55s_both]">
           A versão 2.0 do Freitas da Blaze está no ar.
         </p>
 
-        <div className="mt-10 animate-[fadeUp_0.6s_ease-out_0.7s_both]">
+        <div className="mt-10 animate-[fadeUp_0.6s_ease-out_0.75s_both]">
           <Link
             to="/app"
             preload="intent"
             className="group relative inline-flex items-center gap-3 rounded-full px-9 py-4 text-base font-semibold text-black transition-transform hover:scale-[1.03] active:scale-[0.98]"
             style={{
               background:
-                "linear-gradient(180deg, #a5f3fc 0%, #67e8f9 100%)",
+                "linear-gradient(180deg, #ffb0b0 0%, #ff4d4d 100%)",
               boxShadow:
-                "0 0 40px rgba(103,232,249,0.55), 0 0 90px rgba(34,211,238,0.35), inset 0 1px 0 rgba(255,255,255,0.7)",
+                "0 0 40px rgba(229,57,53,0.55), 0 0 90px rgba(229,57,53,0.35), inset 0 1px 0 rgba(255,255,255,0.55)",
             }}
           >
             <span>Entrar no sistema</span>
