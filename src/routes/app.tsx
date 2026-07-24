@@ -605,13 +605,13 @@ function Index() {
             </div>
           </div>
 
-          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
             <StatusPill status={status} message={errorMsg} />
             <ThemeToggle />
             <button
               type="button"
               onClick={() => setWhiteAlert((v) => !v)}
-              className="hidden h-11 w-11 place-items-center rounded-xl border border-white/5 bg-white/5 text-muted-foreground transition-colors duration-200 hover:bg-white/[0.08] hover:text-foreground sm:grid"
+              className="grid h-9 w-9 place-items-center rounded-xl border border-white/5 bg-white/5 text-muted-foreground transition-colors duration-200 hover:bg-white/[0.08] hover:text-foreground sm:h-11 sm:w-11"
               aria-label="Notificar branco"
               title={whiteAlert ? "Alerta de branco: ligado" : "Alerta de branco: desligado"}
             >
@@ -620,7 +620,7 @@ function Index() {
             <button
               type="button"
               onClick={() => setStatsOpen((v) => !v)}
-              className="hidden h-11 w-11 place-items-center rounded-xl border border-white/5 bg-white/5 text-muted-foreground transition-colors duration-200 hover:bg-white/[0.08] hover:text-foreground sm:grid"
+              className="grid h-9 w-9 place-items-center rounded-xl border border-white/5 bg-white/5 text-muted-foreground transition-colors duration-200 hover:bg-white/[0.08] hover:text-foreground sm:h-11 sm:w-11"
               aria-label="Abrir estatísticas"
             >
               <BarChart3 className="h-4 w-4" />
@@ -630,7 +630,7 @@ function Index() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Abrir Telegram"
-              className="hidden h-11 w-11 place-items-center rounded-xl text-white transition-transform duration-200 hover:scale-105 sm:grid"
+              className="grid h-9 w-9 place-items-center rounded-xl text-white transition-transform duration-200 hover:scale-105 sm:h-11 sm:w-11"
               style={{ background: "linear-gradient(135deg, #29b6f6, #0288d1)" }}
             >
               <Send className="h-4 w-4 -translate-x-[1px] translate-y-[1px] fill-white" />
@@ -1143,28 +1143,6 @@ function Index() {
         onClose={() => setStatsOpen(false)}
         spins={visibleSpins}
       />
-
-      {/* Botões flutuantes no topo esquerdo */}
-      <div className="fixed left-3 top-3 z-30 flex flex-row gap-2 sm:hidden">
-        <button
-          type="button"
-          onClick={() => setStatsOpen((v) => !v)}
-          aria-label="Abrir estatísticas"
-          className="grid h-9 w-9 place-items-center rounded-full border border-white/10 bg-background/80 text-foreground shadow-lg backdrop-blur transition-all hover:scale-105 hover:bg-white/[0.08]"
-        >
-          <BarChart3 className="h-4 w-4" />
-        </button>
-        <a
-          href="https://t.me/freitaswhite"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Abrir Telegram"
-          className="grid h-9 w-9 place-items-center rounded-full shadow-lg transition-all hover:scale-105"
-          style={{ background: "linear-gradient(135deg, #29b6f6, #0288d1)" }}
-        >
-          <Send className="h-4 w-4 -translate-x-[1px] translate-y-[1px] fill-white text-white" />
-        </a>
-      </div>
     </div>
   );
 }
