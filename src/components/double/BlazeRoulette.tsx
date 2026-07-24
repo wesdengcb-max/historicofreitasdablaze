@@ -188,8 +188,8 @@ function PreviousResults({ results }: { results: Result[] }) {
       <div className="text-[10px] tracking-[0.22em] text-muted-foreground font-mono mb-2">
         GIROS ANTERIORES
       </div>
-      <div className="flex flex-row-reverse flex-wrap-reverse items-center justify-end gap-1.5">
-        {results.map((r) => (
+      <div className="flex flex-row-reverse items-center justify-end gap-1.5 overflow-hidden">
+        {results.slice(0, 20).map((r) => (
           <SmallTile key={r.id} n={r.roll} color={r.color} />
         ))}
         {results.length === 0 && (
