@@ -1,14 +1,12 @@
 import { useState } from "react";
-import { Sparkles, ShieldCheck, Megaphone, Dice5, ChevronDown } from "lucide-react";
-import { SignalGenerator } from "./SignalGenerator";
+import { ShieldCheck, Megaphone, Dice5, ChevronDown } from "lucide-react";
 import { PatternValidator } from "./PatternValidator";
 import { PatternNotifier } from "./PatternNotifier";
 import type { Spin } from "./types";
 
-type TabId = "signal" | "notifier" | "validator" | "simulator";
+type TabId = "notifier" | "validator" | "simulator";
 
 const TABS: { id: TabId; label: string; icon: React.ComponentType<{ className?: string }>; soon?: boolean }[] = [
-  { id: "signal", label: "Gerador de sinal", icon: Sparkles },
   { id: "notifier", label: "Notificador", icon: Megaphone },
   { id: "validator", label: "Validador de padrão", icon: ShieldCheck },
   { id: "simulator", label: "Simulador", icon: Dice5, soon: true },
@@ -65,7 +63,6 @@ export function StrategyTabs({ spins }: { spins: Spin[] }) {
           >
             <ChevronDown className="h-4 w-4" />
           </button>
-          {tab === "signal" && <SignalGenerator spins={spins} />}
           {tab === "notifier" && <PatternNotifier spins={spins} />}
           {tab === "validator" && <PatternValidator spins={spins} />}
         </div>
