@@ -212,6 +212,7 @@ function Index() {
   const [status, setStatus] = useState<"loading" | "live" | "error">("loading");
   const [errorMsg, setErrorMsg] = useState("");
   const [whiteFlash, setWhiteFlash] = useState<Spin | null>(null);
+  const [statsOpen, setStatsOpen] = useState(false);
   const [countdown, setCountdown] = useState(15);
 
   // Filtros
