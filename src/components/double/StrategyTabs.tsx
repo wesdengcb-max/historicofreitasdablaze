@@ -63,7 +63,6 @@ export function StrategyTabs({ spins }: { spins: Spin[] }) {
           >
             <ChevronDown className="h-4 w-4" />
           </button>
-          {tab === "signal" && <SignalGenerator spins={spins} />}
           {tab === "notifier" && <PatternNotifier spins={spins} />}
           {tab === "validator" && <PatternValidator spins={spins} />}
         </div>
