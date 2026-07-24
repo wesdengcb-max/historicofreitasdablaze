@@ -1129,25 +1129,25 @@ function Index() {
         spins={visibleSpins}
       />
 
-      {/* Botões flutuantes à esquerda */}
-      <div className="fixed left-3 top-1/2 z-30 flex -translate-y-1/2 flex-col gap-3 sm:left-5">
+      {/* Botões flutuantes no topo esquerdo */}
+      <div className="fixed left-3 top-3 z-30 flex flex-row gap-2 sm:left-4 sm:top-4">
         <button
           type="button"
           onClick={() => setStatsOpen((v) => !v)}
           aria-label="Abrir estatísticas"
-          className="group grid h-12 w-12 place-items-center rounded-full border border-white/10 bg-background/80 text-foreground shadow-lg backdrop-blur transition-all hover:scale-105 hover:bg-white/[0.08] sm:h-14 sm:w-14"
+          className="grid h-9 w-9 place-items-center rounded-full border border-white/10 bg-background/80 text-foreground shadow-lg backdrop-blur transition-all hover:scale-105 hover:bg-white/[0.08] sm:h-10 sm:w-10"
         >
-          <BarChart3 className="h-5 w-5 sm:h-6 sm:w-6" />
+          <BarChart3 className="h-4 w-4 sm:h-[18px] sm:w-[18px]" />
         </button>
         <a
           href="https://t.me/freitaswhite"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Abrir Telegram"
-          className="grid h-12 w-12 place-items-center rounded-full shadow-lg transition-all hover:scale-105 sm:h-14 sm:w-14"
+          className="grid h-9 w-9 place-items-center rounded-full shadow-lg transition-all hover:scale-105 sm:h-10 sm:w-10"
           style={{ background: "linear-gradient(135deg, #29b6f6, #0288d1)" }}
         >
-          <Send className="h-5 w-5 -translate-x-[1px] translate-y-[1px] fill-white text-white sm:h-6 sm:w-6" />
+          <Send className="h-4 w-4 -translate-x-[1px] translate-y-[1px] fill-white text-white sm:h-[18px] sm:w-[18px]" />
         </a>
       </div>
     </div>
