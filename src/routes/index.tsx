@@ -39,7 +39,7 @@ function LandingPage() {
   );
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-black text-white">
+    <div className="relative min-h-[100svh] w-full overflow-hidden bg-black text-white">
       {/* Radial glow background */}
       <div
         aria-hidden
@@ -89,23 +89,23 @@ function LandingPage() {
       </Link>
 
       {/* Content */}
-      <main className="relative z-10 flex min-h-screen flex-col items-center justify-center px-6 text-center">
-        <p className="text-[11px] font-bold uppercase tracking-[0.35em] text-[#c9a84c] animate-[fadeIn_0.6s_ease-out_both]">
+      <main className="relative z-10 mx-auto flex min-h-[100svh] max-w-3xl flex-col items-center justify-center gap-3 px-4 py-6 text-center sm:gap-4 sm:px-6">
+        <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-[#c9a84c] animate-[fadeIn_0.6s_ease-out_both] sm:text-[11px]">
           Freitas da Blaze
         </p>
 
-        <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-400/5 px-4 py-1.5 animate-[fadeIn_0.6s_ease-out_0.15s_both]">
+        <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-400/5 px-4 py-1 animate-[fadeIn_0.6s_ease-out_0.15s_both]">
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
           </span>
-          <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-emerald-300">
+          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-emerald-300 sm:text-[11px]">
             No Ar
           </span>
         </div>
 
         {/* Hero image — o Rei da Blaze */}
-        <div className="relative mt-8 flex h-[240px] w-[240px] items-center justify-center sm:h-[300px] sm:w-[300px] md:h-[340px] md:w-[340px]">
+        <div className="relative flex aspect-square w-[min(46vh,240px)] items-center justify-center sm:w-[min(42vh,280px)] md:w-[min(44vh,320px)]">
           {/* red glow halo */}
           <span
             aria-hidden
@@ -166,7 +166,7 @@ function LandingPage() {
         </div>
 
         <h1
-          className="mt-8 text-[clamp(3.5rem,12vw,8.5rem)] font-black leading-none tracking-tight animate-[fadeUp_0.8s_ease-out_0.35s_both]"
+          className="text-[clamp(3rem,10vw,7rem)] font-black leading-none tracking-tight animate-[fadeUp_0.8s_ease-out_0.35s_both]"
           style={{
             background:
               "linear-gradient(180deg, #ffd6d6 0%, #ff5b5b 45%, #ffffff 100%)",
@@ -179,15 +179,15 @@ function LandingPage() {
           LIBERADO
         </h1>
 
-        <p className="mt-6 max-w-md text-base text-white/70 sm:text-lg animate-[fadeUp_0.6s_ease-out_0.55s_both]">
+        <p className="max-w-md text-sm text-white/70 sm:text-base animate-[fadeUp_0.6s_ease-out_0.55s_both]">
           A versão 2.0 do Freitas da Blaze está no ar.
         </p>
 
-        <div className="mt-10 animate-[fadeUp_0.6s_ease-out_0.75s_both]">
+        <div className="mt-2 animate-[fadeUp_0.6s_ease-out_0.75s_both]">
           <Link
             to="/app"
             preload="intent"
-            className="group relative inline-flex items-center gap-3 rounded-full px-9 py-4 text-base font-semibold text-black transition-transform hover:scale-[1.03] active:scale-[0.98]"
+            className="group relative inline-flex items-center gap-3 rounded-full px-8 py-3 text-sm font-semibold text-black transition-transform hover:scale-[1.03] active:scale-[0.98] sm:px-9 sm:py-3.5 sm:text-base"
             style={{
               background:
                 "linear-gradient(180deg, #ffb0b0 0%, #ff4d4d 100%)",
