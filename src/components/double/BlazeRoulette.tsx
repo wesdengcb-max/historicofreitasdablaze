@@ -120,7 +120,7 @@ export function BlazeRoulette({ results }: { results: Result[] }) {
 
         {/* Side fades */}
         <div className="pointer-events-none absolute inset-y-0 left-0 w-16 z-10 bg-gradient-to-r from-[oklch(0.16_0.014_260)] to-transparent" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-16 z-10 bg-gradient-to-l from=[oklch(0.16_0.014_260)] to-transparent" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-16 z-10 bg-gradient-to-l from-[oklch(0.16_0.014_260)] to-transparent" />
 
         <div
           className="absolute inset-y-0 flex items-center will-change-transform"
