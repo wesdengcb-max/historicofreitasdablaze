@@ -39,7 +39,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Badge } from "@/components/ui/badge";
 
-const mainItems = [
+const mainItems: { title: string; url: string; icon: typeof LayoutDashboard; badge?: string; badgeClass?: string }[] = [
   { title: "Histórico", url: "/", icon: LayoutDashboard },
   { title: "Sinais", url: "/sinais", icon: Radio },
   { title: "Estratégias", url: "/estrategias", icon: Network },
