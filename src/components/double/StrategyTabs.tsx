@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Sparkles, ShieldCheck, Megaphone, Dice5 } from "lucide-react";
+import { Sparkles, ShieldCheck, Megaphone, Dice5, ChevronDown } from "lucide-react";
 import { SignalGenerator } from "./SignalGenerator";
 import { PatternValidator } from "./PatternValidator";
 import { PatternNotifier } from "./PatternNotifier";
@@ -16,7 +16,7 @@ const TABS: { id: TabId; label: string; icon: React.ComponentType<{ className?: 
 
 
 export function StrategyTabs({ spins }: { spins: Spin[] }) {
-  const [tab, setTab] = useState<TabId>("signal");
+  const [tab, setTab] = useState<TabId | null>(null);
 
   return (
     <div className="space-y-4">
@@ -32,7 +32,7 @@ export function StrategyTabs({ spins }: { spins: Spin[] }) {
               key={t.id}
               role="tab"
               aria-selected={active}
-              onClick={() => !t.soon && setTab(t.id)}
+              onClick={() => !t.soon && setTab((cur) => (cur === t.id ? null : t.id))}
               disabled={t.soon}
               className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-semibold transition sm:text-xs ${
                 active
@@ -55,9 +55,21 @@ export function StrategyTabs({ spins }: { spins: Spin[] }) {
         })}
       </div>
 
-      {tab === "signal" && <SignalGenerator spins={spins} />}
-      {tab === "notifier" && <PatternNotifier spins={spins} />}
-      {tab === "validator" && <PatternValidator spins={spins} />}
+      {tab !== null && (
+        <div className="relative animate-in fade-in slide-in-from-top-1 duration-200">
+          <button
+            type="button"
+            onClick={() => setTab(null)}
+            aria-label="Minimizar"
+            className="absolute right-2 top-2 z-10 inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/10 bg-white/[0.04] text-muted-foreground transition hover:bg-white/[0.08] hover:text-foreground"
+          >
+            <ChevronDown className="h-4 w-4" />
+          </button>
+          {tab === "signal" && <SignalGenerator spins={spins} />}
+          {tab === "notifier" && <PatternNotifier spins={spins} />}
+          {tab === "validator" && <PatternValidator spins={spins} />}
+        </div>
+      )}
 
     </div>
   );
