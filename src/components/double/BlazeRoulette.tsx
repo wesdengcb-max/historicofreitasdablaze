@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import brancoAsset from "@/assets/branco-vip.png.asset.json";
 import { colorOf, type Color } from "./types";
 
