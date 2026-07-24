@@ -18,6 +18,8 @@ import {
   X,
   Clock,
   ChevronDown,
+  BarChart3,
+  Send,
 } from "lucide-react";
 
 import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
@@ -27,6 +29,7 @@ import { Switch } from "@/components/double/Switch";
 import { WhiteAlert } from "@/components/double/WhiteAlert";
 import { ProgressBar } from "@/components/double/ProgressBar";
 import { StrategyTabs } from "@/components/double/StrategyTabs";
+import { LeftStatsDrawer } from "@/components/double/LeftStatsDrawer";
 
 
 import { colorOf, fmtTime, type Spin } from "@/components/double/types";
