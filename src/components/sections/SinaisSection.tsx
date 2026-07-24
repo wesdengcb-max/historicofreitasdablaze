@@ -41,6 +41,7 @@ import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client"
 import { ResultCircle } from "@/components/double/ResultCircle";
 import { colorOf, fmtTime, type Color } from "@/components/double/types";
 import { setSignals } from "@/lib/signalsStore";
+import { BlazeRoulette } from "@/components/double/BlazeRoulette";
 
 
 type Signal = {
@@ -403,6 +404,9 @@ export function SinaisPage() {
           </div>
         </div>
       </div>
+
+      {/* Roleta ao vivo */}
+      <BlazeRoulette results={results} />
 
       {/* Estratégias Personalizadas */}
       <Card className="!p-0 overflow-hidden">
