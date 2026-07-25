@@ -476,7 +476,7 @@ export function AnaliseSection() {
           relevante quem tiver pelo menos {MIN_CYCLES} ciclos completos.
         </p>
 
-        <div className="mt-5 grid grid-cols-5 gap-2 sm:grid-cols-8 md:grid-cols-15">
+        <div className="mt-5 grid grid-cols-5 gap-2 sm:grid-cols-8 md:grid-cols-[repeat(15,minmax(0,1fr))]">
           {ALL_NUMBERS.map((n) => {
             const st = stats[n] ?? { total: 0, fullyCompleted: 0, totalGaps: 0, avg: null };
             const ok = n <= 9 && st.fullyCompleted >= MIN_CYCLES;
