@@ -25,6 +25,7 @@ type Cycle = {
 };
 
 const NUMBERS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+const ALL_NUMBERS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 const MIN_CYCLES = 10;
 const ZEROS_PER_CYCLE = 10;
 const TOP_N = 5;
@@ -122,12 +123,9 @@ function buildRepeatCycles(rows: Row[], now: Date): Cycle[] {
       pending: gap >= 0 ? 0 : 1,
       elapsed: diffMinutes(dt, now),
     });
+    (out[out.length - 1] as Cycle & { value: number }).value = cur;
   }
-  const tail = out.slice(-MAX_PATTERN_CYCLES);
-  tail.forEach((c, idx) => {
-    c.index = idx + 1;
-  });
-  return tail;
+  return out;
 }
 
 type GroupResult = {
@@ -430,7 +428,17 @@ export function AnaliseSection() {
   }, []);
 
   const cycles = useMemo(() => buildCycles(rows, now), [rows, now]);
-  const repeatCycles = useMemo(() => buildRepeatCycles(rows, now), [rows, now]);
+  const repeatCyclesAll = useMemo(() => buildRepeatCycles(rows, now), [rows, now]);
+  const repeatCycles = useMemo(() => {
+    const filtered = repeatCyclesAll.filter(
+      (c) => (c as Cycle & { value: number }).value === selected,
+    );
+    const tail = filtered.slice(-MAX_PATTERN_CYCLES);
+    tail.forEach((c, i) => {
+      c.index = i + 1;
+    });
+    return tail;
+  }, [repeatCyclesAll, selected]);
 
   const stats = useMemo(() => {
     const s: Record<
@@ -448,9 +456,10 @@ export function AnaliseSection() {
     return s;
   }, [cycles]);
 
-  const list = cycles[selected] ?? [];
-  const stat = stats[selected];
-  const eligible = stat.fullyCompleted >= MIN_CYCLES;
+  const isMinuteEligible = selected >= 0 && selected <= 9;
+  const list = isMinuteEligible ? (cycles[selected] ?? []) : [];
+  const stat = stats[selected] ?? { total: 0, fullyCompleted: 0, totalGaps: 0, avg: null };
+  const eligible = isMinuteEligible && stat.fullyCompleted >= MIN_CYCLES;
 
   return (
     <main className="mx-auto flex w-full max-w-[1366px] flex-col gap-5 px-3 py-8 sm:gap-6 sm:px-8 sm:py-10">
@@ -467,10 +476,10 @@ export function AnaliseSection() {
           relevante quem tiver pelo menos {MIN_CYCLES} ciclos completos.
         </p>
 
-        <div className="mt-5 grid grid-cols-5 gap-2 sm:grid-cols-10">
-          {NUMBERS.map((n) => {
-            const st = stats[n];
-            const ok = st.fullyCompleted >= MIN_CYCLES;
+        <div className="mt-5 grid grid-cols-5 gap-2 sm:grid-cols-8 md:grid-cols-[repeat(15,minmax(0,1fr))]">
+          {ALL_NUMBERS.map((n) => {
+            const st = stats[n] ?? { total: 0, fullyCompleted: 0, totalGaps: 0, avg: null };
+            const ok = n <= 9 && st.fullyCompleted >= MIN_CYCLES;
             const isSel = selected === n;
             return (
               <button
@@ -486,7 +495,7 @@ export function AnaliseSection() {
               >
                 <span className="text-lg font-bold tabular-nums">{n}</span>
                 <span className="mt-0.5 text-[10px] tabular-nums">
-                  {st.fullyCompleted}/{st.total}
+                  {n <= 9 ? `${st.fullyCompleted}/${st.total}` : "—"}
                 </span>
                 <span className="text-[10px] tabular-nums text-muted-foreground">
                   {st.avg !== null ? `${st.avg} min` : "—"}
@@ -500,23 +509,31 @@ export function AnaliseSection() {
       <AnalysisPanel
         eyebrow={`Análise 1 · dígito ${selected}`}
         title={`Minutos até o 0 (gatilho por unidade do minuto)`}
-        subtitle={`Gatilho: número ${selected} caiu em minuto terminado em ${selected}. Vizinhos ±1 min agrupados.`}
+        subtitle={
+          isMinuteEligible
+            ? `Gatilho: número ${selected} caiu em minuto terminado em ${selected}. Vizinhos ±1 min agrupados.`
+            : "Gatilho de minuto aplicável apenas para pedras de 0 a 9."
+        }
         cycles={list}
         loading={loading}
         err={err}
-        emptyLabel={`Ainda sem zeros registrados após gatilhos do número ${selected}.`}
+        emptyLabel={
+          isMinuteEligible
+            ? `Ainda sem zeros registrados após gatilhos do número ${selected}.`
+            : "Gatilho de minuto aplicável apenas para pedras de 0 a 9."
+        }
         eligible={eligible}
         eligibleHint={`precisa ${MIN_CYCLES}+ ciclos completos`}
       />
 
       <AnalysisPanel
-        eyebrow="Análise 2 · pedras repetidas (0–14)"
+        eyebrow={`Análise 2 · repetição da pedra ${selected}`}
         title="Tempo até o 0 após pedra repetida consecutiva"
-        subtitle="Gatilho dispara a partir da 2ª pedra idêntica. Analisamos as últimas 14 ocorrências."
+        subtitle={`Gatilho: pedra ${selected} sai duas vezes seguidas. Últimas ${MAX_PATTERN_CYCLES} ocorrências.`}
         cycles={repeatCycles}
         loading={loading}
         err={err}
-        emptyLabel="Ainda sem repetições consecutivas detectadas no histórico."
+        emptyLabel={`Ainda sem repetições consecutivas da pedra ${selected} no histórico.`}
         eligible={repeatCycles.length >= MIN_CYCLES}
         eligibleHint={`precisa ${MIN_CYCLES}+ ocorrências`}
         showFullBadge={false}
