@@ -27,9 +27,9 @@ type Cycle = {
 const NUMBERS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 const ALL_NUMBERS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 const MIN_CYCLES = 10;
-const ZEROS_PER_CYCLE = 10;
 const TOP_N = 5;
-const MAX_GAP_MIN = 14;         // limite estendido p/ Análise 1
+const MAX_GAP_MIN = 14;         // limite p/ agrupamento de vizinhos no Top 5
+const WINDOW_SIZE = 14;         // 14 posições após o gatilho (sem break no primeiro 0)
 const MAX_DETAIL_ROWS = 10;     // FIFO detalhes
 const MAX_PATTERN_CYCLES = 14;  // Análise 2: últimas 14 ocorrências
 
@@ -43,11 +43,6 @@ function diffMinutes(a: Date, b: Date) {
  * mede os minutos até os próximos ZEROS_PER_CYCLE zeros (≤ 14 min).
  */
 function buildCycles(rows: Row[], now: Date): Record<number, Cycle[]> {
-  const zeroIdx: number[] = [];
-  rows.forEach((r, i) => {
-    if (Number(r.roll) === 0) zeroIdx.push(i);
-  });
-
   const out: Record<number, Cycle[]> = {};
   for (const n of NUMBERS) out[n] = [];
 
@@ -58,22 +53,14 @@ function buildCycles(rows: Row[], now: Date): Record<number, Cycle[]> {
     if (Number.isNaN(dt.getTime())) return;
     if (dt.getMinutes() % 10 !== n) return;
 
-    // primeiro índice em zeroIdx cujo valor > i (busca binária)
-    let lo = 0;
-    let hi = zeroIdx.length - 1;
-    let start = zeroIdx.length;
-    while (lo <= hi) {
-      const mid = (lo + hi) >> 1;
-      if (zeroIdx[mid] > i) {
-        start = mid;
-        hi = mid - 1;
-      } else lo = mid + 1;
-    }
-
+    // Janela fixa de 14 posições posteriores; registra TODOS os zeros (sem break).
     const gaps: number[] = [];
-    for (let k = start; k < zeroIdx.length && gaps.length < ZEROS_PER_CYCLE; k++) {
-      const g = diffMinutes(dt, new Date(rows[zeroIdx[k]].created_at));
-      if (g <= MAX_GAP_MIN) gaps.push(g);
+    for (let k = 1; k <= WINDOW_SIZE && i + k < rows.length; k++) {
+      const row = rows[i + k];
+      if (Number(row.roll) !== 0) continue;
+      const zdt = new Date(row.created_at);
+      if (Number.isNaN(zdt.getTime())) continue;
+      gaps.push(diffMinutes(dt, zdt));
     }
 
     const list = out[n];
@@ -83,7 +70,7 @@ function buildCycles(rows: Row[], now: Date): Record<number, Cycle[]> {
       triggerLabel: `${n}`,
       triggerDetail: `min ${String(dt.getMinutes()).padStart(2, "0")}`,
       gaps,
-      pending: Math.max(0, ZEROS_PER_CYCLE - gaps.length),
+      pending: gaps.length === 0 ? 1 : 0,
       elapsed: diffMinutes(dt, now),
     });
   });
@@ -106,12 +93,14 @@ function buildRepeatCycles(rows: Row[], now: Date): Cycle[] {
     const dt = new Date(rows[i].created_at);
     if (Number.isNaN(dt.getTime())) continue;
 
-    let gap = -1;
-    for (let k = i + 1; k < rows.length; k++) {
-      if (Number(rows[k].roll) === 0) {
-        gap = diffMinutes(dt, new Date(rows[k].created_at));
-        break;
-      }
+    // Janela fixa de 14 posições posteriores; sem interrupção no primeiro 0.
+    const gaps: number[] = [];
+    for (let k = 1; k <= WINDOW_SIZE && i + k < rows.length; k++) {
+      const row = rows[i + k];
+      if (Number(row.roll) !== 0) continue;
+      const zdt = new Date(row.created_at);
+      if (Number.isNaN(zdt.getTime())) continue;
+      gaps.push(diffMinutes(dt, zdt));
     }
 
     out.push({
@@ -119,8 +108,8 @@ function buildRepeatCycles(rows: Row[], now: Date): Cycle[] {
       triggerAt: dt,
       triggerLabel: `${cur}→${cur}`,
       triggerDetail: `repetição do ${cur}`,
-      gaps: gap >= 0 ? [gap] : [],
-      pending: gap >= 0 ? 0 : 1,
+      gaps,
+      pending: gaps.length === 0 ? 1 : 0,
       elapsed: diffMinutes(dt, now),
     });
     (out[out.length - 1] as Cycle & { value: number }).value = cur;
@@ -448,7 +437,7 @@ export function AnaliseSection() {
     for (const n of NUMBERS) {
       const list = cycles[n];
       const totalGaps = list.reduce((a, c) => a + c.gaps.length, 0);
-      const fullyCompleted = list.filter((c) => c.gaps.length >= ZEROS_PER_CYCLE).length;
+      const fullyCompleted = list.filter((c) => c.gaps.length > 0).length;
       const sum = list.reduce((a, c) => a + c.gaps.reduce((x, y) => x + y, 0), 0);
       const avg = totalGaps ? Math.round(sum / totalGaps) : null;
       s[n] = { total: list.length, fullyCompleted, totalGaps, avg };
