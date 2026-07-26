@@ -334,7 +334,7 @@ function AnalysisPanel({
 
           <div className="mt-5 overflow-x-auto rounded-xl border border-white/10">
             <div className="border-b border-white/10 bg-white/[0.03] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
-              Detalhes dos ciclos · últimos {MAX_DETAIL_ROWS} gatilhos · até {WINDOW_SIZE} minutos até 0
+              Detalhes dos ciclos · últimos {MAX_DETAIL_ROWS} gatilhos · até {MAX_ZEROS} contagens até 0
             </div>
             <table className="w-full text-xs tabular-nums">
               <thead>
@@ -351,7 +351,6 @@ function AnalysisPanel({
                   .slice()
                   .reverse()
                   .map((c) => {
-                    const scannedWithoutZero = c.gaps.length === 0 && c.elapsed >= WINDOW_SIZE;
                     return (
                       <tr
                         key={`${c.triggerAt.getTime()}-${c.triggerLabel}`}
@@ -364,12 +363,14 @@ function AnalysisPanel({
                           {c.gaps.length ? c.gaps.join(" · ") : "—"}
                         </td>
                         <td className="px-3 py-2">
-                          {c.gaps.length > 0 ? (
+                          {c.gaps.length >= MAX_ZEROS ? (
                             <span className="text-emerald-300">
                               {showFullBadge ? `Completo (${c.gaps.length})` : "Completo"}
                             </span>
-                          ) : scannedWithoutZero ? (
-                            <span className="text-red-300">sem 0 em {WINDOW_SIZE} min</span>
+                          ) : c.gaps.length > 0 ? (
+                            <span className="text-emerald-300">
+                              {c.gaps.length}/{MAX_ZEROS}
+                            </span>
                           ) : (
                             <span className="text-amber-300">
                               aguardando · {c.elapsed} min
