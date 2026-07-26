@@ -459,7 +459,7 @@ export function AnaliseSection() {
   const eligible = isMinuteEligible && stat.fullyCompleted >= MIN_CYCLES;
 
   return (
-    <main className="mx-auto flex w-full max-w-[1366px] flex-col gap-5 px-3 py-8 sm:gap-6 sm:px-8 sm:py-10">
+    <main className="mx-auto flex w-full max-w-[1720px] flex-col gap-5 px-3 py-8 sm:gap-6 sm:px-8 sm:py-10">
       <Card delay={0.03}>
         <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
           Catalogador de latência
