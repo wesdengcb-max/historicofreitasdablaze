@@ -28,8 +28,7 @@ const NUMBERS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 const ALL_NUMBERS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 const MIN_CYCLES = 10;
 const TOP_N = 5;
-const MAX_GAP_MIN = 14;         // limite p/ agrupamento de vizinhos no Top 5
-const WINDOW_SIZE = 14;         // 14 posições após o gatilho (sem break no primeiro 0)
+const MAX_ZEROS = 14;           // coleta até 14 zeros após o gatilho (sem limite de tempo)
 const MAX_DETAIL_ROWS = 10;     // FIFO detalhes
 const MAX_PATTERN_CYCLES = 14;  // Análise 2: últimas 14 ocorrências
 
@@ -53,9 +52,9 @@ function buildCycles(rows: Row[], now: Date): Record<number, Cycle[]> {
     if (Number.isNaN(dt.getTime())) return;
     if (dt.getMinutes() % 10 !== n) return;
 
-    // Janela fixa de 14 posições posteriores; registra TODOS os zeros (sem break).
+    // Coleta os próximos até 14 zeros após o gatilho, sem limite de tempo.
     const gaps: number[] = [];
-    for (let k = 1; k <= WINDOW_SIZE && i + k < rows.length; k++) {
+    for (let k = 1; i + k < rows.length && gaps.length < MAX_ZEROS; k++) {
       const row = rows[i + k];
       if (Number(row.roll) !== 0) continue;
       const zdt = new Date(row.created_at);
@@ -93,9 +92,9 @@ function buildRepeatCycles(rows: Row[], now: Date): Cycle[] {
     const dt = new Date(rows[i].created_at);
     if (Number.isNaN(dt.getTime())) continue;
 
-    // Janela fixa de 14 posições posteriores; sem interrupção no primeiro 0.
+    // Coleta os próximos até 14 zeros após o gatilho, sem limite de tempo.
     const gaps: number[] = [];
-    for (let k = 1; k <= WINDOW_SIZE && i + k < rows.length; k++) {
+    for (let k = 1; i + k < rows.length && gaps.length < MAX_ZEROS; k++) {
       const row = rows[i + k];
       if (Number(row.roll) !== 0) continue;
       const zdt = new Date(row.created_at);
@@ -135,7 +134,10 @@ function computeTop5(cycles: Cycle[]): { rows: GroupResult[]; totalRows: number 
   const totalRows = rowSets.filter((s) => s.size > 0).length;
   const candidates: GroupResult[] = [];
 
-  for (let m = 0; m <= MAX_GAP_MIN; m++) {
+  let maxGap = 0;
+  for (const rs of rowSets) for (const v of rs) if (v > maxGap) maxGap = v;
+
+  for (let m = 0; m <= maxGap + 1; m++) {
     let hasM = false;
     let hasMinus = false;
     let hasPlus = false;
@@ -462,7 +464,7 @@ export function AnaliseSection() {
           Catalogador de latência
         </div>
         <h2 className="text-lg font-semibold text-foreground sm:text-xl">
-          Ciclos de espera até o branco (0) · limite {MAX_GAP_MIN} min
+          Ciclos de espera até o branco (0) · até {MAX_ZEROS} contagens
         </h2>
         <p className="mt-1 text-xs text-muted-foreground">
           Gatilho: o número sai num minuto cuja unidade é igual a ele (ex.: 1 no
