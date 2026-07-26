@@ -560,7 +560,7 @@ function Index() {
 
 
   const applyCustom = () => setAppliedTick((v) => v + 1);
-  const historyGridTemplate = "repeat(10, calc((var(--stone-size, 44px) * 2) + 2px))";
+  const historyGridTemplate = "repeat(10, minmax(calc((var(--stone-size, 44px) * 2) + 2px), 1fr))";
 
   const signalsByHM = useMemo(() => {
 
