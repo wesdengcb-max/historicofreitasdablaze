@@ -33,7 +33,7 @@ export function TopNav() {
   const active = useSection();
   return (
     <nav className="border-b border-white/5 bg-background/60 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-[1366px] gap-1 overflow-x-auto px-3 py-2 scrollbar-none sm:px-8">
+      <div className="mx-auto flex max-w-[1720px] gap-1 overflow-x-auto px-3 py-2 scrollbar-none sm:px-8">
         {ITEMS.map((item) => {
           const Icon = item.icon;
           const isActive = active === item.id;
