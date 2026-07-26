@@ -560,7 +560,7 @@ function Index() {
 
 
   const applyCustom = () => setAppliedTick((v) => v + 1);
-  const historyGridTemplate = "repeat(10, minmax(calc((var(--stone-size, 44px) * 2) + 2px), 1fr))";
+  const historyGridTemplate = "repeat(10, calc((var(--stone-size, 44px) * 2) + 2px))";
 
   const signalsByHM = useMemo(() => {
 
@@ -586,7 +586,7 @@ function Index() {
   return (
     <div
       className="min-h-dvh overflow-x-hidden"
-      style={{ ["--stone-size" as never]: "44px" }}
+      style={{ ["--stone-size" as never]: "clamp(44px, 3.6vw, 58px)" }}
     >
       <header className="sticky top-0 z-30 border-b border-white/5 bg-background/70 backdrop-blur-xl">
         <div className="mx-auto grid h-16 max-w-[1720px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-3 sm:gap-4 sm:px-8">
