@@ -116,6 +116,49 @@ function buildRepeatCycles(rows: Row[], now: Date): Cycle[] {
   return out;
 }
 
+/**
+ * Análise 3 — gatilho quando duas pedras iguais (0..9) saem em sequência
+ * E pelo menos uma delas caiu num minuto cuja unidade == valor da pedra.
+ * Gatilho é a SEGUNDA pedra. Mede minutos até os próximos zeros.
+ */
+function buildRepeatMinuteCycles(rows: Row[], now: Date): Cycle[] {
+  const out: Cycle[] = [];
+  for (let i = 1; i < rows.length; i++) {
+    const prev = Number(rows[i - 1].roll);
+    const cur = Number(rows[i].roll);
+    if (!Number.isFinite(cur) || cur < 0 || cur > 9) continue;
+    if (cur !== prev) continue;
+    const dtPrev = new Date(rows[i - 1].created_at);
+    const dt = new Date(rows[i].created_at);
+    if (Number.isNaN(dt.getTime()) || Number.isNaN(dtPrev.getTime())) continue;
+    const matchPrev = dtPrev.getMinutes() % 10 === cur;
+    const matchCur = dt.getMinutes() % 10 === cur;
+    if (!matchPrev && !matchCur) continue;
+
+    const gaps: number[] = [];
+    for (let k = 1; i + k < rows.length && gaps.length < MAX_ZEROS; k++) {
+      const row = rows[i + k];
+      if (Number(row.roll) !== 0) continue;
+      const zdt = new Date(row.created_at);
+      if (Number.isNaN(zdt.getTime())) continue;
+      gaps.push(diffMinutes(dt, zdt));
+    }
+
+    const which = matchPrev && matchCur ? "ambos" : matchPrev ? "1ª" : "2ª";
+    out.push({
+      index: 0,
+      triggerAt: dt,
+      triggerLabel: `${cur}→${cur}`,
+      triggerDetail: `repetição do ${cur} · minuto casa (${which})`,
+      gaps,
+      pending: gaps.length === 0 ? 1 : 0,
+      elapsed: diffMinutes(dt, now),
+    });
+    (out[out.length - 1] as Cycle & { value: number }).value = cur;
+  }
+  return out;
+}
+
 type GroupResult = {
   m: number;
   label: string;
