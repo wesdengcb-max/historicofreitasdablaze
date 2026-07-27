@@ -116,6 +116,49 @@ function buildRepeatCycles(rows: Row[], now: Date): Cycle[] {
   return out;
 }
 
+/**
+ * Análise 3 — gatilho quando duas pedras iguais (0..9) saem em sequência
+ * E pelo menos uma delas caiu num minuto cuja unidade == valor da pedra.
+ * Gatilho é a SEGUNDA pedra. Mede minutos até os próximos zeros.
+ */
+function buildRepeatMinuteCycles(rows: Row[], now: Date): Cycle[] {
+  const out: Cycle[] = [];
+  for (let i = 1; i < rows.length; i++) {
+    const prev = Number(rows[i - 1].roll);
+    const cur = Number(rows[i].roll);
+    if (!Number.isFinite(cur) || cur < 0 || cur > 9) continue;
+    if (cur !== prev) continue;
+    const dtPrev = new Date(rows[i - 1].created_at);
+    const dt = new Date(rows[i].created_at);
+    if (Number.isNaN(dt.getTime()) || Number.isNaN(dtPrev.getTime())) continue;
+    const matchPrev = dtPrev.getMinutes() % 10 === cur;
+    const matchCur = dt.getMinutes() % 10 === cur;
+    if (!matchPrev && !matchCur) continue;
+
+    const gaps: number[] = [];
+    for (let k = 1; i + k < rows.length && gaps.length < MAX_ZEROS; k++) {
+      const row = rows[i + k];
+      if (Number(row.roll) !== 0) continue;
+      const zdt = new Date(row.created_at);
+      if (Number.isNaN(zdt.getTime())) continue;
+      gaps.push(diffMinutes(dt, zdt));
+    }
+
+    const which = matchPrev && matchCur ? "ambos" : matchPrev ? "1ª" : "2ª";
+    out.push({
+      index: 0,
+      triggerAt: dt,
+      triggerLabel: `${cur}→${cur}`,
+      triggerDetail: `repetição do ${cur} · minuto casa (${which})`,
+      gaps,
+      pending: gaps.length === 0 ? 1 : 0,
+      elapsed: diffMinutes(dt, now),
+    });
+    (out[out.length - 1] as Cycle & { value: number }).value = cur;
+  }
+  return out;
+}
+
 type GroupResult = {
   m: number;
   label: string;
@@ -437,6 +480,21 @@ export function AnaliseSection() {
     return tail;
   }, [repeatCyclesAll, selected]);
 
+  const repeatMinuteCyclesAll = useMemo(
+    () => buildRepeatMinuteCycles(rows, now),
+    [rows, now],
+  );
+  const repeatMinuteCycles = useMemo(() => {
+    const filtered = repeatMinuteCyclesAll.filter(
+      (c) => (c as Cycle & { value: number }).value === selected,
+    );
+    const tail = filtered.slice(-MAX_PATTERN_CYCLES);
+    tail.forEach((c, i) => {
+      c.index = i + 1;
+    });
+    return tail;
+  }, [repeatMinuteCyclesAll, selected]);
+
   const stats = useMemo(() => {
     const s: Record<
       number,
@@ -532,6 +590,27 @@ export function AnaliseSection() {
         err={err}
         emptyLabel={`Ainda sem repetições consecutivas da pedra ${selected} no histórico.`}
         eligible={repeatCycles.length >= MIN_CYCLES}
+        eligibleHint={`precisa ${MIN_CYCLES}+ ocorrências`}
+        showFullBadge={false}
+      />
+
+      <AnalysisPanel
+        eyebrow={`Análise 3 · repetição + minuto casado (${selected})`}
+        title="Tempo até o 0 após repetição com unidade do minuto igual"
+        subtitle={
+          selected <= 9
+            ? `Gatilho: pedra ${selected} repete e ao menos uma sai em minuto terminado em ${selected}. Últimas ${MAX_PATTERN_CYCLES} ocorrências.`
+            : "Análise aplicável apenas para pedras de 0 a 9."
+        }
+        cycles={selected <= 9 ? repeatMinuteCycles : []}
+        loading={loading}
+        err={err}
+        emptyLabel={
+          selected <= 9
+            ? `Ainda sem repetições da pedra ${selected} em minuto casado.`
+            : "Análise aplicável apenas para pedras de 0 a 9."
+        }
+        eligible={selected <= 9 && repeatMinuteCycles.length >= MIN_CYCLES}
         eligibleHint={`precisa ${MIN_CYCLES}+ ocorrências`}
         showFullBadge={false}
       />
