@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, BarChart3, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import kingImg from "@/assets/freitas-king.png.asset.json";
@@ -20,6 +20,17 @@ export const Route = createFileRoute("/")({
 
 function LandingPage() {
   const [openPanel, setOpenPanel] = useState<null | "sinais" | "estrategias" | "historico" | "sobre" | "menu">(null);
+  const [exitTo, setExitTo] = useState<null | "/app" | "/sinais" | "/estrategias">(null);
+  const navigate = useNavigate();
+
+  const goWithTransition = (to: "/app" | "/sinais" | "/estrategias") => {
+    if (exitTo) return;
+    setExitTo(to);
+    window.setTimeout(() => {
+      navigate({ to });
+    }, 620);
+  };
+
   const tabs: Array<{ id: "sinais" | "estrategias" | "historico" | "sobre"; label: string }> = [
     { id: "sinais", label: "SINAIS" },
     { id: "estrategias", label: "ESTRATÉGIAS" },
@@ -110,7 +121,13 @@ function LandingPage() {
             >
               <X className="h-4 w-4" />
             </button>
-            <PanelContent panel={openPanel} />
+            <PanelContent
+              panel={openPanel}
+              onNavigate={(to) => {
+                setOpenPanel(null);
+                goWithTransition(to);
+              }}
+            />
           </div>
         </div>
       )}
@@ -119,6 +136,10 @@ function LandingPage() {
       <Link
         to="/app"
         preload="intent"
+        onClick={(e) => {
+          e.preventDefault();
+          goWithTransition("/app");
+        }}
         className="absolute right-6 top-6 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-[#c9a84c]/40 bg-black/40 text-[#c9a84c] backdrop-blur transition hover:border-[#c9a84c] hover:bg-[#c9a84c]/10"
         aria-label="Abrir painel"
       >
@@ -224,6 +245,10 @@ function LandingPage() {
           <Link
             to="/app"
             preload="intent"
+            onClick={(e) => {
+              e.preventDefault();
+              goWithTransition("/app");
+            }}
             className="group relative inline-flex items-center gap-3 rounded-full px-8 py-3 text-sm font-semibold text-black transition-transform hover:scale-[1.03] active:scale-[0.98] sm:px-9 sm:py-3.5 sm:text-base"
             style={{
               background:
@@ -243,21 +268,24 @@ function LandingPage() {
         aria-label="Navegação"
         className="fixed inset-x-0 bottom-4 z-20 flex justify-center px-3 sm:bottom-6"
       >
-        <div className="flex items-center gap-1 rounded-full border border-white/10 bg-black/70 p-1.5 shadow-[0_10px_40px_-12px_rgba(0,0,0,0.8)] backdrop-blur-xl sm:gap-2 sm:p-2">
+        <div className="group/nav relative flex items-center gap-1 overflow-hidden rounded-full border border-white/10 bg-black/70 p-1.5 shadow-[0_10px_40px_-12px_rgba(0,0,0,0.8)] backdrop-blur-xl transition-[border-color,box-shadow] duration-500 hover:border-white/20 hover:shadow-[0_10px_60px_-10px_rgba(229,57,53,0.35)] sm:gap-2 sm:p-2">
+          {/* animated red sheen on hover */}
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover/nav:opacity-100"
+            style={{
+              background:
+                "radial-gradient(120% 80% at 50% 120%, rgba(229,57,53,0.22), transparent 70%)",
+            }}
+          />
           <div className="hidden items-center gap-1 sm:flex">
             {tabs.map((t, i) => (
               <div key={t.id} className="flex items-center">
-                <button
-                  type="button"
+                <NavTab
+                  active={openPanel === t.id}
                   onClick={() => setOpenPanel(t.id)}
-                  className={`rounded-full px-4 py-2 text-[11px] font-bold tracking-[0.18em] transition sm:text-xs ${
-                    openPanel === t.id
-                      ? "bg-white text-black"
-                      : "text-white/80 hover:text-white"
-                  }`}
-                >
-                  {t.label}
-                </button>
+                  label={t.label}
+                />
                 {i < tabs.length - 1 && (
                   <span className="px-1 text-white/25">/</span>
                 )}
@@ -267,39 +295,109 @@ function LandingPage() {
           {/* Mobile compact tabs */}
           <div className="flex items-center gap-0.5 sm:hidden">
             {tabs.map((t) => (
-              <button
+              <NavTab
                 key={t.id}
-                type="button"
+                compact
+                active={openPanel === t.id}
                 onClick={() => setOpenPanel(t.id)}
-                className={`rounded-full px-2.5 py-1.5 text-[10px] font-bold tracking-[0.14em] transition ${
-                  openPanel === t.id ? "bg-white text-black" : "text-white/80"
-                }`}
-              >
-                {t.label}
-              </button>
+                label={t.label}
+              />
             ))}
           </div>
           <button
             type="button"
             onClick={() => setOpenPanel((p) => (p === "menu" ? null : "menu"))}
-            className={`ml-1 rounded-full px-4 py-2 text-[11px] font-bold tracking-[0.2em] transition sm:text-xs ${
+            className={`relative ml-1 overflow-hidden rounded-full px-4 py-2 text-[11px] font-bold tracking-[0.2em] transition-all duration-300 sm:text-xs ${
               openPanel === "menu"
-                ? "bg-white text-black"
-                : "bg-white/10 text-white hover:bg-white/20"
+                ? "bg-white text-black shadow-[0_0_24px_rgba(255,255,255,0.35)]"
+                : "bg-white/10 text-white hover:bg-white/20 hover:shadow-[0_0_18px_rgba(255,255,255,0.18)]"
             }`}
           >
             MENU
           </button>
         </div>
       </nav>
+
+      {/* Page-exit transition (slides across from left) */}
+      {exitTo && (
+        <div
+          aria-hidden
+          className="pointer-events-none fixed inset-0 z-50 overflow-hidden"
+        >
+          <div
+            className="absolute inset-y-0 -left-full w-full animate-[slideOver_0.62s_cubic-bezier(0.7,0,0.2,1)_forwards]"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent 0%, rgba(229,57,53,0.85) 45%, #000 100%)",
+              boxShadow:
+                "0 0 80px 20px rgba(229,57,53,0.45), 0 0 160px 40px rgba(0,0,0,0.6)",
+            }}
+          />
+        </div>
+      )}
     </div>
+  );
+}
+
+function NavTab({
+  label,
+  active,
+  compact,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  compact?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`group/tab relative overflow-hidden rounded-full transition-all duration-300 ${
+        compact
+          ? "px-2.5 py-1.5 text-[10px] tracking-[0.14em]"
+          : "px-4 py-2 text-[11px] tracking-[0.18em] sm:text-xs"
+      } font-bold ${
+        active
+          ? "bg-white text-black shadow-[0_0_28px_rgba(229,57,53,0.55)]"
+          : "text-white/75 hover:text-white"
+      }`}
+    >
+      {/* hover glow bg */}
+      <span
+        aria-hidden
+        className={`absolute inset-0 rounded-full transition-opacity duration-300 ${
+          active
+            ? "opacity-0"
+            : "opacity-0 group-hover/tab:opacity-100"
+        }`}
+        style={{
+          background:
+            "radial-gradient(80% 120% at 50% 120%, rgba(229,57,53,0.45), transparent 70%)",
+        }}
+      />
+      {/* animated underline */}
+      <span
+        aria-hidden
+        className={`pointer-events-none absolute bottom-1 left-1/2 h-[2px] -translate-x-1/2 rounded-full bg-[#ff5b5b] transition-[width,opacity] duration-300 ${
+          active
+            ? "w-0 opacity-0"
+            : "w-0 opacity-0 group-hover/tab:w-5 group-hover/tab:opacity-100"
+        }`}
+        style={{ boxShadow: "0 0 10px rgba(229,57,53,0.9)" }}
+      />
+      <span className="relative">{label}</span>
+    </button>
   );
 }
 
 function PanelContent({
   panel,
+  onNavigate,
 }: {
   panel: "sinais" | "estrategias" | "historico" | "sobre" | "menu";
+  onNavigate: (to: "/app" | "/sinais" | "/estrategias") => void;
 }) {
   if (panel === "menu") {
     return (
@@ -314,27 +412,27 @@ function PanelContent({
           Entre no painel para ver histórico ao vivo, análises e estratégias.
         </p>
         <div className="flex flex-wrap gap-2 pt-2">
-          <Link
-            to="/app"
-            preload="intent"
-            className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition hover:scale-[1.03]"
+          <button
+            type="button"
+            onClick={() => onNavigate("/app")}
+            className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition hover:scale-[1.03] hover:shadow-[0_0_30px_rgba(255,255,255,0.35)]"
           >
             Painel completo <ArrowRight className="h-4 w-4" />
-          </Link>
-          <Link
-            to="/sinais"
-            preload="intent"
-            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
+          </button>
+          <button
+            type="button"
+            onClick={() => onNavigate("/sinais")}
+            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10 hover:shadow-[0_0_24px_rgba(229,57,53,0.35)]"
           >
             Sinais ao vivo
-          </Link>
-          <Link
-            to="/estrategias"
-            preload="intent"
-            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
+          </button>
+          <button
+            type="button"
+            onClick={() => onNavigate("/estrategias")}
+            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10 hover:shadow-[0_0_24px_rgba(229,57,53,0.35)]"
           >
             Estratégias
-          </Link>
+          </button>
         </div>
       </div>
     );
@@ -379,13 +477,13 @@ function PanelContent({
         {content.body}
       </p>
       <div className="pt-2">
-        <Link
-          to={content.cta.to}
-          preload="intent"
-          className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition hover:scale-[1.03]"
+        <button
+          type="button"
+          onClick={() => onNavigate(content.cta.to)}
+          className="group/cta inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_30px_rgba(229,57,53,0.5)]"
         >
           {content.cta.label} <ArrowRight className="h-4 w-4" />
-        </Link>
+        </button>
       </div>
     </div>
   );
