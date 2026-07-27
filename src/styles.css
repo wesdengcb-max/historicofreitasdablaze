@@ -213,3 +213,7 @@
   from { transform: translate(-50%, -50%) rotate(0deg); }
   to   { transform: translate(-50%, -50%) rotate(360deg); }
 }
+@keyframes slideOver {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(200%); }
+}
