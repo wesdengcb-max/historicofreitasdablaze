@@ -480,6 +480,21 @@ export function AnaliseSection() {
     return tail;
   }, [repeatCyclesAll, selected]);
 
+  const repeatMinuteCyclesAll = useMemo(
+    () => buildRepeatMinuteCycles(rows, now),
+    [rows, now],
+  );
+  const repeatMinuteCycles = useMemo(() => {
+    const filtered = repeatMinuteCyclesAll.filter(
+      (c) => (c as Cycle & { value: number }).value === selected,
+    );
+    const tail = filtered.slice(-MAX_PATTERN_CYCLES);
+    tail.forEach((c, i) => {
+      c.index = i + 1;
+    });
+    return tail;
+  }, [repeatMinuteCyclesAll, selected]);
+
   const stats = useMemo(() => {
     const s: Record<
       number,
@@ -575,6 +590,27 @@ export function AnaliseSection() {
         err={err}
         emptyLabel={`Ainda sem repetições consecutivas da pedra ${selected} no histórico.`}
         eligible={repeatCycles.length >= MIN_CYCLES}
+        eligibleHint={`precisa ${MIN_CYCLES}+ ocorrências`}
+        showFullBadge={false}
+      />
+
+      <AnalysisPanel
+        eyebrow={`Análise 3 · repetição + minuto casado (${selected})`}
+        title="Tempo até o 0 após repetição com unidade do minuto igual"
+        subtitle={
+          selected <= 9
+            ? `Gatilho: pedra ${selected} repete e ao menos uma sai em minuto terminado em ${selected}. Últimas ${MAX_PATTERN_CYCLES} ocorrências.`
+            : "Análise aplicável apenas para pedras de 0 a 9."
+        }
+        cycles={selected <= 9 ? repeatMinuteCycles : []}
+        loading={loading}
+        err={err}
+        emptyLabel={
+          selected <= 9
+            ? `Ainda sem repetições da pedra ${selected} em minuto casado.`
+            : "Análise aplicável apenas para pedras de 0 a 9."
+        }
+        eligible={selected <= 9 && repeatMinuteCycles.length >= MIN_CYCLES}
         eligibleHint={`precisa ${MIN_CYCLES}+ ocorrências`}
         showFullBadge={false}
       />
