@@ -950,7 +950,7 @@ function Index() {
                       : "Nenhum resultado no período selecionado."}
                   </div>
                 ) : viewMode === "colunas" ? (
-                  <div className="w-full overflow-x-auto p-3 sm:[container-type:inline-size] sm:overflow-x-hidden sm:p-4">
+                  <div className="w-full overflow-x-auto p-3 [container-type:inline-size] sm:overflow-x-hidden sm:p-4">
                     {/* Cabeçalho fixo dos minutos 00–09 */}
                     <div className="sticky top-0 z-10 -mx-3 mb-2 border-b border-white/10 bg-background/95 px-3 py-2 backdrop-blur sm:-mx-4 sm:px-4">
                       <div
