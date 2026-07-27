@@ -586,10 +586,10 @@ function Index() {
 
   return (
     <div
-      className="min-h-dvh overflow-x-hidden [--cols:5] sm:[--cols:8] lg:[--cols:10]"
+      className="min-h-dvh [--cols:10]"
       style={{
         ["--stone-size" as never]:
-          "clamp(22px, calc((100cqw - 40px) / (var(--cols, 10) * 2)), 74px)",
+          "clamp(34px, calc((100cqw - 40px) / 20), 74px)",
       }}
     >
       <header className="sticky top-0 z-30 border-b border-white/5 bg-background/70 backdrop-blur-xl">
@@ -950,7 +950,7 @@ function Index() {
                       : "Nenhum resultado no período selecionado."}
                   </div>
                 ) : viewMode === "colunas" ? (
-                  <div className="w-full overflow-x-hidden p-3 [container-type:inline-size] sm:p-4">
+                  <div className="w-full overflow-x-auto p-3 [container-type:inline-size] sm:overflow-x-hidden sm:p-4">
                     {/* Cabeçalho fixo dos minutos 00–09 */}
                     <div className="sticky top-0 z-10 -mx-3 mb-2 border-b border-white/10 bg-background/95 px-3 py-2 backdrop-blur sm:-mx-4 sm:px-4">
                       <div
