@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, BarChart3 } from "lucide-react";
-import { useMemo } from "react";
+import { ArrowRight, BarChart3, X } from "lucide-react";
+import { useMemo, useState } from "react";
 import kingImg from "@/assets/freitas-king.png.asset.json";
 
 export const Route = createFileRoute("/")({
@@ -19,6 +19,14 @@ export const Route = createFileRoute("/")({
 });
 
 function LandingPage() {
+  const [openPanel, setOpenPanel] = useState<null | "sinais" | "estrategias" | "historico" | "sobre" | "menu">(null);
+  const tabs: Array<{ id: "sinais" | "estrategias" | "historico" | "sobre"; label: string }> = [
+    { id: "sinais", label: "SINAIS" },
+    { id: "estrategias", label: "ESTRATÉGIAS" },
+    { id: "historico", label: "HISTÓRICO" },
+    { id: "sobre", label: "SOBRE" },
+  ];
+
   const particles = useMemo(
     () =>
       Array.from({ length: 18 }).map((_, i) => ({
@@ -77,6 +85,35 @@ function LandingPage() {
           }}
         />
       ))}
+
+      {/* Slide-up content panel (bytinto-style) */}
+      {openPanel && (
+        <div
+          className="fixed inset-0 z-30 flex items-end justify-center px-3 pb-28 sm:pb-32"
+          onClick={() => setOpenPanel(null)}
+        >
+          <div
+            aria-hidden
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-[fadeIn_0.25s_ease-out_both]"
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-3xl rounded-3xl border border-white/10 bg-black/80 p-6 text-left shadow-2xl backdrop-blur-xl animate-[fadeUp_0.35s_ease-out_both] sm:p-8"
+          >
+            <button
+              type="button"
+              onClick={() => setOpenPanel(null)}
+              className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full border border-white/10 bg-white/5 text-white/70 transition hover:bg-white/10 hover:text-white"
+              aria-label="Fechar"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <PanelContent panel={openPanel} />
+          </div>
+        </div>
+      )}
 
       {/* Top right icon */}
       <Link
@@ -200,6 +237,156 @@ function LandingPage() {
           </Link>
         </div>
       </main>
+
+      {/* Floating bottom nav (bytinto-style) */}
+      <nav
+        aria-label="Navegação"
+        className="fixed inset-x-0 bottom-4 z-20 flex justify-center px-3 sm:bottom-6"
+      >
+        <div className="flex items-center gap-1 rounded-full border border-white/10 bg-black/70 p-1.5 shadow-[0_10px_40px_-12px_rgba(0,0,0,0.8)] backdrop-blur-xl sm:gap-2 sm:p-2">
+          <div className="hidden items-center gap-1 sm:flex">
+            {tabs.map((t, i) => (
+              <div key={t.id} className="flex items-center">
+                <button
+                  type="button"
+                  onClick={() => setOpenPanel(t.id)}
+                  className={`rounded-full px-4 py-2 text-[11px] font-bold tracking-[0.18em] transition sm:text-xs ${
+                    openPanel === t.id
+                      ? "bg-white text-black"
+                      : "text-white/80 hover:text-white"
+                  }`}
+                >
+                  {t.label}
+                </button>
+                {i < tabs.length - 1 && (
+                  <span className="px-1 text-white/25">/</span>
+                )}
+              </div>
+            ))}
+          </div>
+          {/* Mobile compact tabs */}
+          <div className="flex items-center gap-0.5 sm:hidden">
+            {tabs.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setOpenPanel(t.id)}
+                className={`rounded-full px-2.5 py-1.5 text-[10px] font-bold tracking-[0.14em] transition ${
+                  openPanel === t.id ? "bg-white text-black" : "text-white/80"
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={() => setOpenPanel((p) => (p === "menu" ? null : "menu"))}
+            className={`ml-1 rounded-full px-4 py-2 text-[11px] font-bold tracking-[0.2em] transition sm:text-xs ${
+              openPanel === "menu"
+                ? "bg-white text-black"
+                : "bg-white/10 text-white hover:bg-white/20"
+            }`}
+          >
+            MENU
+          </button>
+        </div>
+      </nav>
+    </div>
+  );
+}
+
+function PanelContent({
+  panel,
+}: {
+  panel: "sinais" | "estrategias" | "historico" | "sobre" | "menu";
+}) {
+  if (panel === "menu") {
+    return (
+      <div className="space-y-4">
+        <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-[#c9a84c]">
+          Menu
+        </p>
+        <h2 className="text-2xl font-black tracking-tight sm:text-3xl">
+          Acessar o sistema
+        </h2>
+        <p className="text-sm text-white/70">
+          Entre no painel para ver histórico ao vivo, análises e estratégias.
+        </p>
+        <div className="flex flex-wrap gap-2 pt-2">
+          <Link
+            to="/app"
+            preload="intent"
+            className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition hover:scale-[1.03]"
+          >
+            Painel completo <ArrowRight className="h-4 w-4" />
+          </Link>
+          <Link
+            to="/sinais"
+            preload="intent"
+            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
+          >
+            Sinais ao vivo
+          </Link>
+          <Link
+            to="/estrategias"
+            preload="intent"
+            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
+          >
+            Estratégias
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const content = {
+    sinais: {
+      tag: "Sinais",
+      title: "Sinais ao vivo",
+      body: "Acompanhe alertas em tempo real com marcação de horário e status do resultado.",
+      cta: { to: "/sinais" as const, label: "Abrir Sinais" },
+    },
+    estrategias: {
+      tag: "Estratégias",
+      title: "Estratégias validadas",
+      body: "Padrões e gatilhos que rodam sobre o histórico com validação automática.",
+      cta: { to: "/estrategias" as const, label: "Ver Estratégias" },
+    },
+    historico: {
+      tag: "Histórico",
+      title: "Histórico ao vivo",
+      body: "Visualize resultados em modo lista ou colunas fixas com filtros por período.",
+      cta: { to: "/app" as const, label: "Abrir Histórico" },
+    },
+    sobre: {
+      tag: "Sobre",
+      title: "Freitas da Blaze — 2.0",
+      body: "Painel próprio de leitura e análise do histórico da Blaze, com foco em performance e clareza visual.",
+      cta: { to: "/app" as const, label: "Entrar" },
+    },
+  }[panel];
+
+  return (
+    <div className="space-y-4">
+      <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-[#c9a84c]">
+        {content.tag}
+      </p>
+      <h2 className="text-2xl font-black tracking-tight sm:text-3xl">
+        {content.title}
+      </h2>
+      <p className="max-w-lg text-sm text-white/70 sm:text-base">
+        {content.body}
+      </p>
+      <div className="pt-2">
+        <Link
+          to={content.cta.to}
+          preload="intent"
+          className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition hover:scale-[1.03]"
+        >
+          {content.cta.label} <ArrowRight className="h-4 w-4" />
+        </Link>
+      </div>
     </div>
   );
 }
