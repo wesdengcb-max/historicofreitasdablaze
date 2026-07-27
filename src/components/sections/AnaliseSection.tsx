@@ -131,7 +131,7 @@ type GroupResult = {
  */
 function computeTop5(cycles: Cycle[]): { rows: GroupResult[]; totalRows: number } {
   const rowSets: Set<number>[] = cycles.map((c) => new Set(c.gaps));
-  const totalRows = rowSets.filter((s) => s.size > 0).length;
+  const totalRows = cycles.length;
   const candidates: GroupResult[] = [];
 
   let maxGap = 0;
