@@ -586,10 +586,10 @@ function Index() {
 
   return (
     <div
-      className="min-h-dvh overflow-x-hidden [--cols:5] sm:[--cols:8] lg:[--cols:10]"
+      className="min-h-dvh [--cols:10]"
       style={{
         ["--stone-size" as never]:
-          "clamp(22px, calc((100cqw - 40px) / (var(--cols, 10) * 2)), 74px)",
+          "clamp(34px, calc((100cqw - 40px) / 20), 74px)",
       }}
     >
       <header className="sticky top-0 z-30 border-b border-white/5 bg-background/70 backdrop-blur-xl">
