@@ -96,26 +96,45 @@ export function PredictiveSignals() {
     now.setSeconds(0, 0);
     setGeneratedAt(now);
 
-    // ---- Modo 1: Top 3 de cada número com ciclo em aberto ----
-    const m1: Mode1Signal[] = [];
+    // ---- Modo 1: Top 1 (posição central M) de cada análise ativa, unificado por horário ----
+    const byTime = new Map<
+      number,
+      { values: number[]; pct: number; label: string }
+    >();
     for (const item of active) {
       const hist = cyclesOf(engine[item.analysis], item.value);
       if (!hist.length) continue;
-      const top3 = computeTop(hist, 3);
-      for (const g of top3) {
-        const at = addMinutes(item.open.triggerAt, g.m);
-        if (at.getTime() <= now.getTime()) continue; // elimina horários passados
-        m1.push({
-          key: `${item.analysis}-${item.value}-${g.m}`,
-          title: `Análise ${item.value}`,
-          at,
-          pct: g.pct,
-          label: g.label,
-        });
+      const top1 = computeTop(hist, 1)[0];
+      if (!top1) continue;
+      const at = addMinutes(item.open.triggerAt, top1.m);
+      if (at.getTime() <= now.getTime()) continue; // elimina horários passados
+      const t = at.getTime();
+      const cur = byTime.get(t);
+      if (!cur) {
+        byTime.set(t, { values: [item.value], pct: top1.pct, label: top1.label });
+      } else {
+        if (!cur.values.includes(item.value)) cur.values.push(item.value);
+        if (top1.pct > cur.pct) {
+          cur.pct = top1.pct;
+          cur.label = top1.label;
+        }
       }
     }
-    m1.sort((a, b) => a.at.getTime() - b.at.getTime());
+    const m1: Mode1Signal[] = Array.from(byTime.entries())
+      .sort((a, b) => a[0] - b[0])
+      .map(([t, info]) => {
+        const values = info.values.slice().sort((a, b) => a - b);
+        return {
+          key: `m1-${t}`,
+          title: `Análise ${values.join(" + ")}`,
+          at: new Date(t),
+          pct: info.pct,
+          label: info.label,
+        };
+      });
     setMode1(m1);
+
+    const usedTimes = new Set<number>(m1.map((s) => s.at.getTime()));
 
     // ---- Modo 2: cruzamento de coincidências (Análise 1, pedras 0..9) ----
     const a1Active = active.filter((i) => i.analysis === 1 && i.value <= 9);
@@ -155,12 +174,18 @@ export function PredictiveSignals() {
 
           const best = Math.max(...picks.map((p) => p.pct));
           const tied = picks.filter((p) => Math.abs(p.pct - best) < 0.001);
+          // desduplicação absoluta: remove horários já exibidos em qualquer bloco
           const times = Array.from(new Set(tied.map((p) => p.at)))
-            .sort((a, b) => a - b)
-            .map((t) => new Date(t));
-          const key = `${combo.join("+")}-${anchor.at}`;
-          if (m2.some((s) => s.key === key)) continue;
-          m2.push({ key, title: `Análise ${combo.join(" + ")}`, times, pct });
+            .filter((t) => !usedTimes.has(t))
+            .sort((a, b) => a - b);
+          if (!times.length) continue;
+          times.forEach((t) => usedTimes.add(t));
+          m2.push({
+            key: `m2-${times[0]}`,
+            title: `Análise ${combo.join(" + ")}`,
+            times: times.map((t) => new Date(t)),
+            pct,
+          });
         }
       }
     }
