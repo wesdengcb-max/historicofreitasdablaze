@@ -277,59 +277,6 @@ function LandingPage() {
   );
 }
 
-function NavTab({
-  label,
-  active,
-  compact,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  compact?: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`group/tab relative overflow-hidden rounded-full transition-all duration-300 ${
-        compact
-          ? "px-2.5 py-1.5 text-[10px] tracking-[0.14em]"
-          : "px-4 py-2 text-[11px] tracking-[0.18em] sm:text-xs"
-      } font-bold ${
-        active
-          ? "bg-white text-black shadow-[0_0_28px_rgba(229,57,53,0.55)]"
-          : "text-white/75 hover:text-white"
-      }`}
-    >
-      {/* hover glow bg */}
-      <span
-        aria-hidden
-        className={`absolute inset-0 rounded-full transition-opacity duration-300 ${
-          active
-            ? "opacity-0"
-            : "opacity-0 group-hover/tab:opacity-100"
-        }`}
-        style={{
-          background:
-            "radial-gradient(80% 120% at 50% 120%, rgba(229,57,53,0.45), transparent 70%)",
-        }}
-      />
-      {/* animated underline */}
-      <span
-        aria-hidden
-        className={`pointer-events-none absolute bottom-1 left-1/2 h-[2px] -translate-x-1/2 rounded-full bg-[#ff5b5b] transition-[width,opacity] duration-300 ${
-          active
-            ? "w-0 opacity-0"
-            : "w-0 opacity-0 group-hover/tab:w-5 group-hover/tab:opacity-100"
-        }`}
-        style={{ boxShadow: "0 0 10px rgba(229,57,53,0.9)" }}
-      />
-      <span className="relative">{label}</span>
-    </button>
-  );
-}
-
 function PanelContent({
   panel,
   onNavigate,
