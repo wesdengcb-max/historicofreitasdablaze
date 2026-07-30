@@ -247,7 +247,7 @@ export function PredictiveSignals() {
         {mode1 && (
           <section className="space-y-3">
             <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              <Target className="h-3.5 w-3.5" /> Projeção Top 3
+              <Target className="h-3.5 w-3.5" /> Projeção Top 1
               {generatedAt && (
                 <span className="normal-case tracking-normal opacity-60">
                   · base {fmtClock(generatedAt)}
