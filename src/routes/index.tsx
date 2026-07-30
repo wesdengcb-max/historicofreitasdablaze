@@ -31,13 +31,6 @@ function LandingPage() {
     }, 620);
   };
 
-  const tabs: Array<{ id: "sinais" | "estrategias" | "historico" | "sobre"; label: string }> = [
-    { id: "sinais", label: "SINAIS" },
-    { id: "estrategias", label: "ESTRATÉGIAS" },
-    { id: "historico", label: "HISTÓRICO" },
-    { id: "sobre", label: "SOBRE" },
-  ];
-
   const particles = useMemo(
     () =>
       Array.from({ length: 18 }).map((_, i) => ({
