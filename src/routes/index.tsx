@@ -261,60 +261,6 @@ function LandingPage() {
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
-      {/* Bottom nav in document flow, not floating */}
-      <nav
-        aria-label="Navegação"
-        className="mt-auto w-full pb-4 pt-8 sm:pb-6"
-      >
-        <div className="group/nav relative flex items-center justify-center gap-1 overflow-hidden rounded-full border border-white/10 bg-black/70 p-1.5 shadow-[0_10px_40px_-12px_rgba(0,0,0,0.8)] backdrop-blur-xl transition-[border-color,box-shadow] duration-500 hover:border-white/20 hover:shadow-[0_10px_60px_-10px_rgba(229,57,53,0.35)] sm:gap-2 sm:p-2">
-          {/* animated red sheen on hover */}
-          <span
-            aria-hidden
-            className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover/nav:opacity-100"
-            style={{
-              background:
-                "radial-gradient(120% 80% at 50% 120%, rgba(229,57,53,0.22), transparent 70%)",
-            }}
-          />
-          <div className="hidden items-center gap-1 sm:flex">
-            {tabs.map((t, i) => (
-              <div key={t.id} className="flex items-center">
-                <NavTab
-                  active={openPanel === t.id}
-                  onClick={() => setOpenPanel(t.id)}
-                  label={t.label}
-                />
-                {i < tabs.length - 1 && (
-                  <span className="px-1 text-white/25">/</span>
-                )}
-              </div>
-            ))}
-          </div>
-          {/* Mobile compact tabs */}
-          <div className="flex items-center gap-0.5 sm:hidden">
-            {tabs.map((t) => (
-              <NavTab
-                key={t.id}
-                compact
-                active={openPanel === t.id}
-                onClick={() => setOpenPanel(t.id)}
-                label={t.label}
-              />
-            ))}
-          </div>
-          <button
-            type="button"
-            onClick={() => setOpenPanel((p) => (p === "menu" ? null : "menu"))}
-            className={`relative ml-1 overflow-hidden rounded-full px-4 py-2 text-[11px] font-bold tracking-[0.2em] transition-all duration-300 sm:text-xs ${
-              openPanel === "menu"
-                ? "bg-white text-black shadow-[0_0_24px_rgba(255,255,255,0.35)]"
-                : "bg-white/10 text-white hover:bg-white/20 hover:shadow-[0_0_18px_rgba(255,255,255,0.18)]"
-            }`}
-          >
-            MENU
-          </button>
-        </div>
-      </nav>
       </main>
 
       {/* Page-exit transition (slides across from left) */}
