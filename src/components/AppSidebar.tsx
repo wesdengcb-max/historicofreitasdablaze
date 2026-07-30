@@ -1,4 +1,7 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { getMyProfile } from "@/lib/auth.functions";
 import {
   LayoutDashboard,
   DollarSign,
@@ -14,6 +17,7 @@ import {
   Pencil,
   KeyRound,
   Trash2,
+  Users,
 } from "lucide-react";
 import freitasLogo from "@/assets/freitas-logo.jpg.asset.json";
 import {
@@ -54,6 +58,19 @@ const blazeItems = [
 export function AppSidebar() {
   const currentPath = useRouterState({ select: (s) => s.location.pathname });
   const isActive = (path: string) => currentPath === path;
+  const navigate = useNavigate();
+  const [profile, setProfile] = useState<{ nome: string; email: string; isAdmin: boolean } | null>(null);
+
+  useEffect(() => {
+    getMyProfile()
+      .then((p) => setProfile({ nome: p.nome, email: p.email, isAdmin: p.isAdmin }))
+      .catch(() => setProfile(null));
+  }, []);
+
+  async function handleSignOut() {
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", replace: true });
+  }
 
   return (
     <Sidebar collapsible="icon" className="border-r border-border">
@@ -137,6 +154,26 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {profile?.isAdmin && (
+          <SidebarGroup>
+            <SidebarGroupLabel className="text-[10px] tracking-widest font-mono text-muted-foreground">
+              ADMIN
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={isActive("/admin")} tooltip="Gerenciar acessos">
+                    <Link to="/admin">
+                      <Users className="h-4 w-4" />
+                      <span className="font-semibold">Gerenciar acessos</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
 
       <SidebarFooter className="border-t border-border gap-2">
@@ -149,13 +186,13 @@ export function AppSidebar() {
         </div>
         <div className="flex items-center gap-2 group-data-[collapsible=icon]:justify-center">
           <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-bold text-sm relative">
-            AD
+            {(profile?.nome || profile?.email || "AD").slice(0, 2).toUpperCase()}
             <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-400 border-2 border-background" />
           </div>
           <div className="flex-1 min-w-0 group-data-[collapsible=icon]:hidden">
-            <div className="font-bold text-sm truncate">Admin</div>
+            <div className="font-bold text-sm truncate">{profile?.nome || profile?.email || "Conta"}</div>
             <Badge className="text-[9px] font-mono tracking-widest bg-surface-2 text-muted-foreground border border-border h-4 px-1.5">
-              MEMBRO
+              {profile?.isAdmin ? "ADMIN" : "MEMBRO"}
             </Badge>
           </div>
           <DropdownMenu>
@@ -188,7 +225,11 @@ export function AppSidebar() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <button className="grid h-8 w-8 place-items-center rounded-lg border border-border bg-surface/60 hover:bg-surface-2 group-data-[collapsible=icon]:hidden">
+          <button
+            onClick={handleSignOut}
+            aria-label="Sair"
+            className="grid h-8 w-8 place-items-center rounded-lg border border-border bg-surface/60 hover:bg-surface-2 group-data-[collapsible=icon]:hidden"
+          >
             <LogOut className="h-4 w-4 text-muted-foreground" />
           </button>
         </div>
