@@ -270,12 +270,40 @@ function AnalysisPanel({
   eligibleHint,
   showFullBadge = true,
 }: PanelProps) {
-  const { rows: top5, totalRows } = useMemo(() => computeTop5(cycles), [cycles]);
-  const details = useMemo(() => buildDetailRows(cycles), [cycles]);
-  const fullyCompleted = cycles.filter((c) => c.pending === 0 && c.gaps.length > 0).length;
-  const totalGaps = cycles.reduce((a, c) => a + c.gaps.length, 0);
+  // Janela deslizante FIFO: apenas os 10 gatilhos mais recentes alimentam
+  // histórico, Top 5 e percentuais.
+  const windowed = useMemo(() => buildDetailRows(cycles), [cycles]);
+
+  // Persistência da janela (para reexibir ao voltar/recarregar).
+  const storageKey = `analise:window:${eyebrow}`;
+  useEffect(() => {
+    if (typeof window === "undefined" || windowed.length === 0) return;
+    try {
+      window.localStorage.setItem(
+        storageKey,
+        JSON.stringify(
+          windowed.map((c) => ({
+            index: c.index,
+            triggerAt: c.triggerAt.toISOString(),
+            triggerLabel: c.triggerLabel,
+            triggerDetail: c.triggerDetail,
+            gaps: c.gaps,
+            pending: c.pending,
+            elapsed: c.elapsed,
+          })),
+        ),
+      );
+    } catch {
+      /* ignore quota errors */
+    }
+  }, [storageKey, windowed]);
+
+  const { rows: top5, totalRows } = useMemo(() => computeTop5(windowed), [windowed]);
+  const details = windowed;
+  const fullyCompleted = windowed.filter((c) => c.pending === 0 && c.gaps.length > 0).length;
+  const totalGaps = windowed.reduce((a, c) => a + c.gaps.length, 0);
   const avg = totalGaps
-    ? Math.round(cycles.reduce((a, c) => a + c.gaps.reduce((x, y) => x + y, 0), 0) / totalGaps)
+    ? Math.round(windowed.reduce((a, c) => a + c.gaps.reduce((x, y) => x + y, 0), 0) / totalGaps)
     : null;
 
   const chartData = top5.map((it) => ({ label: it.label, count: it.count }));
@@ -290,7 +318,8 @@ function AnalysisPanel({
           <h3 className="text-lg font-semibold text-foreground">{title}</h3>
           {subtitle && <p className="mt-1 text-xs text-muted-foreground">{subtitle}</p>}
           <p className="mt-1 text-xs text-muted-foreground">
-            {cycles.length} gatilhos · {fullyCompleted} completos · {totalGaps} zeros coletados
+            {windowed.length} gatilhos (últimos {MAX_DETAIL_ROWS}) · {fullyCompleted} completos ·{" "}
+            {totalGaps} zeros coletados
             {avg !== null ? ` · média ${avg} min` : ""}
           </p>
         </div>
