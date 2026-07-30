@@ -9,31 +9,32 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SinaisRouteImport } from './routes/sinais'
-import { Route as EstrategiasRouteImport } from './routes/estrategias'
-import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedSinaisRouteImport } from './routes/_authenticated/sinais'
+import { Route as AuthenticatedEstrategiasRouteImport } from './routes/_authenticated/estrategias'
+import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as ApiPublicRecentRouteImport } from './routes/api/public/recent'
 import { Route as ApiPublicCollectRouteImport } from './routes/api/public/collect'
 
-const SinaisRoute = SinaisRouteImport.update({
-  id: '/sinais',
-  path: '/sinais',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EstrategiasRoute = EstrategiasRouteImport.update({
-  id: '/estrategias',
-  path: '/estrategias',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppRoute = AppRouteImport.update({
-  id: '/app',
-  path: '/app',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedSinaisRoute = AuthenticatedSinaisRouteImport.update({
+  id: '/_authenticated/sinais',
+  path: '/sinais',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedEstrategiasRoute =
+  AuthenticatedEstrategiasRouteImport.update({
+    id: '/_authenticated/estrategias',
+    path: '/estrategias',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
+  id: '/_authenticated/app',
+  path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicRecentRoute = ApiPublicRecentRouteImport.update({
@@ -49,26 +50,26 @@ const ApiPublicCollectRoute = ApiPublicCollectRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/app': typeof AppRoute
-  '/estrategias': typeof EstrategiasRoute
-  '/sinais': typeof SinaisRoute
+  '/app': typeof AuthenticatedAppRoute
+  '/estrategias': typeof AuthenticatedEstrategiasRoute
+  '/sinais': typeof AuthenticatedSinaisRoute
   '/api/public/collect': typeof ApiPublicCollectRoute
   '/api/public/recent': typeof ApiPublicRecentRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/app': typeof AppRoute
-  '/estrategias': typeof EstrategiasRoute
-  '/sinais': typeof SinaisRoute
+  '/app': typeof AuthenticatedAppRoute
+  '/estrategias': typeof AuthenticatedEstrategiasRoute
+  '/sinais': typeof AuthenticatedSinaisRoute
   '/api/public/collect': typeof ApiPublicCollectRoute
   '/api/public/recent': typeof ApiPublicRecentRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/app': typeof AppRoute
-  '/estrategias': typeof EstrategiasRoute
-  '/sinais': typeof SinaisRoute
+  '/_authenticated/app': typeof AuthenticatedAppRoute
+  '/_authenticated/estrategias': typeof AuthenticatedEstrategiasRoute
+  '/_authenticated/sinais': typeof AuthenticatedSinaisRoute
   '/api/public/collect': typeof ApiPublicCollectRoute
   '/api/public/recent': typeof ApiPublicRecentRoute
 }
@@ -92,50 +93,50 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/app'
-    | '/estrategias'
-    | '/sinais'
+    | '/_authenticated/app'
+    | '/_authenticated/estrategias'
+    | '/_authenticated/sinais'
     | '/api/public/collect'
     | '/api/public/recent'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AppRoute: typeof AppRoute
-  EstrategiasRoute: typeof EstrategiasRoute
-  SinaisRoute: typeof SinaisRoute
+  AuthenticatedAppRoute: typeof AuthenticatedAppRoute
+  AuthenticatedEstrategiasRoute: typeof AuthenticatedEstrategiasRoute
+  AuthenticatedSinaisRoute: typeof AuthenticatedSinaisRoute
   ApiPublicCollectRoute: typeof ApiPublicCollectRoute
   ApiPublicRecentRoute: typeof ApiPublicRecentRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/sinais': {
-      id: '/sinais'
-      path: '/sinais'
-      fullPath: '/sinais'
-      preLoaderRoute: typeof SinaisRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/estrategias': {
-      id: '/estrategias'
-      path: '/estrategias'
-      fullPath: '/estrategias'
-      preLoaderRoute: typeof EstrategiasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app': {
-      id: '/app'
-      path: '/app'
-      fullPath: '/app'
-      preLoaderRoute: typeof AppRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/sinais': {
+      id: '/_authenticated/sinais'
+      path: '/sinais'
+      fullPath: '/sinais'
+      preLoaderRoute: typeof AuthenticatedSinaisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/estrategias': {
+      id: '/_authenticated/estrategias'
+      path: '/estrategias'
+      fullPath: '/estrategias'
+      preLoaderRoute: typeof AuthenticatedEstrategiasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/app': {
+      id: '/_authenticated/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AuthenticatedAppRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/recent': {
@@ -157,9 +158,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AppRoute: AppRoute,
-  EstrategiasRoute: EstrategiasRoute,
-  SinaisRoute: SinaisRoute,
+  AuthenticatedAppRoute: AuthenticatedAppRoute,
+  AuthenticatedEstrategiasRoute: AuthenticatedEstrategiasRoute,
+  AuthenticatedSinaisRoute: AuthenticatedSinaisRoute,
   ApiPublicCollectRoute: ApiPublicCollectRoute,
   ApiPublicRecentRoute: ApiPublicRecentRoute,
 }
