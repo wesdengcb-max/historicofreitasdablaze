@@ -42,6 +42,7 @@ import { ResultCircle } from "@/components/double/ResultCircle";
 import { colorOf, fmtTime, type Color } from "@/components/double/types";
 import { setSignals } from "@/lib/signalsStore";
 import { BlazeRoulette } from "@/components/double/BlazeRoulette";
+import { PredictiveSignals } from "@/components/double/PredictiveSignals";
 
 
 type Signal = {
@@ -344,6 +345,9 @@ export function SinaisPage() {
 
   return (
     <div className="min-h-screen bg-background p-4 sm:p-6 space-y-6">
+      {/* Gerador de sinais preditivos */}
+      <PredictiveSignals />
+
       {/* Top header */}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
