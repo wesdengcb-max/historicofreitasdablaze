@@ -63,13 +63,13 @@ function SectionFallback() {
 export const Route = createFileRoute("/app")({
   head: () => ({
     meta: [
-      { title: "Histórico · Freitas da Blaze" },
+      { title: "Freitas da Blaze — Análise do Histórico da Blaze" },
       {
         name: "description",
         content:
           "Freitas da Blaze: análise do histórico da Blaze em tempo real, sequências, frequência e alerta de branco.",
       },
-      { property: "og:title", content: "Histórico · Freitas da Blaze" },
+      { property: "og:title", content: "Freitas da Blaze — Análise do Histórico da Blaze" },
       { property: "og:description", content: "Freitas da Blaze: análise do histórico da Blaze em tempo real, sequências, frequência e alerta de branco." },
     ],
   }),
