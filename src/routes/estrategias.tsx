@@ -31,8 +31,12 @@ import {
 export const Route = createFileRoute("/estrategias")({
   head: () => ({
     meta: [
-      { title: "Catalogador de Estratégias — Freitas da Blaze" },
-      { name: "description", content: "Analise padrões e automatize entradas baseadas em estatísticas." },
+      { title: "Estratégias · Freitas da Blaze" },
+      { name: "description", content: "Catálogo de padrões e estratégias validadas sobre o histórico." },
+      { property: "og:title", content: "Estratégias · Freitas da Blaze" },
+      { property: "og:description", content: "Catálogo de padrões e estratégias validadas sobre o histórico." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: EstrategiasPage,
