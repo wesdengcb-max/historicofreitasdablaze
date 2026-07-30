@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowRight, BarChart3, X } from "lucide-react";
+import { ArrowRight, BarChart3 } from "lucide-react";
 import { useMemo, useState } from "react";
 import kingImg from "@/assets/freitas-king.png.asset.json";
 
@@ -19,7 +19,6 @@ export const Route = createFileRoute("/")({
 });
 
 function LandingPage() {
-  const [openPanel, setOpenPanel] = useState<null | "sinais" | "estrategias" | "historico" | "sobre" | "menu">(null);
   const [exitTo, setExitTo] = useState<null | "/app" | "/sinais" | "/estrategias">(null);
   const navigate = useNavigate();
 
@@ -30,13 +29,6 @@ function LandingPage() {
       navigate({ to });
     }, 620);
   };
-
-  const tabs: Array<{ id: "sinais" | "estrategias" | "historico" | "sobre"; label: string }> = [
-    { id: "sinais", label: "SINAIS" },
-    { id: "estrategias", label: "ESTRATÉGIAS" },
-    { id: "historico", label: "HISTÓRICO" },
-    { id: "sobre", label: "SOBRE" },
-  ];
 
   const particles = useMemo(
     () =>
@@ -96,41 +88,6 @@ function LandingPage() {
           }}
         />
       ))}
-
-      {/* Slide-up content panel (bytinto-style) */}
-      {openPanel && (
-        <div
-          className="fixed inset-0 z-30 flex items-end justify-center px-3 pb-28 sm:pb-32"
-          onClick={() => setOpenPanel(null)}
-        >
-          <div
-            aria-hidden
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-[fadeIn_0.25s_ease-out_both]"
-          />
-          <div
-            role="dialog"
-            aria-modal="true"
-            onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-3xl rounded-3xl border border-white/10 bg-black/80 p-6 text-left shadow-2xl backdrop-blur-xl animate-[fadeUp_0.35s_ease-out_both] sm:p-8"
-          >
-            <button
-              type="button"
-              onClick={() => setOpenPanel(null)}
-              className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full border border-white/10 bg-white/5 text-white/70 transition hover:bg-white/10 hover:text-white"
-              aria-label="Fechar"
-            >
-              <X className="h-4 w-4" />
-            </button>
-            <PanelContent
-              panel={openPanel}
-              onNavigate={(to) => {
-                setOpenPanel(null);
-                goWithTransition(to);
-              }}
-            />
-          </div>
-        </div>
-      )}
 
       {/* Top right icon */}
       <Link
@@ -261,60 +218,6 @@ function LandingPage() {
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
-      {/* Bottom nav in document flow, not floating */}
-      <nav
-        aria-label="Navegação"
-        className="mt-auto w-full pb-4 pt-8 sm:pb-6"
-      >
-        <div className="group/nav relative flex items-center justify-center gap-1 overflow-hidden rounded-full border border-white/10 bg-black/70 p-1.5 shadow-[0_10px_40px_-12px_rgba(0,0,0,0.8)] backdrop-blur-xl transition-[border-color,box-shadow] duration-500 hover:border-white/20 hover:shadow-[0_10px_60px_-10px_rgba(229,57,53,0.35)] sm:gap-2 sm:p-2">
-          {/* animated red sheen on hover */}
-          <span
-            aria-hidden
-            className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover/nav:opacity-100"
-            style={{
-              background:
-                "radial-gradient(120% 80% at 50% 120%, rgba(229,57,53,0.22), transparent 70%)",
-            }}
-          />
-          <div className="hidden items-center gap-1 sm:flex">
-            {tabs.map((t, i) => (
-              <div key={t.id} className="flex items-center">
-                <NavTab
-                  active={openPanel === t.id}
-                  onClick={() => setOpenPanel(t.id)}
-                  label={t.label}
-                />
-                {i < tabs.length - 1 && (
-                  <span className="px-1 text-white/25">/</span>
-                )}
-              </div>
-            ))}
-          </div>
-          {/* Mobile compact tabs */}
-          <div className="flex items-center gap-0.5 sm:hidden">
-            {tabs.map((t) => (
-              <NavTab
-                key={t.id}
-                compact
-                active={openPanel === t.id}
-                onClick={() => setOpenPanel(t.id)}
-                label={t.label}
-              />
-            ))}
-          </div>
-          <button
-            type="button"
-            onClick={() => setOpenPanel((p) => (p === "menu" ? null : "menu"))}
-            className={`relative ml-1 overflow-hidden rounded-full px-4 py-2 text-[11px] font-bold tracking-[0.2em] transition-all duration-300 sm:text-xs ${
-              openPanel === "menu"
-                ? "bg-white text-black shadow-[0_0_24px_rgba(255,255,255,0.35)]"
-                : "bg-white/10 text-white hover:bg-white/20 hover:shadow-[0_0_18px_rgba(255,255,255,0.18)]"
-            }`}
-          >
-            MENU
-          </button>
-        </div>
-      </nav>
       </main>
 
       {/* Page-exit transition (slides across from left) */}
@@ -334,156 +237,6 @@ function LandingPage() {
           />
         </div>
       )}
-    </div>
-  );
-}
-
-function NavTab({
-  label,
-  active,
-  compact,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  compact?: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`group/tab relative overflow-hidden rounded-full transition-all duration-300 ${
-        compact
-          ? "px-2.5 py-1.5 text-[10px] tracking-[0.14em]"
-          : "px-4 py-2 text-[11px] tracking-[0.18em] sm:text-xs"
-      } font-bold ${
-        active
-          ? "bg-white text-black shadow-[0_0_28px_rgba(229,57,53,0.55)]"
-          : "text-white/75 hover:text-white"
-      }`}
-    >
-      {/* hover glow bg */}
-      <span
-        aria-hidden
-        className={`absolute inset-0 rounded-full transition-opacity duration-300 ${
-          active
-            ? "opacity-0"
-            : "opacity-0 group-hover/tab:opacity-100"
-        }`}
-        style={{
-          background:
-            "radial-gradient(80% 120% at 50% 120%, rgba(229,57,53,0.45), transparent 70%)",
-        }}
-      />
-      {/* animated underline */}
-      <span
-        aria-hidden
-        className={`pointer-events-none absolute bottom-1 left-1/2 h-[2px] -translate-x-1/2 rounded-full bg-[#ff5b5b] transition-[width,opacity] duration-300 ${
-          active
-            ? "w-0 opacity-0"
-            : "w-0 opacity-0 group-hover/tab:w-5 group-hover/tab:opacity-100"
-        }`}
-        style={{ boxShadow: "0 0 10px rgba(229,57,53,0.9)" }}
-      />
-      <span className="relative">{label}</span>
-    </button>
-  );
-}
-
-function PanelContent({
-  panel,
-  onNavigate,
-}: {
-  panel: "sinais" | "estrategias" | "historico" | "sobre" | "menu";
-  onNavigate: (to: "/app" | "/sinais" | "/estrategias") => void;
-}) {
-  if (panel === "menu") {
-    return (
-      <div className="space-y-4">
-        <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-[#c9a84c]">
-          Menu
-        </p>
-        <h2 className="text-2xl font-black tracking-tight sm:text-3xl">
-          Acessar o sistema
-        </h2>
-        <p className="text-sm text-white/70">
-          Entre no painel para ver histórico ao vivo, análises e estratégias.
-        </p>
-        <div className="flex flex-wrap gap-2 pt-2">
-          <button
-            type="button"
-            onClick={() => onNavigate("/app")}
-            className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition hover:scale-[1.03] hover:shadow-[0_0_30px_rgba(255,255,255,0.35)]"
-          >
-            Painel completo <ArrowRight className="h-4 w-4" />
-          </button>
-          <button
-            type="button"
-            onClick={() => onNavigate("/sinais")}
-            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10 hover:shadow-[0_0_24px_rgba(229,57,53,0.35)]"
-          >
-            Sinais ao vivo
-          </button>
-          <button
-            type="button"
-            onClick={() => onNavigate("/estrategias")}
-            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10 hover:shadow-[0_0_24px_rgba(229,57,53,0.35)]"
-          >
-            Estratégias
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  const content = {
-    sinais: {
-      tag: "Sinais",
-      title: "Sinais ao vivo",
-      body: "Acompanhe alertas em tempo real com marcação de horário e status do resultado.",
-      cta: { to: "/sinais" as const, label: "Abrir Sinais" },
-    },
-    estrategias: {
-      tag: "Estratégias",
-      title: "Estratégias validadas",
-      body: "Padrões e gatilhos que rodam sobre o histórico com validação automática.",
-      cta: { to: "/estrategias" as const, label: "Ver Estratégias" },
-    },
-    historico: {
-      tag: "Histórico",
-      title: "Histórico ao vivo",
-      body: "Visualize resultados em modo lista ou colunas fixas com filtros por período.",
-      cta: { to: "/app" as const, label: "Abrir Histórico" },
-    },
-    sobre: {
-      tag: "Sobre",
-      title: "Freitas da Blaze — 2.0",
-      body: "Painel próprio de leitura e análise do histórico da Blaze, com foco em performance e clareza visual.",
-      cta: { to: "/app" as const, label: "Entrar" },
-    },
-  }[panel];
-
-  return (
-    <div className="space-y-4">
-      <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-[#c9a84c]">
-        {content.tag}
-      </p>
-      <h2 className="text-2xl font-black tracking-tight sm:text-3xl">
-        {content.title}
-      </h2>
-      <p className="max-w-lg text-sm text-white/70 sm:text-base">
-        {content.body}
-      </p>
-      <div className="pt-2">
-        <button
-          type="button"
-          onClick={() => onNavigate(content.cta.to)}
-          className="group/cta inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_30px_rgba(229,57,53,0.5)]"
-        >
-          {content.cta.label} <ArrowRight className="h-4 w-4" />
-        </button>
-      </div>
     </div>
   );
 }
