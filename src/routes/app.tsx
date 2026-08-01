@@ -808,49 +808,7 @@ function Index() {
             icon={<TrendingUp className="h-3.5 w-3.5" />}
             delay={0.08}
             action={
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="inline-flex rounded-full border border-white/10 bg-white/5 p-0.5 text-[11px] font-medium">
-                  <button
-                    type="button"
-                    onClick={() => setViewMode("colunas")}
-                    className={`rounded-full px-3 py-1.5 transition-colors ${viewMode === "colunas" ? "bg-white/10 text-foreground" : "text-muted-foreground hover:text-foreground"}`}
-                  >
-                    Colunas Fixas
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setViewMode("lista")}
-                    className={`rounded-full px-3 py-1.5 transition-colors ${viewMode === "lista" ? "bg-white/10 text-foreground" : "text-muted-foreground hover:text-foreground"}`}
-                  >
-                    Lista
-                  </button>
-                </div>
-                <Switch checked={inverse} onChange={setInverse} label="Sentido inverso" />
-                <Switch checked={whiteAlert} onChange={setWhiteAlert} label="Alerta de branco" />
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button
-                      type="button"
-                      className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-white/[0.09] hover:text-foreground"
-                      title="Slots futuros"
-                    >
-                      <Clock className="h-3.5 w-3.5" />
-                      <span>{futureSlots === 0 ? "Off" : `+${futureSlots} min`}</span>
-                      <ChevronDown className="h-3 w-3 opacity-70" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="min-w-[7rem]">
-                    {([0, 10, 20, 30] as const).map((v) => (
-                      <DropdownMenuItem
-                        key={v}
-                        onSelect={() => setFutureSlots(v)}
-                        className={futureSlots === v ? "bg-white/10" : ""}
-                      >
-                        {v === 0 ? "Off" : `+${v} min`}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+              <div className="flex items-center gap-3">
                 <button
                   type="button"
                   onClick={() => setFullscreen(true)}
@@ -863,6 +821,62 @@ function Index() {
               </div>
             }
           >
+            {/* Painel de controles alinhado */}
+            <div className="mb-4 rounded-2xl border border-white/5 bg-white/[0.02] p-3 sm:p-4">
+              <div className="grid grid-cols-1 gap-x-8 gap-y-3 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="flex min-w-0 items-center">
+                  <div className="inline-flex rounded-full border border-white/10 bg-white/5 p-0.5 text-[11px] font-medium">
+                    <button
+                      type="button"
+                      onClick={() => setViewMode("colunas")}
+                      className={`rounded-full px-3 py-1.5 transition-colors ${viewMode === "colunas" ? "bg-white/10 text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                    >
+                      Colunas Fixas
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setViewMode("lista")}
+                      className={`rounded-full px-3 py-1.5 transition-colors ${viewMode === "lista" ? "bg-white/10 text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                    >
+                      Lista
+                    </button>
+                  </div>
+                </div>
+                <div className="flex min-w-0 items-center">
+                  <Switch checked={inverse} onChange={setInverse} label="Sentido inverso" />
+                </div>
+                <div className="flex min-w-0 items-center">
+                  <Switch checked={whiteAlert} onChange={setWhiteAlert} label="Alerta de branco" />
+                </div>
+                <div className="flex min-w-0 items-center lg:justify-end">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        type="button"
+                        className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-white/[0.09] hover:text-foreground"
+                        title="Slots futuros"
+                      >
+                        <Clock className="h-3.5 w-3.5" />
+                        <span>{futureSlots === 0 ? "Off" : `+${futureSlots} min`}</span>
+                        <ChevronDown className="h-3 w-3 opacity-70" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="min-w-[7rem]">
+                      {([0, 10, 20, 30] as const).map((v) => (
+                        <DropdownMenuItem
+                          key={v}
+                          onSelect={() => setFutureSlots(v)}
+                          className={futureSlots === v ? "bg-white/10" : ""}
+                        >
+                          {v === 0 ? "Off" : `+${v} min`}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </div>
+            </div>
+
             {/* Filtros de período */}
             <div className="mb-4 space-y-3">
               <div className="flex flex-wrap gap-1.5">
