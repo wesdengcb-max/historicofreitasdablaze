@@ -596,7 +596,7 @@ function Index() {
 
   const applyCustom = () => setAppliedTick((v) => v + 1);
   const historyGridTemplate =
-    "repeat(var(--cols, 10), calc((var(--stone-size, 44px) * 2) + 2px))";
+    "repeat(var(--cols, 10), var(--stone-track, calc((var(--stone-size, 44px) * 2) + 2px)))";
 
   // Contagens auxiliares dos toggles "Contar colunas" / "Contar linhas".
   const colCounts = useMemo(() => {
@@ -1081,7 +1081,7 @@ function Index() {
                                 <span className={`inline-flex h-3.5 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-4 sm:px-2 sm:text-[9px] sm:tracking-widest ${badge ? badgeCls : "opacity-0"}`}>
                                   {badge?.label ?? "·"}
                                 </span>
-                                <div className="flex items-start justify-center gap-0.5">
+                                <div className="flex flex-col items-center justify-center gap-0.5 sm:flex-row sm:items-start">
                                   {(cell.length >= 2
                                     ? [cell[0], cell[1]]
                                     : cell.length === 1
