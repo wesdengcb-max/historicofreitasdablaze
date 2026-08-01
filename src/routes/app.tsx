@@ -863,32 +863,39 @@ function Index() {
           >
             {/* Painel de controles alinhado */}
             <div className="mb-4 rounded-2xl border border-white/5 bg-white/[0.02] p-3 sm:p-4">
-              <div className="grid grid-cols-1 gap-x-8 gap-y-3 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="grid grid-cols-1 gap-x-8 gap-y-3.5 sm:grid-cols-2 lg:grid-cols-4">
                 <div className="flex min-w-0 items-center">
-                  <div className="inline-flex rounded-full border border-white/10 bg-white/5 p-0.5 text-[11px] font-medium">
-                    <button
-                      type="button"
-                      onClick={() => setViewMode("colunas")}
-                      className={`rounded-full px-3 py-1.5 transition-colors ${viewMode === "colunas" ? "bg-white/10 text-foreground" : "text-muted-foreground hover:text-foreground"}`}
-                    >
-                      Colunas Fixas
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setViewMode("lista")}
-                      className={`rounded-full px-3 py-1.5 transition-colors ${viewMode === "lista" ? "bg-white/10 text-foreground" : "text-muted-foreground hover:text-foreground"}`}
-                    >
-                      Lista
-                    </button>
-                  </div>
+                  <Switch checked={realtime} onChange={setRealtime} label="Tempo real" />
+                </div>
+                <div className="flex min-w-0 items-center">
+                  <Switch
+                    checked={viewMode === "colunas"}
+                    onChange={(v) => setViewMode(v ? "colunas" : "lista")}
+                    label="Colunas fixas"
+                  />
+                </div>
+                <div className="flex min-w-0 items-center">
+                  <Switch checked={contarColunas} onChange={setContarColunas} label="Contar colunas" />
                 </div>
                 <div className="flex min-w-0 items-center">
                   <Switch checked={inverse} onChange={setInverse} label="Sentido inverso" />
                 </div>
                 <div className="flex min-w-0 items-center">
+                  <Switch checked={numerado} onChange={setNumerado} label="Numerado" />
+                </div>
+                <div className="flex min-w-0 items-center">
+                  <Switch checked={exibirSegundos} onChange={setExibirSegundos} label="Exibir segundos" />
+                </div>
+                <div className="flex min-w-0 items-center">
+                  <Switch checked={contarLinhas} onChange={setContarLinhas} label="Contar linhas" />
+                </div>
+                <div className="flex min-w-0 items-center">
                   <Switch checked={whiteAlert} onChange={setWhiteAlert} label="Alerta de branco" />
                 </div>
-                <div className="flex min-w-0 items-center lg:justify-end">
+                <div className="flex min-w-0 items-center">
+                  <Switch checked={destaqueHorario} onChange={setDestaqueHorario} label="Destaque horário" />
+                </div>
+                <div className="flex min-w-0 items-center">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button
@@ -897,11 +904,11 @@ function Index() {
                         title="Slots futuros"
                       >
                         <Clock className="h-3.5 w-3.5" />
-                        <span>{futureSlots === 0 ? "Off" : `+${futureSlots} min`}</span>
+                        <span>Slots futuros: {futureSlots === 0 ? "Off" : `+${futureSlots} min`}</span>
                         <ChevronDown className="h-3 w-3 opacity-70" />
                       </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="min-w-[7rem]">
+                    <DropdownMenuContent align="start" className="min-w-[7rem]">
                       {([0, 10, 20, 30] as const).map((v) => (
                         <DropdownMenuItem
                           key={v}
