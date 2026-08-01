@@ -1168,11 +1168,12 @@ function Index() {
                   (() => {
                     return (
                        <div
-                         className="grid justify-center p-3 sm:p-4"
+                         className="grid justify-center p-2 [--blaze-card-h:40px] [--blaze-card-w:42px] [--blaze-dot:24px] [--blaze-num:11px] [--blaze-time:10px] sm:p-3 sm:[--blaze-card-h:46px] sm:[--blaze-card-w:48px] sm:[--blaze-dot:28px] sm:[--blaze-num:12px] sm:[--blaze-time:11px] lg:p-4 lg:[--blaze-card-h:50px] lg:[--blaze-card-w:52px] lg:[--blaze-dot:30px] lg:[--blaze-num:13px] lg:[--blaze-time:12px]"
                          style={{
-                           gridTemplateColumns: `repeat(auto-fill, ${BLAZE_CARD_W}px)`,
-                           columnGap: BLAZE_GAP_X,
-                           rowGap: BLAZE_GAP_Y,
+                           gridTemplateColumns:
+                             `repeat(auto-fill, var(--blaze-card-w, ${BLAZE_CARD_W}px))`,
+                           columnGap: "clamp(4px, 1.2vw, 8px)",
+                           rowGap: "clamp(10px, 2vw, 18px)",
                            direction: inverse ? "rtl" : "ltr",
                          }}
                        >
