@@ -632,10 +632,10 @@ function Index() {
 
   return (
     <div
-      className="min-h-dvh [--cols:10] [--stone-size:clamp(13px,calc((100cqw_-_42px)/20),74px)] sm:[--stone-size:clamp(24px,calc((100cqw_-_44px)/20),74px)] lg:[--stone-size:clamp(34px,calc((100cqw_-_44px)/20),74px)]"
+      className="min-h-dvh [--cols:10] [--stone-size:clamp(22px,calc((100cqw_-_40px)/10),74px)] [--stone-track:var(--stone-size)] sm:[--stone-size:clamp(24px,calc((100cqw_-_44px)/20),74px)] sm:[--stone-track:calc((var(--stone-size)*2)+2px)] lg:[--stone-size:clamp(34px,calc((100cqw_-_44px)/20),74px)]"
       style={{
-        ["--stone-num" as never]: "clamp(8px, calc(var(--stone-size) * 0.32), 14px)",
-        ["--stone-time" as never]: "clamp(7px, calc(var(--stone-size) * 0.26), 12px)",
+        ["--stone-num" as never]: "clamp(9px, calc(var(--stone-size) * 0.32), 14px)",
+        ["--stone-time" as never]: "clamp(8px, calc(var(--stone-size) * 0.26), 12px)",
       }}
     >
       <header className="sticky top-0 z-30 border-b border-white/5 bg-background/70 backdrop-blur-xl">
