@@ -632,11 +632,7 @@ function Index() {
 
   return (
     <div
-      className="min-h-dvh [--cols:10] [--stone-size:clamp(22px,calc((100cqw_-_40px)/10),74px)] [--stone-track:var(--stone-size)] [--cell-min:calc((var(--stone-size)*2)+40px)] sm:[--stone-size:clamp(24px,calc((100cqw_-_44px)/20),74px)] sm:[--stone-track:calc((var(--stone-size)*2)+2px)] sm:[--cell-min:calc(var(--stone-size)+26px)] lg:[--stone-size:clamp(34px,calc((100cqw_-_44px)/20),74px)]"
-      style={{
-        ["--stone-num" as never]: "clamp(9px, calc(var(--stone-size) * 0.32), 14px)",
-        ["--stone-time" as never]: "clamp(8px, calc(var(--stone-size) * 0.26), 12px)",
-      }}
+      className="history-metrics min-h-dvh [--cols:10]"
     >
       <header className="sticky top-0 z-30 border-b border-white/5 bg-background/70 backdrop-blur-xl">
         <div className="mx-auto grid h-16 max-w-[1720px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-3 sm:gap-4 sm:px-8">
