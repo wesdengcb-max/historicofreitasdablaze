@@ -114,6 +114,28 @@ function rowToSpin(r: Row): Spin {
 }
 
 function dedupeById<T extends { id: number | string }>(items: T[]): T[] {
+  return dedupeByIdImpl(items);
+}
+
+const spSecondsFormatter = new Intl.DateTimeFormat("pt-BR", {
+  timeZone: "America/Sao_Paulo",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  hour12: false,
+});
+
+// Exibe HH:MM:SS no fuso de Brasília; cai para o horário já formatado se não houver timestamp.
+function spTimeWithSeconds(spin: Spin): string {
+  const raw = (spin.createdAt ?? "").trim();
+  if (!raw) return spin.time;
+  const hasTz = /Z$|[+-]\d{2}:?\d{2}$/.test(raw);
+  const d = new Date(hasTz ? raw : `${raw.replace(" ", "T")}Z`);
+  if (Number.isNaN(d.getTime())) return spin.time;
+  return spSecondsFormatter.format(d);
+}
+
+function dedupeByIdImpl<T extends { id: number | string }>(items: T[]): T[] {
   const byId = new Map<string, T>();
   for (const item of items) {
     const key = String(item.id);
@@ -191,6 +213,12 @@ function Index() {
   const [inverse, setInverse] = useState(false);
   const [viewMode, setViewMode] = useState<"colunas" | "lista">("colunas");
   const [whiteAlert, setWhiteAlert] = useState(true);
+  const [realtime, setRealtime] = useState(true);
+  const [numerado, setNumerado] = useState(false);
+  const [destaqueHorario, setDestaqueHorario] = useState(false);
+  const [exibirSegundos, setExibirSegundos] = useState(false);
+  const [contarColunas, setContarColunas] = useState(false);
+  const [contarLinhas, setContarLinhas] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
   const [futureSlots, setFutureSlots] = useState<0 | 10 | 20 | 30>(0);
   const [highlightN, setHighlightN] = useState<Set<number>>(() => new Set());
@@ -321,6 +349,7 @@ function Index() {
 
   // Realtime — só insere se a nova rodada está no intervalo ativo.
   useEffect(() => {
+    if (!realtime) return;
     const channel = supabase
       .channel("blaze_results_inserts")
       .on(
@@ -344,11 +373,11 @@ function Index() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [range.start, range.end]);
+  }, [range.start, range.end, realtime]);
 
   // Polling leve — só refresca o topo quando o intervalo inclui o "agora".
   useEffect(() => {
-    if (!range.includesNow) return;
+    if (!range.includesNow || !realtime) return;
     let alive = true;
 
     const poll = async () => {
@@ -387,7 +416,7 @@ function Index() {
       document.removeEventListener("visibilitychange", onVisible);
       window.removeEventListener("focus", onVisible);
     };
-  }, [buildQuery, range.includesNow]);
+  }, [buildQuery, range.includesNow, realtime]);
 
   // Countdown estético
   useEffect(() => {
@@ -562,6 +591,17 @@ function Index() {
   const applyCustom = () => setAppliedTick((v) => v + 1);
   const historyGridTemplate =
     "repeat(var(--cols, 10), calc((var(--stone-size, 44px) * 2) + 2px))";
+
+  // Contagens auxiliares dos toggles "Contar colunas" / "Contar linhas".
+  const colCounts = useMemo(() => {
+    const acc = Array.from({ length: 10 }, () => 0);
+    for (const row of gridRows) {
+      row.cells.forEach((cell, i) => {
+        acc[i] += cell.length;
+      });
+    }
+    return acc;
+  }, [gridRows]);
 
   const signalsByHM = useMemo(() => {
 
@@ -823,32 +863,39 @@ function Index() {
           >
             {/* Painel de controles alinhado */}
             <div className="mb-4 rounded-2xl border border-white/5 bg-white/[0.02] p-3 sm:p-4">
-              <div className="grid grid-cols-1 gap-x-8 gap-y-3 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="grid grid-cols-1 gap-x-8 gap-y-3.5 sm:grid-cols-2 lg:grid-cols-4">
                 <div className="flex min-w-0 items-center">
-                  <div className="inline-flex rounded-full border border-white/10 bg-white/5 p-0.5 text-[11px] font-medium">
-                    <button
-                      type="button"
-                      onClick={() => setViewMode("colunas")}
-                      className={`rounded-full px-3 py-1.5 transition-colors ${viewMode === "colunas" ? "bg-white/10 text-foreground" : "text-muted-foreground hover:text-foreground"}`}
-                    >
-                      Colunas Fixas
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setViewMode("lista")}
-                      className={`rounded-full px-3 py-1.5 transition-colors ${viewMode === "lista" ? "bg-white/10 text-foreground" : "text-muted-foreground hover:text-foreground"}`}
-                    >
-                      Lista
-                    </button>
-                  </div>
+                  <Switch checked={realtime} onChange={setRealtime} label="Tempo real" />
+                </div>
+                <div className="flex min-w-0 items-center">
+                  <Switch
+                    checked={viewMode === "colunas"}
+                    onChange={(v) => setViewMode(v ? "colunas" : "lista")}
+                    label="Colunas fixas"
+                  />
+                </div>
+                <div className="flex min-w-0 items-center">
+                  <Switch checked={contarColunas} onChange={setContarColunas} label="Contar colunas" />
                 </div>
                 <div className="flex min-w-0 items-center">
                   <Switch checked={inverse} onChange={setInverse} label="Sentido inverso" />
                 </div>
                 <div className="flex min-w-0 items-center">
+                  <Switch checked={numerado} onChange={setNumerado} label="Numerado" />
+                </div>
+                <div className="flex min-w-0 items-center">
+                  <Switch checked={exibirSegundos} onChange={setExibirSegundos} label="Exibir segundos" />
+                </div>
+                <div className="flex min-w-0 items-center">
+                  <Switch checked={contarLinhas} onChange={setContarLinhas} label="Contar linhas" />
+                </div>
+                <div className="flex min-w-0 items-center">
                   <Switch checked={whiteAlert} onChange={setWhiteAlert} label="Alerta de branco" />
                 </div>
-                <div className="flex min-w-0 items-center lg:justify-end">
+                <div className="flex min-w-0 items-center">
+                  <Switch checked={destaqueHorario} onChange={setDestaqueHorario} label="Destaque horário" />
+                </div>
+                <div className="flex min-w-0 items-center">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button
@@ -857,11 +904,11 @@ function Index() {
                         title="Slots futuros"
                       >
                         <Clock className="h-3.5 w-3.5" />
-                        <span>{futureSlots === 0 ? "Off" : `+${futureSlots} min`}</span>
+                        <span>Slots futuros: {futureSlots === 0 ? "Off" : `+${futureSlots} min`}</span>
                         <ChevronDown className="h-3 w-3 opacity-70" />
                       </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="min-w-[7rem]">
+                    <DropdownMenuContent align="start" className="min-w-[7rem]">
                       {([0, 10, 20, 30] as const).map((v) => (
                         <DropdownMenuItem
                           key={v}
@@ -974,17 +1021,22 @@ function Index() {
                         {Array.from({ length: 10 }, (_, i) => (
                           <div
                             key={`h-${i}`}
-                            className="flex h-6 items-center justify-center rounded-md bg-white/5 text-[11px] font-semibold tabular-nums text-muted-foreground"
+                            className="flex h-6 items-center justify-center gap-1.5 rounded-md bg-white/5 text-[11px] font-semibold tabular-nums text-muted-foreground"
                           >
-                            {String(i).padStart(2, "0")}
+                            <span>{String(i).padStart(2, "0")}</span>
+                            {contarColunas && (
+                              <span className="rounded-full bg-primary/20 px-1.5 text-[10px] font-bold text-primary">
+                                {colCounts[i]}
+                              </span>
+                            )}
                           </div>
                         ))}
                       </div>
                     </div>
                     <div className="flex flex-col gap-3">
                       {gridRows.map((row) => (
+                        <div key={row.key} className="flex items-start justify-center gap-2">
                         <div
-                          key={row.key}
                           className="grid items-start"
                           style={{ gridTemplateColumns: historyGridTemplate, columnGap: "2px", justifyContent: "center", direction: inverse ? "rtl" : "ltr" }}
                         >
@@ -1032,6 +1084,9 @@ function Index() {
                                           key={(spin as Spin).id}
                                           spin={spin as Spin}
                                           highlightN={highlightN}
+                                          numbered={numerado}
+                                          showSeconds={exibirSegundos}
+                                          timeHighlight={destaqueHorario}
                                           onClick={() =>
                                             setHighlightN((h) => {
                                               const next = new Set(h);
@@ -1085,6 +1140,12 @@ function Index() {
 
 
                         </div>
+                        {contarLinhas && (
+                          <span className="mt-1 shrink-0 rounded-full bg-primary/20 px-2 py-0.5 text-[10px] font-bold tabular-nums text-primary">
+                            {row.cells.reduce((a, c) => a + c.length, 0)}
+                          </span>
+                        )}
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -1104,6 +1165,9 @@ function Index() {
                               spin={spin}
                               delay={i < 20 ? i * 0.015 : 0}
                               highlightN={highlightN}
+                              numbered={numerado}
+                              showSeconds={exibirSegundos}
+                              timeHighlight={destaqueHorario}
                               onClick={() =>
                                 setHighlightN((h) => {
                                   const next = new Set(h);
@@ -1169,12 +1233,18 @@ const TipMinerCard = memo(function TipMinerCard({
   spin,
   delay = 0,
   showTime = true,
+  numbered = false,
+  showSeconds = false,
+  timeHighlight = false,
   highlightN,
   onClick,
 }: {
   spin: Spin;
   delay?: number;
   showTime?: boolean;
+  numbered?: boolean;
+  showSeconds?: boolean;
+  timeHighlight?: boolean;
   highlightN?: Set<number> | null;
   onClick?: () => void;
 }) {
@@ -1207,12 +1277,19 @@ const TipMinerCard = memo(function TipMinerCard({
         }}
       >
         {isWhite ? (
-          <img
-            src={brancoTile.url}
-            alt="Branco"
-            className="h-full w-full object-cover"
-            draggable={false}
-          />
+          <span className="relative flex h-full w-full items-center justify-center">
+            <img
+              src={brancoTile.url}
+              alt="Branco"
+              className="h-full w-full object-cover"
+              draggable={false}
+            />
+            {numbered && (
+              <span className="absolute inset-0 grid place-items-center text-[13px] font-black leading-none tabular-nums text-black/85">
+                {spin.n}
+              </span>
+            )}
+          </span>
         ) : (
           <div
             className="flex h-[calc(var(--stone-size,44px)*0.75)] w-[calc(var(--stone-size,44px)*0.75)] items-center justify-center overflow-hidden rounded-full text-[13px] font-bold leading-none tabular-nums"
@@ -1224,8 +1301,12 @@ const TipMinerCard = memo(function TipMinerCard({
       </button>
 
       {showTime && (
-        <span className="text-[12px] leading-none tabular-nums text-muted-foreground">
-          {spin.time}
+        <span
+          className={`text-[12px] leading-none tabular-nums ${
+            timeHighlight ? "font-bold text-primary" : "text-muted-foreground"
+          }`}
+        >
+          {showSeconds ? spTimeWithSeconds(spin) : spin.time}
         </span>
       )}
     </div>
