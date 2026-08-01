@@ -114,6 +114,28 @@ function rowToSpin(r: Row): Spin {
 }
 
 function dedupeById<T extends { id: number | string }>(items: T[]): T[] {
+  return dedupeByIdImpl(items);
+}
+
+const spSecondsFormatter = new Intl.DateTimeFormat("pt-BR", {
+  timeZone: "America/Sao_Paulo",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  hour12: false,
+});
+
+// Exibe HH:MM:SS no fuso de Brasília; cai para o horário já formatado se não houver timestamp.
+function spTimeWithSeconds(spin: Spin): string {
+  const raw = (spin.createdAt ?? "").trim();
+  if (!raw) return spin.time;
+  const hasTz = /Z$|[+-]\d{2}:?\d{2}$/.test(raw);
+  const d = new Date(hasTz ? raw : `${raw.replace(" ", "T")}Z`);
+  if (Number.isNaN(d.getTime())) return spin.time;
+  return spSecondsFormatter.format(d);
+}
+
+function dedupeByIdImpl<T extends { id: number | string }>(items: T[]): T[] {
   const byId = new Map<string, T>();
   for (const item of items) {
     const key = String(item.id);
