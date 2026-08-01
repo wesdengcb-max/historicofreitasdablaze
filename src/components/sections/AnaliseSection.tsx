@@ -31,6 +31,30 @@ const TOP_N = 5;
 const MAX_ZEROS = 14;           // coleta até 14 zeros após o gatilho (sem limite de tempo)
 const MAX_DETAIL_ROWS = 10;     // FIFO detalhes
 const MAX_PATTERN_CYCLES = 14;  // Análise 2: últimas 14 ocorrências
+const BRAZIL_TIME_ZONE = "America/Sao_Paulo";
+
+const brazilMinuteFormatter = new Intl.DateTimeFormat("pt-BR", {
+  timeZone: BRAZIL_TIME_ZONE,
+  minute: "2-digit",
+});
+
+function getBrazilMinute(date: Date) {
+  const minute = brazilMinuteFormatter.formatToParts(date).find((part) => part.type === "minute")?.value;
+  return minute ? Number(minute) : date.getUTCMinutes();
+}
+
+function serializeBrazilTimestamp(date: Date) {
+  return date.toLocaleString("pt-BR", {
+    timeZone: BRAZIL_TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+}
 
 function diffMinutes(a: Date, b: Date) {
   return Math.max(0, Math.round((b.getTime() - a.getTime()) / 60000));
@@ -50,7 +74,8 @@ function buildCycles(rows: Row[], now: Date): Record<number, Cycle[]> {
     if (!Number.isFinite(n) || n < 0 || n > 9) return;
     const dt = new Date(r.created_at);
     if (Number.isNaN(dt.getTime())) return;
-    if (dt.getMinutes() % 10 !== n) return;
+    const brazilMinute = getBrazilMinute(dt);
+    if (brazilMinute % 10 !== n) return;
 
     // Coleta os próximos até 14 zeros após o gatilho, sem limite de tempo.
     const gaps: number[] = [];
@@ -67,7 +92,7 @@ function buildCycles(rows: Row[], now: Date): Record<number, Cycle[]> {
       index: list.length + 1,
       triggerAt: dt,
       triggerLabel: `${n}`,
-      triggerDetail: `min ${String(dt.getMinutes()).padStart(2, "0")}`,
+      triggerDetail: `min ${String(brazilMinute).padStart(2, "0")}`,
       gaps,
       pending: gaps.length === 0 ? 1 : 0,
       elapsed: diffMinutes(dt, now),
@@ -131,8 +156,8 @@ function buildRepeatMinuteCycles(rows: Row[], now: Date): Cycle[] {
     const dtPrev = new Date(rows[i - 1].created_at);
     const dt = new Date(rows[i].created_at);
     if (Number.isNaN(dt.getTime()) || Number.isNaN(dtPrev.getTime())) continue;
-    const matchPrev = dtPrev.getMinutes() % 10 === cur;
-    const matchCur = dt.getMinutes() % 10 === cur;
+    const matchPrev = getBrazilMinute(dtPrev) % 10 === cur;
+    const matchCur = getBrazilMinute(dt) % 10 === cur;
     if (!matchPrev && !matchCur) continue;
 
     const gaps: number[] = [];
@@ -237,10 +262,8 @@ function buildDetailRows(cycles: Cycle[]): Cycle[] {
 }
 
 function fmtTime(d: Date) {
-  return d.toLocaleString("pt-BR", {
-    timeZone: "America/Sao_Paulo",
-    day: "2-digit",
-    month: "2-digit",
+  return d.toLocaleTimeString("pt-BR", {
+    timeZone: BRAZIL_TIME_ZONE,
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
@@ -286,7 +309,8 @@ function AnalysisPanel({
         JSON.stringify(
           windowed.map((c) => ({
             index: c.index,
-            triggerAt: c.triggerAt.toISOString(),
+            triggerAt: serializeBrazilTimestamp(c.triggerAt),
+            triggerAtEpoch: c.triggerAt.getTime(),
             triggerLabel: c.triggerLabel,
             triggerDetail: c.triggerDetail,
             gaps: c.gaps,
