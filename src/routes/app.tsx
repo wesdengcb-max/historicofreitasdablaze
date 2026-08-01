@@ -1176,12 +1176,18 @@ const TipMinerCard = memo(function TipMinerCard({
   spin,
   delay = 0,
   showTime = true,
+  numbered = false,
+  showSeconds = false,
+  timeHighlight = false,
   highlightN,
   onClick,
 }: {
   spin: Spin;
   delay?: number;
   showTime?: boolean;
+  numbered?: boolean;
+  showSeconds?: boolean;
+  timeHighlight?: boolean;
   highlightN?: Set<number> | null;
   onClick?: () => void;
 }) {
@@ -1214,12 +1220,19 @@ const TipMinerCard = memo(function TipMinerCard({
         }}
       >
         {isWhite ? (
-          <img
-            src={brancoTile.url}
-            alt="Branco"
-            className="h-full w-full object-cover"
-            draggable={false}
-          />
+          <span className="relative flex h-full w-full items-center justify-center">
+            <img
+              src={brancoTile.url}
+              alt="Branco"
+              className="h-full w-full object-cover"
+              draggable={false}
+            />
+            {numbered && (
+              <span className="absolute inset-0 grid place-items-center text-[13px] font-black leading-none tabular-nums text-black/85">
+                {spin.n}
+              </span>
+            )}
+          </span>
         ) : (
           <div
             className="flex h-[calc(var(--stone-size,44px)*0.75)] w-[calc(var(--stone-size,44px)*0.75)] items-center justify-center overflow-hidden rounded-full text-[13px] font-bold leading-none tabular-nums"
@@ -1231,8 +1244,12 @@ const TipMinerCard = memo(function TipMinerCard({
       </button>
 
       {showTime && (
-        <span className="text-[12px] leading-none tabular-nums text-muted-foreground">
-          {spin.time}
+        <span
+          className={`text-[12px] leading-none tabular-nums ${
+            timeHighlight ? "font-bold text-primary" : "text-muted-foreground"
+          }`}
+        >
+          {showSeconds ? spTimeWithSeconds(spin) : spin.time}
         </span>
       )}
     </div>
