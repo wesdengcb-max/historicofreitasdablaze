@@ -172,6 +172,28 @@
   box-shadow: var(--shadow-tile);
 }
 
+/* ===== Métricas responsivas do histórico (mobile / tablet / desktop) ===== */
+.history-metrics {
+  /* Mobile: 10 colunas, 2 pedras empilhadas por célula */
+  --stone-size: clamp(22px, calc((100cqw - 40px) / 10), 74px);
+  --stone-track: var(--stone-size);
+  --cell-min: calc((var(--stone-size) * 2) + 40px);
+  --stone-num: clamp(9px, calc(var(--stone-size) * 0.34), 14px);
+  --stone-time: clamp(8px, calc(var(--stone-size) * 0.26), 12px);
+}
+@media (min-width: 640px) {
+  .history-metrics {
+    --stone-size: clamp(24px, calc((100cqw - 44px) / 20), 74px);
+    --stone-track: calc((var(--stone-size) * 2) + 2px);
+    --cell-min: calc(var(--stone-size) + 26px);
+  }
+}
+@media (min-width: 1024px) {
+  .history-metrics {
+    --stone-size: clamp(34px, calc((100cqw - 44px) / 20), 74px);
+  }
+}
+
 /* Thin custom scrollbar */
 @layer base {
   ::-webkit-scrollbar { width: 8px; height: 8px; }

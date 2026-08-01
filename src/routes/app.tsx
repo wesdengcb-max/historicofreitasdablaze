@@ -596,7 +596,7 @@ function Index() {
 
   const applyCustom = () => setAppliedTick((v) => v + 1);
   const historyGridTemplate =
-    "repeat(var(--cols, 10), calc((var(--stone-size, 44px) * 2) + 2px))";
+    "repeat(var(--cols, 10), var(--stone-track, calc((var(--stone-size, 44px) * 2) + 2px)))";
 
   // Contagens auxiliares dos toggles "Contar colunas" / "Contar linhas".
   const colCounts = useMemo(() => {
@@ -632,11 +632,7 @@ function Index() {
 
   return (
     <div
-      className="min-h-dvh [--cols:10]"
-      style={{
-        ["--stone-size" as never]:
-          "clamp(34px, calc((100cqw - 40px) / 20), 74px)",
-      }}
+      className="history-metrics min-h-dvh [--cols:10]"
     >
       <header className="sticky top-0 z-30 border-b border-white/5 bg-background/70 backdrop-blur-xl">
         <div className="mx-auto grid h-16 max-w-[1720px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-3 sm:gap-4 sm:px-8">
@@ -1017,9 +1013,9 @@ function Index() {
                       : "Nenhum resultado no período selecionado."}
                   </div>
                 ) : viewMode === "colunas" ? (
-                  <div className="w-full overflow-x-auto p-3 [container-type:inline-size] sm:overflow-x-hidden sm:p-4">
+                  <div className="w-full overflow-x-auto p-2 [container-type:inline-size] sm:overflow-x-hidden sm:p-3 lg:p-4">
                     {/* Cabeçalho fixo dos minutos 00–09 */}
-                    <div className="sticky top-0 z-10 -mx-3 mb-2 border-b border-white/10 bg-background/95 px-3 py-2 backdrop-blur sm:-mx-4 sm:px-4">
+                    <div className="sticky top-0 z-10 -mx-2 mb-2 border-b border-white/10 bg-background/95 px-2 py-1.5 backdrop-blur sm:-mx-3 sm:px-3 sm:py-2 lg:-mx-4 lg:px-4">
                       <div
                         className="grid"
                         style={{ gridTemplateColumns: historyGridTemplate, columnGap: "2px", justifyContent: "center", direction: inverse ? "rtl" : "ltr" }}
@@ -1027,11 +1023,11 @@ function Index() {
                         {Array.from({ length: 10 }, (_, i) => (
                           <div
                             key={`h-${i}`}
-                            className="flex h-6 items-center justify-center gap-1.5 rounded-md bg-white/5 text-[11px] font-semibold tabular-nums text-muted-foreground"
+                            className="flex h-5 items-center justify-center gap-1 rounded-md bg-white/5 text-[9px] font-semibold tabular-nums text-muted-foreground sm:h-6 sm:gap-1.5 sm:text-[11px]"
                           >
                             <span>{String(i).padStart(2, "0")}</span>
                             {contarColunas && (
-                              <span className="rounded-full bg-primary/20 px-1.5 text-[10px] font-bold text-primary">
+                              <span className="rounded-full bg-primary/20 px-1 text-[8px] font-bold text-primary sm:px-1.5 sm:text-[10px]">
                                 {colCounts[i]}
                               </span>
                             )}
@@ -1039,9 +1035,9 @@ function Index() {
                         ))}
                       </div>
                     </div>
-                    <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-2 sm:gap-3">
                       {gridRows.map((row) => (
-                        <div key={row.key} className="flex items-start justify-center gap-2">
+                        <div key={row.key} className="flex items-start justify-center gap-1 sm:gap-2">
                         <div
                           className="grid items-start"
                           style={{ gridTemplateColumns: historyGridTemplate, columnGap: "2px", justifyContent: "center", direction: inverse ? "rtl" : "ltr" }}
@@ -1073,11 +1069,15 @@ function Index() {
                                   ? "bg-amber-400 text-black border border-amber-200 shadow-[0_2px_8px_rgba(245,158,11,0.35)]"
                                   : "bg-red-500 text-white border border-red-300 shadow-[0_2px_8px_rgba(239,68,68,0.35)]";
                             return (
-                              <div key={ci} className="flex flex-col items-center gap-1 min-h-[60px]" style={{ direction: inverse ? "rtl" : "ltr" }}>
-                                <span className={`inline-flex h-4 items-center rounded-full px-2 text-[9px] font-black tracking-widest ${badge ? badgeCls : "opacity-0"}`}>
+                              <div
+                                key={ci}
+                                className="flex flex-col items-center gap-1"
+                                style={{ direction: inverse ? "rtl" : "ltr", minHeight: "var(--cell-min, calc(var(--stone-size, 44px) + 26px))" }}
+                              >
+                                <span className={`inline-flex h-3.5 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-4 sm:px-2 sm:text-[9px] sm:tracking-widest ${badge ? badgeCls : "opacity-0"}`}>
                                   {badge?.label ?? "·"}
                                 </span>
-                                <div className="flex items-start justify-center gap-0.5">
+                                <div className="flex flex-col items-center justify-center gap-0.5 sm:flex-row sm:items-start">
                                   {(cell.length >= 2
                                     ? [cell[0], cell[1]]
                                     : cell.length === 1
@@ -1124,7 +1124,12 @@ function Index() {
                                               draggable={false}
                                             />
                                           </div>
-                                          <span className="text-[10px] font-mono tabular-nums text-muted-foreground">{hm}</span>
+                                          <span
+                                            className="font-mono tabular-nums text-muted-foreground"
+                                            style={{ fontSize: "var(--stone-time, 10px)" }}
+                                          >
+                                            {hm}
+                                          </span>
                                         </div>
                                       );
                                     }
@@ -1147,7 +1152,7 @@ function Index() {
 
                         </div>
                         {contarLinhas && (
-                          <span className="mt-1 shrink-0 rounded-full bg-primary/20 px-2 py-0.5 text-[10px] font-bold tabular-nums text-primary">
+                          <span className="mt-1 shrink-0 rounded-full bg-primary/20 px-1.5 py-0.5 text-[8px] font-bold tabular-nums text-primary sm:px-2 sm:text-[10px]">
                             {row.cells.reduce((a, c) => a + c.length, 0)}
                           </span>
                         )}
@@ -1159,11 +1164,12 @@ function Index() {
                   (() => {
                     return (
                        <div
-                         className="grid justify-center p-3 sm:p-4"
+                         className="grid justify-center p-2 [--blaze-card-h:40px] [--blaze-card-w:42px] [--blaze-dot:24px] [--blaze-num:11px] [--blaze-time:10px] sm:p-3 sm:[--blaze-card-h:46px] sm:[--blaze-card-w:48px] sm:[--blaze-dot:28px] sm:[--blaze-num:12px] sm:[--blaze-time:11px] lg:p-4 lg:[--blaze-card-h:50px] lg:[--blaze-card-w:52px] lg:[--blaze-dot:30px] lg:[--blaze-num:13px] lg:[--blaze-time:12px]"
                          style={{
-                           gridTemplateColumns: `repeat(auto-fill, ${BLAZE_CARD_W}px)`,
-                           columnGap: BLAZE_GAP_X,
-                           rowGap: BLAZE_GAP_Y,
+                           gridTemplateColumns:
+                             `repeat(auto-fill, var(--blaze-card-w, ${BLAZE_CARD_W}px))`,
+                           columnGap: "clamp(4px, 1.2vw, 8px)",
+                           rowGap: "clamp(10px, 2vw, 18px)",
                            direction: inverse ? "rtl" : "ltr",
                          }}
                        >
@@ -1298,15 +1304,18 @@ const TipMinerCard = memo(function TipMinerCard({
               draggable={false}
             />
             {numbered && (
-              <span className="absolute inset-0 grid place-items-center text-[13px] font-black leading-none tabular-nums text-black/85">
+              <span
+                className="absolute inset-0 grid place-items-center font-black leading-none tabular-nums text-black/85"
+                style={{ fontSize: "var(--stone-num, 13px)" }}
+              >
                 {spin.n}
               </span>
             )}
           </span>
         ) : (
           <div
-            className="flex h-[calc(var(--stone-size,44px)*0.75)] w-[calc(var(--stone-size,44px)*0.75)] items-center justify-center overflow-hidden rounded-full text-[13px] font-bold leading-none tabular-nums"
-            style={{ border: `2px solid ${ring}`, color: fg }}
+            className="flex h-[calc(var(--stone-size,44px)*0.75)] w-[calc(var(--stone-size,44px)*0.75)] items-center justify-center overflow-hidden rounded-full font-bold leading-none tabular-nums"
+            style={{ border: `2px solid ${ring}`, color: fg, fontSize: "var(--stone-num, 13px)" }}
           >
             {spin.n}
           </div>
@@ -1315,9 +1324,10 @@ const TipMinerCard = memo(function TipMinerCard({
 
       {showTime && (
         <span
-          className={`text-[12px] leading-none tabular-nums ${
+          className={`leading-none tabular-nums ${
             timeHighlight ? "font-bold text-primary" : "text-muted-foreground"
           }`}
+          style={{ fontSize: "var(--stone-time, 12px)" }}
         >
           {showSeconds ? spTimeWithSeconds(spin) : spin.time}
         </span>
@@ -1366,7 +1376,12 @@ const EmptySlot = memo(function EmptySlot({
           )
         ) : null}
       </button>
-      <span className="select-none text-[12px] leading-none text-transparent">--:--</span>
+      <span
+        className="select-none leading-none text-transparent"
+        style={{ fontSize: "var(--stone-time, 12px)" }}
+      >
+        --:--
+      </span>
     </div>
   );
 });

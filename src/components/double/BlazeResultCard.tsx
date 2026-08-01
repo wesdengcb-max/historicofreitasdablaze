@@ -43,14 +43,17 @@ export const BlazeResultCard = memo(function BlazeResultCard({
   return (
     <div
       className="flex animate-in flex-col items-center fade-in slide-in-from-bottom-2"
-      style={{ width: BLAZE_CARD_W, animationDelay: delay > 0 ? `${delay}s` : undefined }}
+      style={{
+        width: `var(--blaze-card-w, ${BLAZE_CARD_W}px)`,
+        animationDelay: delay > 0 ? `${delay}s` : undefined,
+      }}
     >
       <button
         type="button"
         onClick={onClick}
         className="flex w-full cursor-pointer items-center justify-center overflow-hidden transition-[transform,opacity,box-shadow] duration-200 hover:-translate-y-0.5"
         style={{
-          height: BLAZE_CARD_TOP_H,
+          height: `var(--blaze-card-h, ${BLAZE_CARD_TOP_H}px)`,
           borderRadius: 8,
           border: `2px solid ${selected ? "var(--primary)" : c.border}`,
           background: c.bg,
@@ -66,8 +69,14 @@ export const BlazeResultCard = memo(function BlazeResultCard({
           />
         ) : (
           <span
-            className="flex items-center justify-center rounded-full text-[13px] font-bold leading-none tabular-nums"
-            style={{ height: 30, width: 30, border: `3px solid ${c.ring}`, color: c.fg }}
+            className="flex items-center justify-center rounded-full font-bold leading-none tabular-nums"
+            style={{
+              height: "var(--blaze-dot, 30px)",
+              width: "var(--blaze-dot, 30px)",
+              fontSize: "var(--blaze-num, 13px)",
+              border: "3px solid " + c.ring,
+              color: c.fg,
+            }}
           >
             {n}
           </span>
@@ -76,9 +85,10 @@ export const BlazeResultCard = memo(function BlazeResultCard({
 
       {time && (
         <span
-          className={`mt-1 text-center text-[12px] leading-none tabular-nums ${
+          className={`mt-1 text-center leading-none tabular-nums ${
             timeHighlight ? "font-bold text-primary" : "text-muted-foreground"
           }`}
+          style={{ fontSize: "var(--blaze-time, 12px)" }}
         >
           {time}
         </span>
