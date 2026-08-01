@@ -1152,35 +1152,42 @@ function Index() {
                 ) : (
                   (() => {
                     return (
-                      <div
-                        className="grid justify-center gap-x-2 gap-y-3 p-3 sm:p-4"
-                        style={{
-                          gridTemplateColumns: "repeat(auto-fill, var(--stone-size, 44px))",
-                          direction: inverse ? "rtl" : "ltr",
-                        }}
-                      >
-                        {visibleSpins.map((spin, i) => (
-                          <div key={spin.id} style={{ direction: "ltr" }}>
-                            <TipMinerCard
-                              spin={spin}
-                              delay={i < 20 ? i * 0.015 : 0}
-                              highlightN={highlightN}
-                              numbered={numerado}
-                              showSeconds={exibirSegundos}
-                              timeHighlight={destaqueHorario}
-                              onClick={() =>
-                                setHighlightN((h) => {
-                                  const next = new Set(h);
-                                  if (next.has(spin.n)) next.delete(spin.n);
-                                  else next.add(spin.n);
-                                  return next;
-                                })
-                              }
-                            />
-
-                          </div>
-                        ))}
-                      </div>
+                       <div
+                         className="grid justify-center p-3 sm:p-4"
+                         style={{
+                           gridTemplateColumns: `repeat(auto-fill, ${BLAZE_CARD_W}px)`,
+                           columnGap: BLAZE_GAP_X,
+                           rowGap: BLAZE_GAP_Y,
+                           direction: inverse ? "rtl" : "ltr",
+                         }}
+                       >
+                         {visibleSpins.map((spin, i) => {
+                           const hasSel = highlightN.size > 0;
+                           const hit = highlightN.has(spin.n);
+                           return (
+                             <div key={spin.id} style={{ direction: "ltr" }}>
+                               <BlazeResultCard
+                                 n={spin.n}
+                                 color={spin.color}
+                                 time={exibirSegundos ? spTimeWithSeconds(spin) : spin.time}
+                                 numbered={numerado}
+                                 timeHighlight={destaqueHorario}
+                                 selected={hit}
+                                 dimmed={hasSel && !hit}
+                                 delay={i < 20 ? i * 0.015 : 0}
+                                 onClick={() =>
+                                   setHighlightN((h) => {
+                                     const next = new Set(h);
+                                     if (next.has(spin.n)) next.delete(spin.n);
+                                     else next.add(spin.n);
+                                     return next;
+                                   })
+                                 }
+                               />
+                             </div>
+                           );
+                         })}
+                       </div>
                     );
                   })()
                 )}
