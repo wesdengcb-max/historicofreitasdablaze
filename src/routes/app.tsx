@@ -1014,9 +1014,14 @@ function Index() {
                         {Array.from({ length: 10 }, (_, i) => (
                           <div
                             key={`h-${i}`}
-                            className="flex h-6 items-center justify-center rounded-md bg-white/5 text-[11px] font-semibold tabular-nums text-muted-foreground"
+                            className="flex h-6 items-center justify-center gap-1.5 rounded-md bg-white/5 text-[11px] font-semibold tabular-nums text-muted-foreground"
                           >
-                            {String(i).padStart(2, "0")}
+                            <span>{String(i).padStart(2, "0")}</span>
+                            {contarColunas && (
+                              <span className="rounded-full bg-primary/20 px-1.5 text-[10px] font-bold text-primary">
+                                {colCounts[i]}
+                              </span>
+                            )}
                           </div>
                         ))}
                       </div>
