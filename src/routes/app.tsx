@@ -1380,7 +1380,12 @@ const EmptySlot = memo(function EmptySlot({
           )
         ) : null}
       </button>
-      <span className="select-none text-[12px] leading-none text-transparent">--:--</span>
+      <span
+        className="select-none leading-none text-transparent"
+        style={{ fontSize: "var(--stone-time, 12px)" }}
+      >
+        --:--
+      </span>
     </div>
   );
 });
