@@ -10,28 +10,43 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.15"
   }
   public: {
     Tables: {
-      blaze_results: {
+      gatilhos_analise: {
         Row: {
-          color: string
+          analise: string
           created_at: string
-          id: number
-          roll: string
+          detalhe: string | null
+          fuso_horario: string
+          gaps: number[]
+          id: string
+          minuto: number
+          pedra: number
+          trigger_at: string
         }
         Insert: {
-          color: string
+          analise?: string
           created_at?: string
-          id: number
-          roll: string
+          detalhe?: string | null
+          fuso_horario?: string
+          gaps?: number[]
+          id?: string
+          minuto: number
+          pedra: number
+          trigger_at?: string
         }
         Update: {
-          color?: string
+          analise?: string
           created_at?: string
-          id?: number
-          roll?: string
+          detalhe?: string | null
+          fuso_horario?: string
+          gaps?: number[]
+          id?: string
+          minuto?: number
+          pedra?: number
+          trigger_at?: string
         }
         Relationships: []
       }
@@ -42,7 +57,7 @@ export type Database = {
           created_at: string
           data: string
           hora: string
-          id: string
+          id: number
           numero: number
           timestamp: string
         }
@@ -52,7 +67,7 @@ export type Database = {
           created_at?: string
           data: string
           hora: string
-          id?: string
+          id?: number
           numero: number
           timestamp: string
         }
@@ -62,7 +77,7 @@ export type Database = {
           created_at?: string
           data?: string
           hora?: string
-          id?: string
+          id?: number
           numero?: number
           timestamp?: string
         }
@@ -73,7 +88,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      collect_blaze_tick: { Args: never; Returns: undefined }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never
