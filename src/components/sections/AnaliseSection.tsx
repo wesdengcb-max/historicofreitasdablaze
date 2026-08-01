@@ -647,6 +647,8 @@ export function AnaliseSection() {
         }
         eligible={eligible}
         eligibleHint={`precisa ${MIN_CYCLES}+ ciclos completos`}
+        analiseKey="analise1"
+        pedra={selected}
       />
 
       <AnalysisPanel
@@ -660,6 +662,8 @@ export function AnaliseSection() {
         eligible={repeatCycles.length >= MIN_CYCLES}
         eligibleHint={`precisa ${MIN_CYCLES}+ ocorrências`}
         showFullBadge={false}
+        analiseKey="analise2"
+        pedra={selected}
       />
 
       <AnalysisPanel
@@ -681,6 +685,8 @@ export function AnaliseSection() {
         eligible={selected <= 9 && repeatMinuteCycles.length >= MIN_CYCLES}
         eligibleHint={`precisa ${MIN_CYCLES}+ ocorrências`}
         showFullBadge={false}
+        analiseKey="analise3"
+        pedra={selected}
       />
     </main>
   );
