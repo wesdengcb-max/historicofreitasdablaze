@@ -1308,15 +1308,18 @@ const TipMinerCard = memo(function TipMinerCard({
               draggable={false}
             />
             {numbered && (
-              <span className="absolute inset-0 grid place-items-center text-[13px] font-black leading-none tabular-nums text-black/85">
+              <span
+                className="absolute inset-0 grid place-items-center font-black leading-none tabular-nums text-black/85"
+                style={{ fontSize: "var(--stone-num, 13px)" }}
+              >
                 {spin.n}
               </span>
             )}
           </span>
         ) : (
           <div
-            className="flex h-[calc(var(--stone-size,44px)*0.75)] w-[calc(var(--stone-size,44px)*0.75)] items-center justify-center overflow-hidden rounded-full text-[13px] font-bold leading-none tabular-nums"
-            style={{ border: `2px solid ${ring}`, color: fg }}
+            className="flex h-[calc(var(--stone-size,44px)*0.75)] w-[calc(var(--stone-size,44px)*0.75)] items-center justify-center overflow-hidden rounded-full font-bold leading-none tabular-nums"
+            style={{ border: `2px solid ${ring}`, color: fg, fontSize: "var(--stone-num, 13px)" }}
           >
             {spin.n}
           </div>
@@ -1325,9 +1328,10 @@ const TipMinerCard = memo(function TipMinerCard({
 
       {showTime && (
         <span
-          className={`text-[12px] leading-none tabular-nums ${
+          className={`leading-none tabular-nums ${
             timeHighlight ? "font-bold text-primary" : "text-muted-foreground"
           }`}
+          style={{ fontSize: "var(--stone-time, 12px)" }}
         >
           {showSeconds ? spTimeWithSeconds(spin) : spin.time}
         </span>
