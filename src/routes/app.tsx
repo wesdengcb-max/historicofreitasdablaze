@@ -632,7 +632,7 @@ function Index() {
 
   return (
     <div
-      className="min-h-dvh [--cols:10] [--stone-size:clamp(22px,calc((100cqw_-_40px)/10),74px)] [--stone-track:var(--stone-size)] sm:[--stone-size:clamp(24px,calc((100cqw_-_44px)/20),74px)] sm:[--stone-track:calc((var(--stone-size)*2)+2px)] lg:[--stone-size:clamp(34px,calc((100cqw_-_44px)/20),74px)]"
+      className="min-h-dvh [--cols:10] [--stone-size:clamp(22px,calc((100cqw_-_40px)/10),74px)] [--stone-track:var(--stone-size)] [--cell-min:calc((var(--stone-size)*2)+40px)] sm:[--stone-size:clamp(24px,calc((100cqw_-_44px)/20),74px)] sm:[--stone-track:calc((var(--stone-size)*2)+2px)] sm:[--cell-min:calc(var(--stone-size)+26px)] lg:[--stone-size:clamp(34px,calc((100cqw_-_44px)/20),74px)]"
       style={{
         ["--stone-num" as never]: "clamp(9px, calc(var(--stone-size) * 0.32), 14px)",
         ["--stone-time" as never]: "clamp(8px, calc(var(--stone-size) * 0.26), 12px)",
@@ -1076,7 +1076,7 @@ function Index() {
                               <div
                                 key={ci}
                                 className="flex flex-col items-center gap-1"
-                                style={{ direction: inverse ? "rtl" : "ltr", minHeight: "calc(var(--stone-size, 44px) + 26px)" }}
+                                style={{ direction: inverse ? "rtl" : "ltr", minHeight: "var(--cell-min, calc(var(--stone-size, 44px) + 26px))" }}
                               >
                                 <span className={`inline-flex h-3.5 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-4 sm:px-2 sm:text-[9px] sm:tracking-widest ${badge ? badgeCls : "opacity-0"}`}>
                                   {badge?.label ?? "·"}
