@@ -1,3 +1,4 @@
+import { parseUtcDate } from "@/lib/utils";
 export type Row = { id: number; roll: string; color: string; created_at: string };
 
 export type Cycle = {
@@ -18,7 +19,7 @@ function collectGaps(rows: Row[], i: number, dt: Date): number[] {
   const gaps: number[] = [];
   for (let k = 1; i + k < rows.length && gaps.length < MAX_ZEROS; k++) {
     if (Number(rows[i + k].roll) !== 0) continue;
-    const zdt = new Date(rows[i + k].created_at);
+    const zdt = parseUtcDate(rows[i + k].created_at);
     if (Number.isNaN(zdt.getTime())) continue;
     gaps.push(diffMinutes(dt, zdt));
   }
@@ -31,7 +32,7 @@ export function buildA1(rows: Row[]): Cycle[] {
   rows.forEach((r, i) => {
     const n = Number(r.roll);
     if (!Number.isFinite(n) || n < 0 || n > 9) return;
-    const dt = new Date(r.created_at);
+    const dt = parseUtcDate(r.created_at);
     if (Number.isNaN(dt.getTime())) return;
     if (dt.getMinutes() % 10 !== n) return;
     out.push({ value: n, analysis: 1, triggerAt: dt, gaps: collectGaps(rows, i, dt) });
@@ -46,7 +47,7 @@ export function buildA2(rows: Row[]): Cycle[] {
     const prev = Number(rows[i - 1].roll);
     const cur = Number(rows[i].roll);
     if (!Number.isFinite(cur) || cur < 0 || cur > 14 || cur !== prev) continue;
-    const dt = new Date(rows[i].created_at);
+    const dt = parseUtcDate(rows[i].created_at);
     if (Number.isNaN(dt.getTime())) continue;
     out.push({ value: cur, analysis: 2, triggerAt: dt, gaps: collectGaps(rows, i, dt) });
   }
@@ -60,8 +61,8 @@ export function buildA3(rows: Row[]): Cycle[] {
     const prev = Number(rows[i - 1].roll);
     const cur = Number(rows[i].roll);
     if (!Number.isFinite(cur) || cur < 0 || cur > 9 || cur !== prev) continue;
-    const dtPrev = new Date(rows[i - 1].created_at);
-    const dt = new Date(rows[i].created_at);
+    const dtPrev = parseUtcDate(rows[i - 1].created_at);
+    const dt = parseUtcDate(rows[i].created_at);
     if (Number.isNaN(dt.getTime()) || Number.isNaN(dtPrev.getTime())) continue;
     if (dtPrev.getMinutes() % 10 !== cur && dt.getMinutes() % 10 !== cur) continue;
     out.push({ value: cur, analysis: 3, triggerAt: dt, gaps: collectGaps(rows, i, dt) });

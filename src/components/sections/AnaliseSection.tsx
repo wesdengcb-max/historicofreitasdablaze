@@ -1,3 +1,4 @@
+import { parseUtcDate } from "@/lib/utils";
 import { useEffect, useMemo, useState } from "react";
 import { Loader2 } from "lucide-react";
 import {
@@ -73,7 +74,7 @@ function buildCycles(rows: Row[], now: Date): Record<number, Cycle[]> {
   rows.forEach((r, i) => {
     const n = Number(r.roll);
     if (!Number.isFinite(n) || n < 0 || n > 9) return;
-    const dt = new Date(r.created_at);
+    const dt = parseUtcDate(r.created_at);
     if (Number.isNaN(dt.getTime())) return;
     const brazilMinute = getBrazilMinute(dt);
     if (brazilMinute % 10 !== n) return;
@@ -83,7 +84,7 @@ function buildCycles(rows: Row[], now: Date): Record<number, Cycle[]> {
     for (let k = 1; i + k < rows.length && gaps.length < MAX_ZEROS; k++) {
       const row = rows[i + k];
       if (Number(row.roll) !== 0) continue;
-      const zdt = new Date(row.created_at);
+      const zdt = parseUtcDate(row.created_at);
       if (Number.isNaN(zdt.getTime())) continue;
       gaps.push(diffMinutes(dt, zdt));
     }
@@ -115,7 +116,7 @@ function buildRepeatCycles(rows: Row[], now: Date): Cycle[] {
     const cur = Number(rows[i].roll);
     if (!Number.isFinite(cur) || cur < 0 || cur > 14) continue;
     if (cur !== prev) continue;
-    const dt = new Date(rows[i].created_at);
+    const dt = parseUtcDate(rows[i].created_at);
     if (Number.isNaN(dt.getTime())) continue;
 
     // Coleta os próximos até 14 zeros após o gatilho, sem limite de tempo.
@@ -123,7 +124,7 @@ function buildRepeatCycles(rows: Row[], now: Date): Cycle[] {
     for (let k = 1; i + k < rows.length && gaps.length < MAX_ZEROS; k++) {
       const row = rows[i + k];
       if (Number(row.roll) !== 0) continue;
-      const zdt = new Date(row.created_at);
+      const zdt = parseUtcDate(row.created_at);
       if (Number.isNaN(zdt.getTime())) continue;
       gaps.push(diffMinutes(dt, zdt));
     }
@@ -154,8 +155,8 @@ function buildRepeatMinuteCycles(rows: Row[], now: Date): Cycle[] {
     const cur = Number(rows[i].roll);
     if (!Number.isFinite(cur) || cur < 0 || cur > 9) continue;
     if (cur !== prev) continue;
-    const dtPrev = new Date(rows[i - 1].created_at);
-    const dt = new Date(rows[i].created_at);
+    const dtPrev = parseUtcDate(rows[i - 1].created_at);
+    const dt = parseUtcDate(rows[i].created_at);
     if (Number.isNaN(dt.getTime()) || Number.isNaN(dtPrev.getTime())) continue;
     const matchPrev = getBrazilMinute(dtPrev) % 10 === cur;
     const matchCur = getBrazilMinute(dt) % 10 === cur;
@@ -165,7 +166,7 @@ function buildRepeatMinuteCycles(rows: Row[], now: Date): Cycle[] {
     for (let k = 1; i + k < rows.length && gaps.length < MAX_ZEROS; k++) {
       const row = rows[i + k];
       if (Number(row.roll) !== 0) continue;
-      const zdt = new Date(row.created_at);
+      const zdt = parseUtcDate(row.created_at);
       if (Number.isNaN(zdt.getTime())) continue;
       gaps.push(diffMinutes(dt, zdt));
     }
