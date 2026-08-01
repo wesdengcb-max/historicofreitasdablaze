@@ -711,14 +711,41 @@ function Index() {
       ) : (
       <main className="mx-auto flex w-full max-w-[1720px] flex-col gap-5 px-3 py-5 sm:gap-6 sm:px-8 sm:py-10">
 
-        <aside>
+        <section className="space-y-6">
           <Card delay={0.05}>
-            <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              Status da Rodada
-            </div>
-            <div className="mb-5 flex items-center justify-between gap-3">
-              <h2 className="text-lg font-semibold text-foreground sm:text-xl">Rodada Finalizada</h2>
-              <span className="text-xs tabular-nums text-muted-foreground">{total}</span>
+            {/* Cabeçalho compacto: status + contagem + último número */}
+            <div className="mb-3 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+              <div className="min-w-0">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                  Status da rodada
+                </p>
+                <div className="mt-0.5 flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
+                  <h1 className="truncate text-lg font-semibold tracking-tight text-foreground sm:text-xl">
+                    {countdown > 3 ? "Apostas abertas" : "Rodando…"}
+                  </h1>
+                  <span className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                    <span className="relative inline-flex h-1.5 w-1.5">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-positive/70" />
+                      <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-positive" />
+                    </span>
+                    Próximo giro em{" "}
+                    <b className="tabular-nums text-foreground">{String(countdown).padStart(2, "0")}s</b>
+                  </span>
+                  <span className="text-[11px] tabular-nums text-muted-foreground">{total} rodadas</span>
+                </div>
+              </div>
+              <div className="flex shrink-0 items-center gap-2">
+                <p className="hidden text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground sm:block">
+                  Último
+                </p>
+                {last ? (
+                  <div key={last.id} className="animate-in fade-in zoom-in-95 duration-200">
+                    <ResultCircle color={last.color} n={last.n} size="md" glow />
+                  </div>
+                ) : (
+                  <div className="h-9 w-9 rounded-full border border-dashed border-white/10" />
+                )}
+              </div>
             </div>
 
             {(() => {
@@ -729,30 +756,30 @@ function Index() {
               ];
               const leader = items.reduce((a, b) => (b.count > a.count ? b : a), items[0]);
               return (
-                <div className="grid gap-3 sm:grid-cols-3">
+                <div className="grid grid-cols-3 gap-2 sm:gap-3">
                   {items.map((it) => {
                     const isLeader = it.key === leader.key && it.count > 0;
                     return (
                       <div
                         key={it.key}
-                        className={`rounded-xl border p-3 transition-colors ${
+                        className={`rounded-xl border p-2 transition-colors sm:p-2.5 ${
                           isLeader
                             ? "border-emerald-400/70 shadow-[0_0_0_1px_rgba(16,185,129,0.35),0_8px_24px_-12px_rgba(16,185,129,0.45)]"
                             : "border-white/5 bg-white/[0.02]"
                         }`}
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex min-w-0 items-center gap-2">
                           <ResultCircle color={it.color} n={it.color === "white" ? undefined : 0} size="sm" animate={false} />
                           <div className="min-w-0 flex-1">
-                            <div className={`text-sm font-semibold tabular-nums ${isLeader ? "text-emerald-400" : "text-foreground"}`}>
+                            <div className={`text-[13px] font-semibold tabular-nums ${isLeader ? "text-emerald-400" : "text-foreground"}`}>
                               {it.pct.toFixed(1)}%
                             </div>
-                            <div className="text-[11px] tabular-nums text-muted-foreground">
+                            <div className="truncate text-[10px] tabular-nums text-muted-foreground">
                               {it.count} apostas
                             </div>
                           </div>
                         </div>
-                        <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-white/[0.06]">
+                        <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-white/[0.06]">
                           <div
                             className="h-full rounded-full transition-[width] duration-500"
                             style={{
@@ -770,8 +797,8 @@ function Index() {
               );
             })()}
 
-            <div className="mt-5 grid gap-4 border-t border-white/5 pt-4 sm:grid-cols-[1fr_auto] sm:items-center">
-              <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-muted-foreground">
+            <div className="mt-3 grid gap-2 border-t border-white/5 pt-3 sm:grid-cols-[1fr_auto] sm:items-center sm:gap-4">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] text-muted-foreground">
                 <span className="inline-flex items-center gap-2">
                   <Flame className="h-3.5 w-3.5" />
                   Último branco há <b className="text-foreground">{lastWhiteAgo}</b> rodadas
@@ -781,7 +808,7 @@ function Index() {
                   Brancos seguidos <b className="text-foreground">{countConsecutive(visibleSpins, "white")}</b>
                 </span>
               </div>
-              <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+              <div className="flex flex-wrap items-center gap-1.5 sm:justify-end">
                 <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                   Frequência
                 </span>
@@ -792,53 +819,6 @@ function Index() {
                   </div>
                 ))}
               </div>
-            </div>
-          </Card>
-        </aside>
-
-        <section className="space-y-6">
-          <Card delay={0}>
-
-            <div className="grid gap-6 sm:grid-cols-[1fr_auto] sm:items-center">
-              <div className="min-w-0">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                  Status da rodada
-                </p>
-                <h1 className="mt-1 truncate text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-                  {countdown > 3 ? "Apostas abertas" : "Rodando…"}
-                </h1>
-                <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
-                  <span className="relative inline-flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-positive/70" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-positive" />
-                  </span>
-                  Próximo giro em{" "}
-                  <b className="tabular-nums text-foreground">{String(countdown).padStart(2, "0")}s</b>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-end gap-5 sm:justify-self-end">
-                <div className="text-right">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                    Último número
-                  </p>
-                  <div className="mt-2 flex justify-end">
-                    {last ? (
-                      <div key={last.id} className="animate-in fade-in zoom-in-95 duration-200">
-                        <ResultCircle color={last.color} n={last.n} size="md" glow />
-                      </div>
-                    ) : (
-                      <div className="h-9 w-9 rounded-full border border-dashed border-white/10 sm:h-10 sm:w-10" />
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-7 grid gap-4 sm:grid-cols-3">
-              <ProgressMeter label="Vermelho" count={reds} pct={redPct} color="red" />
-              <ProgressMeter label="Preto" count={blacks} pct={blackPct} color="black" />
-              <ProgressMeter label="Branco" count={whites} pct={whitePct} color="primary" />
             </div>
           </Card>
 
