@@ -1077,6 +1077,9 @@ function Index() {
                                           key={(spin as Spin).id}
                                           spin={spin as Spin}
                                           highlightN={highlightN}
+                                          numbered={numerado}
+                                          showSeconds={exibirSegundos}
+                                          timeHighlight={destaqueHorario}
                                           onClick={() =>
                                             setHighlightN((h) => {
                                               const next = new Set(h);
@@ -1155,6 +1158,9 @@ function Index() {
                               spin={spin}
                               delay={i < 20 ? i * 0.015 : 0}
                               highlightN={highlightN}
+                              numbered={numerado}
+                              showSeconds={exibirSegundos}
+                              timeHighlight={destaqueHorario}
                               onClick={() =>
                                 setHighlightN((h) => {
                                   const next = new Set(h);
