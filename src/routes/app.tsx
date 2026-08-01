@@ -1463,27 +1463,3 @@ const StatusPill = memo(function StatusPill({
     </span>
   );
 });
-
-const ProgressMeter = memo(function ProgressMeter({
-  label,
-  count,
-  pct,
-  color,
-}: {
-  label: string;
-  count: number;
-  pct: number;
-  color: "red" | "black" | "primary";
-}) {
-  return (
-    <div>
-      <div className="mb-2 flex items-baseline justify-between">
-        <span className="text-xs font-medium text-muted-foreground">{label}</span>
-        <span className="text-xs tabular-nums text-foreground">
-          {count} <span className="text-muted-foreground">· {pct.toFixed(1)}%</span>
-        </span>
-      </div>
-      <ProgressBar value={pct} color={color} />
-    </div>
-  );
-});
