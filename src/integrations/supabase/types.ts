@@ -10,70 +10,17 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.15"
   }
   public: {
     Tables: {
-      blaze_results: {
-        Row: {
-          color: string
-          created_at: string
-          id: number
-          roll: string
-        }
-        Insert: {
-          color: string
-          created_at?: string
-          id: number
-          roll: string
-        }
-        Update: {
-          color?: string
-          created_at?: string
-          id?: number
-          roll?: string
-        }
-        Relationships: []
-      }
-      historico_blaze: {
-        Row: {
-          blaze_id: string
-          cor: string
-          created_at: string
-          data: string
-          hora: string
-          id: string
-          numero: number
-          timestamp: string
-        }
-        Insert: {
-          blaze_id: string
-          cor: string
-          created_at?: string
-          data: string
-          hora: string
-          id?: string
-          numero: number
-          timestamp: string
-        }
-        Update: {
-          blaze_id?: string
-          cor?: string
-          created_at?: string
-          data?: string
-          hora?: string
-          id?: string
-          numero?: number
-          timestamp?: string
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      collect_blaze_tick: { Args: never; Returns: undefined }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never
