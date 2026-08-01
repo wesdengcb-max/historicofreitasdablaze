@@ -14,7 +14,75 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      gatilhos_analise: {
+        Row: {
+          analise: string
+          created_at: string
+          detalhe: string | null
+          fuso_horario: string
+          gaps: number[]
+          id: string
+          minuto: number
+          pedra: number
+          trigger_at: string
+        }
+        Insert: {
+          analise?: string
+          created_at?: string
+          detalhe?: string | null
+          fuso_horario?: string
+          gaps?: number[]
+          id?: string
+          minuto: number
+          pedra: number
+          trigger_at?: string
+        }
+        Update: {
+          analise?: string
+          created_at?: string
+          detalhe?: string | null
+          fuso_horario?: string
+          gaps?: number[]
+          id?: string
+          minuto?: number
+          pedra?: number
+          trigger_at?: string
+        }
+        Relationships: []
+      }
+      historico_blaze: {
+        Row: {
+          blaze_id: string
+          cor: string
+          created_at: string
+          data: string
+          hora: string
+          id: number
+          numero: number
+          timestamp: string
+        }
+        Insert: {
+          blaze_id: string
+          cor: string
+          created_at?: string
+          data: string
+          hora: string
+          id?: number
+          numero: number
+          timestamp: string
+        }
+        Update: {
+          blaze_id?: string
+          cor?: string
+          created_at?: string
+          data?: string
+          hora?: string
+          id?: number
+          numero?: number
+          timestamp?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
