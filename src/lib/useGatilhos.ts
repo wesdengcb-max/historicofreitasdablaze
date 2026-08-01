@@ -90,7 +90,10 @@ export function useGatilhos(analise: string, pedra: number, pending: GatilhoInpu
     void (async () => {
       const { error: err } = await supabase
         .from("gatilhos_analise")
-        .upsert(payload, { onConflict: "analise,pedra,trigger_at" });
+        .upsert(payload, {
+          onConflict: "analise,pedra,trigger_at",
+          ignoreDuplicates: true,
+        });
       if (err) setError(err.message);
       else await load();
     })();
