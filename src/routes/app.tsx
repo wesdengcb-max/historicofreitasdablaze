@@ -1028,8 +1028,8 @@ function Index() {
                     </div>
                     <div className="flex flex-col gap-3">
                       {gridRows.map((row) => (
+                        <div key={row.key} className="flex items-start justify-center gap-2">
                         <div
-                          key={row.key}
                           className="grid items-start"
                           style={{ gridTemplateColumns: historyGridTemplate, columnGap: "2px", justifyContent: "center", direction: inverse ? "rtl" : "ltr" }}
                         >
@@ -1129,6 +1129,12 @@ function Index() {
 
 
 
+                        </div>
+                        {contarLinhas && (
+                          <span className="mt-1 shrink-0 rounded-full bg-primary/20 px-2 py-0.5 text-[10px] font-bold tabular-nums text-primary">
+                            {row.cells.reduce((a, c) => a + c.length, 0)}
+                          </span>
+                        )}
                         </div>
                       ))}
                     </div>
