@@ -191,6 +191,12 @@ function Index() {
   const [inverse, setInverse] = useState(false);
   const [viewMode, setViewMode] = useState<"colunas" | "lista">("colunas");
   const [whiteAlert, setWhiteAlert] = useState(true);
+  const [realtime, setRealtime] = useState(true);
+  const [numerado, setNumerado] = useState(false);
+  const [destaqueHorario, setDestaqueHorario] = useState(false);
+  const [exibirSegundos, setExibirSegundos] = useState(false);
+  const [contarColunas, setContarColunas] = useState(false);
+  const [contarLinhas, setContarLinhas] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
   const [futureSlots, setFutureSlots] = useState<0 | 10 | 20 | 30>(0);
   const [highlightN, setHighlightN] = useState<Set<number>>(() => new Set());
@@ -321,6 +327,7 @@ function Index() {
 
   // Realtime — só insere se a nova rodada está no intervalo ativo.
   useEffect(() => {
+    if (!realtime) return;
     const channel = supabase
       .channel("blaze_results_inserts")
       .on(
@@ -344,11 +351,11 @@ function Index() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [range.start, range.end]);
+  }, [range.start, range.end, realtime]);
 
   // Polling leve — só refresca o topo quando o intervalo inclui o "agora".
   useEffect(() => {
-    if (!range.includesNow) return;
+    if (!range.includesNow || !realtime) return;
     let alive = true;
 
     const poll = async () => {
@@ -387,7 +394,7 @@ function Index() {
       document.removeEventListener("visibilitychange", onVisible);
       window.removeEventListener("focus", onVisible);
     };
-  }, [buildQuery, range.includesNow]);
+  }, [buildQuery, range.includesNow, realtime]);
 
   // Countdown estético
   useEffect(() => {
