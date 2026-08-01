@@ -11,6 +11,7 @@ import {
 } from "recharts";
 import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
 import { Card } from "@/components/double/Card";
+import { useGatilhos, type GatilhoRow } from "@/lib/useGatilhos";
 
 type Row = { id: number; roll: string; color: string; created_at: string };
 
@@ -281,6 +282,8 @@ type PanelProps = {
   eligible: boolean;
   eligibleHint?: string;
   showFullBadge?: boolean; // Analysis 1 usa "Completo (10/10)"
+  analiseKey: string;      // identificador no banco (analise1/2/3)
+  pedra: number;           // número selecionado
 };
 
 function AnalysisPanel({
@@ -294,35 +297,45 @@ function AnalysisPanel({
   eligible,
   eligibleHint,
   showFullBadge = true,
+  analiseKey,
+  pedra,
 }: PanelProps) {
-  // Janela deslizante FIFO: apenas os 10 gatilhos mais recentes alimentam
-  // histórico, Top 5 e percentuais.
-  const windowed = useMemo(() => buildDetailRows(cycles), [cycles]);
+  // Janela deslizante FIFO local (base para gravar no banco).
+  const local = useMemo(() => buildDetailRows(cycles), [cycles]);
 
-  // Persistência da janela (para reexibir ao voltar/recarregar).
-  const storageKey = `analise:window:${eyebrow}`;
-  useEffect(() => {
-    if (typeof window === "undefined" || windowed.length === 0) return;
-    try {
-      window.localStorage.setItem(
-        storageKey,
-        JSON.stringify(
-          windowed.map((c) => ({
-            index: c.index,
-            triggerAt: serializeBrazilTimestamp(c.triggerAt),
-            triggerAtEpoch: c.triggerAt.getTime(),
-            triggerLabel: c.triggerLabel,
-            triggerDetail: c.triggerDetail,
-            gaps: c.gaps,
-            pending: c.pending,
-            elapsed: c.elapsed,
-          })),
-        ),
-      );
-    } catch {
-      /* ignore quota errors */
-    }
-  }, [storageKey, windowed]);
+  // Gatilhos a persistir no banco (janela de 10).
+  const pendingRows = useMemo(
+    () =>
+      local.map((c) => ({
+        analise: analiseKey,
+        pedra,
+        minuto: getBrazilMinute(c.triggerAt),
+        trigger_at: c.triggerAt.toISOString(),
+        detalhe: `${c.triggerDetail} · ${serializeBrazilTimestamp(c.triggerAt)}`,
+        gaps: c.gaps,
+      })),
+    [local, analiseKey, pedra],
+  );
+
+  const { rows: dbRows, error: dbError } = useGatilhos(analiseKey, pedra, pendingRows);
+
+  // Fonte da verdade da tela: os 10 gatilhos mais recentes vindos do banco.
+  const windowed = useMemo<Cycle[]>(() => {
+    if (dbRows.length === 0) return local;
+    return dbRows.map((r: GatilhoRow, i) => {
+      const at = new Date(r.trigger_at);
+      const match = local.find((c) => c.triggerAt.getTime() === at.getTime());
+      return {
+        index: i + 1,
+        triggerAt: at,
+        triggerLabel: `${r.pedra}`,
+        triggerDetail: match?.triggerDetail ?? (r.detalhe ?? `min ${String(r.minuto).padStart(2, "0")}`),
+        gaps: r.gaps ?? [],
+        pending: (r.gaps ?? []).length === 0 ? 1 : 0,
+        elapsed: match?.elapsed ?? 0,
+      };
+    });
+  }, [dbRows, local]);
 
   const { rows: top5, totalRows } = useMemo(() => computeTop5(windowed), [windowed]);
   const details = windowed;
@@ -360,9 +373,9 @@ function AnalysisPanel({
         <div className="flex items-center justify-center py-20 text-muted-foreground">
           <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Carregando histórico…
         </div>
-      ) : err ? (
+      ) : err || dbError ? (
         <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
-          {err}
+          {err ?? dbError}
         </div>
       ) : totalRows === 0 ? (
         <div className="rounded-lg border border-white/10 bg-white/[0.03] p-8 text-center text-sm text-muted-foreground">
