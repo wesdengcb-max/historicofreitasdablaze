@@ -592,6 +592,17 @@ function Index() {
   const historyGridTemplate =
     "repeat(var(--cols, 10), calc((var(--stone-size, 44px) * 2) + 2px))";
 
+  // Contagens auxiliares dos toggles "Contar colunas" / "Contar linhas".
+  const colCounts = useMemo(() => {
+    const acc = Array.from({ length: 10 }, () => 0);
+    for (const row of gridRows) {
+      row.cells.forEach((cell, i) => {
+        acc[i] += cell.length;
+      });
+    }
+    return acc;
+  }, [gridRows]);
+
   const signalsByHM = useMemo(() => {
 
     const fmt = new Intl.DateTimeFormat("en-GB", {
