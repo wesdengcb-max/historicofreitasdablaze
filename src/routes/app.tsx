@@ -27,7 +27,6 @@ import { Card } from "@/components/double/Card";
 import { ResultCircle } from "@/components/double/ResultCircle";
 import { Switch } from "@/components/double/Switch";
 import { WhiteAlert } from "@/components/double/WhiteAlert";
-import { ProgressBar } from "@/components/double/ProgressBar";
 import { StrategyTabs } from "@/components/double/StrategyTabs";
 import { LeftStatsDrawer } from "@/components/double/LeftStatsDrawer";
 
