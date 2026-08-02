@@ -283,11 +283,11 @@ export function PredictiveSignals() {
         {mode2 && (
           <section className="space-y-3">
             <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              <Layers className="h-3.5 w-3.5" /> Coincidências · confirmações
+              <Layers className="h-3.5 w-3.5" /> Coincidências · validadas pelo Top 5
             </div>
             {mode2.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                Sem coincidências de alta assertividade no momento
+                Sem coincidências validadas (mín. 2 análises no mesmo minuto + presença no Top 5)
               </p>
             ) : (
               <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -307,6 +307,24 @@ export function PredictiveSignals() {
                     </div>
                     <div className="mt-1 text-[11px] tabular-nums text-emerald-300">
                       {s.pct.toFixed(1)}%
+                    </div>
+                    <div className="mt-2 text-[10px] leading-relaxed text-muted-foreground">
+                      Confluência Top 5:{" "}
+                      <span className="font-semibold text-emerald-300">{s.confluence}</span>
+                    </div>
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {s.sources.map((p) => (
+                        <span
+                          key={`${p.analysis}-${p.value}`}
+                          className={
+                            p.top5
+                              ? "rounded border border-emerald-400/40 bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-bold tabular-nums text-emerald-300"
+                              : "rounded border border-white/10 bg-white/[0.03] px-1.5 py-0.5 text-[9px] font-medium tabular-nums text-muted-foreground"
+                          }
+                        >
+                          A{p.analysis}·{p.value} {p.pct.toFixed(0)}%
+                        </span>
+                      ))}
                     </div>
                   </div>
                 ))}
