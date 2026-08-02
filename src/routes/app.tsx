@@ -285,7 +285,7 @@ function Index() {
     (from: number, to: number) => {
       let q = supabase
         .from("blaze_results")
-        .select("*")
+        .select("id, roll, color, created_at")
         .order("created_at", { ascending: false })
         .range(from, to);
       if (range.start) q = q.gte("created_at", range.start);
