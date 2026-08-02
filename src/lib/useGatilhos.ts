@@ -92,7 +92,9 @@ export function useGatilhos(analise: string, pedra: number, pending: GatilhoInpu
         .from("gatilhos_analise")
         .upsert(payload, {
           onConflict: "analise,pedra,trigger_at",
-          ignoreDuplicates: true,
+          // Atualiza os gaps do gatilho existente conforme novos "0" saem
+          // (cada gatilho mantém seu próprio histórico até 14 ocorrências).
+          ignoreDuplicates: false,
         });
       if (err) setError(err.message);
       else await load();
