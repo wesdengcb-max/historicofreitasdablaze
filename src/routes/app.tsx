@@ -216,10 +216,11 @@ function computeRange(
 function Index() {
   const section = useSection();
   const [inverse, setInverse] = useState(false);
+  const [viewMode, setViewMode] = useState<"colunas" | "lista">("colunas");
   // Em celular/tablet inicia em lista (sentido normal); desktop mantém colunas fixas.
-  const [viewMode, setViewMode] = useState<"colunas" | "lista">(() =>
-    typeof window !== "undefined" && window.innerWidth < 1024 ? "lista" : "colunas",
-  );
+  useEffect(() => {
+    if (window.innerWidth < 1024) setViewMode("lista");
+  }, []);
   const [whiteAlert, setWhiteAlert] = useState(true);
   const [realtime, setRealtime] = useState(true);
   const [numerado, setNumerado] = useState(false);
