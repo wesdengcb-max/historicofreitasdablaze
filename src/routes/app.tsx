@@ -1022,7 +1022,7 @@ function Index() {
                     <div className="sticky top-0 z-10 -mx-1 mb-1.5 border-b border-white/10 bg-background/95 px-1 py-1 backdrop-blur sm:-mx-3 sm:mb-2 sm:px-3 sm:py-2 lg:-mx-4 lg:px-4">
                       <div
                         className="grid"
-                        style={{ gridTemplateColumns: historyGridTemplate, columnGap: "2px", justifyContent: "center", direction: inverse ? "rtl" : "ltr" }}
+                        style={{ gridTemplateColumns: historyGridTemplate, columnGap: "2px", justifyContent: "safe center", direction: inverse ? "rtl" : "ltr" }}
                       >
                         {Array.from({ length: 10 }, (_, i) => (
                           <div
@@ -1041,7 +1041,7 @@ function Index() {
                       {contarColunas && (
                         <div
                           className="mt-1.5 grid"
-                          style={{ gridTemplateColumns: historyGridTemplate, columnGap: "2px", justifyContent: "center", direction: inverse ? "rtl" : "ltr" }}
+                          style={{ gridTemplateColumns: historyGridTemplate, columnGap: "2px", justifyContent: "safe center", direction: inverse ? "rtl" : "ltr" }}
                         >
                           {colStats.map((c, i) => (
                             <div
@@ -1069,7 +1069,7 @@ function Index() {
                         <div key={row.key} className="flex items-start justify-center gap-0.5 sm:gap-2">
                         <div
                           className="grid items-start"
-                          style={{ gridTemplateColumns: historyGridTemplate, columnGap: "2px", justifyContent: "center", direction: inverse ? "rtl" : "ltr" }}
+                          style={{ gridTemplateColumns: historyGridTemplate, columnGap: "2px", justifyContent: "safe center", direction: inverse ? "rtl" : "ltr" }}
                         >
                           {row.cells.map((cell, ci) => {
                             const [hh, mmPrefix] = row.label.split(":");
@@ -1193,7 +1193,7 @@ function Index() {
                   (() => {
                     return (
                        <div
-                         className="grid justify-center p-2 [--blaze-card-h:40px] [--blaze-card-w:42px] [--blaze-dot:24px] [--blaze-num:11px] [--blaze-time:10px] sm:p-3 sm:[--blaze-card-h:46px] sm:[--blaze-card-w:48px] sm:[--blaze-dot:28px] sm:[--blaze-num:12px] sm:[--blaze-time:11px] lg:p-4 lg:[--blaze-card-h:50px] lg:[--blaze-card-w:52px] lg:[--blaze-dot:30px] lg:[--blaze-num:13px] lg:[--blaze-time:12px]"
+                         className="history-scroll grid justify-center p-1 [--blaze-card-h:36px] [--blaze-card-w:42px] [--blaze-dot:24px] [--blaze-num:11px] [--blaze-time:10px] sm:p-3 sm:[--blaze-card-h:46px] sm:[--blaze-card-w:48px] sm:[--blaze-dot:28px] sm:[--blaze-num:12px] sm:[--blaze-time:11px] lg:p-4 lg:[--blaze-card-h:50px] lg:[--blaze-card-w:52px] lg:[--blaze-dot:30px] lg:[--blaze-num:13px] lg:[--blaze-time:12px]"
                          style={{
                            gridTemplateColumns:
                              `repeat(auto-fill, var(--blaze-card-w, ${BLAZE_CARD_W}px))`,
