@@ -63,7 +63,6 @@ export const Route = createFileRoute("/api/public/recent")({
               headers: {
                 "Content-Type": "application/json",
                 "Cache-Control": "no-store",
-                "Access-Control-Allow-Origin": "*",
                 "X-Content-Type-Options": "nosniff",
                 "Referrer-Policy": "no-referrer",
               },
@@ -79,7 +78,8 @@ export const Route = createFileRoute("/api/public/recent")({
             status: 200,
             headers: {
               "Content-Type": "application/json",
-              "Access-Control-Allow-Origin": "*",
+              "Cache-Control": "no-store",
+              "X-Content-Type-Options": "nosniff",
             },
           },
         );

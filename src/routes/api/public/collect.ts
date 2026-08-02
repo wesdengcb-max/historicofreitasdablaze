@@ -68,13 +68,34 @@ async function fetchUpstream(): Promise<BlazeRound[] | null> {
 export const Route = createFileRoute("/api/public/collect")({
   server: {
     handlers: {
-      GET: async () => handle(),
-      POST: async () => handle(),
+      GET: async ({ request }) => handle(request),
+      POST: async ({ request }) => handle(request),
     },
   },
 });
 
-async function handle() {
+// Endpoint público (o prefixo /api/public/* ignora o gate de auth do site),
+// portanto exige um segredo compartilhado antes de qualquer trabalho
+// privilegiado: ele dispara fetch externo + gravação com service_role.
+function timingSafeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i += 1) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
+async function handle(request: Request) {
+  const expected = process.env['COLLECTOR_SECRET'];
+  if (!expected) {
+    return Response.json({ ok: false, error: "collector disabled" }, { status: 503 });
+  }
+  const provided =
+    request.headers.get("x-collector-secret") ??
+    (request.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
+  if (!provided || !timingSafeEqual(provided, expected)) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
   const rounds = await fetchUpstream();
   if (!rounds) {
     return Response.json({ ok: false, inserted: 0, error: "upstream unavailable" }, { status: 200 });
