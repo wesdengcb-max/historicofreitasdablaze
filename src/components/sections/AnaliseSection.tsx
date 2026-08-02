@@ -317,6 +317,8 @@ type PanelProps = {
   showFullBadge?: boolean; // Analysis 1 usa "Completo (10/10)"
   analiseKey: string;      // identificador no banco (analise1/2/3)
   pedra: number;           // número selecionado
+  history: Row[];          // histórico para backfill retroativo
+  now: Date;
 };
 
 function AnalysisPanel({
@@ -332,6 +334,8 @@ function AnalysisPanel({
   showFullBadge = true,
   analiseKey,
   pedra,
+  history,
+  now,
 }: PanelProps) {
   // Janela deslizante FIFO local (base para gravar no banco).
   const local = useMemo(() => buildDetailRows(cycles), [cycles]);
@@ -358,21 +362,30 @@ function AnalysisPanel({
     return dbRows.map((r: GatilhoRow, i) => {
       const at = new Date(r.trigger_at);
       const match = local.find((c) => c.triggerAt.getTime() === at.getTime());
+      const dbGaps = r.gaps ?? [];
+      // Backfill: prioriza a sequência mais completa entre banco, cálculo
+      // local e recálculo retroativo direto do histórico.
+      const backfilled =
+        match && match.gaps.length >= MAX_ZEROS
+          ? match.gaps
+          : computeGapsFromHistory(history, at);
+      const candidates = [dbGaps, match?.gaps ?? [], backfilled];
+      const gaps = candidates.reduce((best, g) => (g.length > best.length ? g : best), [] as number[]);
       return {
         index: i + 1,
         triggerAt: at,
         triggerLabel: `${r.pedra}`,
         triggerDetail: match?.triggerDetail ?? (r.detalhe ?? `min ${String(r.minuto).padStart(2, "0")}`),
-        gaps: r.gaps ?? [],
-        pending: (r.gaps ?? []).length === 0 ? 1 : 0,
-        elapsed: match?.elapsed ?? 0,
+        gaps,
+        pending: gaps.length >= MAX_ZEROS ? 0 : 1,
+        elapsed: diffMinutes(at, now),
       };
     });
-  }, [dbRows, local]);
+  }, [dbRows, local, history, now]);
 
   const { rows: top5, totalRows } = useMemo(() => computeTop5(windowed), [windowed]);
   const details = windowed;
-  const fullyCompleted = windowed.filter((c) => c.pending === 0 && c.gaps.length > 0).length;
+  const fullyCompleted = windowed.filter((c) => cycleStatus(c) !== "ativo" && c.gaps.length > 0).length;
   const totalGaps = windowed.reduce((a, c) => a + c.gaps.length, 0);
   const avg = totalGaps
     ? Math.round(windowed.reduce((a, c) => a + c.gaps.reduce((x, y) => x + y, 0), 0) / totalGaps)
