@@ -868,8 +868,8 @@ function Index() {
             }
           >
             {/* Painel de controles alinhado */}
-            <div className="mb-4 rounded-2xl border border-white/5 bg-white/[0.02] p-3 sm:p-4">
-              <div className="grid grid-cols-1 gap-x-8 gap-y-3.5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mb-3 rounded-2xl border border-white/5 bg-white/[0.02] p-2 sm:mb-4 sm:p-4">
+              <div className="grid grid-cols-2 gap-x-3 gap-y-2 text-[11px] sm:gap-x-8 sm:gap-y-3.5 lg:grid-cols-4">
                 <div className="flex min-w-0 items-center">
                   <Switch checked={realtime} onChange={setRealtime} label="Tempo real" />
                 </div>
@@ -931,8 +931,8 @@ function Index() {
             </div>
 
             {/* Filtros de período */}
-            <div className="mb-4 space-y-3">
-              <div className="flex flex-wrap gap-1.5">
+            <div className="mb-3 space-y-2 sm:mb-4 sm:space-y-3">
+              <div className="flex flex-wrap gap-1 sm:gap-1.5">
                 {([
                   ["hoje", "Hoje"],
                   ["ontem", "Ontem"],
@@ -944,7 +944,7 @@ function Index() {
                     key={id}
                     type="button"
                     onClick={() => setFilter(id)}
-                    className={`rounded-full border px-3 py-1.5 text-[11px] font-medium transition-colors ${
+                    className={`rounded-full border px-2 py-1 text-[10px] font-medium transition-colors sm:px-3 sm:py-1.5 sm:text-[11px] ${
                       filter === id
                         ? "border-white/20 bg-white/10 text-foreground"
                         : "border-white/5 bg-white/[0.03] text-muted-foreground hover:text-foreground"
@@ -975,7 +975,7 @@ function Index() {
               className={
                 fullscreen
                   ? "fixed inset-0 z-50 flex flex-col bg-background/95 p-4 backdrop-blur-md sm:p-6"
-                  : "rounded-2xl border border-white/5 bg-black/15"
+                  : "overflow-hidden rounded-2xl border border-white/5 bg-black/15"
               }
             >
               {fullscreen && (
@@ -1017,9 +1017,9 @@ function Index() {
                       : "Nenhum resultado no período selecionado."}
                   </div>
                 ) : viewMode === "colunas" ? (
-                  <div className="w-full overflow-x-auto p-2 [container-type:inline-size] sm:overflow-x-hidden sm:p-3 lg:p-4">
+                  <div className="history-scroll w-full p-1 [container-type:inline-size] sm:p-3 lg:p-4">
                     {/* Cabeçalho fixo dos minutos 00–09 */}
-                    <div className="sticky top-0 z-10 -mx-2 mb-2 border-b border-white/10 bg-background/95 px-2 py-1.5 backdrop-blur sm:-mx-3 sm:px-3 sm:py-2 lg:-mx-4 lg:px-4">
+                    <div className="sticky top-0 z-10 -mx-1 mb-1.5 border-b border-white/10 bg-background/95 px-1 py-1 backdrop-blur sm:-mx-3 sm:mb-2 sm:px-3 sm:py-2 lg:-mx-4 lg:px-4">
                       <div
                         className="grid"
                         style={{ gridTemplateColumns: historyGridTemplate, columnGap: "2px", justifyContent: "center", direction: inverse ? "rtl" : "ltr" }}
@@ -1064,9 +1064,9 @@ function Index() {
                         </div>
                       )}
                     </div>
-                    <div className="flex flex-col gap-2 sm:gap-3">
+                    <div className="flex flex-col gap-1.5 sm:gap-3">
                       {gridRows.map((row) => (
-                        <div key={row.key} className="flex items-start justify-center gap-1 sm:gap-2">
+                        <div key={row.key} className="flex items-start justify-center gap-0.5 sm:gap-2">
                         <div
                           className="grid items-start"
                           style={{ gridTemplateColumns: historyGridTemplate, columnGap: "2px", justifyContent: "center", direction: inverse ? "rtl" : "ltr" }}
@@ -1106,7 +1106,7 @@ function Index() {
                                 <span className={`inline-flex h-3.5 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-4 sm:px-2 sm:text-[9px] sm:tracking-widest ${badge ? badgeCls : "opacity-0"}`}>
                                   {badge?.label ?? "·"}
                                 </span>
-                                <div className="flex flex-col items-center justify-center gap-0.5 sm:flex-row sm:items-start">
+                                <div className="flex flex-row items-start justify-center gap-[2px] sm:gap-0.5">
                                   {(cell.length >= 2
                                     ? [cell[0], cell[1]]
                                     : cell.length === 1
