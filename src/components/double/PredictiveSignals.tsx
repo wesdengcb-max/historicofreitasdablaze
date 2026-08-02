@@ -16,7 +16,14 @@ import {
 } from "@/lib/predictive";
 
 type Mode1Signal = { key: string; title: string; at: Date; pct: number; label: string };
-type Mode2Signal = { key: string; title: string; times: Date[]; pct: number };
+type Mode2Signal = {
+  key: string;
+  title: string;
+  times: Date[];
+  pct: number;
+  sources: Array<{ analysis: 1 | 2 | 3; value: number; pct: number; top5: boolean }>;
+  confluence: string;
+};
 
 const MIN_ASSERTIVIDADE = 30;
 
@@ -26,19 +33,10 @@ function addMinutes(d: Date, m: number) {
   return out;
 }
 
-function combos<T>(arr: T[], size: number): T[][] {
-  if (size > arr.length) return [];
-  const res: T[][] = [];
-  const walk = (start: number, acc: T[]) => {
-    if (acc.length === size) {
-      res.push(acc.slice());
-      return;
-    }
-    for (let i = start; i < arr.length; i++) walk(i + 1, [...acc, arr[i]]);
-  };
-  walk(0, []);
-  return res;
-}
+/** Quantidade de projeções consideradas como candidatas por análise/pedra. */
+const CANDIDATE_DEPTH = 10;
+/** Somente as N primeiras contam como Top 5 validador. */
+const TOP5_DEPTH = 5;
 
 export function PredictiveSignals() {
   const [rows, setRows] = useState<Row[]>([]);
@@ -136,58 +134,61 @@ export function PredictiveSignals() {
 
     const usedTimes = new Set<number>(m1.map((s) => s.at.getTime()));
 
-    // ---- Modo 2: cruzamento de coincidências (Análise 1, pedras 0..9) ----
-    const a1Active = active.filter((i) => i.analysis === 1 && i.value <= 9);
-    const projections = new Map<number, Array<{ at: number; pct: number }>>();
-    for (const item of a1Active) {
-      const hist = cyclesOf(engine[1], item.value);
+    // ---- Modo 2: Estratégia de Coincidência ----
+    // Requisito mínimo: mais de 1 análise ativa projetando o mesmo minuto.
+    // Filtro de validação: o minuto precisa estar no Top 5 de pelo menos uma delas.
+    type Proj = { analysis: 1 | 2 | 3; value: number; pct: number; top5: boolean };
+    const byMinute = new Map<number, Proj[]>();
+
+    for (const item of active) {
+      const hist = cyclesOf(engine[item.analysis], item.value);
       if (!hist.length) continue;
-      const list = computeTop(hist, 5)
-        .map((g) => ({ at: addMinutes(item.open.triggerAt, g.m).getTime(), pct: g.pct }))
-        .filter((p) => p.at > now.getTime());
-      if (list.length) projections.set(item.value, list);
+      const list = computeTop(hist, CANDIDATE_DEPTH);
+      list.forEach((g, idx) => {
+        const at = addMinutes(item.open.triggerAt, g.m).getTime();
+        if (at <= now.getTime()) return;
+        const arr = byMinute.get(at) ?? [];
+        arr.push({
+          analysis: item.analysis,
+          value: item.value,
+          pct: g.pct,
+          top5: idx < TOP5_DEPTH,
+        });
+        byMinute.set(at, arr);
+      });
     }
 
-    const values = Array.from(projections.keys()).sort((a, b) => a - b);
     const m2: Mode2Signal[] = [];
-    for (const size of [3, 2]) {
-      for (const combo of combos(values, size)) {
-        // coincidência com margem de ±1 minuto entre todos os membros
-        const base = projections.get(combo[0])!;
-        for (const anchor of base) {
-          const picks: Array<{ at: number; pct: number }> = [anchor];
-          let ok = true;
-          for (let i = 1; i < combo.length; i++) {
-            const near = (projections.get(combo[i]) ?? []).filter(
-              (p) => Math.abs(p.at - anchor.at) <= 60_000,
-            );
-            if (!near.length) {
-              ok = false;
-              break;
-            }
-            near.sort((a, b) => b.pct - a.pct);
-            picks.push(near[0]);
-          }
-          if (!ok) continue;
-          const pct = picks.reduce((s, p) => s + p.pct, 0) / picks.length;
-          if (pct < MIN_ASSERTIVIDADE) continue;
+    for (const [at, projs] of byMinute) {
+      // 1) precisa de mais de 1 análise ativa em comum nesse minuto
+      const distinctAnalyses = new Set(projs.map((p) => p.analysis));
+      if (distinctAnalyses.size < 2) continue;
+      // 2) o minuto precisa estar no Top 5 de pelo menos uma das análises
+      const validators = projs.filter((p) => p.top5);
+      if (!validators.length) continue;
 
-          const best = Math.max(...picks.map((p) => p.pct));
-          const tied = picks.filter((p) => Math.abs(p.pct - best) < 0.001);
-          // desduplicação absoluta: remove horários já exibidos em qualquer bloco
-          const times = Array.from(new Set(tied.map((p) => p.at)))
-            .filter((t) => !usedTimes.has(t))
-            .sort((a, b) => a - b);
-          if (!times.length) continue;
-          times.forEach((t) => usedTimes.add(t));
-          m2.push({
-            key: `m2-${times[0]}`,
-            title: `Análise ${combo.join(" + ")}`,
-            times: times.map((t) => new Date(t)),
-            pct,
-          });
-        }
-      }
+      const pct = projs.reduce((s, p) => s + p.pct, 0) / projs.length;
+      if (pct < MIN_ASSERTIVIDADE) continue;
+      if (usedTimes.has(at)) continue;
+      usedTimes.add(at);
+
+      const sources = projs.slice().sort((a, b) => b.pct - a.pct);
+      const confluence = validators
+        .slice()
+        .sort((a, b) => b.pct - a.pct)
+        .map((p) => `A${p.analysis}·${p.value}`)
+        .join(", ");
+      m2.push({
+        key: `m2-${at}`,
+        title: Array.from(distinctAnalyses)
+          .sort()
+          .map((a) => `Análise ${a}`)
+          .join(" + "),
+        times: [new Date(at)],
+        pct,
+        sources,
+        confluence,
+      });
     }
     m2.sort((a, b) => a.times[0].getTime() - b.times[0].getTime());
     setMode2(m2);
@@ -282,11 +283,11 @@ export function PredictiveSignals() {
         {mode2 && (
           <section className="space-y-3">
             <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              <Layers className="h-3.5 w-3.5" /> Coincidências · confirmações
+              <Layers className="h-3.5 w-3.5" /> Coincidências · validadas pelo Top 5
             </div>
             {mode2.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                Sem coincidências de alta assertividade no momento
+                Sem coincidências validadas (mín. 2 análises no mesmo minuto + presença no Top 5)
               </p>
             ) : (
               <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -306,6 +307,24 @@ export function PredictiveSignals() {
                     </div>
                     <div className="mt-1 text-[11px] tabular-nums text-emerald-300">
                       {s.pct.toFixed(1)}%
+                    </div>
+                    <div className="mt-2 text-[10px] leading-relaxed text-muted-foreground">
+                      Confluência Top 5:{" "}
+                      <span className="font-semibold text-emerald-300">{s.confluence}</span>
+                    </div>
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {s.sources.map((p) => (
+                        <span
+                          key={`${p.analysis}-${p.value}`}
+                          className={
+                            p.top5
+                              ? "rounded border border-emerald-400/40 bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-bold tabular-nums text-emerald-300"
+                              : "rounded border border-white/10 bg-white/[0.03] px-1.5 py-0.5 text-[9px] font-medium tabular-nums text-muted-foreground"
+                          }
+                        >
+                          A{p.analysis}·{p.value} {p.pct.toFixed(0)}%
+                        </span>
+                      ))}
                     </div>
                   </div>
                 ))}
