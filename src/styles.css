@@ -172,26 +172,46 @@
   box-shadow: var(--shadow-tile);
 }
 
-/* ===== Métricas responsivas do histórico (mobile / tablet / desktop) ===== */
+/* ===== Métricas responsivas do histórico (mobile / tablet / desktop) =====
+   Mesma estrutura em todos os tamanhos (nunca vira card): apenas escala de
+   tamanhos, com rolagem horizontal quando não couber. */
 .history-metrics {
-  /* Mobile: 10 colunas, 2 pedras empilhadas por célula */
-  --stone-size: clamp(22px, calc((100cqw - 40px) / 10), 74px);
-  --stone-track: var(--stone-size);
-  --cell-min: calc((var(--stone-size) * 2) + 40px);
-  --stone-num: clamp(9px, calc(var(--stone-size) * 0.34), 14px);
-  --stone-time: clamp(8px, calc(var(--stone-size) * 0.26), 12px);
+  /* Celular: 20 pedras por linha, lado a lado, com scroll horizontal */
+  --stone-size: 26px;
+  --stone-track: calc((var(--stone-size) * 2) + 2px);
+  --cell-min: calc(var(--stone-size) + 20px);
+  --stone-num: clamp(8px, calc(var(--stone-size) * 0.34), 14px);
+  --stone-time: clamp(7px, calc(var(--stone-size) * 0.28), 12px);
+}
+@media (min-width: 420px) {
+  .history-metrics { --stone-size: 30px; }
 }
 @media (min-width: 640px) {
+  .history-metrics { --stone-size: 32px; }
+}
+/* Tablet: praticamente igual ao desktop, só menor */
+@media (min-width: 768px) {
   .history-metrics {
-    --stone-size: clamp(24px, calc((100cqw - 44px) / 20), 74px);
-    --stone-track: calc((var(--stone-size) * 2) + 2px);
-    --cell-min: calc(var(--stone-size) + 26px);
+    --stone-size: clamp(28px, calc((100cqw - 28px) / 20), 52px);
+    --cell-min: calc(var(--stone-size) + 24px);
   }
 }
 @media (min-width: 1024px) {
   .history-metrics {
     --stone-size: clamp(34px, calc((100cqw - 44px) / 20), 74px);
+    --cell-min: calc(var(--stone-size) + 26px);
   }
+}
+
+/* Rolagem horizontal suave do histórico */
+.history-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+}
+@media (min-width: 1280px) {
+  .history-scroll { overflow-x: hidden; }
 }
 
 /* Thin custom scrollbar */

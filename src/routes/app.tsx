@@ -217,6 +217,10 @@ function Index() {
   const section = useSection();
   const [inverse, setInverse] = useState(false);
   const [viewMode, setViewMode] = useState<"colunas" | "lista">("colunas");
+  // Em celular/tablet inicia em lista (sentido normal); desktop mantém colunas fixas.
+  useEffect(() => {
+    if (window.innerWidth < 1024) setViewMode("lista");
+  }, []);
   const [whiteAlert, setWhiteAlert] = useState(true);
   const [realtime, setRealtime] = useState(true);
   const [numerado, setNumerado] = useState(false);
@@ -656,29 +660,29 @@ function Index() {
       className="history-metrics min-h-dvh [--cols:10]"
     >
       <header className="sticky top-0 z-30 border-b border-white/5 bg-background/70 backdrop-blur-xl">
-        <div className="mx-auto grid h-16 max-w-[1720px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-3 sm:gap-4 sm:px-8">
+        <div className="mx-auto grid h-12 max-w-[1720px] grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-2 sm:h-14 sm:gap-4 sm:px-6 lg:h-16 lg:px-8">
           <div className="flex min-w-0 items-center gap-3">
             <div
-              className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-xl bg-white ring-1 ring-white/40"
+              className="grid h-7 w-7 shrink-0 place-items-center overflow-hidden rounded-xl bg-white ring-1 ring-white/40 sm:h-9 sm:w-9"
               style={{ boxShadow: "var(--shadow-glow)" }}
             >
               <img src={freitasLogo.url} alt="Freitas Blaze" className="h-full w-full object-cover" />
             </div>
             <div className="min-w-0 leading-tight">
-              <p className="truncate text-sm font-semibold tracking-tight">Freitas da Blaze</p>
-              <p className="truncate text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+              <p className="truncate text-[12px] font-semibold tracking-tight sm:text-sm">Freitas da Blaze</p>
+              <p className="truncate text-[9px] font-medium uppercase tracking-[0.14em] text-muted-foreground sm:text-[10px] sm:tracking-[0.18em]">
                 Análise do Histórico da Blaze
               </p>
             </div>
           </div>
 
-          <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
+          <div className="flex shrink-0 items-center gap-1 sm:gap-3">
             <StatusPill status={status} message={errorMsg} />
             <ThemeToggle />
             <button
               type="button"
               onClick={() => setWhiteAlert((v) => !v)}
-              className="grid h-9 w-9 place-items-center rounded-xl border border-white/5 bg-white/5 text-muted-foreground transition-colors duration-200 hover:bg-white/[0.08] hover:text-foreground sm:h-11 sm:w-11"
+              className="grid h-8 w-8 place-items-center rounded-xl border border-white/5 bg-white/5 text-muted-foreground transition-colors duration-200 hover:bg-white/[0.08] hover:text-foreground sm:h-10 sm:w-10 lg:h-11 lg:w-11"
               aria-label="Notificar branco"
               title={whiteAlert ? "Alerta de branco: ligado" : "Alerta de branco: desligado"}
             >
@@ -687,7 +691,7 @@ function Index() {
             <button
               type="button"
               onClick={() => setStatsOpen((v) => !v)}
-              className="grid h-9 w-9 place-items-center rounded-xl border border-white/5 bg-white/5 text-muted-foreground transition-colors duration-200 hover:bg-white/[0.08] hover:text-foreground sm:h-11 sm:w-11"
+              className="grid h-8 w-8 place-items-center rounded-xl border border-white/5 bg-white/5 text-muted-foreground transition-colors duration-200 hover:bg-white/[0.08] hover:text-foreground sm:h-10 sm:w-10 lg:h-11 lg:w-11"
               aria-label="Abrir estatísticas"
             >
               <BarChart3 className="h-4 w-4" />
@@ -697,7 +701,7 @@ function Index() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Abrir Telegram"
-              className="grid h-9 w-9 place-items-center rounded-xl text-white transition-transform duration-200 hover:scale-105 sm:h-11 sm:w-11"
+              className="grid h-8 w-8 place-items-center rounded-xl text-white transition-transform duration-200 hover:scale-105 sm:h-10 sm:w-10 lg:h-11 lg:w-11"
               style={{ background: "linear-gradient(135deg, #29b6f6, #0288d1)" }}
             >
               <Send className="h-4 w-4 -translate-x-[1px] translate-y-[1px] fill-white" />
@@ -730,9 +734,9 @@ function Index() {
           </Card>
         </main>
       ) : (
-      <main className="mx-auto flex w-full max-w-[1720px] flex-col gap-5 px-3 py-5 sm:gap-6 sm:px-8 sm:py-10">
+      <main className="mx-auto flex w-full max-w-[1720px] flex-col gap-3 px-1.5 py-3 sm:gap-5 sm:px-4 sm:py-6 lg:gap-6 lg:px-8 lg:py-10">
 
-        <section className="space-y-6">
+        <section className="space-y-3 sm:space-y-5 lg:space-y-6">
           <Card delay={0.05}>
             {/* Cabeçalho compacto: status + contagem + último número */}
             <div className="mb-3 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
@@ -865,8 +869,8 @@ function Index() {
             }
           >
             {/* Painel de controles alinhado */}
-            <div className="mb-4 rounded-2xl border border-white/5 bg-white/[0.02] p-3 sm:p-4">
-              <div className="grid grid-cols-1 gap-x-8 gap-y-3.5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mb-3 rounded-2xl border border-white/5 bg-white/[0.02] p-2 sm:mb-4 sm:p-4">
+              <div className="grid grid-cols-2 gap-x-3 gap-y-2 text-[11px] sm:gap-x-8 sm:gap-y-3.5 lg:grid-cols-4">
                 <div className="flex min-w-0 items-center">
                   <Switch checked={realtime} onChange={setRealtime} label="Tempo real" />
                 </div>
@@ -928,8 +932,8 @@ function Index() {
             </div>
 
             {/* Filtros de período */}
-            <div className="mb-4 space-y-3">
-              <div className="flex flex-wrap gap-1.5">
+            <div className="mb-3 space-y-2 sm:mb-4 sm:space-y-3">
+              <div className="flex flex-wrap gap-1 sm:gap-1.5">
                 {([
                   ["hoje", "Hoje"],
                   ["ontem", "Ontem"],
@@ -941,7 +945,7 @@ function Index() {
                     key={id}
                     type="button"
                     onClick={() => setFilter(id)}
-                    className={`rounded-full border px-3 py-1.5 text-[11px] font-medium transition-colors ${
+                    className={`rounded-full border px-2 py-1 text-[10px] font-medium transition-colors sm:px-3 sm:py-1.5 sm:text-[11px] ${
                       filter === id
                         ? "border-white/20 bg-white/10 text-foreground"
                         : "border-white/5 bg-white/[0.03] text-muted-foreground hover:text-foreground"
@@ -972,7 +976,7 @@ function Index() {
               className={
                 fullscreen
                   ? "fixed inset-0 z-50 flex flex-col bg-background/95 p-4 backdrop-blur-md sm:p-6"
-                  : "rounded-2xl border border-white/5 bg-black/15"
+                  : "overflow-hidden rounded-2xl border border-white/5 bg-black/15"
               }
             >
               {fullscreen && (
@@ -1014,12 +1018,12 @@ function Index() {
                       : "Nenhum resultado no período selecionado."}
                   </div>
                 ) : viewMode === "colunas" ? (
-                  <div className="w-full overflow-x-auto p-2 [container-type:inline-size] sm:overflow-x-hidden sm:p-3 lg:p-4">
+                  <div className="history-scroll w-full p-1 [container-type:inline-size] sm:p-3 lg:p-4">
                     {/* Cabeçalho fixo dos minutos 00–09 */}
-                    <div className="sticky top-0 z-10 -mx-2 mb-2 border-b border-white/10 bg-background/95 px-2 py-1.5 backdrop-blur sm:-mx-3 sm:px-3 sm:py-2 lg:-mx-4 lg:px-4">
+                    <div className="sticky top-0 z-10 -mx-1 mb-1.5 border-b border-white/10 bg-background/95 px-1 py-1 backdrop-blur sm:-mx-3 sm:mb-2 sm:px-3 sm:py-2 lg:-mx-4 lg:px-4">
                       <div
                         className="grid"
-                        style={{ gridTemplateColumns: historyGridTemplate, columnGap: "2px", justifyContent: "center", direction: inverse ? "rtl" : "ltr" }}
+                        style={{ gridTemplateColumns: historyGridTemplate, columnGap: "2px", justifyContent: "safe center", direction: inverse ? "rtl" : "ltr" }}
                       >
                         {Array.from({ length: 10 }, (_, i) => (
                           <div
@@ -1038,7 +1042,7 @@ function Index() {
                       {contarColunas && (
                         <div
                           className="mt-1.5 grid"
-                          style={{ gridTemplateColumns: historyGridTemplate, columnGap: "2px", justifyContent: "center", direction: inverse ? "rtl" : "ltr" }}
+                          style={{ gridTemplateColumns: historyGridTemplate, columnGap: "2px", justifyContent: "safe center", direction: inverse ? "rtl" : "ltr" }}
                         >
                           {colStats.map((c, i) => (
                             <div
@@ -1061,12 +1065,12 @@ function Index() {
                         </div>
                       )}
                     </div>
-                    <div className="flex flex-col gap-2 sm:gap-3">
+                    <div className="flex flex-col gap-1.5 sm:gap-3">
                       {gridRows.map((row) => (
-                        <div key={row.key} className="flex items-start justify-center gap-1 sm:gap-2">
+                        <div key={row.key} className="flex items-start justify-center gap-0.5 sm:gap-2">
                         <div
                           className="grid items-start"
-                          style={{ gridTemplateColumns: historyGridTemplate, columnGap: "2px", justifyContent: "center", direction: inverse ? "rtl" : "ltr" }}
+                          style={{ gridTemplateColumns: historyGridTemplate, columnGap: "2px", justifyContent: "safe center", direction: inverse ? "rtl" : "ltr" }}
                         >
                           {row.cells.map((cell, ci) => {
                             const [hh, mmPrefix] = row.label.split(":");
@@ -1103,7 +1107,7 @@ function Index() {
                                 <span className={`inline-flex h-3.5 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-4 sm:px-2 sm:text-[9px] sm:tracking-widest ${badge ? badgeCls : "opacity-0"}`}>
                                   {badge?.label ?? "·"}
                                 </span>
-                                <div className="flex flex-col items-center justify-center gap-0.5 sm:flex-row sm:items-start">
+                                <div className="flex flex-row items-start justify-center gap-[2px] sm:gap-0.5">
                                   {(cell.length >= 2
                                     ? [cell[0], cell[1]]
                                     : cell.length === 1
@@ -1190,7 +1194,7 @@ function Index() {
                   (() => {
                     return (
                        <div
-                         className="grid justify-center p-2 [--blaze-card-h:40px] [--blaze-card-w:42px] [--blaze-dot:24px] [--blaze-num:11px] [--blaze-time:10px] sm:p-3 sm:[--blaze-card-h:46px] sm:[--blaze-card-w:48px] sm:[--blaze-dot:28px] sm:[--blaze-num:12px] sm:[--blaze-time:11px] lg:p-4 lg:[--blaze-card-h:50px] lg:[--blaze-card-w:52px] lg:[--blaze-dot:30px] lg:[--blaze-num:13px] lg:[--blaze-time:12px]"
+                         className="history-scroll grid justify-center p-1 [--blaze-card-h:36px] [--blaze-card-w:42px] [--blaze-dot:24px] [--blaze-num:11px] [--blaze-time:10px] sm:p-3 sm:[--blaze-card-h:46px] sm:[--blaze-card-w:48px] sm:[--blaze-dot:28px] sm:[--blaze-num:12px] sm:[--blaze-time:11px] lg:p-4 lg:[--blaze-card-h:50px] lg:[--blaze-card-w:52px] lg:[--blaze-dot:30px] lg:[--blaze-num:13px] lg:[--blaze-time:12px]"
                          style={{
                            gridTemplateColumns:
                              `repeat(auto-fill, var(--blaze-card-w, ${BLAZE_CARD_W}px))`,
