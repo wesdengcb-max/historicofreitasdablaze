@@ -33,6 +33,7 @@ const TOP_N = 5;
 const MAX_ZEROS = 14;           // coleta até 14 zeros após o gatilho (sem limite de tempo)
 const MAX_DETAIL_ROWS = 10;     // FIFO detalhes
 const MAX_PATTERN_CYCLES = 14;  // Análise 2: últimas 14 ocorrências
+const MAX_OPEN_MINUTES = 90;    // trava de tempo: gatilho não fica ativo além disso
 const BRAZIL_TIME_ZONE = "America/Sao_Paulo";
 
 const brazilMinuteFormatter = new Intl.DateTimeFormat("pt-BR", {
@@ -60,6 +61,37 @@ function serializeBrazilTimestamp(date: Date) {
 
 function diffMinutes(a: Date, b: Date) {
   return Math.max(0, Math.round((b.getTime() - a.getTime()) / 60000));
+}
+
+/**
+ * Backfill: recalcula a sequência de "minutos até 0" varrendo o histórico
+ * a partir do horário do gatilho. Usado para fechar gatilhos que ficaram
+ * gravados no banco com dados vazios/incompletos.
+ */
+function computeGapsFromHistory(rows: Row[], triggerAt: Date): number[] {
+  const gaps: number[] = [];
+  const t = triggerAt.getTime();
+  for (let i = 0; i < rows.length && gaps.length < MAX_ZEROS; i++) {
+    const row = rows[i];
+    if (Number(row.roll) !== 0) continue;
+    const zdt = parseUtcDate(row.created_at);
+    if (Number.isNaN(zdt.getTime())) continue;
+    if (zdt.getTime() <= t) continue;
+    gaps.push(diffMinutes(triggerAt, zdt));
+  }
+  return gaps;
+}
+
+type CycleStatus = "completo" | "encerrado" | "ativo";
+
+/**
+ * Trava de encerramento: 14 contagens fecham o ciclo; passado o limite de
+ * tempo o gatilho é encerrado mesmo incompleto (nunca fica ativo para sempre).
+ */
+function cycleStatus(c: Cycle): CycleStatus {
+  if (c.gaps.length >= MAX_ZEROS) return "completo";
+  if (c.elapsed >= MAX_OPEN_MINUTES) return "encerrado";
+  return "ativo";
 }
 
 /**
@@ -285,6 +317,8 @@ type PanelProps = {
   showFullBadge?: boolean; // Analysis 1 usa "Completo (10/10)"
   analiseKey: string;      // identificador no banco (analise1/2/3)
   pedra: number;           // número selecionado
+  history: Row[];          // histórico para backfill retroativo
+  now: Date;
 };
 
 function AnalysisPanel({
@@ -300,6 +334,8 @@ function AnalysisPanel({
   showFullBadge = true,
   analiseKey,
   pedra,
+  history,
+  now,
 }: PanelProps) {
   // Janela deslizante FIFO local (base para gravar no banco).
   const local = useMemo(() => buildDetailRows(cycles), [cycles]);
@@ -326,21 +362,30 @@ function AnalysisPanel({
     return dbRows.map((r: GatilhoRow, i) => {
       const at = new Date(r.trigger_at);
       const match = local.find((c) => c.triggerAt.getTime() === at.getTime());
+      const dbGaps = r.gaps ?? [];
+      // Backfill: prioriza a sequência mais completa entre banco, cálculo
+      // local e recálculo retroativo direto do histórico.
+      const backfilled =
+        match && match.gaps.length >= MAX_ZEROS
+          ? match.gaps
+          : computeGapsFromHistory(history, at);
+      const candidates = [dbGaps, match?.gaps ?? [], backfilled];
+      const gaps = candidates.reduce((best, g) => (g.length > best.length ? g : best), [] as number[]);
       return {
         index: i + 1,
         triggerAt: at,
         triggerLabel: `${r.pedra}`,
         triggerDetail: match?.triggerDetail ?? (r.detalhe ?? `min ${String(r.minuto).padStart(2, "0")}`),
-        gaps: r.gaps ?? [],
-        pending: (r.gaps ?? []).length === 0 ? 1 : 0,
-        elapsed: match?.elapsed ?? 0,
+        gaps,
+        pending: gaps.length >= MAX_ZEROS ? 0 : 1,
+        elapsed: diffMinutes(at, now),
       };
     });
-  }, [dbRows, local]);
+  }, [dbRows, local, history, now]);
 
   const { rows: top5, totalRows } = useMemo(() => computeTop5(windowed), [windowed]);
   const details = windowed;
-  const fullyCompleted = windowed.filter((c) => c.pending === 0 && c.gaps.length > 0).length;
+  const fullyCompleted = windowed.filter((c) => cycleStatus(c) !== "ativo" && c.gaps.length > 0).length;
   const totalGaps = windowed.reduce((a, c) => a + c.gaps.length, 0);
   const avg = totalGaps
     ? Math.round(windowed.reduce((a, c) => a + c.gaps.reduce((x, y) => x + y, 0), 0) / totalGaps)
@@ -463,6 +508,7 @@ function AnalysisPanel({
                   .slice()
                   .reverse()
                   .map((c) => {
+                    const status = cycleStatus(c);
                     return (
                       <tr
                         key={`${c.triggerAt.getTime()}-${c.triggerLabel}`}
@@ -475,17 +521,17 @@ function AnalysisPanel({
                           {c.gaps.length ? c.gaps.join(" · ") : "—"}
                         </td>
                         <td className="px-3 py-2">
-                          {c.gaps.length >= MAX_ZEROS ? (
+                          {status === "completo" ? (
                             <span className="text-emerald-300">
                               {showFullBadge ? `Completo (${c.gaps.length})` : "Completo"}
                             </span>
-                          ) : c.gaps.length > 0 ? (
-                            <span className="text-emerald-300">
-                              {c.gaps.length}/{MAX_ZEROS}
+                          ) : status === "encerrado" ? (
+                            <span className="text-sky-300">
+                              Encerrado ({c.gaps.length}/{MAX_ZEROS})
                             </span>
                           ) : (
                             <span className="text-amber-300">
-                              aguardando · {c.elapsed} min
+                              ativo · {c.gaps.length}/{MAX_ZEROS} · {c.elapsed} min
                             </span>
                           )}
                         </td>
@@ -650,6 +696,8 @@ export function AnaliseSection() {
         eligibleHint={`precisa ${MIN_CYCLES}+ ciclos completos`}
         analiseKey="analise1"
         pedra={selected}
+        history={rows}
+        now={now}
       />
 
       <AnalysisPanel
@@ -665,6 +713,8 @@ export function AnaliseSection() {
         showFullBadge={false}
         analiseKey="analise2"
         pedra={selected}
+        history={rows}
+        now={now}
       />
 
       <AnalysisPanel
@@ -688,6 +738,8 @@ export function AnaliseSection() {
         showFullBadge={false}
         analiseKey="analise3"
         pedra={selected}
+        history={rows}
+        now={now}
       />
     </main>
   );
