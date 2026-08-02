@@ -1,6 +1,8 @@
-import { memo, useMemo } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { X } from "lucide-react";
-import { colorOf, type Spin } from "./types";
+import { colorOf, fmtTime, mapColor, type Color, type Spin } from "./types";
+import { blazeSupabase } from "@/integrations/supabase/blaze-client";
+import { parseUtcDate } from "@/lib/utils";
 import brancoTile from "@/assets/branco-tile.png.asset.json";
 
 type Props = {
@@ -10,9 +12,13 @@ type Props = {
 };
 
 const HOUR_TZ = "America/Sao_Paulo";
+const CHUNK = 1000;
+const MAX_ROWS = 20000;
+const HISTORY_ROWS = 1500;
+const REFRESH_MS = 30000;
 
 function minutesAgo(iso: string): number {
-  const t = new Date(iso).getTime();
+  const t = parseUtcDate(iso).getTime();
   if (Number.isNaN(t)) return 0;
   return Math.max(0, Math.floor((Date.now() - t) / 60000));
 }
@@ -30,7 +36,7 @@ function ptDayStartIso(): number {
 }
 
 function hourOf(iso: string): number {
-  const d = new Date(iso);
+  const d = parseUtcDate(iso);
   if (Number.isNaN(d.getTime())) return -1;
   const h = new Intl.DateTimeFormat("en-GB", {
     timeZone: HOUR_TZ,
@@ -38,6 +44,91 @@ function hourOf(iso: string): number {
     hour12: false,
   }).format(d);
   return parseInt(h, 10);
+}
+
+type RawRow = { id: number | string; roll: unknown; color: unknown; created_at: string };
+
+function normalizeColor(v: unknown): Color | null {
+  const s = (v ?? "").toString().trim().toLowerCase();
+  if (["red", "vermelho", "vermelha", "r"].includes(s)) return "red";
+  if (["black", "preto", "preta", "b"].includes(s)) return "black";
+  if (["white", "branco", "branca", "w"].includes(s)) return "white";
+  const num = Number(s);
+  if (s !== "" && Number.isFinite(num) && num >= 0 && num <= 2) return mapColor(num);
+  return null;
+}
+
+function rowToSpin(r: RawRow): Spin {
+  const rollNumber = Number(r.roll);
+  const n = Number.isFinite(rollNumber) ? rollNumber : 0;
+  const color = normalizeColor(r.color) ?? colorOf(n);
+  return { id: String(r.id), n, color, time: fmtTime(r.created_at), createdAt: r.created_at };
+}
+
+function dedupeSort(rows: Spin[]): Spin[] {
+  const byId = new Map<string, Spin>();
+  for (const s of rows) if (s.id && !byId.has(s.id)) byId.set(s.id, s);
+  return Array.from(byId.values()).sort(
+    (a, b) => parseUtcDate(b.createdAt).getTime() - parseUtcDate(a.createdAt).getTime(),
+  );
+}
+
+/**
+ * Busca TODAS as rodadas desde 00:00 (Brasília) + um lote extra de histórico
+ * recente (para análise de brancos/sequências que atravessa a virada do dia).
+ * Só roda enquanto o painel está aberto.
+ */
+function useFullStatsSpins(open: boolean, fallback: Spin[]) {
+  const [rows, setRows] = useState<Spin[] | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    let alive = true;
+
+    const load = async () => {
+      try {
+        const dayStartIso = new Date(ptDayStartIso()).toISOString();
+        const collected: Spin[] = [];
+        for (let from = 0; from < MAX_ROWS; from += CHUNK) {
+          const { data, error } = await blazeSupabase
+            .from("blaze_results")
+            .select("id, roll, color, created_at")
+            .gte("created_at", dayStartIso)
+            .order("created_at", { ascending: false })
+            .range(from, from + CHUNK - 1);
+          if (error) throw error;
+          const batch = (data ?? []) as RawRow[];
+          collected.push(...batch.map(rowToSpin));
+          if (batch.length < CHUNK) break;
+        }
+
+        const { data: hist } = await blazeSupabase
+          .from("blaze_results")
+          .select("id, roll, color, created_at")
+          .order("created_at", { ascending: false })
+          .range(0, HISTORY_ROWS - 1);
+        collected.push(...(((hist ?? []) as RawRow[]).map(rowToSpin)));
+
+        if (!alive) return;
+        setRows(dedupeSort(collected));
+      } catch {
+        if (alive) setRows(null);
+      }
+    };
+
+    void load();
+    const timer = setInterval(load, REFRESH_MS);
+    return () => {
+      alive = false;
+      clearInterval(timer);
+    };
+  }, [open]);
+
+  // Mescla o que já está na tela com o carregamento completo.
+  return useMemo(() => {
+    if (!rows) return fallback;
+    return dedupeSort([...rows, ...fallback]);
+  }, [rows, fallback]);
 }
 
 // spins is sorted newest -> oldest
@@ -110,7 +201,10 @@ function useStats(spins: Spin[]) {
 
     // Today (since 00:00 BRT)
     const dayStart = ptDayStartIso();
-    const today = spins.filter((s) => new Date(s.createdAt).getTime() >= dayStart);
+    const today = spins.filter((s) => {
+      const t = parseUtcDate(s.createdAt).getTime();
+      return !Number.isNaN(t) && t >= dayStart;
+    });
 
     // Frequência das pedras
     const freq: number[] = Array.from({ length: 15 }, () => 0);
@@ -133,10 +227,8 @@ function useStats(spins: Spin[]) {
     const totalBlack = today.filter((s) => s.color === "black").length;
     const totalWhite = today.filter((s) => s.color === "white").length;
     const totalAll = today.length || 1;
-    const hoursElapsed = Math.max(
-      1,
-      Math.round((Date.now() - dayStart) / 3_600_000),
-    );
+    // Horas decorridas no dia (fração), mínimo de 1/60h para não estourar a média.
+    const hoursElapsed = Math.max(1 / 60, (Date.now() - dayStart) / 3_600_000);
 
     return {
       lastWhiteMin,
@@ -205,7 +297,8 @@ const B = ({ children }: { children: React.ReactNode }) => (
 );
 
 export const LeftStatsDrawer = memo(function LeftStatsDrawer({ open, onClose, spins }: Props) {
-  const s = useStats(spins);
+  const allSpins = useFullStatsSpins(open, spins);
+  const s = useStats(allSpins);
 
   return (
     <>
