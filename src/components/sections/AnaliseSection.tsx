@@ -508,6 +508,7 @@ function AnalysisPanel({
                   .slice()
                   .reverse()
                   .map((c) => {
+                    const status = cycleStatus(c);
                     return (
                       <tr
                         key={`${c.triggerAt.getTime()}-${c.triggerLabel}`}
@@ -520,17 +521,17 @@ function AnalysisPanel({
                           {c.gaps.length ? c.gaps.join(" · ") : "—"}
                         </td>
                         <td className="px-3 py-2">
-                          {c.gaps.length >= MAX_ZEROS ? (
+                          {status === "completo" ? (
                             <span className="text-emerald-300">
                               {showFullBadge ? `Completo (${c.gaps.length})` : "Completo"}
                             </span>
-                          ) : c.gaps.length > 0 ? (
-                            <span className="text-emerald-300">
-                              {c.gaps.length}/{MAX_ZEROS}
+                          ) : status === "encerrado" ? (
+                            <span className="text-sky-300">
+                              Encerrado ({c.gaps.length}/{MAX_ZEROS})
                             </span>
                           ) : (
                             <span className="text-amber-300">
-                              aguardando · {c.elapsed} min
+                              ativo · {c.gaps.length}/{MAX_ZEROS} · {c.elapsed} min
                             </span>
                           )}
                         </td>
