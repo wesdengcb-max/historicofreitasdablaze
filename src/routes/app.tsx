@@ -216,7 +216,10 @@ function computeRange(
 function Index() {
   const section = useSection();
   const [inverse, setInverse] = useState(false);
-  const [viewMode, setViewMode] = useState<"colunas" | "lista">("colunas");
+  // Em celular/tablet inicia em lista (sentido normal); desktop mantém colunas fixas.
+  const [viewMode, setViewMode] = useState<"colunas" | "lista">(() =>
+    typeof window !== "undefined" && window.innerWidth < 1024 ? "lista" : "colunas",
+  );
   const [whiteAlert, setWhiteAlert] = useState(true);
   const [realtime, setRealtime] = useState(true);
   const [numerado, setNumerado] = useState(false);
@@ -656,29 +659,29 @@ function Index() {
       className="history-metrics min-h-dvh [--cols:10]"
     >
       <header className="sticky top-0 z-30 border-b border-white/5 bg-background/70 backdrop-blur-xl">
-        <div className="mx-auto grid h-16 max-w-[1720px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-3 sm:gap-4 sm:px-8">
+        <div className="mx-auto grid h-12 max-w-[1720px] grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-2 sm:h-14 sm:gap-4 sm:px-6 lg:h-16 lg:px-8">
           <div className="flex min-w-0 items-center gap-3">
             <div
-              className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-xl bg-white ring-1 ring-white/40"
+              className="grid h-7 w-7 shrink-0 place-items-center overflow-hidden rounded-xl bg-white ring-1 ring-white/40 sm:h-9 sm:w-9"
               style={{ boxShadow: "var(--shadow-glow)" }}
             >
               <img src={freitasLogo.url} alt="Freitas Blaze" className="h-full w-full object-cover" />
             </div>
             <div className="min-w-0 leading-tight">
-              <p className="truncate text-sm font-semibold tracking-tight">Freitas da Blaze</p>
-              <p className="truncate text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+              <p className="truncate text-[12px] font-semibold tracking-tight sm:text-sm">Freitas da Blaze</p>
+              <p className="truncate text-[9px] font-medium uppercase tracking-[0.14em] text-muted-foreground sm:text-[10px] sm:tracking-[0.18em]">
                 Análise do Histórico da Blaze
               </p>
             </div>
           </div>
 
-          <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
+          <div className="flex shrink-0 items-center gap-1 sm:gap-3">
             <StatusPill status={status} message={errorMsg} />
             <ThemeToggle />
             <button
               type="button"
               onClick={() => setWhiteAlert((v) => !v)}
-              className="grid h-9 w-9 place-items-center rounded-xl border border-white/5 bg-white/5 text-muted-foreground transition-colors duration-200 hover:bg-white/[0.08] hover:text-foreground sm:h-11 sm:w-11"
+              className="grid h-8 w-8 place-items-center rounded-xl border border-white/5 bg-white/5 text-muted-foreground transition-colors duration-200 hover:bg-white/[0.08] hover:text-foreground sm:h-10 sm:w-10 lg:h-11 lg:w-11"
               aria-label="Notificar branco"
               title={whiteAlert ? "Alerta de branco: ligado" : "Alerta de branco: desligado"}
             >
@@ -687,7 +690,7 @@ function Index() {
             <button
               type="button"
               onClick={() => setStatsOpen((v) => !v)}
-              className="grid h-9 w-9 place-items-center rounded-xl border border-white/5 bg-white/5 text-muted-foreground transition-colors duration-200 hover:bg-white/[0.08] hover:text-foreground sm:h-11 sm:w-11"
+              className="grid h-8 w-8 place-items-center rounded-xl border border-white/5 bg-white/5 text-muted-foreground transition-colors duration-200 hover:bg-white/[0.08] hover:text-foreground sm:h-10 sm:w-10 lg:h-11 lg:w-11"
               aria-label="Abrir estatísticas"
             >
               <BarChart3 className="h-4 w-4" />
@@ -697,7 +700,7 @@ function Index() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Abrir Telegram"
-              className="grid h-9 w-9 place-items-center rounded-xl text-white transition-transform duration-200 hover:scale-105 sm:h-11 sm:w-11"
+              className="grid h-8 w-8 place-items-center rounded-xl text-white transition-transform duration-200 hover:scale-105 sm:h-10 sm:w-10 lg:h-11 lg:w-11"
               style={{ background: "linear-gradient(135deg, #29b6f6, #0288d1)" }}
             >
               <Send className="h-4 w-4 -translate-x-[1px] translate-y-[1px] fill-white" />
@@ -730,9 +733,9 @@ function Index() {
           </Card>
         </main>
       ) : (
-      <main className="mx-auto flex w-full max-w-[1720px] flex-col gap-5 px-3 py-5 sm:gap-6 sm:px-8 sm:py-10">
+      <main className="mx-auto flex w-full max-w-[1720px] flex-col gap-3 px-1.5 py-3 sm:gap-5 sm:px-4 sm:py-6 lg:gap-6 lg:px-8 lg:py-10">
 
-        <section className="space-y-6">
+        <section className="space-y-3 sm:space-y-5 lg:space-y-6">
           <Card delay={0.05}>
             {/* Cabeçalho compacto: status + contagem + último número */}
             <div className="mb-3 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
