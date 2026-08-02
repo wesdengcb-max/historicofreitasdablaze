@@ -1035,6 +1035,31 @@ function Index() {
                           </div>
                         ))}
                       </div>
+                      {contarColunas && (
+                        <div
+                          className="mt-1.5 grid"
+                          style={{ gridTemplateColumns: historyGridTemplate, columnGap: "2px", justifyContent: "center", direction: inverse ? "rtl" : "ltr" }}
+                        >
+                          {colStats.map((c, i) => (
+                            <div
+                              key={`cs-${i}`}
+                              className="rounded-md border border-white/5 bg-white/[0.02] px-1 py-1"
+                              style={{ direction: "ltr" }}
+                            >
+                              <div className="flex h-1.5 overflow-hidden rounded-full bg-white/10">
+                                <span style={{ width: `${c.redPct}%`, background: "#DE2143" }} />
+                                <span style={{ width: `${c.blackPct}%`, background: "#16171d" }} />
+                                <span style={{ width: `${c.whitePct}%`, background: "#ffffff" }} />
+                              </div>
+                              <div className="mt-1 flex items-center justify-between gap-0.5 text-[7px] font-bold tabular-nums leading-none sm:text-[9px]">
+                                <span style={{ color: "#ff6b83" }}>{c.redPct.toFixed(0)}%</span>
+                                <span className="text-muted-foreground">{c.blackPct.toFixed(0)}%</span>
+                                <span className="text-foreground">{c.whitePct.toFixed(0)}%</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                     <div className="flex flex-col gap-2 sm:gap-3">
                       {gridRows.map((row) => (
