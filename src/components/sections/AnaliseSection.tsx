@@ -33,6 +33,7 @@ const TOP_N = 5;
 const MAX_ZEROS = 14;           // coleta até 14 zeros após o gatilho (sem limite de tempo)
 const MAX_DETAIL_ROWS = 10;     // FIFO detalhes
 const MAX_PATTERN_CYCLES = 14;  // Análise 2: últimas 14 ocorrências
+const MAX_OPEN_MINUTES = 90;    // trava de tempo: gatilho não fica ativo além disso
 const BRAZIL_TIME_ZONE = "America/Sao_Paulo";
 
 const brazilMinuteFormatter = new Intl.DateTimeFormat("pt-BR", {
@@ -60,6 +61,37 @@ function serializeBrazilTimestamp(date: Date) {
 
 function diffMinutes(a: Date, b: Date) {
   return Math.max(0, Math.round((b.getTime() - a.getTime()) / 60000));
+}
+
+/**
+ * Backfill: recalcula a sequência de "minutos até 0" varrendo o histórico
+ * a partir do horário do gatilho. Usado para fechar gatilhos que ficaram
+ * gravados no banco com dados vazios/incompletos.
+ */
+function computeGapsFromHistory(rows: Row[], triggerAt: Date): number[] {
+  const gaps: number[] = [];
+  const t = triggerAt.getTime();
+  for (let i = 0; i < rows.length && gaps.length < MAX_ZEROS; i++) {
+    const row = rows[i];
+    if (Number(row.roll) !== 0) continue;
+    const zdt = parseUtcDate(row.created_at);
+    if (Number.isNaN(zdt.getTime())) continue;
+    if (zdt.getTime() <= t) continue;
+    gaps.push(diffMinutes(triggerAt, zdt));
+  }
+  return gaps;
+}
+
+type CycleStatus = "completo" | "encerrado" | "ativo";
+
+/**
+ * Trava de encerramento: 14 contagens fecham o ciclo; passado o limite de
+ * tempo o gatilho é encerrado mesmo incompleto (nunca fica ativo para sempre).
+ */
+function cycleStatus(c: Cycle): CycleStatus {
+  if (c.gaps.length >= MAX_ZEROS) return "completo";
+  if (c.elapsed >= MAX_OPEN_MINUTES) return "encerrado";
+  return "ativo";
 }
 
 /**
