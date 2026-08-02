@@ -64,22 +64,47 @@ function diffMinutes(a: Date, b: Date) {
 }
 
 /**
- * Backfill: recalcula a sequência de "minutos até 0" varrendo o histórico
- * a partir do horário do gatilho. Usado para fechar gatilhos que ficaram
- * gravados no banco com dados vazios/incompletos.
+ * Backfill cronológico INDIVIDUALIZADO: para um gatilho específico, varre o
+ * histórico (ordem crescente) começando EXCLUSIVAMENTE a partir do horário
+ * daquele gatilho e acumula até 14 ocorrências de "0", medindo
+ * (minuto do 0 − minuto do gatilho). Nunca usa a lista global de zeros
+ * recentes do sistema.
+ *
+ * `covered` indica se o histórico carregado realmente cobre o instante do
+ * gatilho — quando não cobre, o valor calculado é inválido e não deve
+ * sobrescrever o que já está gravado no banco.
  */
-function computeGapsFromHistory(rows: Row[], triggerAt: Date): number[] {
-  const gaps: number[] = [];
+function computeGapsFromHistory(
+  rows: Row[],
+  triggerAt: Date,
+): { gaps: number[]; covered: boolean } {
   const t = triggerAt.getTime();
-  for (let i = 0; i < rows.length && gaps.length < MAX_ZEROS; i++) {
+  if (rows.length === 0) return { gaps: [], covered: false };
+
+  // O histórico está em ordem cronológica crescente: o primeiro registro
+  // precisa ser anterior (ou igual) ao gatilho para cobrir sua janela.
+  const first = parseUtcDate(rows[0].created_at).getTime();
+  const covered = Number.isFinite(first) && first <= t;
+
+  // Busca binária pelo primeiro registro posterior ao gatilho.
+  let lo = 0;
+  let hi = rows.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    const ts = parseUtcDate(rows[mid].created_at).getTime();
+    if (Number.isNaN(ts) || ts <= t) lo = mid + 1;
+    else hi = mid;
+  }
+
+  const gaps: number[] = [];
+  for (let i = lo; i < rows.length && gaps.length < MAX_ZEROS; i++) {
     const row = rows[i];
     if (Number(row.roll) !== 0) continue;
     const zdt = parseUtcDate(row.created_at);
-    if (Number.isNaN(zdt.getTime())) continue;
-    if (zdt.getTime() <= t) continue;
+    if (Number.isNaN(zdt.getTime()) || zdt.getTime() <= t) continue;
     gaps.push(diffMinutes(triggerAt, zdt));
   }
-  return gaps;
+  return { gaps, covered };
 }
 
 type CycleStatus = "completo" | "encerrado" | "ativo";
@@ -363,14 +388,11 @@ function AnalysisPanel({
       const at = new Date(r.trigger_at);
       const match = local.find((c) => c.triggerAt.getTime() === at.getTime());
       const dbGaps = r.gaps ?? [];
-      // Backfill: prioriza a sequência mais completa entre banco, cálculo
-      // local e recálculo retroativo direto do histórico.
-      const backfilled =
-        match && match.gaps.length >= MAX_ZEROS
-          ? match.gaps
-          : computeGapsFromHistory(history, at);
-      const candidates = [dbGaps, match?.gaps ?? [], backfilled];
-      const gaps = candidates.reduce((best, g) => (g.length > best.length ? g : best), [] as number[]);
+      // Recálculo cronológico individual a partir do horário DESTE gatilho.
+      // Quando o histórico carregado cobre o instante do gatilho, ele é a
+      // única fonte da verdade (evita herdar zeros globais recentes).
+      const { gaps: computed, covered } = computeGapsFromHistory(history, at);
+      const gaps = covered ? computed : dbGaps.slice(0, MAX_ZEROS);
       return {
         index: i + 1,
         triggerAt: at,
