@@ -16,7 +16,14 @@ import {
 } from "@/lib/predictive";
 
 type Mode1Signal = { key: string; title: string; at: Date; pct: number; label: string };
-type Mode2Signal = { key: string; title: string; times: Date[]; pct: number };
+type Mode2Signal = {
+  key: string;
+  title: string;
+  times: Date[];
+  pct: number;
+  sources: Array<{ analysis: 1 | 2 | 3; value: number; pct: number; top5: boolean }>;
+  confluence: string;
+};
 
 const MIN_ASSERTIVIDADE = 30;
 
@@ -26,19 +33,10 @@ function addMinutes(d: Date, m: number) {
   return out;
 }
 
-function combos<T>(arr: T[], size: number): T[][] {
-  if (size > arr.length) return [];
-  const res: T[][] = [];
-  const walk = (start: number, acc: T[]) => {
-    if (acc.length === size) {
-      res.push(acc.slice());
-      return;
-    }
-    for (let i = start; i < arr.length; i++) walk(i + 1, [...acc, arr[i]]);
-  };
-  walk(0, []);
-  return res;
-}
+/** Quantidade de projeções consideradas como candidatas por análise/pedra. */
+const CANDIDATE_DEPTH = 10;
+/** Somente as N primeiras contam como Top 5 validador. */
+const TOP5_DEPTH = 5;
 
 export function PredictiveSignals() {
   const [rows, setRows] = useState<Row[]>([]);
