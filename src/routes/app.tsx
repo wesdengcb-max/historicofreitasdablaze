@@ -608,6 +608,28 @@ function Index() {
     return acc;
   }, [gridRows]);
 
+  /** Percentual de vermelho / preto / branco por coluna (00–09). */
+  const colStats = useMemo(() => {
+    const acc = Array.from({ length: 10 }, () => ({ red: 0, black: 0, white: 0, total: 0 }));
+    for (const row of gridRows) {
+      row.cells.forEach((cell, i) => {
+        for (const spin of cell) {
+          if (spin.color === "red") acc[i].red += 1;
+          else if (spin.color === "black") acc[i].black += 1;
+          else if (spin.color === "white") acc[i].white += 1;
+          else continue;
+          acc[i].total += 1;
+        }
+      });
+    }
+    return acc.map((c) => ({
+      ...c,
+      redPct: c.total ? (c.red / c.total) * 100 : 0,
+      blackPct: c.total ? (c.black / c.total) * 100 : 0,
+      whitePct: c.total ? (c.white / c.total) * 100 : 0,
+    }));
+  }, [gridRows]);
+
   const signalsByHM = useMemo(() => {
 
     const fmt = new Intl.DateTimeFormat("en-GB", {
