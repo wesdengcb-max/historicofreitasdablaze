@@ -388,14 +388,11 @@ function AnalysisPanel({
       const at = new Date(r.trigger_at);
       const match = local.find((c) => c.triggerAt.getTime() === at.getTime());
       const dbGaps = r.gaps ?? [];
-      // Backfill: prioriza a sequência mais completa entre banco, cálculo
-      // local e recálculo retroativo direto do histórico.
-      const backfilled =
-        match && match.gaps.length >= MAX_ZEROS
-          ? match.gaps
-          : computeGapsFromHistory(history, at);
-      const candidates = [dbGaps, match?.gaps ?? [], backfilled];
-      const gaps = candidates.reduce((best, g) => (g.length > best.length ? g : best), [] as number[]);
+      // Recálculo cronológico individual a partir do horário DESTE gatilho.
+      // Quando o histórico carregado cobre o instante do gatilho, ele é a
+      // única fonte da verdade (evita herdar zeros globais recentes).
+      const { gaps: computed, covered } = computeGapsFromHistory(history, at);
+      const gaps = covered ? computed : dbGaps.slice(0, MAX_ZEROS);
       return {
         index: i + 1,
         triggerAt: at,
