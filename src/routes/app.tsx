@@ -27,6 +27,7 @@ import { Card } from "@/components/double/Card";
 import { ResultCircle } from "@/components/double/ResultCircle";
 import { Switch } from "@/components/double/Switch";
 import { WhiteAlert } from "@/components/double/WhiteAlert";
+import { WhiteCelebration, WhiteAlertToggleFx } from "@/components/double/WhiteCelebration";
 import { StrategyTabs } from "@/components/double/StrategyTabs";
 import { LeftStatsDrawer } from "@/components/double/LeftStatsDrawer";
 
@@ -221,7 +222,12 @@ function Index() {
   useEffect(() => {
     if (window.innerWidth < 1024) setViewMode("lista");
   }, []);
-  const [whiteAlert, setWhiteAlert] = useState(true);
+  const [whiteAlert, setWhiteAlert] = useState(false);
+  const [alertFx, setAlertFx] = useState<"on" | "off" | null>(null);
+  const toggleWhiteAlert = useCallback((next: boolean) => {
+    setWhiteAlert(next);
+    setAlertFx(next ? "on" : "off");
+  }, []);
   const [realtime, setRealtime] = useState(true);
   const [numerado, setNumerado] = useState(false);
   const [destaqueHorario, setDestaqueHorario] = useState(false);
@@ -465,7 +471,7 @@ function Index() {
     } catch {
       /* noop */
     }
-    const t = setTimeout(() => setWhiteFlash(null), 6000);
+    const t = setTimeout(() => setWhiteFlash(null), 8000);
     return () => clearTimeout(t);
   }, [spins, whiteAlert]);
 
@@ -681,7 +687,7 @@ function Index() {
             <ThemeToggle />
             <button
               type="button"
-              onClick={() => setWhiteAlert((v) => !v)}
+              onClick={() => toggleWhiteAlert(!whiteAlert)}
               className="grid h-8 w-8 place-items-center rounded-xl border border-white/5 bg-white/5 text-muted-foreground transition-colors duration-200 hover:bg-white/[0.08] hover:text-foreground sm:h-10 sm:w-10 lg:h-11 lg:w-11"
               aria-label="Notificar branco"
               title={whiteAlert ? "Alerta de branco: ligado" : "Alerta de branco: desligado"}
@@ -897,7 +903,7 @@ function Index() {
                   <Switch checked={contarLinhas} onChange={setContarLinhas} label="Contar linhas" />
                 </div>
                 <div className="flex min-w-0 items-center">
-                  <Switch checked={whiteAlert} onChange={setWhiteAlert} label="Alerta de branco" />
+                  <Switch checked={whiteAlert} onChange={toggleWhiteAlert} label="Alerta de branco" />
                 </div>
                 <div className="flex min-w-0 items-center">
                   <Switch checked={destaqueHorario} onChange={setDestaqueHorario} label="Destaque horário" />
@@ -1267,7 +1273,8 @@ function Index() {
 
 
 
-      <WhiteAlert spin={whiteFlash} onClose={() => setWhiteFlash(null)} />
+      <WhiteCelebration spin={whiteFlash} onClose={() => setWhiteFlash(null)} />
+      <WhiteAlertToggleFx state={alertFx} onDone={() => setAlertFx(null)} />
 
       <LeftStatsDrawer
         open={statsOpen}
