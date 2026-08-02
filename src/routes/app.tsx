@@ -26,7 +26,6 @@ import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client"
 import { Card } from "@/components/double/Card";
 import { ResultCircle } from "@/components/double/ResultCircle";
 import { Switch } from "@/components/double/Switch";
-import { WhiteAlert } from "@/components/double/WhiteAlert";
 import { WhiteCelebration, WhiteAlertToggleFx } from "@/components/double/WhiteCelebration";
 import { StrategyTabs } from "@/components/double/StrategyTabs";
 import { LeftStatsDrawer } from "@/components/double/LeftStatsDrawer";
