@@ -696,6 +696,8 @@ export function AnaliseSection() {
         eligibleHint={`precisa ${MIN_CYCLES}+ ciclos completos`}
         analiseKey="analise1"
         pedra={selected}
+        history={rows}
+        now={now}
       />
 
       <AnalysisPanel
@@ -711,6 +713,8 @@ export function AnaliseSection() {
         showFullBadge={false}
         analiseKey="analise2"
         pedra={selected}
+        history={rows}
+        now={now}
       />
 
       <AnalysisPanel
@@ -734,6 +738,8 @@ export function AnaliseSection() {
         showFullBadge={false}
         analiseKey="analise3"
         pedra={selected}
+        history={rows}
+        now={now}
       />
     </main>
   );
