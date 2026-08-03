@@ -1176,7 +1176,7 @@ function Index() {
                                                 draggable={false}
                                               />
                                             </div>
-                                            <span className="mt-0.5 text-[10px] tabular-nums font-medium text-[#7b7c80]">
+                                            <span className="mt-0.5 text-[10px] tabular-nums font-medium h-[12px] flex items-center text-[#7b7c80]">
                                               {hm}
                                             </span>
                                           </div>
