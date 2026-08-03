@@ -1120,8 +1120,8 @@ function Index() {
                                 style={{ width: "var(--colW, 120px)", height: "var(--cell-min-h, 66px)", direction: "ltr", gap: "var(--gap-col, 8px)" }}
                               >
 
-                                <div className="flex flex-col items-center gap-1">
-                                  <span className={`inline-flex h-3.5 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-4 sm:px-2 sm:text-[9px] ${badge ? badgeCls : "opacity-0"}`}>
+                                <div className="flex flex-col items-center">
+                                  <span className={`inline-flex h-3.5 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-4 sm:px-2 sm:text-[9px] ${badge ? badgeCls : "opacity-0 invisible"}`}>
                                     {badge?.label ?? "·"}
                                   </span>
                                   <div className="grid grid-cols-2 gap-[var(--gap-col,8px)]">
@@ -1134,7 +1134,7 @@ function Index() {
                                       const slotKey = `${hm}-${i}`;
                                       if (spin) {
                                         return (
-                                          <div key={(spin as Spin).id} className="flex flex-col items-center gap-0.5">
+                                          <div key={(spin as Spin).id} className="flex flex-col items-center">
                                             <TipMinerCard
                                               spin={spin as Spin}
                                               highlightN={highlightN}
@@ -1178,7 +1178,7 @@ function Index() {
                                       }
 
                                       return (
-                                        <div key={`e-${ci}-${i}`} className="flex flex-col items-center gap-0.5">
+                                        <div key={`e-${ci}-${i}`} className="flex flex-col items-center">
                                           <EmptySlot
                                             prediction={slotPredictions[slotKey]}
                                             onClick={() => cycleSlotPrediction(slotKey)}
