@@ -919,7 +919,7 @@ function Index() {
             {/* Cabeçalho das colunas (0-9) movido para fora do "quadrado" */}
             {viewMode === "colunas" && (
               <div className="history-scroll mb-3 w-full border-b border-white/5 pb-3">
-                <div className="flex items-start justify-center gap-[var(--gap-col,8px)] px-1 sm:px-3 lg:px-4">
+                <div className="grid justify-center gap-[var(--gap-col,8px)] px-[1px]" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "1274px", margin: "0 auto" }}>
                   {Array.from({ length: 10 }).map((_, ci) => {
                     const stats = colStats[ci];
                     return (
@@ -928,7 +928,7 @@ function Index() {
                         className="flex flex-col items-center gap-2"
                         style={{ width: "var(--colW, 120px)" }}
                       >
-                        <div className="flex h-7 w-full items-center justify-center rounded-lg bg-white/5 text-[13px] font-black tabular-nums text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground">
+                        <div className="flex h-[22px] w-full items-center justify-center rounded-[6px] border border-white/10 bg-white/[0.03] text-[13px] font-medium tabular-nums text-[#eaeaea] transition-colors hover:bg-white/10 hover:text-white">
                           {ci}
                         </div>
                         {contarColunas && (
@@ -1080,7 +1080,7 @@ function Index() {
 
                       {gridRows.map((row) => (
                         <div key={row.key} className="flex flex-col gap-3">
-                          <div className="flex items-start justify-center gap-[var(--gap-col,8px)] relative">
+                          <div className="grid justify-center gap-[var(--gap-col,8px)] relative px-[1px]" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "1274px", margin: "0 auto" }}>
                             {/* Marcador de hora na lateral esquerda, visível apenas se Contar Linhas estiver ativo */}
                             {contarLinhas && (
                               <div className="absolute -left-12 top-1/2 -translate-y-1/2 rotate-180 [writing-mode:vertical-lr] text-[10px] font-black tracking-widest text-muted-foreground/30 uppercase select-none">
@@ -1124,7 +1124,7 @@ function Index() {
                                   <span className={`inline-flex h-3.5 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-4 sm:px-2 sm:text-[9px] ${badge ? badgeCls : "opacity-0"}`}>
                                     {badge?.label ?? "·"}
                                   </span>
-                                  <div className="grid grid-cols-2 gap-2">
+                                  <div className="grid grid-cols-2 gap-[var(--gap-col,8px)]">
                                     {(cell.length >= 2
                                       ? [cell[0], cell[1]]
                                       : cell.length === 1
