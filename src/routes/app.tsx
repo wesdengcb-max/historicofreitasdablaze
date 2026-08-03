@@ -916,49 +916,42 @@ function Index() {
               </div>
             )}
 
-            {/* Cabeçalho das colunas (0-9) movido para fora do "quadrado" */}
-            {viewMode === "colunas" && (
+            {/* Cabeçalho das estatísticas por coluna */}
+            {viewMode === "colunas" && contarColunas && (
               <div className="history-scroll mb-3 w-full border-b border-white/5 pb-3">
                 <div className="grid justify-center gap-[var(--gap-col,8px)] px-[1px]" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "1274px", margin: "0 auto" }}>
                   {Array.from({ length: 10 }).map((_, ci) => {
                     const stats = colStats[ci];
                     return (
                       <div
-                        key={`header-outer-${ci}`}
-                        className="flex flex-col items-center gap-2"
+                        key={`col-stats-${ci}`}
+                        className="flex w-full flex-col gap-0.5 overflow-hidden rounded-[4px] bg-white/[0.03] p-1 shadow-inner"
                         style={{ width: "var(--colW, 120px)" }}
                       >
-                        <div className="flex h-[22px] w-full items-center justify-center rounded-[6px] border border-white/10 bg-white/[0.03] text-[13px] font-medium tabular-nums text-[#eaeaea] transition-colors hover:bg-white/10 hover:text-white">
-                          {ci}
+                        <div className="flex items-center justify-between px-0.5 text-[8px] font-bold tabular-nums">
+                          <span className="text-white">B: {stats.white}</span>
+                          <span className="text-white/40">{stats.whitePct.toFixed(0)}%</span>
                         </div>
-                        {contarColunas && (
-                          <div className="flex w-full flex-col gap-0.5 overflow-hidden rounded-[4px] bg-white/[0.03] p-1 shadow-inner">
-                            <div className="flex items-center justify-between px-0.5 text-[8px] font-bold tabular-nums">
-                              <span className="text-white">B: {stats.white}</span>
-                              <span className="text-white/40">{stats.whitePct.toFixed(0)}%</span>
-                            </div>
-                            <div className="relative h-1 w-full overflow-hidden rounded-full bg-white/5">
-                              <div className="flex h-full w-full">
-                                <div
-                                  className="h-full bg-red-500 transition-all duration-500"
-                                  style={{ width: `${stats.redPct}%` }}
-                                />
-                                <div
-                                  className="h-full bg-slate-800 transition-all duration-500"
-                                  style={{ width: `${stats.blackPct}%` }}
-                                />
-                                <div
-                                  className="h-full bg-white transition-all duration-500"
-                                  style={{ width: `${stats.whitePct}%` }}
-                                />
-                              </div>
-                            </div>
-                            <div className="mt-0.5 flex items-center justify-between px-0.5 text-[7px] font-medium text-muted-foreground/60 tabular-nums uppercase">
-                              <span>V: {stats.red}</span>
-                              <span>P: {stats.black}</span>
-                            </div>
+                        <div className="relative h-1 w-full overflow-hidden rounded-full bg-white/5">
+                          <div className="flex h-full w-full">
+                            <div
+                              className="h-full bg-red-500 transition-all duration-500"
+                              style={{ width: `${stats.redPct}%` }}
+                            />
+                            <div
+                              className="h-full bg-slate-800 transition-all duration-500"
+                              style={{ width: `${stats.blackPct}%` }}
+                            />
+                            <div
+                              className="h-full bg-white transition-all duration-500"
+                              style={{ width: `${stats.whitePct}%` }}
+                            />
                           </div>
-                        )}
+                        </div>
+                        <div className="mt-0.5 flex items-center justify-between px-0.5 text-[7px] font-medium text-muted-foreground/60 tabular-nums uppercase">
+                          <span>V: {stats.red}</span>
+                          <span>P: {stats.black}</span>
+                        </div>
                       </div>
                     );
                   })}
