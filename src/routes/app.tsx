@@ -57,7 +57,7 @@ const EstrategiasSection = lazy(() =>
 
 function SectionFallback() {
   return (
-    <div className="mx-auto flex w-full max-w-[1720px] items-center justify-center px-3 py-24 sm:px-8">
+    <div className="mx-auto flex w-full max-w-[1366px] items-center justify-center px-3 py-24 sm:px-8">
       <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
     </div>
   );
@@ -727,7 +727,7 @@ function Index() {
       ) : section === "estrategias" ? (
         <Suspense fallback={<SectionFallback />}><EstrategiasSection /></Suspense>
       ) : section !== "dashboard" ? (
-        <main className="mx-auto flex w-full max-w-[1720px] flex-col gap-5 px-3 py-10 sm:gap-6 sm:px-8 sm:py-16">
+        <main className="mx-auto flex w-full max-w-[1366px] flex-col gap-5 px-3 py-10 sm:gap-6 sm:px-8 sm:py-16">
           <Card delay={0.05}>
             <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
               <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
