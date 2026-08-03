@@ -1126,7 +1126,7 @@ function Index() {
                               >
                                 <div className="relative flex flex-col items-center pt-1.5">
                                   {badge && (
-                                    <span className={`absolute -top-3 z-10 inline-flex h-3 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-3.5 sm:px-1.5 sm:text-[8px] ${badgeCls}`}>
+                                    <span className={`absolute top-0 z-10 inline-flex h-3 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-3.5 sm:px-1.5 sm:text-[8px] ${badgeCls}`}>
                                       {badge.label}
                                     </span>
                                   )}
