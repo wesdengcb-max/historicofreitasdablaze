@@ -1121,14 +1121,16 @@ function Index() {
                             return (
                               <div
                                 key={ci}
-                                className="flex flex-col items-center justify-center"
+                                className="flex flex-col items-center justify-center p-1 sm:p-2"
                                 style={{ width: "var(--colW, 120px)", height: "var(--cell-min-h, 66px)", direction: "ltr", gap: "var(--gap-col, 8px)" }}
                               >
 
-                                <div className="flex flex-col items-center">
-                                  <span className={`inline-flex h-3.5 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-4 sm:px-2 sm:text-[9px] ${badge ? badgeCls : "opacity-0 invisible"}`}>
-                                    {badge?.label ?? "·"}
-                                  </span>
+                              <div className="relative flex flex-col items-center">
+                                  {badge && (
+                                    <span className={`absolute -top-4 z-10 inline-flex h-3.5 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-4 sm:px-2 sm:text-[9px] ${badgeCls}`}>
+                                      {badge.label}
+                                    </span>
+                                  )}
                                   <div className="grid grid-cols-2 gap-[var(--gap-col,8px)]">
                                     {(cell.length >= 2
                                       ? [cell[0], cell[1]]
