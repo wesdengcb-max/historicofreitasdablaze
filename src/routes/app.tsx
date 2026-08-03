@@ -607,8 +607,7 @@ function Index() {
 
 
   const applyCustom = () => setAppliedTick((v) => v + 1);
-  const historyGridTemplate =
-    "repeat(var(--cols, 10), var(--stone-track, calc((var(--stone-size, 44px) * 2) + 2px)))";
+  const historyGridTemplate = `repeat(10, var(--colW, 120px))`;
 
   // Contagens auxiliares dos toggles "Contar colunas" / "Contar linhas".
   const colCounts = useMemo(() => {
@@ -1032,7 +1031,7 @@ function Index() {
                     <div className="sticky top-0 z-10 -mx-1 mb-1.5 border-b border-white/10 bg-background/95 px-1 py-1 backdrop-blur sm:-mx-3 sm:mb-2 sm:px-3 sm:py-2 lg:-mx-4 lg:px-4">
                       <div
                         className="grid"
-                        style={{ gridTemplateColumns: historyGridTemplate, columnGap: "2px", justifyContent: "safe center", direction: inverse ? "rtl" : "ltr" }}
+                        style={{ gridTemplateColumns: historyGridTemplate, columnGap: "var(--gap-col, 8px)", justifyContent: "safe center", direction: inverse ? "rtl" : "ltr" }}
                       >
                         {Array.from({ length: 10 }, (_, i) => (
                           <div
@@ -1051,7 +1050,7 @@ function Index() {
                       {contarColunas && (
                         <div
                           className="mt-1.5 grid"
-                          style={{ gridTemplateColumns: historyGridTemplate, columnGap: "2px", justifyContent: "safe center", direction: inverse ? "rtl" : "ltr" }}
+                          style={{ gridTemplateColumns: historyGridTemplate, columnGap: "var(--gap-col, 8px)", justifyContent: "safe center", direction: inverse ? "rtl" : "ltr" }}
                         >
                           {colStats.map((c, i) => (
                             <div
@@ -1074,12 +1073,12 @@ function Index() {
                         </div>
                       )}
                     </div>
-                    <div className="flex flex-col gap-1.5 sm:gap-3">
+                    <div className="flex flex-col gap-[var(--slot-gap,14px)]">
                       {gridRows.map((row) => (
                         <div key={row.key} className="flex items-start justify-center gap-0.5 sm:gap-2">
                         <div
                           className="grid items-start"
-                          style={{ gridTemplateColumns: historyGridTemplate, columnGap: "2px", justifyContent: "safe center", direction: inverse ? "rtl" : "ltr" }}
+                          style={{ gridTemplateColumns: historyGridTemplate, columnGap: "var(--gap-col, 8px)", justifyContent: "safe center", direction: inverse ? "rtl" : "ltr" }}
                         >
                           {row.cells.map((cell, ci) => {
                             const [hh, mmPrefix] = row.label.split(":");
