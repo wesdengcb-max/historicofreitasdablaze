@@ -1070,13 +1070,11 @@ function Index() {
                                 className="flex flex-col items-center"
                                 style={{ width: "var(--colW, 120px)", direction: "ltr" }}
                               >
-                                {rowIndex === 0 && (
                                   <div className="mb-2 flex w-full items-center justify-center">
                                     <div className="flex h-5 w-full items-center justify-center rounded-md bg-white/5 text-[11px] font-bold tabular-nums text-muted-foreground sm:h-6">
                                       {String(ci).padStart(1, "0")}
                                     </div>
                                   </div>
-                                )}
 
                                 <div className="flex flex-col items-center gap-1.5">
                                   <span className={`inline-flex h-3.5 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-4 sm:px-2 sm:text-[9px] ${badge ? badgeCls : "opacity-0"}`}>
