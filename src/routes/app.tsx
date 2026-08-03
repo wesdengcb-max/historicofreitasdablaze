@@ -1162,7 +1162,7 @@ function Index() {
                                       if (pending && i === 0) {
                                          return (
                                           <div key={`p-${ci}-${i}`} className="flex flex-col items-center">
-                                            <div className="relative flex h-[var(--stone,52px)] w-[var(--stone,52px)] items-center justify-center overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-emerald-400/40">
+                                            <div className="relative flex h-[var(--stone-h,48px)] w-[var(--stone,52px)] items-center justify-center overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-emerald-400/40">
                                               <img
                                                 src={brancoTile.url}
                                                 alt="Sinal"
