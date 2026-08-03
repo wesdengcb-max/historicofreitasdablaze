@@ -1068,7 +1068,7 @@ function Index() {
                       : "Nenhum resultado no período selecionado."}
                   </div>
                 ) : viewMode === "colunas" ? (
-                  <div className="history-scroll w-full p-1 [container-type:inline-size] sm:p-3 lg:p-4">
+                  <div className="history-scroll max-w-full overflow-x-auto p-1 [container-type:inline-size] sm:p-3 lg:p-4">
                     <div className="flex flex-col gap-0">
                       {/* Cabeçalho 0-9 interno para Colunas Fixas */}
                       <div className="grid justify-center gap-[var(--gap-col,8px)] px-[1px] mb-3 sticky top-0 z-10 bg-background/40 backdrop-blur-sm" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "1274px", margin: "0 auto" }}>
@@ -1122,16 +1122,15 @@ function Index() {
                               <div
                                 key={ci}
                                 className="flex flex-col items-center justify-center p-1 sm:p-2"
-                                style={{ width: "var(--colW, 120px)", height: "var(--cell-min-h, 66px)", direction: "ltr", gap: "var(--gap-col, 8px)" }}
+                                style={{ width: "var(--colW, 120px)", height: "var(--cell-min-h, 66px)", direction: "ltr" }}
                               >
-
-                              <div className="relative flex flex-col items-center">
+                                <div className="relative flex flex-col items-center">
                                   {badge && (
                                     <span className={`absolute -top-4 z-10 inline-flex h-3.5 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-4 sm:px-2 sm:text-[9px] ${badgeCls}`}>
                                       {badge.label}
                                     </span>
                                   )}
-                                  <div className="grid grid-cols-2 gap-[var(--gap-col,8px)]">
+                                  <div className="flex items-start gap-[var(--gap-col,8px)]">
                                     {(cell.length >= 2
                                       ? [cell[0], cell[1]]
                                       : cell.length === 1
@@ -1186,18 +1185,20 @@ function Index() {
 
                                       return (
                                         <div key={`e-${ci}-${i}`} className="flex flex-col items-center">
-                                          <EmptySlot
-                                            prediction={slotPredictions[slotKey]}
-                                            onClick={() => cycleSlotPrediction(slotKey)}
-                                          />
+                                          <div className="h-[48px] w-[48px]">
+                                            <EmptySlot
+                                              prediction={slotPredictions[slotKey]}
+                                              onClick={() => cycleSlotPrediction(slotKey)}
+                                            />
+                                          </div>
                                           <span className="mt-1 select-none text-[10px] text-transparent">--:--</span>
                                         </div>
                                       );
-                                      })}
-                                    </div>
+                                    })}
                                   </div>
                                 </div>
-                              );
+                              </div>
+                            );
                             })}
                           </div>
                         </div>
