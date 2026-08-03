@@ -33,31 +33,7 @@ const TOP_N = 5;
 const MAX_ZEROS = 14;           // coleta até 14 zeros após o gatilho (sem limite de tempo)
 const MAX_DETAIL_ROWS = 10;     // FIFO detalhes
 const MAX_PATTERN_CYCLES = 14;  // Análise 2: últimas 14 ocorrências
-// const MAX_OPEN_MINUTES = 90;    // REMOVIDO: gatilho não encerra por tempo.
 const BRAZIL_TIME_ZONE = "America/Sao_Paulo";
-
-const brazilMinuteFormatter = new Intl.DateTimeFormat("pt-BR", {
-  timeZone: BRAZIL_TIME_ZONE,
-  minute: "2-digit",
-});
-
-function getBrazilMinute(date: Date) {
-  const minute = brazilMinuteFormatter.formatToParts(date).find((part) => part.type === "minute")?.value;
-  return minute ? Number(minute) : date.getUTCMinutes();
-}
-
-function serializeBrazilTimestamp(date: Date) {
-  return date.toLocaleString("pt-BR", {
-    timeZone: BRAZIL_TIME_ZONE,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
-  });
-}
 
 function diffMinutes(a: Date, b: Date) {
   return Math.max(0, Math.round((b.getTime() - a.getTime()) / 60000));
@@ -369,7 +345,6 @@ function AnalysisPanel({
 }
 
 export function AnaliseSection() {
-  const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
   const [selected, setSelected] = useState<number>(1);
@@ -380,76 +355,58 @@ export function AnaliseSection() {
     return () => clearInterval(t);
   }, []);
 
+  // Agora a tela é PASSIVA. Ela carrega apenas as estatísticas globais
+  // lendo o que o banco já calculou.
+  const [stats, setStats] = useState<Record<number, { total: number; fullyCompleted: number; avg: number | null }>>({});
+
   useEffect(() => {
     let alive = true;
     (async () => {
       setLoading(true);
       const { data, error } = await supabase
-        .from("blaze_results")
-        .select("id, roll, color, created_at")
-        .order("created_at", { ascending: false })
-        .limit(5000);
+        .from("gatilhos_analise")
+        .select("analise, pedra, gaps");
+      
       if (!alive) return;
       if (error) {
         setErr(error.message);
         setLoading(false);
         return;
       }
-      setRows(((data ?? []) as Row[]).slice().reverse());
+
+      const s: Record<number, { total: number; fullyCompleted: number; totalGaps: number; sumGaps: number }> = {};
+      ALL_NUMBERS.forEach(n => s[n] = { total: 0, fullyCompleted: 0, totalGaps: 0, sumGaps: 0 });
+
+      (data as any[] ?? []).forEach(r => {
+        const n = r.pedra;
+        if (s[n]) {
+          s[n].total++;
+          const gaps = r.gaps ?? [];
+          if (gaps.length > 0) {
+            s[n].fullyCompleted++;
+            s[n].totalGaps += gaps.length;
+            s[n].sumGaps += gaps.reduce((a: number, b: number) => a + b, 0);
+          }
+        }
+      });
+
+      const finalStats: Record<number, { total: number; fullyCompleted: number; avg: number | null }> = {};
+      ALL_NUMBERS.forEach(n => {
+        finalStats[n] = {
+          total: s[n].total,
+          fullyCompleted: s[n].fullyCompleted,
+          avg: s[n].totalGaps ? Math.round(s[n].sumGaps / s[n].totalGaps) : null
+        };
+      });
+
+      setStats(finalStats);
       setLoading(false);
     })();
-    return () => {
-      alive = false;
-    };
+    return () => { alive = false; };
   }, []);
 
-  const cycles = useMemo(() => buildCycles(rows, now), [rows, now]);
-  const repeatCyclesAll = useMemo(() => buildRepeatCycles(rows, now), [rows, now]);
-  const repeatCycles = useMemo(() => {
-    const filtered = repeatCyclesAll.filter(
-      (c) => (c as Cycle & { value: number }).value === selected,
-    );
-    const tail = filtered.slice(-MAX_PATTERN_CYCLES);
-    tail.forEach((c, i) => {
-      c.index = i + 1;
-    });
-    return tail;
-  }, [repeatCyclesAll, selected]);
-
-  const repeatMinuteCyclesAll = useMemo(
-    () => buildRepeatMinuteCycles(rows, now),
-    [rows, now],
-  );
-  const repeatMinuteCycles = useMemo(() => {
-    const filtered = repeatMinuteCyclesAll.filter(
-      (c) => (c as Cycle & { value: number }).value === selected,
-    );
-    const tail = filtered.slice(-MAX_PATTERN_CYCLES);
-    tail.forEach((c, i) => {
-      c.index = i + 1;
-    });
-    return tail;
-  }, [repeatMinuteCyclesAll, selected]);
-
-  const stats = useMemo(() => {
-    const s: Record<
-      number,
-      { total: number; fullyCompleted: number; totalGaps: number; avg: number | null }
-    > = {};
-    for (const n of NUMBERS) {
-      const list = cycles[n];
-      const totalGaps = list.reduce((a, c) => a + c.gaps.length, 0);
-      const fullyCompleted = list.filter((c) => c.gaps.length > 0).length;
-      const sum = list.reduce((a, c) => a + c.gaps.reduce((x, y) => x + y, 0), 0);
-      const avg = totalGaps ? Math.round(sum / totalGaps) : null;
-      s[n] = { total: list.length, fullyCompleted, totalGaps, avg };
-    }
-    return s;
-  }, [cycles]);
-
   const isMinuteEligible = selected >= 0 && selected <= 9;
-  const list = isMinuteEligible ? (cycles[selected] ?? []) : [];
-  const stat = stats[selected] ?? { total: 0, fullyCompleted: 0, totalGaps: 0, avg: null };
+  const stat = stats[selected] ?? { total: 0, fullyCompleted: 0, avg: null };
   const eligible = isMinuteEligible && stat.fullyCompleted >= MIN_CYCLES;
 
   return (
@@ -469,7 +426,7 @@ export function AnaliseSection() {
 
         <div className="mt-5 grid grid-cols-5 gap-2 sm:grid-cols-8 md:grid-cols-[repeat(15,minmax(0,1fr))]">
           {ALL_NUMBERS.map((n) => {
-            const st = stats[n] ?? { total: 0, fullyCompleted: 0, totalGaps: 0, avg: null };
+            const st = stats[n] ?? { total: 0, fullyCompleted: 0, avg: null };
             const ok = n <= 9 && st.fullyCompleted >= MIN_CYCLES;
             const isSel = selected === n;
             return (
@@ -505,7 +462,6 @@ export function AnaliseSection() {
             ? `Gatilho: número ${selected} caiu em minuto terminado em ${selected}. Vizinhos ±1 min agrupados.`
             : "Gatilho de minuto aplicável apenas para pedras de 0 a 9."
         }
-        cycles={list}
         loading={loading}
         err={err}
         emptyLabel={
@@ -517,7 +473,6 @@ export function AnaliseSection() {
         eligibleHint={`precisa ${MIN_CYCLES}+ ciclos completos`}
         analiseKey="analise1"
         pedra={selected}
-        history={rows}
         now={now}
       />
 
@@ -525,16 +480,14 @@ export function AnaliseSection() {
         eyebrow={`Análise 2 · repetição da pedra ${selected}`}
         title="Tempo até o 0 após pedra repetida consecutiva"
         subtitle={`Gatilho: pedra ${selected} sai duas vezes seguidas. Últimas ${MAX_PATTERN_CYCLES} ocorrências.`}
-        cycles={repeatCycles}
         loading={loading}
         err={err}
         emptyLabel={`Ainda sem repetições consecutivas da pedra ${selected} no histórico.`}
-        eligible={repeatCycles.length >= MIN_CYCLES}
+        eligible={stat.total >= MIN_CYCLES}
         eligibleHint={`precisa ${MIN_CYCLES}+ ocorrências`}
         showFullBadge={false}
         analiseKey="analise2"
         pedra={selected}
-        history={rows}
         now={now}
       />
 
@@ -546,7 +499,6 @@ export function AnaliseSection() {
             ? `Gatilho: pedra ${selected} repete e ao menos uma sai em minuto terminado em ${selected}. Últimas ${MAX_PATTERN_CYCLES} ocorrências.`
             : "Análise aplicável apenas para pedras de 0 a 9."
         }
-        cycles={selected <= 9 ? repeatMinuteCycles : []}
         loading={loading}
         err={err}
         emptyLabel={
@@ -554,12 +506,11 @@ export function AnaliseSection() {
             ? `Ainda sem repetições da pedra ${selected} em minuto casado.`
             : "Análise aplicável apenas para pedras de 0 a 9."
         }
-        eligible={selected <= 9 && repeatMinuteCycles.length >= MIN_CYCLES}
+        eligible={selected <= 9 && stat.total >= MIN_CYCLES}
         eligibleHint={`precisa ${MIN_CYCLES}+ ocorrências`}
         showFullBadge={false}
         analiseKey="analise3"
         pedra={selected}
-        history={rows}
         now={now}
       />
     </main>
