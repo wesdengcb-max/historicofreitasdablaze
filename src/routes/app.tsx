@@ -1071,14 +1071,21 @@ function Index() {
                   <div className="history-scroll max-w-full overflow-x-auto p-1 [container-type:inline-size] sm:p-2 lg:p-3">
                     <div className="flex flex-col gap-0">
                       {/* Cabeçalho 0-9 interno para Colunas Fixas */}
-                      <div className="grid justify-center gap-[var(--gap-col,8px)] px-[1px] mb-3 sticky top-0 z-10 bg-background/40 backdrop-blur-sm" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "1274px", margin: "0 auto" }}>
+                      <div
+                        className="sticky top-0 z-30 mx-auto mb-1 grid justify-center gap-[4px] bg-[#171717]/90 py-1 backdrop-blur-sm"
+                        style={{
+                          gridTemplateColumns: "70px repeat(10, 44px)",
+                          width: "514px",
+                          height: "34px",
+                        }}
+                      >
+                        <div className="flex h-full items-center justify-center text-[13px] font-bold text-zinc-500">Hora</div>
                         {Array.from({ length: 10 }).map((_, ci) => (
                           <div
                             key={`header-inner-${ci}`}
-                            className="flex h-[24px] w-full items-center justify-center rounded-[6px] border border-white/5 bg-white/[0.04] text-[13px] font-bold tabular-nums text-[#eaeaea]"
-                            style={{ width: "var(--colW, 120px)" }}
+                            className="flex h-full w-full items-center justify-center rounded-[10px] border border-white/5 bg-white/[0.04] text-[13px] font-bold tabular-nums text-[#eaeaea]"
                           >
-                            {ci}
+                            {String(ci).padStart(2, "0")}
                           </div>
                         ))}
                       </div>
