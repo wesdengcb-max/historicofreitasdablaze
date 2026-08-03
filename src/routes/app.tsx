@@ -876,6 +876,46 @@ function Index() {
               </div>
             }
           >
+            {/* Filtros de período acima dos toggles */}
+            <div className="mb-3 flex flex-wrap gap-1 sm:mb-4 sm:gap-1.5">
+              {([
+                ["hoje", "Hoje"],
+                ["ontem", "Ontem"],
+                ["7d", "Últimos 7 dias"],
+                ["30d", "Últimos 30 dias"],
+                ["custom", "Personalizado"],
+              ] as [FilterId, string][]).map(([id, label]) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => setFilter(id)}
+                  className={`rounded-full border px-2 py-1 text-[10px] font-medium transition-colors sm:px-3 sm:py-1.5 sm:text-[11px] ${
+                    filter === id
+                      ? "border-white/20 bg-white/10 text-foreground"
+                      : "border-white/5 bg-white/[0.03] text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            {filter === "custom" && (
+              <div className="mb-3 grid gap-2 rounded-xl border border-white/5 bg-white/[0.02] p-3 sm:mb-4 sm:grid-cols-[repeat(4,1fr)_auto] sm:items-end">
+                <FieldInput label="Data inicial" type="date" value={customStart} onChange={setCustomStart} />
+                <FieldInput label="Data final" type="date" value={customEnd} onChange={setCustomEnd} />
+                <FieldInput label="Hora inicial" type="time" value={timeStart} onChange={setTimeStart} placeholder="00:00" />
+                <FieldInput label="Hora final" type="time" value={timeEnd} onChange={setTimeEnd} placeholder="23:59" />
+                <button
+                  type="button"
+                  onClick={applyCustom}
+                  className="h-9 rounded-lg bg-primary px-4 text-[12px] font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+                >
+                  Pesquisar
+                </button>
+              </div>
+            )}
+
             {/* Painel de controles alinhado */}
             <div className="mb-3 rounded-2xl border border-white/5 bg-white/[0.02] p-2 sm:mb-4 sm:p-4">
               <div className="grid grid-cols-2 gap-x-3 gap-y-2 text-[11px] sm:gap-x-8 sm:gap-y-3.5 lg:grid-cols-4">
@@ -940,31 +980,31 @@ function Index() {
             </div>
 
             {/* Filtros de período */}
-            <div className="mb-3 space-y-2 sm:mb-4 sm:space-y-3">
-              <div className="flex flex-wrap gap-1 sm:gap-1.5">
-                {([
-                  ["hoje", "Hoje"],
-                  ["ontem", "Ontem"],
-                  ["7d", "Últimos 7 dias"],
-                  ["30d", "Últimos 30 dias"],
-                  ["custom", "Personalizado"],
-                ] as [FilterId, string][]).map(([id, label]) => (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => setFilter(id)}
-                    className={`rounded-full border px-2 py-1 text-[10px] font-medium transition-colors sm:px-3 sm:py-1.5 sm:text-[11px] ${
-                      filter === id
-                        ? "border-white/20 bg-white/10 text-foreground"
-                        : "border-white/5 bg-white/[0.03] text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-              {filter === "custom" && (
-                <div className="grid gap-2 rounded-xl border border-white/5 bg-white/[0.02] p-3 sm:grid-cols-[repeat(4,1fr)_auto] sm:items-end">
+            <div className="mb-3 flex flex-wrap gap-1 sm:mb-4 sm:gap-1.5">
+              {([
+                ["hoje", "Hoje"],
+                ["ontem", "Ontem"],
+                ["7d", "Últimos 7 dias"],
+                ["30d", "Últimos 30 dias"],
+                ["custom", "Personalizado"],
+              ] as [FilterId, string][]).map(([id, label]) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => setFilter(id)}
+                  className={`rounded-full border px-2 py-1 text-[10px] font-medium transition-colors sm:px-3 sm:py-1.5 sm:text-[11px] ${
+                    filter === id
+                      ? "border-white/20 bg-white/10 text-foreground"
+                      : "border-white/5 bg-white/[0.03] text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            {filter === "custom" && (
+              <div className="mb-3 grid gap-2 rounded-xl border border-white/5 bg-white/[0.02] p-3 sm:mb-4 sm:grid-cols-[repeat(4,1fr)_auto] sm:items-end">
                   <FieldInput label="Data inicial" type="date" value={customStart} onChange={setCustomStart} />
                   <FieldInput label="Data final" type="date" value={customEnd} onChange={setCustomEnd} />
                   <FieldInput label="Hora inicial" type="time" value={timeStart} onChange={setTimeStart} placeholder="00:00" />
@@ -978,7 +1018,6 @@ function Index() {
                   </button>
                 </div>
               )}
-            </div>
 
             <div
               className={
@@ -1029,7 +1068,7 @@ function Index() {
                   <div className="history-scroll w-full p-1 [container-type:inline-size] sm:p-3 lg:p-4">
                     <div className="flex flex-col gap-[var(--slot-gap,14px)]">
                       {/* Cabeçalho fixo das colunas (0-9) no topo do histórico */}
-                      <div className="flex items-start justify-center gap-[var(--gap-col,8px)] sticky top-0 z-20 bg-black/80 backdrop-blur-md pb-3 pt-0 border-b border-white/5">
+                      <div className="flex items-start justify-center gap-[var(--gap-col,8px)] sticky top-0 z-20 bg-black/80 backdrop-blur-md pb-3 pt-0">
                         {Array.from({ length: 10 }).map((_, ci) => {
                           const stats = colStats[ci];
                           return (
