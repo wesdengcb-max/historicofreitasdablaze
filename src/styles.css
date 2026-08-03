@@ -44,7 +44,7 @@
   --radius: 1rem;
 
   /* Premium dark base — not pure black */
-  --background: #171717;
+  --background: oklch(0.165 0.012 260);
   --foreground: oklch(0.985 0.003 260);
 
   --surface:   oklch(0.205 0.014 260);
@@ -176,13 +176,13 @@
    Alinhamento pixel-perfect conforme referência:
    Pedras: 48x48px, Gap: 8px (col), 14px (row), Col Width: 120px */
 :root {
-  --stone: 28px;
-  --stone-h: 28px;
-  --colW: 44px;
-  --cell-min-h: 34px;
-  --slot-gap: 4px;
-  --gap-col: 4px;
-  --history-row-h: 34px;
+  --stone: 48px;
+  --stone-h: 48px;
+  --colW: 120px;
+  --cell-min-h: 66px;
+  --slot-gap: 14px;
+  --gap-col: 8px;
+  --history-row-h: 66px;
 }
 
 .history-metrics {

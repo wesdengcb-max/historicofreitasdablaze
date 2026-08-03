@@ -665,7 +665,7 @@ function Index() {
 
   return (
     <div
-      className="history-metrics min-h-dvh bg-[#171717] [--cols:10]"
+      className="history-metrics min-h-dvh [--cols:10]"
     >
       <header className="sticky top-0 z-30 border-b border-white/5 bg-background/70 backdrop-blur-xl">
         <div className="mx-auto grid h-12 max-w-[1366px] grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-2 sm:h-14 sm:gap-4 sm:px-6 lg:h-16 lg:px-8">
@@ -1050,7 +1050,7 @@ function Index() {
               <div
                 className={
                   fullscreen
-                    ? "min-h-0 flex-1 overflow-auto rounded-2xl border border-white/5 bg-[#171717]"
+                    ? "min-h-0 flex-1 overflow-auto rounded-2xl border border-white/5 bg-black/20"
                     : ""
                 }
                 style={{ direction: inverse && viewMode === "colunas" ? "rtl" : "ltr" }}
@@ -1071,38 +1071,30 @@ function Index() {
                   <div className="history-scroll max-w-full overflow-x-auto p-1 [container-type:inline-size] sm:p-2 lg:p-3">
                     <div className="flex flex-col gap-0">
                       {/* Cabeçalho 0-9 interno para Colunas Fixas */}
-                      <div className="sticky top-0 z-30 mx-auto mb-1 grid justify-center gap-[4px] bg-[#171717] py-1" style={{ gridTemplateColumns: "70px repeat(10, 44px)", width: "514px", height: "34px" }}>
-                        <div className="flex h-full items-center justify-center text-[13px] font-bold text-zinc-500">Hora</div>
+                      <div className="grid justify-center gap-[var(--gap-col,8px)] px-[1px] mb-3 sticky top-0 z-10 bg-background/40 backdrop-blur-sm" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "1274px", margin: "0 auto" }}>
                         {Array.from({ length: 10 }).map((_, ci) => (
                           <div
                             key={`header-inner-${ci}`}
-                            className="flex h-full w-full items-center justify-center rounded-[10px] border border-white/5 bg-white/[0.04] text-[13px] font-bold tabular-nums text-[#eaeaea]"
+                            className="flex h-[24px] w-full items-center justify-center rounded-[6px] border border-white/5 bg-white/[0.04] text-[13px] font-bold tabular-nums text-[#eaeaea]"
+                            style={{ width: "var(--colW, 120px)" }}
                           >
-                            {String(ci).padStart(2, "0")}
+                            {ci}
                           </div>
                         ))}
                       </div>
 
                       {gridRows.map((row) => (
-                        <div
-                          key={row.key}
-                          className="mx-auto grid justify-center border-b border-white/[0.02]"
-                          style={{
-                            gridTemplateColumns: "70px repeat(10, 44px)",
-                            width: "514px",
-                            gap: "4px",
-                            height: "34px",
-                          }}
-                        >
-                          {/* Lateral: Horário da Linha */}
-                          <div className="flex items-center justify-center border-r border-white/[0.04] bg-[#171717]/50">
-                            <span className="text-[11px] font-medium text-zinc-500">
-                              {contarLinhas ? String(gridRows.length - gridRows.indexOf(row)).padStart(2, "0") : row.label}
-                            </span>
-                          </div>
+                        <div key={row.key} className="flex flex-col gap-0 border-b border-white/[0.02]">
+                          <div className="grid justify-center gap-[var(--gap-col,8px)] relative px-[1px]" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "1274px", margin: "0 auto" }}>
+                            {/* Marcador de hora na lateral esquerda, visível apenas se Contar Linhas estiver ativo */}
+                            {contarLinhas && (
+                              <div className="absolute -left-12 top-1/2 -translate-y-1/2 rotate-180 [writing-mode:vertical-lr] text-[10px] font-black tracking-widest text-muted-foreground/30 uppercase select-none">
+                                {row.label}
+                              </div>
+                            )}
                             {row.cells.map((cell, ci) => {
-                            const [hh, mm_p] = row.label.split(":");
-                            const hm = `${hh}:${mm_p[0]}${ci}`;
+                            const [hh, mmPrefix] = row.label.split(":");
+                            const hm = `${hh}:${mmPrefix[0]}${ci}`;
                             const cellSignals = signalsByHM.get(hm) ?? [];
                             const green = cellSignals.find((s) => s.outcome === "green");
                             const pending = cellSignals.find((s) => s.outcome === "pending");
@@ -1129,81 +1121,103 @@ function Index() {
                             return (
                               <div
                                 key={ci}
-                                className="relative flex items-center justify-center p-[6px]"
-                                style={{ width: "44px", height: "34px" }}
+                                className="flex flex-col items-center justify-center p-0.5 sm:p-1"
+                                style={{ width: "var(--colW, 120px)", height: "66px", direction: "ltr" }}
                               >
-                                {badge && (
-                                  <span
-                                    className={`absolute top-0 z-10 inline-flex h-3 items-center rounded-full px-1 text-[7px] font-black tracking-wider ${badgeCls}`}
-                                    style={{ transform: "translateY(-50%)" }}
-                                  >
-                                    {badge.label}
-                                  </span>
-                                )}
+                                <div className="relative flex flex-col items-center pt-2">
+                                  {badge && (
+                                    <span className={`absolute top-0 z-10 inline-flex h-3 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-3.5 sm:px-1.5 sm:text-[8px] ${badgeCls}`}>
+                                      {badge.label}
+                                    </span>
+                                  )}
+                                  <div className="flex items-start gap-[var(--gap-col,8px)] h-[56px]">
+                                    {(cell.length >= 2
+                                      ? [cell[0], cell[1]]
+                                      : cell.length === 1
+                                        ? [cell[0], undefined]
+                                        : [undefined, undefined]
+                                    ).map((spin, i) => {
+                                      const slotKey = `${hm}-${i}`;
+                                      if (spin) {
+                                        return (
+                                          <div key={(spin as Spin).id} className="flex flex-col items-center">
+                                            <TipMinerCard
+                                              spin={spin as Spin}
+                                              highlightN={highlightN}
+                                              numbered={numerado}
+                                              showSeconds={exibirSegundos}
+                                              timeHighlight={destaqueHorario}
+                                              showTime={false}
+                                              onClick={() =>
+                                                setHighlightN((h) => {
+                                                  const next = new Set(h);
+                                                  const n = (spin as Spin).n;
+                                                  if (next.has(n)) next.delete(n);
+                                                  else next.add(n);
+                                                  return next;
+                                                })
+                                              }
+                                            />
+                                            <span className={`mt-1 text-[10px] tabular-nums leading-none font-medium h-[12px] flex items-center ${destaqueHorario ? "text-primary font-bold" : "text-[#7b7c80]"}`}>
+                                              {exibirSegundos ? spTimeWithSeconds(spin as Spin) : (spin as Spin).time}
+                                            </span>
+                                          </div>
+                                        );
+                                      }
+                                      
+                                      if (pending && i === 0) {
+                                         return (
+                                          <div key={`p-${ci}-${i}`} className="flex flex-col items-center">
+                                            <div className="relative flex h-[48px] w-[48px] items-center justify-center overflow-hidden rounded-[6px] border border-white/10 bg-white shadow-sm ring-1 ring-emerald-400/40">
+                                              <img
+                                                src={brancoTile.url}
+                                                alt="Sinal"
+                                                className="h-full w-full object-cover"
+                                                draggable={false}
+                                              />
+                                            </div>
+                                            <span className="mt-1 text-[10px] tabular-nums font-medium h-[12px] flex items-center text-[#7b7c80]">
+                                              {hm}
+                                            </span>
+                                          </div>
+                                        );
+                                      }
 
-                                {(cell.length >= 1 ? [cell[0]] : [undefined]).map((spin, i) => {
-                                  const slotKey = `${hm}-${i}`;
-                                  if (spin) {
-                                    return (
-                                      <BlazeResultCard
-                                        key={(spin as Spin).id}
-                                        n={(spin as Spin).n}
-                                        color={(spin as Spin).color}
-                                        time={exibirSegundos ? spTimeWithSeconds(spin as Spin) : undefined}
-                                        numbered={numerado}
-                                        timeHighlight={destaqueHorario}
-                                        dimmed={highlightN.size > 0 && !highlightN.has((spin as Spin).n)}
-                                        selected={highlightN.has((spin as Spin).n)}
-                                        onClick={() =>
-                                          setHighlightN((h) => {
-                                            const next = new Set(h);
-                                            const n = (spin as Spin).n;
-                                            if (next.has(n)) next.delete(n);
-                                            else next.add(n);
-                                            return next;
-                                          })
-                                        }
-                                      />
-                                    );
-                                  }
-
-                                  if (pending && i === 0) {
-                                    return (
-                                      <div key={`p-${ci}-${i}`} className="relative flex h-[28px] w-[28px] items-center justify-center overflow-hidden rounded-full border border-white/10 bg-white shadow-sm ring-1 ring-emerald-400/40">
-                                        <img src={brancoTile.url} alt="Sinal" className="h-full w-full object-cover" draggable={false} />
-                                      </div>
-                                    );
-                                  }
-
-                                  const p = slotPredictions[slotKey];
-                                  return (
-                                    <button
-                                      key={`e-${ci}-${i}`}
-                                      type="button"
-                                      onClick={() => cycleSlotPrediction(slotKey)}
-                                      className={`relative flex h-[28px] w-[28px] items-center justify-center rounded-full border border-dashed transition-colors hover:border-white/20 ${
-                                        p === "white"
-                                          ? "border-emerald-400/50 bg-emerald-400/5"
-                                          : p === "red"
-                                            ? "border-red-500/50 bg-red-500/5"
-                                            : p === "black"
-                                              ? "border-slate-500/50 bg-slate-500/5"
-                                              : "border-white/10"
-                                      }`}
-                                    >
-                                      {p && (
-                                        <div
-                                          className={`h-[18px] w-[18px] rounded-full ring-1 ring-inset ${
-                                            p === "white" ? "bg-white ring-white/20" : p === "red" ? "bg-red-500 ring-red-400/20" : "bg-slate-800 ring-slate-700/20"
-                                          }`}
-                                        />
-                                      )}
-                                    </button>
-                                  );
-                                })}
+                                      const p = slotPredictions[slotKey];
+                                      return (
+                                        <div key={`e-${ci}-${i}`} className="flex flex-col items-center">
+                                          <button
+                                            type="button"
+                                            onClick={() => cycleSlotPrediction(slotKey)}
+                                            className={`relative flex h-[48px] w-[48px] items-center justify-center rounded-[6px] border border-dashed transition-colors hover:border-white/20 ${
+                                              p === "white"
+                                                ? "border-emerald-400/50 bg-emerald-400/5"
+                                                : p === "red"
+                                                  ? "border-red-500/50 bg-red-500/5"
+                                                  : p === "black"
+                                                    ? "border-slate-500/50 bg-slate-500/5"
+                                                    : "border-white/10"
+                                            }`}
+                                          >
+                                            <div className={`h-[30px] w-[30px] rounded-full ring-1 ring-inset transition-all ${
+                                              p === "white" ? "bg-white ring-white/20" :
+                                              p === "red" ? "bg-red-500 ring-red-400/20" :
+                                              p === "black" ? "bg-slate-800 ring-slate-700/20" :
+                                              "bg-transparent ring-transparent"
+                                            }`} />
+                                          </button>
+                                          <span className="mt-1 h-3 text-[10px] tabular-nums text-muted-foreground/30">
+                                            {hm}
+                                          </span>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
                               </div>
                             );
                             })}
+                          </div>
                         </div>
                       ))}
                     </div>
