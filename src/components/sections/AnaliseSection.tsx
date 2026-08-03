@@ -209,7 +209,7 @@ function AnalysisPanel({
             {avg !== null ? ` · média ${avg} min` : ""}
           </p>
         </div>
-        {!eligible && cycles.length > 0 && eligibleHint && (
+        {!eligible && windowed.length > 0 && eligibleHint && (
           <span className="rounded-md border border-amber-400/30 bg-amber-500/10 px-2 py-1 text-[10px] font-semibold text-amber-300">
             {eligibleHint}
           </span>
