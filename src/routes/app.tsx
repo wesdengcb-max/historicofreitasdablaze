@@ -1076,6 +1076,15 @@ function Index() {
 
                       {gridRows.map((row) => (
                         <div key={row.key} className="flex flex-col gap-3">
+                          {contarLinhas && (
+                            <div className="flex items-center gap-2 px-2">
+                              <div className="h-px flex-1 bg-white/5" />
+                              <span className="text-[10px] font-bold tracking-widest text-muted-foreground/40 uppercase">
+                                {row.label}
+                              </span>
+                              <div className="h-px flex-1 bg-white/5" />
+                            </div>
+                          )}
                           <div className="flex items-start justify-center gap-[var(--gap-col,8px)]">
                             {row.cells.map((cell, ci) => {
                             const [hh, mmPrefix] = row.label.split(":");
