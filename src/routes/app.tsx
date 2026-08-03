@@ -1120,7 +1120,7 @@ function Index() {
                                 style={{ width: "var(--colW, 120px)", height: "var(--cell-min-h, 66px)", direction: "ltr" }}
                               >
 
-                                <div className="flex flex-col items-center gap-1.5">
+                                <div className="flex flex-col items-center gap-1">
                                   <span className={`inline-flex h-3.5 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-4 sm:px-2 sm:text-[9px] ${badge ? badgeCls : "opacity-0"}`}>
                                     {badge?.label ?? "·"}
                                   </span>
@@ -1134,7 +1134,7 @@ function Index() {
                                       const slotKey = `${hm}-${i}`;
                                       if (spin) {
                                         return (
-                                          <div key={(spin as Spin).id} className="flex flex-col items-center gap-1">
+                                          <div key={(spin as Spin).id} className="flex flex-col items-center gap-0.5">
                                             <TipMinerCard
                                               spin={spin as Spin}
                                               highlightN={highlightN}
@@ -1161,7 +1161,7 @@ function Index() {
                                       
                                       if (pending && i === 0) {
                                          return (
-                                          <div key={`p-${ci}-${i}`} className="flex flex-col items-center gap-1">
+                                          <div key={`p-${ci}-${i}`} className="flex flex-col items-center gap-0.5">
                                             <div className="relative flex h-[var(--stone,52px)] w-[var(--stone,52px)] items-center justify-center overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-emerald-400/40">
                                               <img
                                                 src={brancoTile.url}
@@ -1178,7 +1178,7 @@ function Index() {
                                       }
 
                                       return (
-                                        <div key={`e-${ci}-${i}`} className="flex flex-col items-center gap-1">
+                                        <div key={`e-${ci}-${i}`} className="flex flex-col items-center gap-0.5">
                                           <EmptySlot
                                             prediction={slotPredictions[slotKey]}
                                             onClick={() => cycleSlotPrediction(slotKey)}
@@ -1320,7 +1320,7 @@ const TipMinerCard = memo(function TipMinerCard({
 
   const delayStyle = delay > 0 ? { animationDelay: `${delay}s` } : undefined;
   return (
-    <div className="flex flex-col items-center gap-1">
+    <div className="flex flex-col items-center gap-0.5">
       <button
         type="button"
         onClick={onClick}
@@ -1394,7 +1394,7 @@ const EmptySlot = memo(function EmptySlot({
     prediction === "red" ? "#DE2143" : prediction === "black" ? "#16171d" : "#ffffff";
   const ring = isWhite ? "#16171d" : "#ffffff";
   return (
-    <div className="flex flex-col items-center gap-1">
+    <div className="flex flex-col items-center gap-0.5">
       <button
         type="button"
         onClick={onClick}
