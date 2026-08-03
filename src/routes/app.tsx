@@ -1144,7 +1144,6 @@ function Index() {
                         ))}
                       </div>
                     </div>
-                  </div>
                 ) : (
                   (() => {
                     return (
