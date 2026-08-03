@@ -389,26 +389,28 @@ function Index() {
     };
   }, [range.start, range.end, realtime]);
 
-  // Polling leve — só refresca o topo quando o intervalo inclui o "agora".
+  // Polling leve e Processamento de Gatilhos em Background
   useEffect(() => {
     if (!range.includesNow || !realtime) return;
     let alive = true;
 
     const poll = async () => {
       if (!alive) return;
-      if (typeof document !== "undefined" && document.hidden) return;
+      // Removido document.hidden para processar gatilhos em segundo plano
       try {
         const { data, error } = await buildQuery(0, PAGE_SIZE - 1);
         if (error) throw error;
         if (!alive) return;
         const rows = (data ?? []) as Row[];
         const fresh = rows.filter((r) => !seen.current.has(String(r.id)));
-        if (fresh.length === 0) return;
-        setSpins((prev) => {
-          const merged = dedupeById([...fresh.map(rowToSpin), ...prev]);
-          seen.current = new Set(merged.map((s) => s.id));
-          return merged;
-        });
+        
+        if (fresh.length > 0) {
+          setSpins((prev) => {
+            const merged = dedupeById([...fresh.map(rowToSpin), ...prev]);
+            seen.current = new Set(merged.map((s) => s.id));
+            return merged;
+          });
+        }
         setStatus("live");
       } catch (error) {
         if (!alive) return;
@@ -418,6 +420,8 @@ function Index() {
     };
 
     const timer = setInterval(poll, POLL_MS);
+    // Notificamos mudanças mesmo com a aba "escondida" para garantir que Gatilhos e Sinais
+    // continuem sendo calculados em background.
     const onVisible = () => {
       if (!document.hidden) void poll();
     };
