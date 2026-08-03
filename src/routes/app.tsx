@@ -1183,15 +1183,32 @@ function Index() {
                                         );
                                       }
 
+                                      const p = slotPredictions[slotKey];
                                       return (
                                         <div key={`e-${ci}-${i}`} className="flex flex-col items-center">
-                                          <div className="h-[48px] w-[48px]">
-                                            <EmptySlot
-                                              prediction={slotPredictions[slotKey]}
-                                              onClick={() => cycleSlotPrediction(slotKey)}
-                                            />
-                                          </div>
-                                          <span className="mt-1 select-none text-[10px] text-transparent">--:--</span>
+                                          <button
+                                            type="button"
+                                            onClick={() => cycleSlotPrediction(slotKey)}
+                                            className={`relative flex h-[48px] w-[48px] items-center justify-center rounded-[6px] border border-dashed transition-colors hover:border-white/20 ${
+                                              p === "white"
+                                                ? "border-emerald-400/50 bg-emerald-400/5"
+                                                : p === "red"
+                                                  ? "border-red-500/50 bg-red-500/5"
+                                                  : p === "black"
+                                                    ? "border-slate-500/50 bg-slate-500/5"
+                                                    : "border-white/10"
+                                            }`}
+                                          >
+                                            <div className={`h-[30px] w-[30px] rounded-full ring-1 ring-inset transition-all ${
+                                              p === "white" ? "bg-white ring-white/20" :
+                                              p === "red" ? "bg-red-500 ring-red-400/20" :
+                                              p === "black" ? "bg-slate-800 ring-slate-700/20" :
+                                              "bg-transparent ring-transparent"
+                                            }`} />
+                                          </button>
+                                          <span className="mt-1 h-3 text-[10px] tabular-nums text-muted-foreground/30">
+                                            {hm}
+                                          </span>
                                         </div>
                                       );
                                     })}
