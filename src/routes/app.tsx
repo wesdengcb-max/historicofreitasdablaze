@@ -1121,8 +1121,8 @@ function Index() {
                             return (
                               <div
                                 key={ci}
-                                className="flex flex-col items-center justify-center p-1 sm:p-2"
-                                style={{ width: "var(--colW, 120px)", height: "var(--cell-min-h, 66px)", direction: "ltr" }}
+                                className="flex flex-col items-center justify-center p-0.5 sm:p-1"
+                                style={{ width: "var(--colW, 120px)", height: "var(--history-row-h, 66px)", direction: "ltr" }}
                               >
                                 <div className="relative flex flex-col items-center">
                                   {badge && (
