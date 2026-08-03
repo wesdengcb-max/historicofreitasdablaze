@@ -1080,7 +1080,7 @@ function Index() {
 
                       {gridRows.map((row) => (
                         <div key={row.key} className="flex flex-col gap-3">
-                          <div className="grid justify-center gap-[var(--gap-col,8px)] relative" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))" }}>
+                          <div className="grid justify-center gap-[var(--gap-col,8px)] relative px-[1px]" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "1274px", margin: "0 auto" }}>
                             {/* Marcador de hora na lateral esquerda, visível apenas se Contar Linhas estiver ativo */}
                             {contarLinhas && (
                               <div className="absolute -left-12 top-1/2 -translate-y-1/2 rotate-180 [writing-mode:vertical-lr] text-[10px] font-black tracking-widest text-muted-foreground/30 uppercase select-none">
