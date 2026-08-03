@@ -91,13 +91,12 @@ export function useGatilhos(analise: string, pedra: number, pending: GatilhoInpu
     lastSent.set(`${analise}:${pedra}`, signature);
 
     void (async () => {
-      // Upsert com ignoreDuplicates para persistir dados calculados em tempo real
-      // sem interferir em gatilhos já finalizados ou processados por outros clientes.
+      // Upsert para persistir novos "0" em tempo real.
+      // O banco decide se sobrescreve baseado na unicidade (analise, pedra, trigger_at).
       const { error: err } = await supabase
         .from("gatilhos_analise")
         .upsert(payload, {
           onConflict: "analise,pedra,trigger_at",
-          ignoreDuplicates: true,
         });
       if (err) setError(err.message);
       else await load();
