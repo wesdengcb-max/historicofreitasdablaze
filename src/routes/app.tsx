@@ -1028,6 +1028,21 @@ function Index() {
                 ) : viewMode === "colunas" ? (
                   <div className="history-scroll w-full p-1 [container-type:inline-size] sm:p-3 lg:p-4">
                     <div className="flex flex-col gap-[var(--slot-gap,14px)]">
+                      {/* Cabeçalho fixo das colunas (0-9) no topo do histórico */}
+                      <div className="flex items-start justify-center gap-[var(--gap-col,8px)] sticky top-0 z-20 bg-black/80 backdrop-blur-md py-3 border-b border-white/5">
+                        {Array.from({ length: 10 }).map((_, ci) => (
+                          <div
+                            key={`header-${ci}`}
+                            className="flex flex-col items-center"
+                            style={{ width: "var(--colW, 120px)" }}
+                          >
+                            <div className="flex h-7 w-full items-center justify-center rounded-lg bg-white/5 text-[13px] font-black tabular-nums text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground">
+                              {ci}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
                       {gridRows.map((row) => (
                         <div key={row.key} className="flex flex-col gap-3">
                           <div className="flex items-center gap-2 px-2">
@@ -1070,11 +1085,6 @@ function Index() {
                                 className="flex flex-col items-center"
                                 style={{ width: "var(--colW, 120px)", direction: "ltr" }}
                               >
-                                  <div className="mb-2 flex w-full items-center justify-center">
-                                    <div className="flex h-5 w-full items-center justify-center rounded-md bg-white/5 text-[11px] font-bold tabular-nums text-muted-foreground sm:h-6">
-                                      {String(ci).padStart(1, "0")}
-                                    </div>
-                                  </div>
 
                                 <div className="flex flex-col items-center gap-1.5">
                                   <span className={`inline-flex h-3.5 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-4 sm:px-2 sm:text-[9px] ${badge ? badgeCls : "opacity-0"}`}>
