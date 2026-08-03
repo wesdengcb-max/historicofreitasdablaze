@@ -1074,13 +1074,14 @@ function Index() {
                                   <span className={`inline-flex h-3.5 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-4 sm:px-2 sm:text-[9px] ${badge ? badgeCls : "opacity-0"}`}>
                                     {badge?.label ?? "·"}
                                   </span>
-                                <div className="grid grid-cols-2 gap-2">
-                                  {(cell.length >= 2
-                                    ? [cell[0], cell[1]]
-                                    : cell.length === 1
-                                      ? [cell[0], undefined]
-                                      : [undefined, undefined]
-                                  ).map((spin, i) => {
+                                  <div className="grid grid-cols-2 gap-2">
+                                    {(cell.length >= 2
+                                      ? [cell[0], cell[1]]
+                                      : cell.length === 1
+                                        ? [cell[0], undefined]
+                                        : [undefined, undefined]
+                                    ).map((spin, i) => {
+                                      const slotKey = `${hm}-${i}`;
                                       if (spin) {
                                         return (
                                           <div key={(spin as Spin).id} className="flex flex-col items-center gap-1">
