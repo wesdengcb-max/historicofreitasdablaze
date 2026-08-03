@@ -1121,7 +1121,7 @@ function Index() {
                             return (
                               <div
                                 key={ci}
-                                className="flex flex-col items-center justify-center"
+                                className="flex flex-col items-center justify-center p-1 sm:p-2"
                                 style={{ width: "var(--colW, 120px)", height: "var(--cell-min-h, 66px)", direction: "ltr", gap: "var(--gap-col, 8px)" }}
                               >
 
