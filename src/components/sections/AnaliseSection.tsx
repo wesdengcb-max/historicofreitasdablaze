@@ -64,183 +64,14 @@ function diffMinutes(a: Date, b: Date) {
 }
 
 /**
- * Backfill cronológico INDIVIDUALIZADO: para um gatilho específico, varre o
- * histórico (ordem crescente) começando EXCLUSIVAMENTE a partir do horário
- * daquele gatilho e acumula até 14 ocorrências de "0", medindo
- * (minuto do 0 − minuto do gatilho). Nunca usa a lista global de zeros
- * recentes do sistema.
- *
- * `covered` indica se o histórico carregado realmente cobre o instante do
- * gatilho — quando não cobre, o valor calculado é inválido e não deve
- * sobrescrever o que já está gravado no banco.
- */
-function computeGapsFromHistory(
-  rows: Row[],
-  triggerAt: Date,
-): { gaps: number[]; covered: boolean } {
-  const t = triggerAt.getTime();
-  if (rows.length === 0) return { gaps: [], covered: false };
-
-  // O histórico está em ordem cronológica crescente: o primeiro registro
-  // precisa ser anterior (ou igual) ao gatilho para cobrir sua janela.
-  const first = parseUtcDate(rows[0].created_at).getTime();
-  const covered = Number.isFinite(first) && first <= t;
-
-  // Busca binária pelo primeiro registro posterior ao gatilho.
-  let lo = 0;
-  let hi = rows.length;
-  while (lo < hi) {
-    const mid = (lo + hi) >> 1;
-    const ts = parseUtcDate(rows[mid].created_at).getTime();
-    if (Number.isNaN(ts) || ts <= t) lo = mid + 1;
-    else hi = mid;
-  }
-
-  const gaps: number[] = [];
-  for (let i = lo; i < rows.length && gaps.length < MAX_ZEROS; i++) {
-    const row = rows[i];
-    if (Number(row.roll) !== 0) continue;
-    const zdt = parseUtcDate(row.created_at);
-    if (Number.isNaN(zdt.getTime()) || zdt.getTime() <= t) continue;
-    gaps.push(diffMinutes(triggerAt, zdt));
-  }
-  return { gaps, covered };
-}
-
-type CycleStatus = "completo" | "ativo";
-
-/**
  * Gatilhos só podem ser Ativos ou Completos (14 contagens).
  * Não há mais o estado 'encerrado' por tempo.
  */
-function cycleStatus(c: Cycle): CycleStatus {
+function cycleStatus(c: Cycle): "completo" | "ativo" {
   if (c.gaps.length >= MAX_ZEROS) return "completo";
   return "ativo";
 }
 
-/**
- * Análise 1 — para cada dígito 0..9, coleta ciclos: gatilho é
- * "número N caiu num minuto cuja unidade == N". Para cada gatilho,
- * mede os minutos até os próximos ZEROS_PER_CYCLE zeros (≤ 14 min).
- */
-function buildCycles(rows: Row[], now: Date): Record<number, Cycle[]> {
-  const out: Record<number, Cycle[]> = {};
-  for (const n of NUMBERS) out[n] = [];
-
-  rows.forEach((r, i) => {
-    const n = Number(r.roll);
-    if (!Number.isFinite(n) || n < 0 || n > 9) return;
-    const dt = parseUtcDate(r.created_at);
-    if (Number.isNaN(dt.getTime())) return;
-    const brazilMinute = getBrazilMinute(dt);
-    if (brazilMinute % 10 !== n) return;
-
-    // Coleta os próximos até 14 zeros após o gatilho, sem limite de tempo.
-    const gaps: number[] = [];
-    for (let k = 1; i + k < rows.length && gaps.length < MAX_ZEROS; k++) {
-      const row = rows[i + k];
-      if (Number(row.roll) !== 0) continue;
-      const zdt = parseUtcDate(row.created_at);
-      if (Number.isNaN(zdt.getTime())) continue;
-      gaps.push(diffMinutes(dt, zdt));
-    }
-
-    const list = out[n];
-    list.push({
-      index: list.length + 1,
-      triggerAt: dt,
-      triggerLabel: `${n}`,
-      triggerDetail: `min ${String(brazilMinute).padStart(2, "0")}`,
-      gaps,
-      pending: gaps.length >= MAX_ZEROS ? 0 : 1,
-      elapsed: diffMinutes(dt, now),
-    });
-  });
-
-  return out;
-}
-
-/**
- * Análise 2 — gatilho quando uma pedra (0..14) repete consecutivamente.
- * O gatilho é a SEGUNDA pedra idêntica; medimos o tempo até o próximo 0.
- * Mantemos apenas as últimas MAX_PATTERN_CYCLES ocorrências.
- */
-function buildRepeatCycles(rows: Row[], now: Date): Cycle[] {
-  const out: Cycle[] = [];
-  for (let i = 1; i < rows.length; i++) {
-    const prev = Number(rows[i - 1].roll);
-    const cur = Number(rows[i].roll);
-    if (!Number.isFinite(cur) || cur < 0 || cur > 14) continue;
-    if (cur !== prev) continue;
-    const dt = parseUtcDate(rows[i].created_at);
-    if (Number.isNaN(dt.getTime())) continue;
-
-    // Coleta os próximos até 14 zeros após o gatilho, sem limite de tempo.
-    const gaps: number[] = [];
-    for (let k = 1; i + k < rows.length && gaps.length < MAX_ZEROS; k++) {
-      const row = rows[i + k];
-      if (Number(row.roll) !== 0) continue;
-      const zdt = parseUtcDate(row.created_at);
-      if (Number.isNaN(zdt.getTime())) continue;
-      gaps.push(diffMinutes(dt, zdt));
-    }
-
-    out.push({
-      index: 0,
-      triggerAt: dt,
-      triggerLabel: `${cur}→${cur}`,
-      triggerDetail: `repetição do ${cur}`,
-      gaps,
-      pending: gaps.length >= MAX_ZEROS ? 0 : 1,
-      elapsed: diffMinutes(dt, now),
-    });
-    (out[out.length - 1] as Cycle & { value: number }).value = cur;
-  }
-  return out;
-}
-
-/**
- * Análise 3 — gatilho quando duas pedras iguais (0..9) saem em sequência
- * E pelo menos uma delas caiu num minuto cuja unidade == valor da pedra.
- * Gatilho é a SEGUNDA pedra. Mede minutos até os próximos zeros.
- */
-function buildRepeatMinuteCycles(rows: Row[], now: Date): Cycle[] {
-  const out: Cycle[] = [];
-  for (let i = 1; i < rows.length; i++) {
-    const prev = Number(rows[i - 1].roll);
-    const cur = Number(rows[i].roll);
-    if (!Number.isFinite(cur) || cur < 0 || cur > 9) continue;
-    if (cur !== prev) continue;
-    const dtPrev = parseUtcDate(rows[i - 1].created_at);
-    const dt = parseUtcDate(rows[i].created_at);
-    if (Number.isNaN(dt.getTime()) || Number.isNaN(dtPrev.getTime())) continue;
-    const matchPrev = getBrazilMinute(dtPrev) % 10 === cur;
-    const matchCur = getBrazilMinute(dt) % 10 === cur;
-    if (!matchPrev && !matchCur) continue;
-
-    const gaps: number[] = [];
-    for (let k = 1; i + k < rows.length && gaps.length < MAX_ZEROS; k++) {
-      const row = rows[i + k];
-      if (Number(row.roll) !== 0) continue;
-      const zdt = parseUtcDate(row.created_at);
-      if (Number.isNaN(zdt.getTime())) continue;
-      gaps.push(diffMinutes(dt, zdt));
-    }
-
-    const which = matchPrev && matchCur ? "ambos" : matchPrev ? "1ª" : "2ª";
-    out.push({
-      index: 0,
-      triggerAt: dt,
-      triggerLabel: `${cur}→${cur}`,
-      triggerDetail: `repetição do ${cur} · minuto casa (${which})`,
-      gaps,
-      pending: gaps.length >= MAX_ZEROS ? 0 : 1,
-      elapsed: diffMinutes(dt, now),
-    });
-    (out[out.length - 1] as Cycle & { value: number }).value = cur;
-  }
-  return out;
-}
 
 type GroupResult = {
   m: number;
@@ -332,7 +163,6 @@ type PanelProps = {
   eyebrow: string;
   title: string;
   subtitle?: string;
-  cycles: Cycle[];
   loading: boolean;
   err: string | null;
   emptyLabel: string;
@@ -341,7 +171,6 @@ type PanelProps = {
   showFullBadge?: boolean; // Analysis 1 usa "Completo (10/10)"
   analiseKey: string;      // identificador no banco (analise1/2/3)
   pedra: number;           // número selecionado
-  history: Row[];          // histórico para backfill retroativo
   now: Date;
 };
 
@@ -349,7 +178,6 @@ function AnalysisPanel({
   eyebrow,
   title,
   subtitle,
-  cycles,
   loading,
   err,
   emptyLabel,
@@ -358,59 +186,27 @@ function AnalysisPanel({
   showFullBadge = true,
   analiseKey,
   pedra,
-  history,
   now,
 }: PanelProps) {
-  // Janela deslizante FIFO local (base para gravar no banco).
-  const local = useMemo(() => buildDetailRows(cycles), [cycles]);
+  const { rows: dbRows, error: dbError } = useGatilhos(analiseKey, pedra);
 
-  // Gatilhos a persistir no banco (janela de 10).
-  const pendingRows = useMemo(
-    () =>
-      local.map((c) => ({
-        analise: analiseKey,
-        pedra,
-        minuto: getBrazilMinute(c.triggerAt),
-        trigger_at: c.triggerAt.toISOString(),
-        detalhe: `${c.triggerDetail} · ${serializeBrazilTimestamp(c.triggerAt)}`,
-        gaps: c.gaps,
-      })),
-    [local, analiseKey, pedra],
-  );
-
-  const { rows: dbRows, error: dbError } = useGatilhos(analiseKey, pedra, pendingRows);
-
-  // Fonte da verdade da tela: os 10 gatilhos mais recentes vindos do banco.
-  // A tela assume um papel PASSIVO, apenas complementando lacunas se necessário
-  // sem forçar encerramento ou alterações estruturais nos dados persistidos.
+  // A tela assume um papel PASSIVO, apenas lendo o que está no banco.
   const windowed = useMemo<Cycle[]>(() => {
-    // Se não há nada no banco, usamos o cálculo local temporário
-    if (dbRows.length === 0) return local;
-
     return dbRows.map((r: GatilhoRow, i) => {
       const at = new Date(r.trigger_at);
-      const match = local.find((c) => c.triggerAt.getTime() === at.getTime());
-      const dbGaps = r.gaps ?? [];
-      
-      // Recálculo cronológico individual a partir do horário DESTE gatilho.
-      // Priorizamos os dados do banco, mas se o histórico local for mais completo
-      // (cobertura verificada), ele auxilia na visualização.
-      const { gaps: computed, covered } = computeGapsFromHistory(history, at);
-      
-      // O gatilho só é considerado completo se atingir MAX_ZEROS no banco ou no cálculo local coberto.
-      const gaps = covered && computed.length >= dbGaps.length ? computed : dbGaps.slice(0, MAX_ZEROS);
+      const gaps = r.gaps ?? [];
       
       return {
         index: i + 1,
         triggerAt: at,
         triggerLabel: `${r.pedra}`,
-        triggerDetail: match?.triggerDetail ?? (r.detalhe ?? `min ${String(r.minuto).padStart(2, "0")}`),
+        triggerDetail: r.detalhe ?? `min ${String(r.minuto).padStart(2, "0")}`,
         gaps,
         pending: gaps.length >= MAX_ZEROS ? 0 : 1,
         elapsed: diffMinutes(at, now),
       };
     });
-  }, [dbRows, local, history, now]);
+  }, [dbRows, now]);
 
   const { rows: top5, totalRows } = useMemo(() => computeTop5(windowed), [windowed]);
   const details = windowed;
