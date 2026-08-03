@@ -1158,7 +1158,7 @@ function Index() {
                                                 })
                                               }
                                             />
-                                            <span className={`mt-0.5 text-[10px] tabular-nums leading-none font-medium h-[12px] flex items-center ${destaqueHorario ? "text-primary font-bold" : "text-[#7b7c80]"}`}>
+                                            <span className={`mt-1 text-[10px] tabular-nums leading-none font-medium h-[12px] flex items-center ${destaqueHorario ? "text-primary font-bold" : "text-[#7b7c80]"}`}>
                                               {exibirSegundos ? spTimeWithSeconds(spin as Spin) : (spin as Spin).time}
                                             </span>
                                           </div>
