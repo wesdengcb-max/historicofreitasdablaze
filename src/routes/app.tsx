@@ -876,6 +876,96 @@ function Index() {
               </div>
             }
           >
+            {/* Filtros de período */}
+            <div className="mb-3 flex flex-wrap gap-1 sm:mb-4 sm:gap-1.5">
+              {([
+                ["hoje", "Hoje"],
+                ["ontem", "Ontem"],
+                ["7d", "Últimos 7 dias"],
+                ["30d", "Últimos 30 dias"],
+                ["custom", "Personalizado"],
+              ] as [FilterId, string][]).map(([id, label]) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => setFilter(id)}
+                  className={`rounded-full border px-2 py-1 text-[10px] font-medium transition-colors sm:px-3 sm:py-1.5 sm:text-[11px] ${
+                    filter === id
+                      ? "border-white/20 bg-white/10 text-foreground"
+                      : "border-white/5 bg-white/[0.03] text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            {filter === "custom" && (
+              <div className="mb-3 grid gap-2 rounded-xl border border-white/5 bg-white/[0.02] p-3 sm:mb-4 sm:grid-cols-[repeat(4,1fr)_auto] sm:items-end">
+                <FieldInput label="Data inicial" type="date" value={customStart} onChange={setCustomStart} />
+                <FieldInput label="Data final" type="date" value={customEnd} onChange={setCustomEnd} />
+                <FieldInput label="Hora inicial" type="time" value={timeStart} onChange={setTimeStart} placeholder="00:00" />
+                <FieldInput label="Hora final" type="time" value={timeEnd} onChange={setTimeEnd} placeholder="23:59" />
+                <button
+                  type="button"
+                  onClick={applyCustom}
+                  className="h-9 rounded-lg bg-primary px-4 text-[12px] font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+                >
+                  Pesquisar
+                </button>
+              </div>
+            )}
+
+            {/* Cabeçalho das colunas (0-9) movido para fora do "quadrado" */}
+            {viewMode === "colunas" && (
+              <div className="history-scroll mb-3 w-full border-b border-white/5 pb-3">
+                <div className="flex items-start justify-center gap-[var(--gap-col,8px)] px-1 sm:px-3 lg:px-4">
+                  {Array.from({ length: 10 }).map((_, ci) => {
+                    const stats = colStats[ci];
+                    return (
+                      <div
+                        key={`header-outer-${ci}`}
+                        className="flex flex-col items-center gap-2"
+                        style={{ width: "var(--colW, 120px)" }}
+                      >
+                        <div className="flex h-7 w-full items-center justify-center rounded-lg bg-white/5 text-[13px] font-black tabular-nums text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground">
+                          {ci}
+                        </div>
+                        {contarColunas && (
+                          <div className="flex w-full flex-col gap-0.5 overflow-hidden rounded-[4px] bg-white/[0.03] p-1 shadow-inner">
+                            <div className="flex items-center justify-between px-0.5 text-[8px] font-bold tabular-nums">
+                              <span className="text-white">B: {stats.white}</span>
+                              <span className="text-white/40">{stats.whitePct.toFixed(0)}%</span>
+                            </div>
+                            <div className="relative h-1 w-full overflow-hidden rounded-full bg-white/5">
+                              <div className="flex h-full w-full">
+                                <div
+                                  className="h-full bg-red-500 transition-all duration-500"
+                                  style={{ width: `${stats.redPct}%` }}
+                                />
+                                <div
+                                  className="h-full bg-slate-800 transition-all duration-500"
+                                  style={{ width: `${stats.blackPct}%` }}
+                                />
+                                <div
+                                  className="h-full bg-white transition-all duration-500"
+                                  style={{ width: `${stats.whitePct}%` }}
+                                />
+                              </div>
+                            </div>
+                            <div className="mt-0.5 flex items-center justify-between px-0.5 text-[7px] font-medium text-muted-foreground/60 tabular-nums uppercase">
+                              <span>V: {stats.red}</span>
+                              <span>P: {stats.black}</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {/* Painel de controles alinhado */}
             <div className="mb-3 rounded-2xl border border-white/5 bg-white/[0.02] p-2 sm:mb-4 sm:p-4">
               <div className="grid grid-cols-2 gap-x-3 gap-y-2 text-[11px] sm:gap-x-8 sm:gap-y-3.5 lg:grid-cols-4">
@@ -939,47 +1029,6 @@ function Index() {
               </div>
             </div>
 
-            {/* Filtros de período */}
-            <div className="mb-3 space-y-2 sm:mb-4 sm:space-y-3">
-              <div className="flex flex-wrap gap-1 sm:gap-1.5">
-                {([
-                  ["hoje", "Hoje"],
-                  ["ontem", "Ontem"],
-                  ["7d", "Últimos 7 dias"],
-                  ["30d", "Últimos 30 dias"],
-                  ["custom", "Personalizado"],
-                ] as [FilterId, string][]).map(([id, label]) => (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => setFilter(id)}
-                    className={`rounded-full border px-2 py-1 text-[10px] font-medium transition-colors sm:px-3 sm:py-1.5 sm:text-[11px] ${
-                      filter === id
-                        ? "border-white/20 bg-white/10 text-foreground"
-                        : "border-white/5 bg-white/[0.03] text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-              {filter === "custom" && (
-                <div className="grid gap-2 rounded-xl border border-white/5 bg-white/[0.02] p-3 sm:grid-cols-[repeat(4,1fr)_auto] sm:items-end">
-                  <FieldInput label="Data inicial" type="date" value={customStart} onChange={setCustomStart} />
-                  <FieldInput label="Data final" type="date" value={customEnd} onChange={setCustomEnd} />
-                  <FieldInput label="Hora inicial" type="time" value={timeStart} onChange={setTimeStart} placeholder="00:00" />
-                  <FieldInput label="Hora final" type="time" value={timeEnd} onChange={setTimeEnd} placeholder="23:59" />
-                  <button
-                    type="button"
-                    onClick={applyCustom}
-                    className="h-9 rounded-lg bg-primary px-4 text-[12px] font-semibold text-primary-foreground transition-opacity hover:opacity-90"
-                  >
-                    Pesquisar
-                  </button>
-                </div>
-              )}
-            </div>
-
             <div
               className={
                 fullscreen
@@ -1028,51 +1077,6 @@ function Index() {
                 ) : viewMode === "colunas" ? (
                   <div className="history-scroll w-full p-1 [container-type:inline-size] sm:p-3 lg:p-4">
                     <div className="flex flex-col gap-[var(--slot-gap,14px)]">
-                      {/* Cabeçalho fixo das colunas (0-9) no topo do histórico */}
-                      <div className="flex items-start justify-center gap-[var(--gap-col,8px)] sticky top-0 z-20 bg-black/80 backdrop-blur-md pb-3 pt-0 border-b border-white/5">
-                        {Array.from({ length: 10 }).map((_, ci) => {
-                          const stats = colStats[ci];
-                          return (
-                            <div
-                              key={`header-${ci}`}
-                              className="flex flex-col items-center gap-2"
-                              style={{ width: "var(--colW, 120px)" }}
-                            >
-                              <div className="flex h-7 w-full items-center justify-center rounded-lg bg-white/5 text-[13px] font-black tabular-nums text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground">
-                                {ci}
-                              </div>
-                              {contarColunas && (
-                                <div className="flex w-full flex-col gap-0.5 overflow-hidden rounded-[4px] bg-white/[0.03] p-1 shadow-inner">
-                                  <div className="flex items-center justify-between px-0.5 text-[8px] font-bold tabular-nums">
-                                    <span className="text-white">B: {stats.white}</span>
-                                    <span className="text-white/40">{stats.whitePct.toFixed(0)}%</span>
-                                  </div>
-                                  <div className="relative h-1 w-full overflow-hidden rounded-full bg-white/5">
-                                    <div className="flex h-full w-full">
-                                      <div
-                                        className="h-full bg-red-500 transition-all duration-500"
-                                        style={{ width: `${stats.redPct}%` }}
-                                      />
-                                      <div
-                                        className="h-full bg-slate-800 transition-all duration-500"
-                                        style={{ width: `${stats.blackPct}%` }}
-                                      />
-                                      <div
-                                        className="h-full bg-white transition-all duration-500"
-                                        style={{ width: `${stats.whitePct}%` }}
-                                      />
-                                    </div>
-                                  </div>
-                                  <div className="mt-0.5 flex items-center justify-between px-0.5 text-[7px] font-medium text-muted-foreground/60 tabular-nums uppercase">
-                                    <span>V: {stats.red}</span>
-                                    <span>P: {stats.black}</span>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
 
                       {gridRows.map((row) => (
                         <div key={row.key} className="flex flex-col gap-3">
