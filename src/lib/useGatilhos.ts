@@ -29,7 +29,7 @@ export type GatilhoInput = {
  * análise/pedra), lê apenas os 10 mais recentes e escuta mudanças em
  * tempo real para refletir em todos os dispositivos.
  */
-export function useGatilhos(analise: string, pedra: number, pending: GatilhoInput[]) {
+export function useGatilhos(analise: string, pedra: number) {
   const [rows, setRows] = useState<GatilhoRow[]>([]);
   const [error, setError] = useState<string | null>(null);
 
@@ -54,7 +54,7 @@ export function useGatilhos(analise: string, pedra: number, pending: GatilhoInpu
     void load();
   }, [load]);
 
-  // Realtime: qualquer novo gatilho recarrega a janela de 10
+  // Realtime: qualquer mudança na tabela (inserção via trigger ou atualização de gaps) recarrega a visualização
   useEffect(() => {
     const channel = supabase
       .channel(`gatilhos-${analise}-${pedra}`)
@@ -70,38 +70,6 @@ export function useGatilhos(analise: string, pedra: number, pending: GatilhoInpu
       void supabase.removeChannel(channel);
     };
   }, [analise, pedra, load]);
-
-  // Monitoramento e Persistência passiva (apenas para atualizar o que falta)
-  useEffect(() => {
-    if (pending.length === 0) return;
-    
-    // Filtramos apenas o que realmente mudou para evitar tráfego desnecessário
-    const payload = pending.slice(-MAX_GATILHOS).map((g) => ({
-      analise: g.analise,
-      pedra: g.pedra,
-      minuto: g.minuto,
-      fuso_horario: BRAZIL_TZ,
-      trigger_at: g.trigger_at,
-      detalhe: g.detalhe,
-      gaps: g.gaps,
-    }));
-
-    const signature = JSON.stringify(payload);
-    if (signature === lastSent.get(`${analise}:${pedra}`)) return;
-    lastSent.set(`${analise}:${pedra}`, signature);
-
-    void (async () => {
-      // Upsert para persistir novos "0" em tempo real.
-      // O banco decide se sobrescreve baseado na unicidade (analise, pedra, trigger_at).
-      const { error: err } = await supabase
-        .from("gatilhos_analise")
-        .upsert(payload, {
-          onConflict: "analise,pedra,trigger_at",
-        });
-      if (err) setError(err.message);
-      else await load();
-    })();
-  }, [analise, pedra, pending, load]);
 
   return { rows, error };
 }
