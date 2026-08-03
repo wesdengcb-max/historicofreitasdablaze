@@ -1076,10 +1076,22 @@ function Index() {
                   </div>
                 ) : viewMode === "colunas" ? (
                   <div className="history-scroll w-full p-1 [container-type:inline-size] sm:p-3 lg:p-4">
-                    <div className="flex flex-col gap-[var(--slot-gap,14px)]">
+                    <div className="flex flex-col gap-0">
+                      {/* Cabeçalho 0-9 interno para Colunas Fixas */}
+                      <div className="grid justify-center gap-[var(--gap-col,8px)] px-[1px] mb-3 sticky top-0 z-10 bg-background/40 backdrop-blur-sm" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "1274px", margin: "0 auto" }}>
+                        {Array.from({ length: 10 }).map((_, ci) => (
+                          <div
+                            key={`header-inner-${ci}`}
+                            className="flex h-[22px] w-full items-center justify-center rounded-[6px] border border-white/10 bg-white/[0.03] text-[13px] font-medium tabular-nums text-[#eaeaea]"
+                            style={{ width: "var(--colW, 120px)" }}
+                          >
+                            {ci}
+                          </div>
+                        ))}
+                      </div>
 
                       {gridRows.map((row) => (
-                        <div key={row.key} className="flex flex-col gap-3">
+                        <div key={row.key} className="flex flex-col gap-0 border-b border-white/[0.02]">
                           <div className="grid justify-center gap-[var(--gap-col,8px)] relative px-[1px]" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "1274px", margin: "0 auto" }}>
                             {/* Marcador de hora na lateral esquerda, visível apenas se Contar Linhas estiver ativo */}
                             {contarLinhas && (
