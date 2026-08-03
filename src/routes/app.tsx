@@ -1141,13 +1141,14 @@ function Index() {
                                       if (spin) {
                                         return (
                                           <div key={(spin as Spin).id} className="flex flex-col items-center">
-                                            <TipMinerCard
-                                              spin={spin as Spin}
-                                              highlightN={highlightN}
+                                            <BlazeResultCard
+                                              n={(spin as Spin).n}
+                                              color={(spin as Spin).color}
+                                              time={exibirSegundos ? spTimeWithSeconds(spin as Spin) : undefined}
                                               numbered={numerado}
-                                              showSeconds={exibirSegundos}
                                               timeHighlight={destaqueHorario}
-                                              showTime={false}
+                                              dimmed={highlightN.size > 0 && !highlightN.has((spin as Spin).n)}
+                                              selected={highlightN.has((spin as Spin).n)}
                                               onClick={() =>
                                                 setHighlightN((h) => {
                                                   const next = new Set(h);
@@ -1158,9 +1159,6 @@ function Index() {
                                                 })
                                               }
                                             />
-                                            <span className={`mt-1 text-[10px] tabular-nums leading-none font-medium h-[12px] flex items-center ${destaqueHorario ? "text-primary font-bold" : "text-[#7b7c80]"}`}>
-                                              {exibirSegundos ? spTimeWithSeconds(spin as Spin) : (spin as Spin).time}
-                                            </span>
                                           </div>
                                         );
                                       }
