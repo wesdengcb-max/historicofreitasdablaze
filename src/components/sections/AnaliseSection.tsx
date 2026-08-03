@@ -33,7 +33,7 @@ const TOP_N = 5;
 const MAX_ZEROS = 14;           // coleta até 14 zeros após o gatilho (sem limite de tempo)
 const MAX_DETAIL_ROWS = 10;     // FIFO detalhes
 const MAX_PATTERN_CYCLES = 14;  // Análise 2: últimas 14 ocorrências
-const MAX_OPEN_MINUTES = 90;    // trava de tempo: gatilho não fica ativo além disso
+// const MAX_OPEN_MINUTES = 90;    // REMOVIDO: gatilho não encerra por tempo.
 const BRAZIL_TIME_ZONE = "America/Sao_Paulo";
 
 const brazilMinuteFormatter = new Intl.DateTimeFormat("pt-BR", {
@@ -152,7 +152,7 @@ function buildCycles(rows: Row[], now: Date): Record<number, Cycle[]> {
       triggerLabel: `${n}`,
       triggerDetail: `min ${String(brazilMinute).padStart(2, "0")}`,
       gaps,
-      pending: gaps.length === 0 ? 1 : 0,
+      pending: gaps.length >= MAX_ZEROS ? 0 : 1,
       elapsed: diffMinutes(dt, now),
     });
   });
@@ -191,7 +191,7 @@ function buildRepeatCycles(rows: Row[], now: Date): Cycle[] {
       triggerLabel: `${cur}→${cur}`,
       triggerDetail: `repetição do ${cur}`,
       gaps,
-      pending: gaps.length === 0 ? 1 : 0,
+      pending: gaps.length >= MAX_ZEROS ? 0 : 1,
       elapsed: diffMinutes(dt, now),
     });
     (out[out.length - 1] as Cycle & { value: number }).value = cur;
@@ -234,7 +234,7 @@ function buildRepeatMinuteCycles(rows: Row[], now: Date): Cycle[] {
       triggerLabel: `${cur}→${cur}`,
       triggerDetail: `repetição do ${cur} · minuto casa (${which})`,
       gaps,
-      pending: gaps.length === 0 ? 1 : 0,
+      pending: gaps.length >= MAX_ZEROS ? 0 : 1,
       elapsed: diffMinutes(dt, now),
     });
     (out[out.length - 1] as Cycle & { value: number }).value = cur;
@@ -414,7 +414,7 @@ function AnalysisPanel({
 
   const { rows: top5, totalRows } = useMemo(() => computeTop5(windowed), [windowed]);
   const details = windowed;
-  const fullyCompleted = windowed.filter((c) => cycleStatus(c) !== "ativo" && c.gaps.length > 0).length;
+  const fullyCompleted = windowed.filter((c) => cycleStatus(c) === "completo").length;
   const totalGaps = windowed.reduce((a, c) => a + c.gaps.length, 0);
   const avg = totalGaps
     ? Math.round(windowed.reduce((a, c) => a + c.gaps.reduce((x, y) => x + y, 0), 0) / totalGaps)
