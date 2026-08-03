@@ -1329,7 +1329,7 @@ const TipMinerCard = memo(function TipMinerCard({
         }`}
         style={{
           width: "var(--stone, 52px)",
-          height: "var(--stone-h, 50px)",
+          height: "var(--stone-h, 48px)",
           background: isWhite ? "#ffffff" : bg,
           opacity: isActive ? 1 : 0.25,
           ...(delayStyle ?? {}),
