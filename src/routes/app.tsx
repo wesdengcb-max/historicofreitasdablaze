@@ -919,7 +919,7 @@ function Index() {
             {/* Cabeçalho das colunas (0-9) movido para fora do "quadrado" */}
             {viewMode === "colunas" && (
               <div className="history-scroll mb-3 w-full border-b border-white/5 pb-3">
-                <div className="grid justify-center gap-[var(--gap-col,8px)] px-1 sm:px-3 lg:px-4" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))" }}>
+                <div className="grid justify-center gap-[var(--gap-col,8px)] px-[1px]" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "1274px", margin: "0 auto" }}>
                   {Array.from({ length: 10 }).map((_, ci) => {
                     const stats = colStats[ci];
                     return (
