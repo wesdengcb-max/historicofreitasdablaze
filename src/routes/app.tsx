@@ -665,7 +665,7 @@ function Index() {
 
   return (
     <div
-      className="history-metrics min-h-dvh [--cols:10]"
+      className="history-metrics min-h-dvh bg-[#171717] [--cols:10]"
     >
       <header className="sticky top-0 z-30 border-b border-white/5 bg-background/70 backdrop-blur-xl">
         <div className="mx-auto grid h-12 max-w-[1366px] grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-2 sm:h-14 sm:gap-4 sm:px-6 lg:h-16 lg:px-8">
