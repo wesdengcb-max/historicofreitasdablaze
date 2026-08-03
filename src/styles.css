@@ -182,6 +182,7 @@
   --cell-min-h: 66px;
   --slot-gap: 14px;
   --gap-col: 8px;
+  --history-row-h: 66px;
 }
 
 .history-metrics {
