@@ -382,17 +382,25 @@ function AnalysisPanel({
   const { rows: dbRows, error: dbError } = useGatilhos(analiseKey, pedra, pendingRows);
 
   // Fonte da verdade da tela: os 10 gatilhos mais recentes vindos do banco.
+  // A tela assume um papel PASSIVO, apenas complementando lacunas se necessário
+  // sem forçar encerramento ou alterações estruturais nos dados persistidos.
   const windowed = useMemo<Cycle[]>(() => {
+    // Se não há nada no banco, usamos o cálculo local temporário
     if (dbRows.length === 0) return local;
+
     return dbRows.map((r: GatilhoRow, i) => {
       const at = new Date(r.trigger_at);
       const match = local.find((c) => c.triggerAt.getTime() === at.getTime());
       const dbGaps = r.gaps ?? [];
+      
       // Recálculo cronológico individual a partir do horário DESTE gatilho.
-      // Quando o histórico carregado cobre o instante do gatilho, ele é a
-      // única fonte da verdade (evita herdar zeros globais recentes).
+      // Priorizamos os dados do banco, mas se o histórico local for mais completo
+      // (cobertura verificada), ele auxilia na visualização.
       const { gaps: computed, covered } = computeGapsFromHistory(history, at);
-      const gaps = covered ? computed : dbGaps.slice(0, MAX_ZEROS);
+      
+      // O gatilho só é considerado completo se atingir MAX_ZEROS no banco ou no cálculo local coberto.
+      const gaps = covered && computed.length >= dbGaps.length ? computed : dbGaps.slice(0, MAX_ZEROS);
+      
       return {
         index: i + 1,
         triggerAt: at,

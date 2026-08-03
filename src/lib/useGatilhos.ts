@@ -71,10 +71,11 @@ export function useGatilhos(analise: string, pedra: number, pending: GatilhoInpu
     };
   }, [analise, pedra, load]);
 
-  // Grava/atualiza os gatilhos detectados (últimos 10). O trigger no banco
-  // apaga automaticamente qualquer registro além dos 10 mais recentes.
+  // Monitoramento e Persistência passiva (apenas para atualizar o que falta)
   useEffect(() => {
     if (pending.length === 0) return;
+    
+    // Filtramos apenas o que realmente mudou para evitar tráfego desnecessário
     const payload = pending.slice(-MAX_GATILHOS).map((g) => ({
       analise: g.analise,
       pedra: g.pedra,
@@ -84,17 +85,18 @@ export function useGatilhos(analise: string, pedra: number, pending: GatilhoInpu
       detalhe: g.detalhe,
       gaps: g.gaps,
     }));
+
     const signature = JSON.stringify(payload);
     if (signature === lastSent.get(`${analise}:${pedra}`)) return;
     lastSent.set(`${analise}:${pedra}`, signature);
+
     void (async () => {
+      // Upsert com ignoreDuplicates para persistir dados calculados em tempo real
+      // sem interferir em gatilhos já finalizados ou processados por outros clientes.
       const { error: err } = await supabase
         .from("gatilhos_analise")
         .upsert(payload, {
           onConflict: "analise,pedra,trigger_at",
-          // Somente inserção: a tabela não permite UPDATE público. Os gaps
-          // de cada gatilho são recalculados na tela a partir do histórico
-          // cronológico individual daquele horário.
           ignoreDuplicates: true,
         });
       if (err) setError(err.message);
