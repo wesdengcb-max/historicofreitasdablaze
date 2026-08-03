@@ -1050,7 +1050,7 @@ function Index() {
               <div
                 className={
                   fullscreen
-                    ? "min-h-0 flex-1 overflow-auto rounded-2xl border border-white/5 bg-black/20"
+                    ? "min-h-0 flex-1 overflow-auto rounded-2xl border border-white/5 bg-[#171717]"
                     : ""
                 }
                 style={{ direction: inverse && viewMode === "colunas" ? "rtl" : "ltr" }}
@@ -1071,14 +1071,7 @@ function Index() {
                   <div className="history-scroll max-w-full overflow-x-auto p-1 [container-type:inline-size] sm:p-2 lg:p-3">
                     <div className="flex flex-col gap-0">
                       {/* Cabeçalho 0-9 interno para Colunas Fixas */}
-                      <div
-                        className="sticky top-0 z-30 mx-auto mb-1 grid justify-center gap-[4px] bg-[#171717]/90 py-1 backdrop-blur-sm"
-                        style={{
-                          gridTemplateColumns: "70px repeat(10, 44px)",
-                          width: "514px",
-                          height: "34px",
-                        }}
-                      >
+                      <div className="sticky top-0 z-30 mx-auto mb-1 grid justify-center gap-[4px] bg-[#171717] py-1" style={{ gridTemplateColumns: "70px repeat(10, 44px)", width: "514px", height: "34px" }}>
                         <div className="flex h-full items-center justify-center text-[13px] font-bold text-zinc-500">Hora</div>
                         {Array.from({ length: 10 }).map((_, ci) => (
                           <div
@@ -1108,8 +1101,8 @@ function Index() {
                             </span>
                           </div>
                             {row.cells.map((cell, ci) => {
-                            const [hh, mmPrefix] = row.label.split(":");
-                            const hm = `${hh}:${mmPrefix[0]}${ci}`;
+                            const [hh, mm_p] = row.label.split(":");
+                            const hm = `${hh}:${mm_p[0]}${ci}`;
                             const cellSignals = signalsByHM.get(hm) ?? [];
                             const green = cellSignals.find((s) => s.outcome === "green");
                             const pending = cellSignals.find((s) => s.outcome === "pending");
