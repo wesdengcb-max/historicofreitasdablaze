@@ -1030,17 +1030,48 @@ function Index() {
                     <div className="flex flex-col gap-[var(--slot-gap,14px)]">
                       {/* Cabeçalho fixo das colunas (0-9) no topo do histórico */}
                       <div className="flex items-start justify-center gap-[var(--gap-col,8px)] sticky top-0 z-20 bg-black/80 backdrop-blur-md py-3 border-b border-white/5">
-                        {Array.from({ length: 10 }).map((_, ci) => (
-                          <div
-                            key={`header-${ci}`}
-                            className="flex flex-col items-center"
-                            style={{ width: "var(--colW, 120px)" }}
-                          >
-                            <div className="flex h-7 w-full items-center justify-center rounded-lg bg-white/5 text-[13px] font-black tabular-nums text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground">
-                              {ci}
+                        {Array.from({ length: 10 }).map((_, ci) => {
+                          const stats = colStats[ci];
+                          return (
+                            <div
+                              key={`header-${ci}`}
+                              className="flex flex-col items-center gap-2"
+                              style={{ width: "var(--colW, 120px)" }}
+                            >
+                              <div className="flex h-7 w-full items-center justify-center rounded-lg bg-white/5 text-[13px] font-black tabular-nums text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground">
+                                {ci}
+                              </div>
+                              {contarColunas && (
+                                <div className="flex w-full flex-col gap-0.5 overflow-hidden rounded-[4px] bg-white/[0.03] p-1 shadow-inner">
+                                  <div className="flex items-center justify-between px-0.5 text-[8px] font-bold tabular-nums">
+                                    <span className="text-white">B: {stats.white}</span>
+                                    <span className="text-white/40">{stats.whitePct.toFixed(0)}%</span>
+                                  </div>
+                                  <div className="relative h-1 w-full overflow-hidden rounded-full bg-white/5">
+                                    <div className="flex h-full w-full">
+                                      <div
+                                        className="h-full bg-red-500 transition-all duration-500"
+                                        style={{ width: `${stats.redPct}%` }}
+                                      />
+                                      <div
+                                        className="h-full bg-slate-800 transition-all duration-500"
+                                        style={{ width: `${stats.blackPct}%` }}
+                                      />
+                                      <div
+                                        className="h-full bg-white transition-all duration-500"
+                                        style={{ width: `${stats.whitePct}%` }}
+                                      />
+                                    </div>
+                                  </div>
+                                  <div className="mt-0.5 flex items-center justify-between px-0.5 text-[7px] font-medium text-muted-foreground/60 tabular-nums uppercase">
+                                    <span>V: {stats.red}</span>
+                                    <span>P: {stats.black}</span>
+                                  </div>
+                                </div>
+                              )}
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
 
                       {gridRows.map((row) => (
