@@ -928,7 +928,7 @@ function Index() {
                         className="flex flex-col items-center gap-2"
                         style={{ width: "var(--colW, 120px)" }}
                       >
-                        <div className="flex h-7 w-full items-center justify-center rounded-lg bg-white/5 text-[13px] font-black tabular-nums text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground">
+                        <div className="flex h-[22px] w-full items-center justify-center rounded-[6px] border border-white/10 bg-white/[0.03] text-[13px] font-medium tabular-nums text-[#eaeaea] transition-colors hover:bg-white/10 hover:text-white">
                           {ci}
                         </div>
                         {contarColunas && (
