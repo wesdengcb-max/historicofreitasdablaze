@@ -1406,7 +1406,7 @@ const EmptySlot = memo(function EmptySlot({
         }`}
         style={{
           width: "var(--stone, 52px)",
-          height: "var(--stone-h, 50px)",
+          height: "var(--stone-h, 48px)",
           background: prediction ? (isWhite ? "#ffffff" : bg) : undefined
         }}
       >
