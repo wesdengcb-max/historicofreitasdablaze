@@ -1076,7 +1076,13 @@ function Index() {
 
                       {gridRows.map((row) => (
                         <div key={row.key} className="flex flex-col gap-3">
-                          <div className="flex items-start justify-center gap-[var(--gap-col,8px)]">
+                          <div className="flex items-start justify-center gap-[var(--gap-col,8px)] relative">
+                            {/* Marcador de hora na lateral esquerda, visível apenas se Contar Linhas estiver ativo */}
+                            {contarLinhas && (
+                              <div className="absolute -left-12 top-1/2 -translate-y-1/2 rotate-180 [writing-mode:vertical-lr] text-[10px] font-black tracking-widest text-muted-foreground/30 uppercase select-none">
+                                {row.label}
+                              </div>
+                            )}
                             {row.cells.map((cell, ci) => {
                             const [hh, mmPrefix] = row.label.split(":");
                             const hm = `${hh}:${mmPrefix[0]}${ci}`;
