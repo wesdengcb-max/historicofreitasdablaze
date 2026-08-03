@@ -607,8 +607,7 @@ function Index() {
 
 
   const applyCustom = () => setAppliedTick((v) => v + 1);
-  const historyGridTemplate =
-    "repeat(var(--cols, 10), var(--stone-track, calc((var(--stone-size, 44px) * 2) + 2px)))";
+  const historyGridTemplate = `repeat(10, var(--colW, 120px))`;
 
   // Contagens auxiliares dos toggles "Contar colunas" / "Contar linhas".
   const colCounts = useMemo(() => {
