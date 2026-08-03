@@ -1029,7 +1029,7 @@ function Index() {
                   <div className="history-scroll w-full p-1 [container-type:inline-size] sm:p-3 lg:p-4">
                     <div className="flex flex-col gap-[var(--slot-gap,14px)]">
                       {/* Cabeçalho fixo das colunas (0-9) no topo do histórico */}
-                      <div className="flex items-start justify-center gap-[var(--gap-col,8px)] sticky top-0 z-20 bg-black/80 backdrop-blur-md py-3 border-b border-white/5">
+                      <div className="flex items-start justify-center gap-[var(--gap-col,8px)] sticky top-0 z-20 bg-black/80 backdrop-blur-md pb-3 pt-0 border-b border-white/5">
                         {Array.from({ length: 10 }).map((_, ci) => {
                           const stats = colStats[ci];
                           return (
