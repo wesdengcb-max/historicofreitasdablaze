@@ -107,15 +107,14 @@ function computeGapsFromHistory(
   return { gaps, covered };
 }
 
-type CycleStatus = "completo" | "encerrado" | "ativo";
+type CycleStatus = "completo" | "ativo";
 
 /**
- * Trava de encerramento: 14 contagens fecham o ciclo; passado o limite de
- * tempo o gatilho é encerrado mesmo incompleto (nunca fica ativo para sempre).
+ * Gatilhos só podem ser Ativos ou Completos (14 contagens).
+ * Não há mais o estado 'encerrado' por tempo.
  */
 function cycleStatus(c: Cycle): CycleStatus {
   if (c.gaps.length >= MAX_ZEROS) return "completo";
-  if (c.elapsed >= MAX_OPEN_MINUTES) return "encerrado";
   return "ativo";
 }
 
@@ -554,10 +553,6 @@ function AnalysisPanel({
                           {status === "completo" ? (
                             <span className="text-emerald-300">
                               {showFullBadge ? `Completo (${c.gaps.length})` : "Completo"}
-                            </span>
-                          ) : status === "encerrado" ? (
-                            <span className="text-sky-300">
-                              Encerrado ({c.gaps.length}/{MAX_ZEROS})
                             </span>
                           ) : (
                             <span className="text-amber-300">
