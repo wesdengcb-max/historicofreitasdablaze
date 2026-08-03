@@ -176,9 +176,10 @@
    Alinhamento pixel-perfect conforme referência:
    Pedras: 48x48px, Gap: 8px (col), 14px (row), Col Width: 120px */
 :root {
-  --stone: 48px;
+  --stone: 52px;
+  --stone-h: 50px;
   --colW: 120px;
-  --cell-min-h: 68px;
+  --cell-min-h: 70px;
   --slot-gap: 14px;
   --gap-col: 8px;
 }

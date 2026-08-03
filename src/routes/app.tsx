@@ -1027,59 +1027,9 @@ function Index() {
                   </div>
                 ) : viewMode === "colunas" ? (
                   <div className="history-scroll w-full p-1 [container-type:inline-size] sm:p-3 lg:p-4">
-                    {/* Cabeçalho fixo dos minutos 00–09 */}
-                    <div className="sticky top-0 z-10 -mx-1 mb-1.5 border-b border-white/10 bg-background/95 px-1 py-1 backdrop-blur sm:-mx-3 sm:mb-2 sm:px-3 sm:py-2 lg:-mx-4 lg:px-4">
-                      <div
-                        className="grid"
-                        style={{ gridTemplateColumns: historyGridTemplate, columnGap: "var(--gap-col, 8px)", justifyContent: "safe center", direction: inverse ? "rtl" : "ltr" }}
-                      >
-                        {Array.from({ length: 10 }, (_, i) => (
-                          <div
-                            key={`h-${i}`}
-                            className="flex h-5 items-center justify-center gap-1 rounded-md bg-white/5 text-[9px] font-semibold tabular-nums text-muted-foreground sm:h-6 sm:gap-1.5 sm:text-[11px]"
-                          >
-                            <span>{String(i).padStart(2, "0")}</span>
-                            {contarColunas && (
-                              <span className="rounded-full bg-primary/20 px-1 text-[8px] font-bold text-primary sm:px-1.5 sm:text-[10px]">
-                                {colCounts[i]}
-                              </span>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                      {contarColunas && (
-                        <div
-                          className="mt-1.5 grid"
-                          style={{ gridTemplateColumns: historyGridTemplate, columnGap: "var(--gap-col, 8px)", justifyContent: "safe center", direction: inverse ? "rtl" : "ltr" }}
-                        >
-                          {colStats.map((c, i) => (
-                            <div
-                              key={`cs-${i}`}
-                              className="rounded-md border border-white/5 bg-white/[0.02] px-1 py-1"
-                              style={{ direction: "ltr" }}
-                            >
-                              <div className="flex h-1.5 overflow-hidden rounded-full bg-white/10">
-                                <span style={{ width: `${c.redPct}%`, background: "#DE2143" }} />
-                                <span style={{ width: `${c.blackPct}%`, background: "#16171d" }} />
-                                <span style={{ width: `${c.whitePct}%`, background: "#ffffff" }} />
-                              </div>
-                              <div className="mt-1 flex items-center justify-between gap-0.5 text-[7px] font-bold tabular-nums leading-none sm:text-[9px]">
-                                <span style={{ color: "#ff6b83" }}>{c.redPct.toFixed(0)}%</span>
-                                <span className="text-muted-foreground">{c.blackPct.toFixed(0)}%</span>
-                                <span className="text-foreground">{c.whitePct.toFixed(0)}%</span>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
                     <div className="flex flex-col gap-[var(--slot-gap,14px)]">
-                      {gridRows.map((row) => (
-                        <div key={row.key} className="flex items-start justify-center gap-0.5 sm:gap-2">
-                        <div
-                          className="grid items-start"
-                          style={{ gridTemplateColumns: historyGridTemplate, columnGap: "var(--gap-col, 8px)", justifyContent: "safe center", direction: inverse ? "rtl" : "ltr" }}
-                        >
+                      {gridRows.map((row, rowIndex) => (
+                        <div key={row.key} className="flex items-start justify-center gap-[var(--gap-col,8px)]">
                           {row.cells.map((cell, ci) => {
                             const [hh, mmPrefix] = row.label.split(":");
                             const hm = `${hh}:${mmPrefix[0]}${ci}`;
@@ -1109,93 +1059,90 @@ function Index() {
                             return (
                               <div
                                 key={ci}
-                                className="flex flex-col items-center gap-1"
-                                style={{ direction: inverse ? "rtl" : "ltr", minHeight: "var(--cell-min, calc(var(--stone-size, 44px) + 26px))" }}
+                                className="flex flex-col items-center"
+                                style={{ width: "var(--colW, 120px)", direction: "ltr" }}
                               >
-                                <span className={`inline-flex h-3.5 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-4 sm:px-2 sm:text-[9px] sm:tracking-widest ${badge ? badgeCls : "opacity-0"}`}>
-                                  {badge?.label ?? "·"}
-                                </span>
-                                <div className="flex flex-row items-start justify-center gap-[2px] sm:gap-0.5">
+                                {rowIndex === 0 && (
+                                  <div className="mb-2 flex w-full items-center justify-center">
+                                    <div className="flex h-5 w-full items-center justify-center rounded-md bg-white/5 text-[11px] font-bold tabular-nums text-muted-foreground sm:h-6">
+                                      {String(ci).padStart(1, "0")}
+                                    </div>
+                                  </div>
+                                )}
+
+                                <div className="flex flex-col items-center gap-1.5">
+                                  <span className={`inline-flex h-3.5 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-4 sm:px-2 sm:text-[9px] ${badge ? badgeCls : "opacity-0"}`}>
+                                    {badge?.label ?? "·"}
+                                  </span>
+                                <div className="grid grid-cols-2 gap-2">
                                   {(cell.length >= 2
                                     ? [cell[0], cell[1]]
                                     : cell.length === 1
                                       ? [cell[0], undefined]
                                       : [undefined, undefined]
                                   ).map((spin, i) => {
-                                    if (spin) {
-                                      return (
-                                        <TipMinerCard
-                                          key={(spin as Spin).id}
-                                          spin={spin as Spin}
-                                          highlightN={highlightN}
-                                          numbered={numerado}
-                                          showSeconds={exibirSegundos}
-                                          timeHighlight={destaqueHorario}
-                                          onClick={() =>
-                                            setHighlightN((h) => {
-                                              const next = new Set(h);
-                                              const n = (spin as Spin).n;
-                                              if (next.has(n)) next.delete(n);
-                                              else next.add(n);
-                                              return next;
-                                            })
-                                          }
-                                        />
-                                      );
-                                    }
-                                    if (pending) {
-                                      return (
-                                        <div key={`p-${ci}-${i}`} className="flex flex-col items-center gap-1" style={{ direction: "ltr" }}>
-                                          <div
-                                            className="relative flex h-[var(--stone-size,44px)] w-[var(--stone-size,44px)] items-center justify-center overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-emerald-400/40"
-                                          >
-                                            <div
-                                              className="absolute top-0 left-0 right-0 h-2.5 md:h-3 flex items-center justify-center flex-shrink-0 text-[5px] md:text-[6px] font-black leading-none tracking-wide z-10 cursor-default bg-emerald-500 text-white"
-                                              style={{ pointerEvents: "auto" }}
-                                            >
-                                              SINAL
-                                            </div>
-                                            <img
-                                              src={brancoTile.url}
-                                              alt="Sinal"
-                                              className="h-full w-full object-cover"
-                                              draggable={false}
+                                      if (spin) {
+                                        return (
+                                          <div key={(spin as Spin).id} className="flex flex-col items-center gap-1">
+                                            <TipMinerCard
+                                              spin={spin as Spin}
+                                              highlightN={highlightN}
+                                              numbered={numerado}
+                                              showSeconds={exibirSegundos}
+                                              timeHighlight={destaqueHorario}
+                                              showTime={false}
+                                              onClick={() =>
+                                                setHighlightN((h) => {
+                                                  const next = new Set(h);
+                                                  const n = (spin as Spin).n;
+                                                  if (next.has(n)) next.delete(n);
+                                                  else next.add(n);
+                                                  return next;
+                                                })
+                                              }
                                             />
+                                            <span className={`text-[10px] tabular-nums leading-none ${destaqueHorario ? "font-bold text-primary" : "text-muted-foreground"}`}>
+                                              {exibirSegundos ? spTimeWithSeconds(spin as Spin) : (spin as Spin).time}
+                                            </span>
                                           </div>
-                                          <span
-                                            className="font-mono tabular-nums text-muted-foreground"
-                                            style={{ fontSize: "var(--stone-time, 10px)" }}
-                                          >
-                                            {hm}
-                                          </span>
+                                        );
+                                      }
+                                      
+                                      if (pending && i === 0) {
+                                         return (
+                                          <div key={`p-${ci}-${i}`} className="flex flex-col items-center gap-1">
+                                            <div className="relative flex h-[var(--stone,52px)] w-[var(--stone,52px)] items-center justify-center overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-emerald-400/40">
+                                              <img
+                                                src={brancoTile.url}
+                                                alt="Sinal"
+                                                className="h-full w-full object-cover"
+                                                draggable={false}
+                                              />
+                                            </div>
+                                            <span className="text-[10px] tabular-nums text-muted-foreground">
+                                              {hm}
+                                            </span>
+                                          </div>
+                                        );
+                                      }
+
+                                      return (
+                                        <div key={`e-${ci}-${i}`} className="flex flex-col items-center gap-1">
+                                          <EmptySlot
+                                            prediction={slotPredictions[slotKey]}
+                                            onClick={() => cycleSlotPrediction(slotKey)}
+                                          />
+                                          <span className="select-none text-[10px] text-transparent">--:--</span>
                                         </div>
                                       );
-                                    }
-                                    const slotKey = `${hm}-${i}`;
-                                    return (
-                                      <EmptySlot
-                                        key={`e-${ci}-${i}`}
-                                        prediction={slotPredictions[slotKey]}
-                                        onClick={() => cycleSlotPrediction(slotKey)}
-                                      />
-                                    );
-                                  })}
+                                    })}
+                                  </div>
                                 </div>
-                              </div>
-                            );
-                          })}
-
-
-
-
-                        </div>
-                        {contarLinhas && (
-                          <span className="mt-1 shrink-0 rounded-full bg-primary/20 px-1.5 py-0.5 text-[8px] font-bold tabular-nums text-primary sm:px-2 sm:text-[10px]">
-                            {row.cells.reduce((a, c) => a + c.length, 0)}
-                          </span>
-                        )}
-                        </div>
-                      ))}
+                              );
+                            })}
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 ) : (
@@ -1325,10 +1272,12 @@ const TipMinerCard = memo(function TipMinerCard({
       <button
         type="button"
         onClick={onClick}
-        className={`flex h-[var(--stone-size,44px)] w-[var(--stone-size,44px)] items-center justify-center overflow-hidden rounded-md shadow-sm transition-[transform,opacity] duration-200 hover:-translate-y-0.5 animate-in fade-in zoom-in-95 ${
+        className={`flex items-center justify-center overflow-hidden rounded-md shadow-sm transition-[transform,opacity] duration-200 hover:-translate-y-0.5 animate-in fade-in zoom-in-95 ${
           isHit ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : ""
         }`}
         style={{
+          width: "var(--stone, 52px)",
+          height: "var(--stone-h, 50px)",
           background: isWhite ? "#ffffff" : bg,
           opacity: isActive ? 1 : 0.25,
           ...(delayStyle ?? {}),
@@ -1344,8 +1293,8 @@ const TipMinerCard = memo(function TipMinerCard({
             />
             {numbered && (
               <span
-                className="absolute inset-0 grid place-items-center font-black leading-none tabular-nums text-black/85"
-                style={{ fontSize: "var(--stone-num, 13px)" }}
+                className="absolute inset-0 grid place-items-center font-bold leading-none tabular-nums text-black/85"
+                style={{ fontSize: "14px" }}
               >
                 {spin.n}
               </span>
@@ -1353,8 +1302,14 @@ const TipMinerCard = memo(function TipMinerCard({
           </span>
         ) : (
           <div
-            className="flex h-[calc(var(--stone-size,44px)*0.75)] w-[calc(var(--stone-size,44px)*0.75)] items-center justify-center overflow-hidden rounded-full font-bold leading-none tabular-nums"
-            style={{ border: `2px solid ${ring}`, color: fg, fontSize: "var(--stone-num, 13px)" }}
+            className="flex items-center justify-center rounded-full font-bold leading-none tabular-nums"
+            style={{ 
+              height: "30px", 
+              width: "30px", 
+              border: `3px solid ${ring}`, 
+              color: fg, 
+              fontSize: "14px" 
+            }}
           >
             {spin.n}
           </div>
@@ -1366,7 +1321,7 @@ const TipMinerCard = memo(function TipMinerCard({
           className={`leading-none tabular-nums ${
             timeHighlight ? "font-bold text-primary" : "text-muted-foreground"
           }`}
-          style={{ fontSize: "var(--stone-time, 12px)" }}
+          style={{ fontSize: "12px" }}
         >
           {showSeconds ? spTimeWithSeconds(spin) : spin.time}
         </span>
@@ -1392,12 +1347,16 @@ const EmptySlot = memo(function EmptySlot({
         type="button"
         onClick={onClick}
         aria-label="Marcar previsão"
-        className={`flex h-[var(--stone-size,44px)] w-[var(--stone-size,44px)] items-center justify-center overflow-hidden rounded-md transition-colors ${
+        className={`flex items-center justify-center overflow-hidden rounded-md transition-colors ${
           prediction
             ? "shadow-sm hover:-translate-y-0.5"
             : "border border-dashed border-white/10 bg-white/[0.02] hover:bg-white/[0.06]"
         }`}
-        style={prediction ? { background: isWhite ? "#ffffff" : bg } : undefined}
+        style={{
+          width: "var(--stone, 52px)",
+          height: "var(--stone-h, 50px)",
+          background: prediction ? (isWhite ? "#ffffff" : bg) : undefined
+        }}
       >
         {prediction ? (
           isWhite ? (

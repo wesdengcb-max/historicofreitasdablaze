@@ -2,8 +2,8 @@ import { memo } from "react";
 import brancoTile from "@/assets/branco-tile.png.asset.json";
 import type { Color } from "./types";
 
-export const BLAZE_CARD_W = 48;
-export const BLAZE_CARD_TOP_H = 48;
+export const BLAZE_CARD_W = 52;
+export const BLAZE_CARD_TOP_H = 50;
 export const BLAZE_GAP_X = 8;
 export const BLAZE_GAP_Y = 14;
 
