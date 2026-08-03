@@ -1152,7 +1152,7 @@ function Index() {
                                                 })
                                               }
                                             />
-                                            <span className={`text-[10px] tabular-nums leading-none ${destaqueHorario ? "font-bold text-primary" : "text-muted-foreground"}`}>
+                                            <span className={`mt-1 text-[10px] tabular-nums leading-none ${destaqueHorario ? "font-bold text-primary" : "text-muted-foreground"}`}>
                                               {exibirSegundos ? spTimeWithSeconds(spin as Spin) : (spin as Spin).time}
                                             </span>
                                           </div>
@@ -1170,7 +1170,7 @@ function Index() {
                                                 draggable={false}
                                               />
                                             </div>
-                                            <span className="text-[10px] tabular-nums text-muted-foreground">
+                                            <span className="mt-1 text-[10px] tabular-nums text-muted-foreground">
                                               {hm}
                                             </span>
                                           </div>
@@ -1183,7 +1183,7 @@ function Index() {
                                             prediction={slotPredictions[slotKey]}
                                             onClick={() => cycleSlotPrediction(slotKey)}
                                           />
-                                          <span className="select-none text-[10px] text-transparent">--:--</span>
+                                          <span className="mt-1 select-none text-[10px] text-transparent">--:--</span>
                                         </div>
                                       );
                                       })}
@@ -1320,7 +1320,7 @@ const TipMinerCard = memo(function TipMinerCard({
 
   const delayStyle = delay > 0 ? { animationDelay: `${delay}s` } : undefined;
   return (
-    <div className="flex flex-col items-center gap-0.5">
+    <div className="flex flex-col items-center">
       <button
         type="button"
         onClick={onClick}
@@ -1370,7 +1370,7 @@ const TipMinerCard = memo(function TipMinerCard({
 
       {showTime && (
         <span
-          className={`leading-none tabular-nums ${
+          className={`mt-1 leading-none tabular-nums ${
             timeHighlight ? "font-bold text-primary" : "text-muted-foreground"
           }`}
           style={{ fontSize: "12px" }}
@@ -1394,7 +1394,7 @@ const EmptySlot = memo(function EmptySlot({
     prediction === "red" ? "#DE2143" : prediction === "black" ? "#16171d" : "#ffffff";
   const ring = isWhite ? "#16171d" : "#ffffff";
   return (
-    <div className="flex flex-col items-center gap-0.5">
+    <div className="flex flex-col items-center">
       <button
         type="button"
         onClick={onClick}
@@ -1427,7 +1427,7 @@ const EmptySlot = memo(function EmptySlot({
         ) : null}
       </button>
       <span
-        className="select-none leading-none text-transparent"
+        className="mt-1 select-none leading-none text-transparent"
         style={{ fontSize: "var(--stone-time, 12px)" }}
       >
         --:--
