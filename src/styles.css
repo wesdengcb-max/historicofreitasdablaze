@@ -173,35 +173,30 @@
 }
 
 /* ===== Métricas responsivas do histórico (mobile / tablet / desktop) =====
-   Mesma estrutura em todos os tamanhos (nunca vira card): apenas escala de
-   tamanhos, com rolagem horizontal quando não couber. */
+   Alinhamento pixel-perfect conforme referência:
+   Pedras: 48x48px, Gap: 8px (col), 14px (row), Col Width: 120px */
+:root {
+  --stone: 48px;
+  --colW: 120px;
+  --cell-min-h: 68px;
+  --slot-gap: 14px;
+  --gap-col: 8px;
+}
+
 .history-metrics {
-  /* Celular: 20 pedras por linha, lado a lado, com scroll horizontal */
-  --stone-size: 26px;
-  --stone-track: calc((var(--stone-size) * 2) + 2px);
-  --cell-min: calc(var(--stone-size) + 20px);
-  --stone-num: clamp(8px, calc(var(--stone-size) * 0.34), 14px);
-  --stone-time: clamp(7px, calc(var(--stone-size) * 0.28), 12px);
+  --stone-size: var(--stone);
+  --cell-min: var(--cell-min-h);
 }
-@media (min-width: 420px) {
-  .history-metrics { --stone-size: 30px; }
-}
-@media (min-width: 640px) {
-  .history-metrics { --stone-size: 32px; }
-}
-/* Tablet: praticamente igual ao desktop, só menor */
-@media (min-width: 768px) {
+
+@media (max-width: 1023px) {
+  /* Em mobile, mantemos as proporções mas permitimos escala se necessário
+     ou apenas scroll horizontal se o container for pequeno */
   .history-metrics {
-    --stone-size: clamp(28px, calc((100cqw - 28px) / 20), 52px);
-    --cell-min: calc(var(--stone-size) + 24px);
+    --stone-size: 48px;
+    --cell-min: 68px;
   }
 }
-@media (min-width: 1024px) {
-  .history-metrics {
-    --stone-size: clamp(34px, calc((100cqw - 44px) / 20), 74px);
-    --cell-min: calc(var(--stone-size) + 26px);
-  }
-}
+
 
 /* Rolagem horizontal suave do histórico */
 .history-scroll {
