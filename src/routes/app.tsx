@@ -1068,14 +1068,14 @@ function Index() {
                       : "Nenhum resultado no período selecionado."}
                   </div>
                 ) : viewMode === "colunas" ? (
-                  <div className="history-scroll max-w-full overflow-x-auto p-1 [container-type:inline-size] sm:p-3 lg:p-4">
+                  <div className="history-scroll max-w-full overflow-x-auto p-1 [container-type:inline-size] sm:p-2 lg:p-3">
                     <div className="flex flex-col gap-0">
                       {/* Cabeçalho 0-9 interno para Colunas Fixas */}
                       <div className="grid justify-center gap-[var(--gap-col,8px)] px-[1px] mb-3 sticky top-0 z-10 bg-background/40 backdrop-blur-sm" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "1274px", margin: "0 auto" }}>
                         {Array.from({ length: 10 }).map((_, ci) => (
                           <div
                             key={`header-inner-${ci}`}
-                            className="flex h-[22px] w-full items-center justify-center rounded-[6px] border border-white/10 bg-white/[0.03] text-[13px] font-medium tabular-nums text-[#eaeaea]"
+                            className="flex h-[24px] w-full items-center justify-center rounded-[6px] border border-white/5 bg-white/[0.04] text-[13px] font-bold tabular-nums text-[#eaeaea]"
                             style={{ width: "var(--colW, 120px)" }}
                           >
                             {ci}
@@ -1121,16 +1121,16 @@ function Index() {
                             return (
                               <div
                                 key={ci}
-                                className="flex flex-col items-center justify-center p-1 sm:p-2"
-                                style={{ width: "var(--colW, 120px)", height: "var(--cell-min-h, 66px)", direction: "ltr" }}
+                                className="flex flex-col items-center justify-center p-0.5 sm:p-1"
+                                style={{ width: "var(--colW, 120px)", height: "66px", direction: "ltr" }}
                               >
-                                <div className="relative flex flex-col items-center">
+                                <div className="relative flex flex-col items-center pt-2">
                                   {badge && (
-                                    <span className={`absolute -top-4 z-10 inline-flex h-3.5 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-4 sm:px-2 sm:text-[9px] ${badgeCls}`}>
+                                    <span className={`absolute top-0 z-10 inline-flex h-3 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-3.5 sm:px-1.5 sm:text-[8px] ${badgeCls}`}>
                                       {badge.label}
                                     </span>
                                   )}
-                                  <div className="flex items-start gap-[var(--gap-col,8px)]">
+                                  <div className="flex items-start gap-[var(--gap-col,8px)] h-[56px]">
                                     {(cell.length >= 2
                                       ? [cell[0], cell[1]]
                                       : cell.length === 1
@@ -1158,7 +1158,7 @@ function Index() {
                                                 })
                                               }
                                             />
-                                            <span className={`mt-1 text-[10px] tabular-nums leading-none ${destaqueHorario ? "font-bold text-primary" : "text-muted-foreground"}`}>
+                                            <span className={`mt-1 text-[10px] tabular-nums leading-none font-medium h-[12px] flex items-center ${destaqueHorario ? "text-primary font-bold" : "text-[#7b7c80]"}`}>
                                               {exibirSegundos ? spTimeWithSeconds(spin as Spin) : (spin as Spin).time}
                                             </span>
                                           </div>
@@ -1176,7 +1176,7 @@ function Index() {
                                                 draggable={false}
                                               />
                                             </div>
-                                            <span className="mt-1 text-[10px] tabular-nums text-muted-foreground">
+                                            <span className="mt-1 text-[10px] tabular-nums font-medium h-[12px] flex items-center text-[#7b7c80]">
                                               {hm}
                                             </span>
                                           </div>
@@ -1349,7 +1349,7 @@ const TipMinerCard = memo(function TipMinerCard({
       <button
         type="button"
         onClick={onClick}
-        className={`flex items-center justify-center overflow-hidden rounded-md shadow-sm transition-[transform,opacity] duration-200 hover:-translate-y-0.5 animate-in fade-in zoom-in-95 ${
+        className={`flex items-center justify-center overflow-hidden rounded-[6px] border border-white/[0.08] shadow-sm transition-[transform,opacity] duration-200 hover:-translate-y-0.5 animate-in fade-in zoom-in-95 ${
           isHit ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : ""
         }`}
         style={{
@@ -1383,9 +1383,10 @@ const TipMinerCard = memo(function TipMinerCard({
             style={{ 
               height: "30px", 
               width: "30px", 
-              border: `3px solid ${ring}`, 
+              border: `2px solid ${ring}`, 
               color: fg, 
-              fontSize: "14px" 
+              fontSize: "13px" 
+
             }}
           >
             {spin.n}
