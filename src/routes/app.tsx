@@ -1091,14 +1091,22 @@ function Index() {
                       </div>
 
                       {gridRows.map((row) => (
-                        <div key={row.key} className="flex flex-col gap-0 border-b border-white/[0.02]">
-                          <div className="grid justify-center gap-[var(--gap-col,8px)] relative px-[1px]" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "1274px", margin: "0 auto" }}>
-                            {/* Marcador de hora na lateral esquerda, visível apenas se Contar Linhas estiver ativo */}
-                            {contarLinhas && (
-                              <div className="absolute -left-12 top-1/2 -translate-y-1/2 rotate-180 [writing-mode:vertical-lr] text-[10px] font-black tracking-widest text-muted-foreground/30 uppercase select-none">
-                                {row.label}
-                              </div>
-                            )}
+                        <div
+                          key={row.key}
+                          className="mx-auto grid justify-center border-b border-white/[0.02]"
+                          style={{
+                            gridTemplateColumns: "70px repeat(10, 44px)",
+                            width: "514px",
+                            gap: "4px",
+                            height: "34px",
+                          }}
+                        >
+                          {/* Lateral: Horário da Linha */}
+                          <div className="flex items-center justify-center border-r border-white/[0.04] bg-[#171717]/50">
+                            <span className="text-[11px] font-medium text-zinc-500">
+                              {contarLinhas ? String(gridRows.length - gridRows.indexOf(row)).padStart(2, "0") : row.label}
+                            </span>
+                          </div>
                             {row.cells.map((cell, ci) => {
                             const [hh, mmPrefix] = row.label.split(":");
                             const hm = `${hh}:${mmPrefix[0]}${ci}`;
