@@ -1383,9 +1383,10 @@ const TipMinerCard = memo(function TipMinerCard({
             style={{ 
               height: "30px", 
               width: "30px", 
-              border: `3px solid ${ring}`, 
+              border: `2px solid ${ring}`, 
               color: fg, 
-              fontSize: "14px" 
+              fontSize: "13px" 
+
             }}
           >
             {spin.n}
