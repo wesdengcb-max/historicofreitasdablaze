@@ -1136,97 +1136,78 @@ function Index() {
                             return (
                               <div
                                 key={ci}
-                                className="flex flex-col items-center justify-center p-0.5 sm:p-1"
-                                style={{ width: "var(--colW, 120px)", height: "66px", direction: "ltr" }}
+                                className="relative flex items-center justify-center p-[6px]"
+                                style={{ width: "44px", height: "34px" }}
                               >
-                                <div className="relative flex flex-col items-center pt-2">
-                                  {badge && (
-                                    <span className={`absolute top-0 z-10 inline-flex h-3 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-3.5 sm:px-1.5 sm:text-[8px] ${badgeCls}`}>
-                                      {badge.label}
-                                    </span>
-                                  )}
-                                  <div className="flex items-start gap-[var(--gap-col,8px)] h-[56px]">
-                                    {(cell.length >= 2
-                                      ? [cell[0], cell[1]]
-                                      : cell.length === 1
-                                        ? [cell[0], undefined]
-                                        : [undefined, undefined]
-                                    ).map((spin, i) => {
-                                      const slotKey = `${hm}-${i}`;
-                                      if (spin) {
-                                        return (
-                                          <div key={(spin as Spin).id} className="flex flex-col items-center">
-                                            <BlazeResultCard
-                                              n={(spin as Spin).n}
-                                              color={(spin as Spin).color}
-                                              time={exibirSegundos ? spTimeWithSeconds(spin as Spin) : undefined}
-                                              numbered={numerado}
-                                              timeHighlight={destaqueHorario}
-                                              dimmed={highlightN.size > 0 && !highlightN.has((spin as Spin).n)}
-                                              selected={highlightN.has((spin as Spin).n)}
-                                              onClick={() =>
-                                                setHighlightN((h) => {
-                                                  const next = new Set(h);
-                                                  const n = (spin as Spin).n;
-                                                  if (next.has(n)) next.delete(n);
-                                                  else next.add(n);
-                                                  return next;
-                                                })
-                                              }
-                                            />
-                                          </div>
-                                        );
-                                      }
-                                      
-                                      if (pending && i === 0) {
-                                         return (
-                                          <div key={`p-${ci}-${i}`} className="flex flex-col items-center">
-                                            <div className="relative flex h-[48px] w-[48px] items-center justify-center overflow-hidden rounded-[6px] border border-white/10 bg-white shadow-sm ring-1 ring-emerald-400/40">
-                                              <img
-                                                src={brancoTile.url}
-                                                alt="Sinal"
-                                                className="h-full w-full object-cover"
-                                                draggable={false}
-                                              />
-                                            </div>
-                                            <span className="mt-1 text-[10px] tabular-nums font-medium h-[12px] flex items-center text-[#7b7c80]">
-                                              {hm}
-                                            </span>
-                                          </div>
-                                        );
-                                      }
+                                {badge && (
+                                  <span
+                                    className={`absolute top-0 z-10 inline-flex h-3 items-center rounded-full px-1 text-[7px] font-black tracking-wider ${badgeCls}`}
+                                    style={{ transform: "translateY(-50%)" }}
+                                  >
+                                    {badge.label}
+                                  </span>
+                                )}
 
-                                      const p = slotPredictions[slotKey];
-                                      return (
-                                        <div key={`e-${ci}-${i}`} className="flex flex-col items-center">
-                                          <button
-                                            type="button"
-                                            onClick={() => cycleSlotPrediction(slotKey)}
-                                            className={`relative flex h-[48px] w-[48px] items-center justify-center rounded-[6px] border border-dashed transition-colors hover:border-white/20 ${
-                                              p === "white"
-                                                ? "border-emerald-400/50 bg-emerald-400/5"
-                                                : p === "red"
-                                                  ? "border-red-500/50 bg-red-500/5"
-                                                  : p === "black"
-                                                    ? "border-slate-500/50 bg-slate-500/5"
-                                                    : "border-white/10"
-                                            }`}
-                                          >
-                                            <div className={`h-[30px] w-[30px] rounded-full ring-1 ring-inset transition-all ${
-                                              p === "white" ? "bg-white ring-white/20" :
-                                              p === "red" ? "bg-red-500 ring-red-400/20" :
-                                              p === "black" ? "bg-slate-800 ring-slate-700/20" :
-                                              "bg-transparent ring-transparent"
-                                            }`} />
-                                          </button>
-                                          <span className="mt-1 h-3 text-[10px] tabular-nums text-muted-foreground/30">
-                                            {hm}
-                                          </span>
-                                        </div>
-                                      );
-                                    })}
-                                  </div>
-                                </div>
+                                {(cell.length >= 1 ? [cell[0]] : [undefined]).map((spin, i) => {
+                                  const slotKey = `${hm}-${i}`;
+                                  if (spin) {
+                                    return (
+                                      <BlazeResultCard
+                                        key={(spin as Spin).id}
+                                        n={(spin as Spin).n}
+                                        color={(spin as Spin).color}
+                                        time={exibirSegundos ? spTimeWithSeconds(spin as Spin) : undefined}
+                                        numbered={numerado}
+                                        timeHighlight={destaqueHorario}
+                                        dimmed={highlightN.size > 0 && !highlightN.has((spin as Spin).n)}
+                                        selected={highlightN.has((spin as Spin).n)}
+                                        onClick={() =>
+                                          setHighlightN((h) => {
+                                            const next = new Set(h);
+                                            const n = (spin as Spin).n;
+                                            if (next.has(n)) next.delete(n);
+                                            else next.add(n);
+                                            return next;
+                                          })
+                                        }
+                                      />
+                                    );
+                                  }
+
+                                  if (pending && i === 0) {
+                                    return (
+                                      <div key={`p-${ci}-${i}`} className="relative flex h-[28px] w-[28px] items-center justify-center overflow-hidden rounded-full border border-white/10 bg-white shadow-sm ring-1 ring-emerald-400/40">
+                                        <img src={brancoTile.url} alt="Sinal" className="h-full w-full object-cover" draggable={false} />
+                                      </div>
+                                    );
+                                  }
+
+                                  const p = slotPredictions[slotKey];
+                                  return (
+                                    <button
+                                      key={`e-${ci}-${i}`}
+                                      type="button"
+                                      onClick={() => cycleSlotPrediction(slotKey)}
+                                      className={`relative flex h-[28px] w-[28px] items-center justify-center rounded-full border border-dashed transition-colors hover:border-white/20 ${
+                                        p === "white"
+                                          ? "border-emerald-400/50 bg-emerald-400/5"
+                                          : p === "red"
+                                            ? "border-red-500/50 bg-red-500/5"
+                                            : p === "black"
+                                              ? "border-slate-500/50 bg-slate-500/5"
+                                              : "border-white/10"
+                                      }`}
+                                    >
+                                      {p && (
+                                        <div
+                                          className={`h-[18px] w-[18px] rounded-full ring-1 ring-inset ${
+                                            p === "white" ? "bg-white ring-white/20" : p === "red" ? "bg-red-500 ring-red-400/20" : "bg-slate-800 ring-slate-700/20"
+                                          }`}
+                                        />
+                                      )}
+                                    </button>
+                                  );
+                                })}
                               </div>
                             );
                             })}
