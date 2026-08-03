@@ -1028,9 +1028,17 @@ function Index() {
                 ) : viewMode === "colunas" ? (
                   <div className="history-scroll w-full p-1 [container-type:inline-size] sm:p-3 lg:p-4">
                     <div className="flex flex-col gap-[var(--slot-gap,14px)]">
-                      {gridRows.map((row, rowIndex) => (
-                        <div key={row.key} className="flex items-start justify-center gap-[var(--gap-col,8px)]">
-                          {row.cells.map((cell, ci) => {
+                      {gridRows.map((row) => (
+                        <div key={row.key} className="flex flex-col gap-3">
+                          <div className="flex items-center gap-2 px-2">
+                            <div className="h-px flex-1 bg-white/5" />
+                            <span className="text-[10px] font-bold tracking-widest text-muted-foreground/40 uppercase">
+                              {row.label}
+                            </span>
+                            <div className="h-px flex-1 bg-white/5" />
+                          </div>
+                          <div className="flex items-start justify-center gap-[var(--gap-col,8px)]">
+                            {row.cells.map((cell, ci) => {
                             const [hh, mmPrefix] = row.label.split(":");
                             const hm = `${hh}:${mmPrefix[0]}${ci}`;
                             const cellSignals = signalsByHM.get(hm) ?? [];
