@@ -1,16 +1,24 @@
 import { motion } from "framer-motion";
 import { X } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
+import { useEffect } from "react";
 import type { Spin } from "./types";
 import brancoVip from "@/assets/branco-vip.png.asset.json";
-
 
 type Props = {
   spin: Spin | null;
   onClose: () => void;
+  autoCloseTime?: number;
 };
 
-export function WhiteAlert({ spin, onClose }: Props) {
+export function WhiteAlert({ spin, onClose, autoCloseTime = 5000 }: Props) {
+  useEffect(() => {
+    if (spin) {
+      const timer = setTimeout(onClose, autoCloseTime);
+      return () => clearTimeout(timer);
+    }
+  }, [spin, onClose, autoCloseTime]);
+
   return (
     <AnimatePresence>
       {spin && (
