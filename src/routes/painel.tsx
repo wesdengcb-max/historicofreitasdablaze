@@ -478,7 +478,7 @@ function Index() {
     } catch {
       /* noop */
     }
-    const t = setTimeout(() => setWhiteFlash(null), 8000);
+    const t = setTimeout(() => setWhiteFlash(null), 5000);
     return () => clearTimeout(t);
   }, [spins, whiteAlert]);
 
