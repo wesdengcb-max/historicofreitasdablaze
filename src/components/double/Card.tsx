@@ -17,19 +17,19 @@ export function Card({ title, subtitle, icon, action, children, delay = 0, class
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={`glass-card rounded-2xl p-3 sm:p-5 lg:p-7 ${className}`}
+      className={`rounded-[8px] border border-[#2a3545] bg-[#121923] p-[26px] ${className}`}
     >
       {(title || action) && (
-        <header className="mb-5 flex items-center justify-between gap-4">
+        <header className="mb-4 flex items-center justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3">
             {icon && (
-              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-white/5 text-primary ring-1 ring-white/5">
+              <span className="text-primary">
                 {icon}
               </span>
             )}
             <div className="min-w-0">
-              {title && <h2 className="truncate text-sm font-semibold tracking-tight text-foreground">{title}</h2>}
-              {subtitle && <p className="truncate text-xs text-muted-foreground">{subtitle}</p>}
+              {title && <h2 className="truncate text-[14px] font-medium tracking-tight text-[#eaeaea]">{title}</h2>}
+              {subtitle && <p className="truncate text-[11px] text-[#8ebcf0]">{subtitle}</p>}
             </div>
           </div>
           {action}

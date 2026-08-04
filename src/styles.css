@@ -180,8 +180,9 @@
   --stone-h: 48px;
   --colW: 120px;
   --cell-min-h: 66px;
-  --slot-gap: 14px;
-  --gap-col: 8px;
+  --slot-gap: 16px;
+  --gap-col: 24px;
+  --history-row-h: 66px;
 }
 
 .history-metrics {

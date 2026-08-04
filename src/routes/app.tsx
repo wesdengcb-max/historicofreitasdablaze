@@ -57,7 +57,7 @@ const EstrategiasSection = lazy(() =>
 
 function SectionFallback() {
   return (
-    <div className="mx-auto flex w-full max-w-[1720px] items-center justify-center px-3 py-24 sm:px-8">
+    <div className="mx-auto flex w-full max-w-[1366px] items-center justify-center px-3 py-24 sm:px-8">
       <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
     </div>
   );
@@ -668,7 +668,7 @@ function Index() {
       className="history-metrics min-h-dvh [--cols:10]"
     >
       <header className="sticky top-0 z-30 border-b border-white/5 bg-background/70 backdrop-blur-xl">
-        <div className="mx-auto grid h-12 max-w-[1720px] grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-2 sm:h-14 sm:gap-4 sm:px-6 lg:h-16 lg:px-8">
+        <div className="mx-auto grid h-12 max-w-[1366px] grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-2 sm:h-14 sm:gap-4 sm:px-6 lg:h-16 lg:px-8">
           <div className="flex min-w-0 items-center gap-3">
             <div
               className="grid h-7 w-7 shrink-0 place-items-center overflow-hidden rounded-xl bg-white ring-1 ring-white/40 sm:h-9 sm:w-9"
@@ -727,7 +727,7 @@ function Index() {
       ) : section === "estrategias" ? (
         <Suspense fallback={<SectionFallback />}><EstrategiasSection /></Suspense>
       ) : section !== "dashboard" ? (
-        <main className="mx-auto flex w-full max-w-[1720px] flex-col gap-5 px-3 py-10 sm:gap-6 sm:px-8 sm:py-16">
+        <main className="mx-auto flex w-full max-w-[1366px] flex-col gap-5 px-3 py-10 sm:gap-6 sm:px-8 sm:py-16">
           <Card delay={0.05}>
             <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
               <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
@@ -742,7 +742,7 @@ function Index() {
           </Card>
         </main>
       ) : (
-      <main className="mx-auto flex w-full max-w-[1720px] flex-col gap-3 px-1.5 py-3 sm:gap-5 sm:px-4 sm:py-6 lg:gap-6 lg:px-8 lg:py-10">
+      <main className="mx-auto flex w-full max-w-[1366px] flex-col gap-3 px-1.5 py-3 sm:gap-5 sm:px-4 sm:py-6 lg:gap-6 lg:px-8 lg:py-10 bg-[#0d131d]">
 
         <section className="space-y-3 sm:space-y-5 lg:space-y-6">
           <Card delay={0.05}>
@@ -858,7 +858,7 @@ function Index() {
           <StrategyTabs spins={visibleSpins} />
 
           <Card
-            title="Histórico"
+            title="Giros anteriores"
             subtitle={`${total} rodadas · horário de Brasília`}
             icon={<TrendingUp className="h-3.5 w-3.5" />}
             delay={0.08}
@@ -1068,14 +1068,14 @@ function Index() {
                       : "Nenhum resultado no período selecionado."}
                   </div>
                 ) : viewMode === "colunas" ? (
-                  <div className="history-scroll max-w-full overflow-x-auto p-1 [container-type:inline-size] sm:p-3 lg:p-4">
+                  <div className="history-scroll max-w-full overflow-x-auto p-1 [container-type:inline-size] sm:p-2 lg:p-3">
                     <div className="flex flex-col gap-0">
                       {/* Cabeçalho 0-9 interno para Colunas Fixas */}
-                      <div className="grid justify-center gap-[var(--gap-col,8px)] px-[1px] mb-3 sticky top-0 z-10 bg-background/40 backdrop-blur-sm" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "1274px", margin: "0 auto" }}>
+                      <div className="grid justify-center gap-[var(--gap-col,8px)] px-[1px] mb-1 sticky top-0 z-10 bg-background/40 backdrop-blur-sm" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "1274px", margin: "0 auto" }}>
                         {Array.from({ length: 10 }).map((_, ci) => (
                           <div
                             key={`header-inner-${ci}`}
-                            className="flex h-[22px] w-full items-center justify-center rounded-[6px] border border-white/10 bg-white/[0.03] text-[13px] font-medium tabular-nums text-[#eaeaea]"
+                            className="flex h-[23px] w-[137px] items-center justify-center rounded-[6px] border border-[#2a3545] bg-transparent text-[14px] font-medium tabular-nums text-white"
                             style={{ width: "var(--colW, 120px)" }}
                           >
                             {ci}
@@ -1121,16 +1121,16 @@ function Index() {
                             return (
                               <div
                                 key={ci}
-                                className="flex flex-col items-center justify-center p-1 sm:p-2"
-                                style={{ width: "var(--colW, 120px)", height: "var(--cell-min-h, 66px)", direction: "ltr" }}
+                                className="flex flex-col items-center justify-center p-0.5 sm:p-1"
+                                style={{ width: "var(--colW, 120px)", height: "66px", direction: "ltr" }}
                               >
-                                <div className="relative flex flex-col items-center">
+                                <div className="relative flex flex-col items-center pt-2">
                                   {badge && (
-                                    <span className={`absolute -top-4 z-10 inline-flex h-3.5 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-4 sm:px-2 sm:text-[9px] ${badgeCls}`}>
+                                    <span className={`absolute top-0 z-10 inline-flex h-3 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-3.5 sm:px-1.5 sm:text-[8px] ${badgeCls}`}>
                                       {badge.label}
                                     </span>
                                   )}
-                                  <div className="flex items-start gap-[var(--gap-col,8px)]">
+                                  <div className="flex items-start gap-[var(--gap-col,8px)] h-[56px]">
                                     {(cell.length >= 2
                                       ? [cell[0], cell[1]]
                                       : cell.length === 1
@@ -1158,7 +1158,7 @@ function Index() {
                                                 })
                                               }
                                             />
-                                            <span className={`mt-1 text-[10px] tabular-nums leading-none ${destaqueHorario ? "font-bold text-primary" : "text-muted-foreground"}`}>
+                                            <span className={`mt-[5px] text-[11px] tabular-nums leading-none font-medium h-[11px] flex items-center ${destaqueHorario ? "text-primary font-bold" : "text-[#8ebcf0]"}`}>
                                               {exibirSegundos ? spTimeWithSeconds(spin as Spin) : (spin as Spin).time}
                                             </span>
                                           </div>
@@ -1168,7 +1168,7 @@ function Index() {
                                       if (pending && i === 0) {
                                          return (
                                           <div key={`p-${ci}-${i}`} className="flex flex-col items-center">
-                                            <div className="relative flex h-[48px] w-[48px] items-center justify-center overflow-hidden rounded-[6px] border border-white/10 bg-white shadow-sm ring-1 ring-emerald-400/40">
+                                            <div className="relative flex h-[48px] w-[48px] items-center justify-center overflow-hidden rounded-[6px] border-[2.5px] border-emerald-400 bg-white shadow-sm">
                                               <img
                                                 src={brancoTile.url}
                                                 alt="Sinal"
@@ -1176,22 +1176,39 @@ function Index() {
                                                 draggable={false}
                                               />
                                             </div>
-                                            <span className="mt-1 text-[10px] tabular-nums text-muted-foreground">
+                                            <span className="mt-[5px] text-[11px] tabular-nums font-medium h-[11px] flex items-center text-[#8ebcf0]">
                                               {hm}
                                             </span>
                                           </div>
                                         );
                                       }
 
+                                      const p = slotPredictions[slotKey];
                                       return (
                                         <div key={`e-${ci}-${i}`} className="flex flex-col items-center">
-                                          <div className="h-[48px] w-[48px]">
-                                            <EmptySlot
-                                              prediction={slotPredictions[slotKey]}
-                                              onClick={() => cycleSlotPrediction(slotKey)}
-                                            />
-                                          </div>
-                                          <span className="mt-1 select-none text-[10px] text-transparent">--:--</span>
+                                          <button
+                                            type="button"
+                                            onClick={() => cycleSlotPrediction(slotKey)}
+                                            className={`relative flex h-[48px] w-[48px] items-center justify-center rounded-[6px] border border-dashed transition-colors hover:border-white/20 ${
+                                              p === "white"
+                                                ? "border-emerald-400/50 bg-emerald-400/5"
+                                                : p === "red"
+                                                  ? "border-red-500/50 bg-red-500/5"
+                                                  : p === "black"
+                                                    ? "border-slate-500/50 bg-slate-500/5"
+                                                    : "border-[#3b5270] bg-[#233248]"
+                                            }`}
+                                          >
+                                            <div className={`h-[32px] w-[32px] rounded-full border-2 transition-all ${
+                                              p === "white" ? "bg-white border-white/20" :
+                                              p === "red" ? "bg-red-500 border-red-400/20" :
+                                              p === "black" ? "bg-slate-800 border-slate-700/20" :
+                                              "bg-transparent border-[#5a6d84]"
+                                            }`} />
+                                          </button>
+                                          <span className="mt-[5px] h-[11px] text-[11px] font-medium tabular-nums text-[#8ebcf0]">
+                                            {hm}
+                                          </span>
                                         </div>
                                       );
                                     })}
@@ -1332,7 +1349,7 @@ const TipMinerCard = memo(function TipMinerCard({
       <button
         type="button"
         onClick={onClick}
-        className={`flex items-center justify-center overflow-hidden rounded-md shadow-sm transition-[transform,opacity] duration-200 hover:-translate-y-0.5 animate-in fade-in zoom-in-95 ${
+        className={`flex items-center justify-center overflow-hidden rounded-[6px] border border-white/[0.08] shadow-sm transition-[transform,opacity] duration-200 hover:-translate-y-0.5 animate-in fade-in zoom-in-95 ${
           isHit ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : ""
         }`}
         style={{
@@ -1366,9 +1383,10 @@ const TipMinerCard = memo(function TipMinerCard({
             style={{ 
               height: "30px", 
               width: "30px", 
-              border: `3px solid ${ring}`, 
+              border: `2px solid ${ring}`, 
               color: fg, 
-              fontSize: "14px" 
+              fontSize: "13px" 
+
             }}
           >
             {spin.n}
