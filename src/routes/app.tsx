@@ -1452,9 +1452,12 @@ const TipMinerCard = memo(function TipMinerCard({
       {showTime && (
         <span
           className={`mt-1 leading-none tabular-nums ${
-            timeHighlight ? "font-bold text-primary" : "text-muted-foreground"
+            timeHighlight ? "font-bold text-primary" : ""
           }`}
-          style={{ fontSize: "12px" }}
+          style={{ 
+            fontSize: "12px",
+            color: timeHighlight ? undefined : "var(--time-text)"
+          }}
         >
           {showSeconds ? spTimeWithSeconds(spin) : spin.time}
         </span>
