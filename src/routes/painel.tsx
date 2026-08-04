@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 import { lazy, memo, Suspense, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
@@ -20,6 +20,8 @@ import {
   ChevronDown,
   BarChart3,
   Send,
+  Crown,
+  Lock,
 } from "lucide-react";
 
 import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
@@ -43,6 +45,7 @@ import freitasLogo from "@/assets/freitas-logo.jpg.asset.json";
 import { getSignals, subscribeSignals, type StoredSignal } from "@/lib/signalsStore";
 import { TopNav } from "@/components/TopNav";
 import { type SectionId } from "@/lib/sectionStore";
+
 const SinaisPage = lazy(() =>
   import("@/components/sections/SinaisSection").then((m) => ({ default: m.SinaisPage })),
 );
@@ -213,6 +216,8 @@ function computeRange(
 
 function Index() {
   const [section, setSection] = useState<SectionId>("historico");
+  const [isVip, setIsVip] = useState(false);
+  const navigate = useNavigate();
   const [inverse, setInverse] = useState(false);
   const [viewMode, setViewMode] = useState<"colunas" | "lista">("colunas");
   // Em celular/tablet inicia em lista (sentido normal); desktop mantém colunas fixas.
@@ -684,7 +689,7 @@ function Index() {
 
           <div className="flex shrink-0 items-center gap-1 sm:gap-3">
             <StatusPill status={status} message={errorMsg} />
-            <ThemeToggle />
+
             <button
               type="button"
               onClick={() => toggleWhiteAlert(!whiteAlert)}
@@ -702,6 +707,18 @@ function Index() {
             >
               <BarChart3 className="h-4 w-4" />
             </button>
+            <button
+              type="button"
+              onClick={() => setIsVip(!isVip)}
+              className={`grid h-8 w-8 place-items-center rounded-xl transition-all duration-300 sm:h-10 sm:w-10 lg:h-11 lg:w-11 ${
+                isVip 
+                ? "bg-gradient-to-tr from-amber-500 to-yellow-300 text-black shadow-[0_0_20px_rgba(245,158,11,0.4)] scale-110" 
+                : "bg-white/5 border border-white/10 text-white/40 hover:text-white hover:border-white/20"
+              }`}
+              title={isVip ? "Membro VIP Ativo" : "Acessar Área VIP"}
+            >
+              <Crown className={`h-4 w-4 lg:h-5 lg:w-5 ${isVip ? "animate-pulse" : ""}`} />
+            </button>
             <a
               href="https://t.me/freitaswhite"
               target="_blank"
@@ -716,7 +733,21 @@ function Index() {
         </div>
       </header>
 
-      <TopNav activeSection={section} onSectionChange={setSection} />
+      <TopNav 
+        activeSection={section} 
+        onSectionChange={(id) => {
+          if (id === "historico") {
+            setSection(id);
+          } else if (isVip) {
+            setSection(id);
+          } else {
+            // Se não for VIP, redireciona para a home para login/compra
+            // ou poderíamos mostrar um modal, mas o pedido implica bloqueio
+            navigate({ to: "/" });
+          }
+        }} 
+        isVip={isVip} 
+      />
 
       {section === "sinais" ? (
         <Suspense fallback={<SectionFallback />}><SinaisPage /></Suspense>
@@ -1525,7 +1556,7 @@ const StatusPill = memo(function StatusPill({
 }) {
   const cls =
     status === "live"
-      ? "border-positive/25 bg-positive/10 text-positive"
+      ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-500"
       : status === "error"
         ? "border-destructive/30 bg-destructive/10 text-destructive"
         : "border-white/10 bg-white/5 text-muted-foreground";
@@ -1534,7 +1565,7 @@ const StatusPill = memo(function StatusPill({
   return (
     <span
       title={message}
-      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-medium ${cls}`}
+      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-bold uppercase tracking-wider h-8 sm:h-10 lg:h-11 ${cls}`}
     >
       {status === "error" ? <WifiOff className="h-3.5 w-3.5" /> : <Wifi className="h-3.5 w-3.5" />}
       <span className="hidden sm:inline">{label}</span>
