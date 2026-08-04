@@ -237,12 +237,25 @@ export function PatternValidator({ spins }: { spins: Spin[] }) {
         </div>
       </div>
       <div className="p-6">
-        {!open ? (
-          <div className="flex items-center justify-center py-4 text-xs font-black uppercase tracking-widest text-[#9CA3AF] font-outfit">
-            {pattern.length} pedras • {stats.wins}V / {stats.losses}D {currentlyMatches && "• ATIVO"}
-          </div>
-        ) : (
-          <div className="animate-in fade-in slide-in-from-top-1 duration-200">
+        <AnimatePresence initial={false} mode="wait">
+          {!open ? (
+            <motion.div
+              key="closed"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="flex items-center justify-center py-4 text-xs font-black uppercase tracking-widest text-[#9CA3AF] font-outfit"
+            >
+              {pattern.length} pedras • {stats.wins}V / {stats.losses}D {currentlyMatches && "• ATIVO"}
+            </motion.div>
+          ) : (
+            <motion.div
+              key="open"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden"
+            >
             {/* Header row: name + premium hint */}
             <div className="mb-4 grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3">
               <div className="inline-flex items-center gap-2 rounded-lg bg-primary/15 px-3 py-1.5 text-xs font-semibold text-primary ring-1 ring-primary/30">
