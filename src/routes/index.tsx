@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, BarChart3 } from "lucide-react";
 import { useMemo, useState } from "react";
-import kingImg from "@/assets/freitas-king.png.asset.json";
+import kingImg from "@/assets/freitas-white-hero.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -50,45 +50,17 @@ function LandingPage() {
   );
 
   return (
-    <div className="relative min-h-[100svh] w-full overflow-hidden bg-[#050505] text-white">
-      {/* Premium background effects */}
+    <div className="relative min-h-[100svh] w-full overflow-hidden bg-black text-white">
+      {/* Black Background without extra overlays as requested */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(circle at 50% 0%, rgba(255, 31, 61, 0.25) 0%, transparent 70%), radial-gradient(circle at 0% 100%, rgba(255, 31, 61, 0.1) 0%, transparent 50%), radial-gradient(circle at 100% 100%, rgba(255, 31, 61, 0.1) 0%, transparent 50%)",
-        }}
-      />
-      <div className="absolute inset-0 opacity-[0.05] pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
-      {/* Grid overlay - Enhanced contrast and depth */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.12]"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(255,31,61,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,31,61,0.2) 1px, transparent 1px)",
-          backgroundSize: "64px 64px",
-          maskImage:
-            "radial-gradient(ellipse 80% 60% at 50% 50%, black 20%, transparent 95%)",
+            "radial-gradient(circle at 50% 50%, rgba(255, 0, 0, 0.15) 0%, transparent 80%)",
         }}
       />
 
-      {/* Particles */}
-      {particles.map((p) => (
-        <span
-          key={p.id}
-          className={`absolute rounded-full ${p.color} animate-[floaty_var(--d)_ease-in-out_infinite]`}
-          style={{
-            left: `${p.left}%`,
-            top: `${p.top}%`,
-            width: p.size,
-            height: p.size,
-            animationDuration: `${p.duration}s`,
-            animationDelay: `${p.delay}s`,
-          }}
-        />
-      ))}
 
       {/* Top right icon */}
       <Link
@@ -120,63 +92,13 @@ function LandingPage() {
           </span>
         </div>
 
-        {/* Hero image — o Rei da Blaze */}
-        <div className="relative flex aspect-square w-[min(46vh,240px)] items-center justify-center sm:w-[min(42vh,280px)] md:w-[min(44vh,320px)]">
-          {/* red glow halo */}
-          <span
-            aria-hidden
-            className="pointer-events-none absolute left-1/2 top-1/2 h-[120%] w-[120%] rounded-full"
-            style={{
-              background:
-                "radial-gradient(circle, rgba(229,57,53,0.55) 0%, rgba(229,57,53,0.25) 35%, transparent 70%)",
-              filter: "blur(24px)",
-              animation: "kingGlow 4.5s ease-in-out infinite",
-            }}
-          />
-          {/* rotating ring */}
-          <span
-            aria-hidden
-            className="pointer-events-none absolute left-1/2 top-1/2 h-[108%] w-[108%] rounded-full"
-            style={{
-              border: "1px solid rgba(229,57,53,0.35)",
-              boxShadow:
-                "inset 0 0 30px rgba(229,57,53,0.25), 0 0 30px rgba(229,57,53,0.25)",
-              animation: "ringSpin 22s linear infinite",
-            }}
-          />
-          {/* floating portrait */}
-          <div
-            className="relative h-full w-full overflow-hidden rounded-full ring-1 ring-red-500/40 animate-[fadeUp_0.9s_ease-out_0.3s_both]"
-            style={{
-              boxShadow:
-                "0 30px 80px -20px rgba(229,57,53,0.6), inset 0 0 40px rgba(0,0,0,0.6)",
-            }}
-          >
+        {/* Hero image — Freitas White */}
+        <div className="relative flex w-full max-w-[600px] items-center justify-center animate-[fadeUp_0.9s_ease-out_0.3s_both]">
+          <div className="relative w-full aspect-square md:aspect-[4/3] overflow-hidden rounded-2xl shadow-2xl shadow-red-900/20">
             <img
               src={kingImg.url}
-              alt="Freitas da Blaze"
-              draggable={false}
-              className="h-full w-full select-none object-cover"
-              style={{ animation: "kingFloat 6s ease-in-out infinite" }}
-            />
-            {/* diagonal light sweep */}
-            <span
-              aria-hidden
-              className="pointer-events-none absolute inset-y-0 left-0 w-1/3"
-              style={{
-                background:
-                  "linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent)",
-                animation: "sweep 5.5s ease-in-out infinite",
-              }}
-            />
-            {/* inner vignette to blend with page */}
-            <span
-              aria-hidden
-              className="pointer-events-none absolute inset-0 rounded-full"
-              style={{
-                background:
-                  "radial-gradient(circle at 50% 50%, transparent 55%, rgba(0,0,0,0.55) 100%)",
-              }}
+              alt="Freitas White"
+              className="h-full w-full object-contain"
             />
           </div>
         </div>
