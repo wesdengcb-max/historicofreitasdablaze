@@ -203,10 +203,10 @@ function PreviousResults({ results }: { results: Result[] }) {
 function SmallTile({ n, color }: { n: number; color: Color }) {
   const bg =
     color === "red"
-      ? "var(--gradient-red)"
+      ? "linear-gradient(180deg, #FF3554 0%, #FF1F3D 100%)"
       : color === "black"
-        ? "var(--gradient-black)"
-        : "linear-gradient(160deg, oklch(0.35 0.02 260), oklch(0.22 0.014 260))";
+        ? "linear-gradient(180deg, #2A2A2A 0%, #1A1A1A 100%)"
+        : "#FFFFFF";
   return (
     <div
       className="grid place-items-center h-7 w-7 rounded-md border border-white/10 text-white text-[11px] font-bold tabular-nums"
@@ -220,7 +220,7 @@ function SmallTile({ n, color }: { n: number; color: Color }) {
           draggable={false}
         />
       ) : (
-        <span className="grid place-items-center h-5 w-5 rounded-full border border-white/50">
+        <span className="grid place-items-center h-5 w-5 rounded-full border border-white/50 font-outfit">
           {n}
         </span>
       )}
