@@ -372,8 +372,8 @@ export function PatternNotifier({ spins }: { spins: Spin[] }) {
               )}
             </aside>
           </div>
-        </>
-      )}
+        )}
+      </div>
     </Card>
   );
 }
