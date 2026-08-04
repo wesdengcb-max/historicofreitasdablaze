@@ -79,7 +79,7 @@ function LandingPage() {
       {/* Content */}
       <main className="relative z-10 mx-auto flex min-h-[100svh] max-w-4xl flex-col items-center justify-center gap-4 px-4 py-8 text-center sm:gap-6 sm:px-6">
         <p className="text-[10px] font-black uppercase tracking-[0.5em] text-[#FF1F3D] animate-[fadeIn_0.6s_ease-out_both] sm:text-[12px] font-outfit">
-          Freitas da Blaze
+          Freitas White
         </p>
 
         <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-400/5 px-4 py-1 animate-[fadeIn_0.6s_ease-out_0.15s_both]">
@@ -118,7 +118,7 @@ function LandingPage() {
         </h1>
 
         <p className="max-w-md text-sm text-white/70 sm:text-base animate-[fadeUp_0.6s_ease-out_0.55s_both]">
-          A versão 2.0 do Freitas da Blaze está no ar.
+          A versão 2.0 do Freitas White está no ar.
         </p>
 
         <div className="mt-2 animate-[fadeUp_0.6s_ease-out_0.75s_both]">
