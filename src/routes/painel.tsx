@@ -215,6 +215,7 @@ function computeRange(
 
 function Index() {
   const [section, setSection] = useState<SectionId>("historico");
+  const [isVip, setIsVip] = useState(false);
   const [inverse, setInverse] = useState(false);
   const [viewMode, setViewMode] = useState<"colunas" | "lista">("colunas");
   // Em celular/tablet inicia em lista (sentido normal); desktop mantém colunas fixas.
@@ -704,6 +705,18 @@ function Index() {
             >
               <BarChart3 className="h-4 w-4" />
             </button>
+            <button
+              type="button"
+              onClick={() => setIsVip(!isVip)}
+              className={`grid h-8 w-8 place-items-center rounded-xl transition-all duration-300 sm:h-10 sm:w-10 lg:h-11 lg:w-11 ${
+                isVip 
+                ? "bg-gradient-to-tr from-amber-500 to-yellow-300 text-black shadow-[0_0_20px_rgba(245,158,11,0.4)] scale-110" 
+                : "bg-white/5 border border-white/10 text-white/40 hover:text-white hover:border-white/20"
+              }`}
+              title={isVip ? "Membro VIP Ativo" : "Acessar Área VIP"}
+            >
+              <Crown className={`h-4 w-4 lg:h-5 lg:w-5 ${isVip ? "animate-pulse" : ""}`} />
+            </button>
             <a
               href="https://t.me/freitaswhite"
               target="_blank"
@@ -718,7 +731,7 @@ function Index() {
         </div>
       </header>
 
-      <TopNav activeSection={section} onSectionChange={setSection} />
+      <TopNav activeSection={section} onSectionChange={setSection} isVip={isVip} />
 
       {section === "sinais" ? (
         <Suspense fallback={<SectionFallback />}><SinaisPage /></Suspense>
