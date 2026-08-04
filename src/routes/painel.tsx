@@ -903,6 +903,25 @@ function Index() {
               <div className="flex items-center gap-3">
                 <button
                   type="button"
+                  onClick={() => {
+                    if (isVip) {
+                      setStatsOpen(!statsOpen);
+                    } else {
+                      navigate({ to: "/" });
+                    }
+                  }}
+                  className={`grid h-8 w-8 place-items-center rounded-lg border transition-all duration-200 ${
+                    statsOpen 
+                      ? "border-[#FF1F3D]/30 bg-[#FF1F3D]/10 text-white shadow-[0_0_10px_rgba(255,31,61,0.2)]" 
+                      : "border-white/10 bg-white/5 text-muted-foreground hover:bg-white/[0.09] hover:text-foreground"
+                  }`}
+                  aria-label="Alternar estatísticas"
+                  title="Estatísticas do histórico"
+                >
+                  <BarChart3 className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
                   onClick={() => setFullscreen(true)}
                   className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 bg-white/5 text-muted-foreground transition-colors hover:bg-white/[0.09] hover:text-foreground"
                   aria-label="Tela cheia"
