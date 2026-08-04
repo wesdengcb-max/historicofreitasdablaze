@@ -153,14 +153,12 @@ function LandingPage() {
             <div className="space-y-2">
               <label className="text-[11px] font-bold uppercase tracking-wider text-white/30">E-mail</label>
               <div className="flex h-12 w-full items-center rounded-xl border border-white/5 bg-[#111111] px-4">
-                <div className="mr-3 h-4 w-4 text-white/20" />
                 <div className="h-2 w-24 rounded bg-white/5" />
               </div>
             </div>
             <div className="space-y-2">
               <label className="text-[11px] font-bold uppercase tracking-wider text-white/30">Senha</label>
               <div className="flex h-12 w-full items-center rounded-xl border border-white/5 bg-[#111111] px-4">
-                <div className="mr-3 h-4 w-4 text-white/20" />
                 <div className="h-2 w-32 rounded bg-white/5" />
               </div>
             </div>
