@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 import { lazy, memo, Suspense, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
@@ -20,16 +20,15 @@ import {
   ChevronDown,
   BarChart3,
   Send,
-  Crown,
-  Lock,
 } from "lucide-react";
 
 import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
 import { Card } from "@/components/double/Card";
 import { ResultCircle } from "@/components/double/ResultCircle";
 import { Switch } from "@/components/double/Switch";
-import { WhiteAlert } from "@/components/double/WhiteAlert";
 import { WhiteCelebration, WhiteAlertToggleFx } from "@/components/double/WhiteCelebration";
+import { StrategyTabs } from "@/components/double/StrategyTabs";
+import { LeftStatsDrawer } from "@/components/double/LeftStatsDrawer";
 
 
 import { colorOf, fmtTime, type Spin } from "@/components/double/types";
@@ -45,8 +44,7 @@ import freitasLogo from "@/assets/freitas-logo.jpg.asset.json";
 
 import { getSignals, subscribeSignals, type StoredSignal } from "@/lib/signalsStore";
 import { TopNav } from "@/components/TopNav";
-import { type SectionId } from "@/lib/sectionStore";
-
+import { useSection } from "@/lib/sectionStore";
 const SinaisPage = lazy(() =>
   import("@/components/sections/SinaisSection").then((m) => ({ default: m.SinaisPage })),
 );
@@ -67,7 +65,7 @@ function SectionFallback() {
 
 
 
-export const Route = createFileRoute("/painel")({
+export const Route = createFileRoute("/app")({
   head: () => ({
     meta: [
       { title: "Freitas da Blaze — Análise do Histórico da Blaze" },
@@ -216,9 +214,7 @@ function computeRange(
 }
 
 function Index() {
-  const [section, setSection] = useState<SectionId>("historico");
-  const [isVip, setIsVip] = useState(false);
-  const navigate = useNavigate();
+  const section = useSection();
   const [inverse, setInverse] = useState(false);
   const [viewMode, setViewMode] = useState<"colunas" | "lista">("colunas");
   // Em celular/tablet inicia em lista (sentido normal); desktop mantém colunas fixas.
@@ -258,7 +254,7 @@ function Index() {
   const [status, setStatus] = useState<"loading" | "live" | "error">("loading");
   const [errorMsg, setErrorMsg] = useState("");
   const [whiteFlash, setWhiteFlash] = useState<Spin | null>(null);
-  const [statsOpen, setStatsOpen] = useState(true);
+  const [statsOpen, setStatsOpen] = useState(false);
   const [countdown, setCountdown] = useState(15);
 
   // Filtros
@@ -478,7 +474,7 @@ function Index() {
     } catch {
       /* noop */
     }
-    const t = setTimeout(() => setWhiteFlash(null), 3000);
+    const t = setTimeout(() => setWhiteFlash(null), 8000);
     return () => clearTimeout(t);
   }, [spins, whiteAlert]);
 
@@ -690,7 +686,7 @@ function Index() {
 
           <div className="flex shrink-0 items-center gap-1 sm:gap-3">
             <StatusPill status={status} message={errorMsg} />
-
+            <ThemeToggle />
             <button
               type="button"
               onClick={() => toggleWhiteAlert(!whiteAlert)}
@@ -702,29 +698,11 @@ function Index() {
             </button>
             <button
               type="button"
-              onClick={() => {
-                if (isVip) {
-                  setStatsOpen((v) => !v);
-                } else {
-                  navigate({ to: "/" });
-                }
-              }}
+              onClick={() => setStatsOpen((v) => !v)}
               className="grid h-8 w-8 place-items-center rounded-xl border border-white/5 bg-white/5 text-muted-foreground transition-colors duration-200 hover:bg-white/[0.08] hover:text-foreground sm:h-10 sm:w-10 lg:h-11 lg:w-11"
               aria-label="Abrir estatísticas"
             >
               <BarChart3 className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsVip(!isVip)}
-              className={`grid h-8 w-8 place-items-center rounded-xl transition-all duration-300 sm:h-10 sm:w-10 lg:h-11 lg:w-11 ${
-                isVip 
-                ? "bg-gradient-to-tr from-amber-500 to-yellow-300 text-black shadow-[0_0_20px_rgba(245,158,11,0.4)] scale-110" 
-                : "bg-white/5 border border-white/10 text-white/40 hover:text-white hover:border-white/20"
-              }`}
-              title={isVip ? "Membro VIP Ativo" : "Acessar Área VIP"}
-            >
-              <Crown className={`h-4 w-4 lg:h-5 lg:w-5 ${isVip ? "animate-pulse" : ""}`} />
             </button>
             <a
               href="https://t.me/freitaswhite"
@@ -740,21 +718,7 @@ function Index() {
         </div>
       </header>
 
-      <TopNav 
-        activeSection={section} 
-        onSectionChange={(id) => {
-          if (id === "historico") {
-            setSection(id);
-          } else if (isVip) {
-            setSection(id);
-          } else {
-            // Se não for VIP, redireciona para a home para login/compra
-            // ou poderíamos mostrar um modal, mas o pedido implica bloqueio
-            navigate({ to: "/" });
-          }
-        }} 
-        isVip={isVip} 
-      />
+      <TopNav />
 
       {section === "sinais" ? (
         <Suspense fallback={<SectionFallback />}><SinaisPage /></Suspense>
@@ -762,7 +726,7 @@ function Index() {
         <Suspense fallback={<SectionFallback />}><AnaliseSection /></Suspense>
       ) : section === "estrategias" ? (
         <Suspense fallback={<SectionFallback />}><EstrategiasSection /></Suspense>
-      ) : section !== "historico" ? (
+      ) : section !== "dashboard" ? (
         <main className="mx-auto flex w-full max-w-[1366px] flex-col gap-5 px-3 py-10 sm:gap-6 sm:px-8 sm:py-16">
           <Card delay={0.05}>
             <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
@@ -866,8 +830,7 @@ function Index() {
               );
             })()}
 
-            {statsOpen && (
-              <div className="mt-3 grid gap-2 border-t border-white/5 pt-3 sm:grid-cols-[1fr_auto] sm:items-center sm:gap-4 animate-in fade-in slide-in-from-top-1 duration-300">
+            <div className="mt-3 grid gap-2 border-t border-white/5 pt-3 sm:grid-cols-[1fr_auto] sm:items-center sm:gap-4">
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] text-muted-foreground">
                 <span className="inline-flex items-center gap-2">
                   <Flame className="h-3.5 w-3.5" />
@@ -889,10 +852,12 @@ function Index() {
                   </div>
                 ))}
               </div>
-              </div>
-            )}
+            </div>
           </Card>
 
+          <div className="mx-auto w-full max-w-[1366px] mb-8">
+             <StrategyTabs spins={visibleSpins} />
+          </div>
 
           <Card
             title="Giros anteriores"
@@ -901,25 +866,6 @@ function Index() {
             delay={0.08}
             action={
               <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (isVip) {
-                      setStatsOpen(!statsOpen);
-                    } else {
-                      navigate({ to: "/" });
-                    }
-                  }}
-                  className={`grid h-8 w-8 place-items-center rounded-lg border transition-all duration-200 ${
-                    statsOpen 
-                      ? "border-[#FF1F3D]/30 bg-[#FF1F3D]/10 text-white shadow-[0_0_10px_rgba(255,31,61,0.2)]" 
-                      : "border-white/10 bg-white/5 text-muted-foreground hover:bg-white/[0.09] hover:text-foreground"
-                  }`}
-                  aria-label="Alternar estatísticas"
-                  title="Estatísticas do histórico"
-                >
-                  <BarChart3 className="h-4 w-4" />
-                </button>
                 <button
                   type="button"
                   onClick={() => setFullscreen(true)}
@@ -1346,10 +1292,14 @@ function Index() {
 
 
 
-      <WhiteAlert spin={whiteFlash} onClose={() => setWhiteFlash(null)} autoCloseTime={3000} />
       <WhiteCelebration spin={whiteFlash} onClose={() => setWhiteFlash(null)} />
       <WhiteAlertToggleFx state={alertFx} onDone={() => setAlertFx(null)} />
 
+      <LeftStatsDrawer
+        open={statsOpen}
+        onClose={() => setStatsOpen(false)}
+        spins={visibleSpins}
+      />
     </div>
   );
 }
@@ -1585,7 +1535,7 @@ const StatusPill = memo(function StatusPill({
 }) {
   const cls =
     status === "live"
-      ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-500"
+      ? "border-positive/25 bg-positive/10 text-positive"
       : status === "error"
         ? "border-destructive/30 bg-destructive/10 text-destructive"
         : "border-white/10 bg-white/5 text-muted-foreground";
@@ -1594,7 +1544,7 @@ const StatusPill = memo(function StatusPill({
   return (
     <span
       title={message}
-      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-bold uppercase tracking-wider h-8 sm:h-10 lg:h-11 ${cls}`}
+      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-medium ${cls}`}
     >
       {status === "error" ? <WifiOff className="h-3.5 w-3.5" /> : <Wifi className="h-3.5 w-3.5" />}
       <span className="hidden sm:inline">{label}</span>

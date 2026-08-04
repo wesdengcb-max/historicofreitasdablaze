@@ -1,15 +1,17 @@
 import { useSyncExternalStore } from "react";
 
 export type SectionId =
-  | "historico"
+  | "dashboard"
   | "analise"
+  | "apostas"
+  | "feed"
   | "sinais"
   | "estrategias"
   | "videos"
   | "blaze"
   | "hostman";
 
-let currentSection: SectionId = "historico";
+let currentSection: SectionId = "dashboard";
 const listeners = new Set<() => void>();
 
 function subscribe(cb: () => void) {

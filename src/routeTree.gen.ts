@@ -9,14 +9,26 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as PainelRouteImport } from './routes/painel'
+import { Route as SinaisRouteImport } from './routes/sinais'
+import { Route as EstrategiasRouteImport } from './routes/estrategias'
+import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiPublicRecentRouteImport } from './routes/api/public/recent'
 import { Route as ApiPublicCollectRouteImport } from './routes/api/public/collect'
 
-const PainelRoute = PainelRouteImport.update({
-  id: '/painel',
-  path: '/painel',
+const SinaisRoute = SinaisRouteImport.update({
+  id: '/sinais',
+  path: '/sinais',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EstrategiasRoute = EstrategiasRouteImport.update({
+  id: '/estrategias',
+  path: '/estrategias',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -37,50 +49,86 @@ const ApiPublicCollectRoute = ApiPublicCollectRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/painel': typeof PainelRoute
+  '/app': typeof AppRoute
+  '/estrategias': typeof EstrategiasRoute
+  '/sinais': typeof SinaisRoute
   '/api/public/collect': typeof ApiPublicCollectRoute
   '/api/public/recent': typeof ApiPublicRecentRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/painel': typeof PainelRoute
+  '/app': typeof AppRoute
+  '/estrategias': typeof EstrategiasRoute
+  '/sinais': typeof SinaisRoute
   '/api/public/collect': typeof ApiPublicCollectRoute
   '/api/public/recent': typeof ApiPublicRecentRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/painel': typeof PainelRoute
+  '/app': typeof AppRoute
+  '/estrategias': typeof EstrategiasRoute
+  '/sinais': typeof SinaisRoute
   '/api/public/collect': typeof ApiPublicCollectRoute
   '/api/public/recent': typeof ApiPublicRecentRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/painel' | '/api/public/collect' | '/api/public/recent'
+  fullPaths:
+    | '/'
+    | '/app'
+    | '/estrategias'
+    | '/sinais'
+    | '/api/public/collect'
+    | '/api/public/recent'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/painel' | '/api/public/collect' | '/api/public/recent'
+  to:
+    | '/'
+    | '/app'
+    | '/estrategias'
+    | '/sinais'
+    | '/api/public/collect'
+    | '/api/public/recent'
   id:
     | '__root__'
     | '/'
-    | '/painel'
+    | '/app'
+    | '/estrategias'
+    | '/sinais'
     | '/api/public/collect'
     | '/api/public/recent'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  PainelRoute: typeof PainelRoute
+  AppRoute: typeof AppRoute
+  EstrategiasRoute: typeof EstrategiasRoute
+  SinaisRoute: typeof SinaisRoute
   ApiPublicCollectRoute: typeof ApiPublicCollectRoute
   ApiPublicRecentRoute: typeof ApiPublicRecentRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/painel': {
-      id: '/painel'
-      path: '/painel'
-      fullPath: '/painel'
-      preLoaderRoute: typeof PainelRouteImport
+    '/sinais': {
+      id: '/sinais'
+      path: '/sinais'
+      fullPath: '/sinais'
+      preLoaderRoute: typeof SinaisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/estrategias': {
+      id: '/estrategias'
+      path: '/estrategias'
+      fullPath: '/estrategias'
+      preLoaderRoute: typeof EstrategiasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -109,7 +157,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  PainelRoute: PainelRoute,
+  AppRoute: AppRoute,
+  EstrategiasRoute: EstrategiasRoute,
+  SinaisRoute: SinaisRoute,
   ApiPublicCollectRoute: ApiPublicCollectRoute,
   ApiPublicRecentRoute: ApiPublicRecentRoute,
 }
