@@ -104,11 +104,9 @@ export function PatternNotifier({ spins }: { spins: Spin[] }) {
   const addToken = (t: Token) => pattern.length < 800 && setPattern((p) => [...p, t]);
 
   return (
-    <Card
-      className="glass-card overflow-hidden !p-0"
-    >
+    <Card className="glass-card overflow-hidden !p-0">
       <div className="flex flex-wrap items-center justify-between border-b border-white/[0.05] bg-white/[0.02] px-6 py-5">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 text-left">
           <div className="grid h-10 w-10 place-items-center rounded-xl bg-[#FF1F3D]/10 text-[#FF1F3D] shadow-[0_0_15px_rgba(255,31,61,0.1)]">
             <Megaphone className="h-5 w-5" />
           </div>
@@ -119,14 +117,13 @@ export function PatternNotifier({ spins }: { spins: Spin[] }) {
             <h2 className="text-xl font-black text-white font-outfit uppercase tracking-tight">Notificador de padrão</h2>
           </div>
         </div>
-      action={
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           <button
             onClick={() => setSound((s) => !s)}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-white/5 bg-white/[0.03] text-muted-foreground hover:text-foreground"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-[#9CA3AF] hover:text-white"
             title={sound ? "Silenciar" : "Ativar som"}
           >
-            {sound ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
+            {sound ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
           </button>
           <button
             onClick={() => {
@@ -135,22 +132,26 @@ export function PatternNotifier({ spins }: { spins: Spin[] }) {
               setTimeline([]);
               setOpen(true);
             }}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-[#FF1F3D] px-3 py-1.5 text-[11px] font-black uppercase tracking-widest text-white shadow-[0_5px_15px_rgba(255,31,61,0.3)] hover:opacity-90 font-outfit"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#FF1F3D] px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white shadow-[0_5px_15px_rgba(255,31,61,0.3)] hover:opacity-90 font-outfit"
           >
-            <PlusCircle className="h-3.5 w-3.5" />
+            <PlusCircle className="h-4 w-4" />
             <span className="hidden sm:inline">NOVO</span>
           </button>
           <button
             onClick={() => setOpen((o) => !o)}
-            className="inline-flex items-center gap-1.5 rounded-md border border-white/5 bg-white/[0.03] px-2.5 py-1.5 text-[11px] font-semibold text-muted-foreground hover:text-foreground"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-[#9CA3AF] hover:text-white"
+            title={open ? "Ocultar painel" : "Abrir painel"}
           >
-            {open ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-            <span className="hidden sm:inline">{open ? "OCULTAR" : "ABRIR"}</span>
+            {open ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
         </div>
-      }
-    >
-      {!open ? null : (
+      </div>
+      <div className="p-6">
+        {!open ? (
+          <div className="flex items-center justify-center py-4 text-xs font-black uppercase tracking-widest text-[#9CA3AF] font-outfit">
+            {pattern.length} pedras • {occurrences.length} ocorrências {playing && "• MONITORANDO"}
+          </div>
+        ) : (
         <>
           <div className="mb-4 grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3">
             <div className="inline-flex items-center gap-2 rounded-lg bg-primary/15 px-3 py-1.5 text-xs font-semibold text-primary ring-1 ring-primary/30">
