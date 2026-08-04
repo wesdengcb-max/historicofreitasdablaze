@@ -1,6 +1,5 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
-import { AnimatePresence } from "framer-motion";
 import { useEffect } from "react";
 import type { Spin } from "./types";
 import brancoVip from "@/assets/branco-vip.png.asset.json";
@@ -11,7 +10,7 @@ type Props = {
   autoCloseTime?: number;
 };
 
-export function WhiteAlert({ spin, onClose, autoCloseTime = 5000 }: Props) {
+export function WhiteAlert({ spin, onClose, autoCloseTime = 3000 }: Props) {
   useEffect(() => {
     if (spin) {
       const timer = setTimeout(onClose, autoCloseTime);
@@ -27,37 +26,34 @@ export function WhiteAlert({ spin, onClose, autoCloseTime = 5000 }: Props) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
-          className="pointer-events-none fixed inset-0 z-50 flex items-start justify-center px-4 pt-6"
+          className="pointer-events-none fixed left-1/2 top-6 z-[110] -translate-x-1/2"
           role="status"
           aria-live="assertive"
         >
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-white/[0.04]"
-          />
           <motion.div
             initial={{ y: -24, opacity: 0, scale: 0.96 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: -24, opacity: 0, scale: 0.96 }}
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-            className="glass-card pointer-events-auto relative flex items-center gap-4 rounded-2xl px-5 py-4"
-            style={{ boxShadow: "0 24px 70px -16px oklch(0 0 0 / 0.7), 0 0 40px oklch(1 0 0 / 0.12)" }}
+            className="glass-card pointer-events-auto relative flex items-center gap-4 rounded-2xl px-5 py-3"
+            style={{ 
+              boxShadow: "0 20px 50px -12px rgba(0,0,0,0.5), 0 0 20px rgba(255,255,255,0.1)",
+              border: "1px solid rgba(255,255,255,0.15)"
+            }}
           >
-            <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-white ring-1 ring-white/40">
+            <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-white ring-2 ring-white/50">
               <img src={brancoVip.url} alt="Branco" className="h-full w-full object-cover" />
-              <span className="pointer-events-none absolute inset-0 animate-ping rounded-full bg-white/40" />
+              <span className="pointer-events-none absolute inset-0 animate-ping rounded-full bg-white/60" />
             </div>
 
             <div className="leading-tight">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/60">
                 Alerta de Branco
               </p>
-              <p className="mt-1 text-base font-semibold text-foreground">
-                Branco confirmado · {spin.time}
+              <p className="text-base font-black tracking-tight text-white">
+                BRANCO CONFIRMADO
               </p>
-              <p className="text-xs text-muted-foreground">IA Freitas</p>
+              <p className="text-[10px] text-white/50">IA Freitas · {spin.time}</p>
             </div>
             <button
               type="button"

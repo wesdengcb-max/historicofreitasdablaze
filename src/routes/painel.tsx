@@ -28,6 +28,7 @@ import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client"
 import { Card } from "@/components/double/Card";
 import { ResultCircle } from "@/components/double/ResultCircle";
 import { Switch } from "@/components/double/Switch";
+import { WhiteAlert } from "@/components/double/WhiteAlert";
 import { WhiteCelebration, WhiteAlertToggleFx } from "@/components/double/WhiteCelebration";
 
 
@@ -477,7 +478,7 @@ function Index() {
     } catch {
       /* noop */
     }
-    const t = setTimeout(() => setWhiteFlash(null), 8000);
+    const t = setTimeout(() => setWhiteFlash(null), 3000);
     return () => clearTimeout(t);
   }, [spins, whiteAlert]);
 
@@ -1318,6 +1319,7 @@ function Index() {
 
 
 
+      <WhiteAlert spin={whiteFlash} onClose={() => setWhiteFlash(null)} autoCloseTime={3000} />
       <WhiteCelebration spin={whiteFlash} onClose={() => setWhiteFlash(null)} />
       <WhiteAlertToggleFx state={alertFx} onDone={() => setAlertFx(null)} />
 

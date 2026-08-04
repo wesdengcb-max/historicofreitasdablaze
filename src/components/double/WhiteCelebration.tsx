@@ -188,7 +188,7 @@ export function WhiteCelebration({ spin, onClose }: Props) {
 export function WhiteAlertToggleFx({ state, onDone }: { state: "on" | "off" | null; onDone: () => void }) {
   useEffect(() => {
     if (!state) return;
-    const t = setTimeout(onDone, 3000); // Exibe por 3 segundos e some sozinho
+    const t = setTimeout(onDone, 2000); // Exibe por 2 segundos e some sozinho
     return () => clearTimeout(t);
   }, [state, onDone]);
 
