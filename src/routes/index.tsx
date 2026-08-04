@@ -22,7 +22,9 @@ export const Route = createFileRoute("/")({
 
 function LandingPage() {
   const [exitTo, setExitTo] = useState<null | "/app" | "/sinais" | "/estrategias">(null);
+  const isVip = useVipStatus();
   const navigate = useNavigate();
+
 
   const goWithTransition = (to: "/app" | "/sinais" | "/estrategias") => {
     if (exitTo) return;
