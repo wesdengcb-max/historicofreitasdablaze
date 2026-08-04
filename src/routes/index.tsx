@@ -52,53 +52,53 @@ function LandingPage() {
 
   return (
     <div className="relative min-h-[100svh] w-full overflow-hidden bg-[#000000] text-white">
-      {/* 1. Main Background Image - 100% cover/center as requested */}
+      {/* 1. Main Background Image Layer - Preserved and centered */}
       <div 
-        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000"
+        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
         style={{ 
           backgroundImage: `url(${bgImg.url})`,
         }}
       />
       
-      {/* 2. Cinematic Overlays & Effects */}
-      <div className="absolute inset-0 z-[1] pointer-events-none">
-        {/* Dark Overlay (45-55% opacity) */}
-        <div className="absolute inset-0 bg-black/50" />
+      {/* 2. Independent Composition Layers (LoveKing Style) */}
+      <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden">
+        {/* Layer: Soft Dimming (Escurecimento suave) */}
+        <div className="absolute inset-0 bg-black/45" />
         
-        {/* Vertical Gradient (Top and Bottom darkening) */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black opacity-80" />
-        
-        {/* Vignette Effect (Darker sides, illuminated center) */}
+        {/* Layer: Edge Vignette (Vinheta nas bordas) */}
         <div 
-          className="absolute inset-0"
+          className="absolute inset-0 shadow-[inset_0_0_150px_rgba(0,0,0,0.85)]"
           style={{
-            background: 'radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.9) 100%)'
+            background: 'radial-gradient(circle at center, transparent 20%, rgba(0,0,0,0.5) 70%, rgba(0,0,0,1) 100%)'
           }}
         />
         
-        {/* Discreet Red Glow (Radial Gradient) */}
+        {/* Layer: Vertical Gradient (Gradiente vertical) */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black opacity-60" />
+        
+        {/* Layer: Horizontal Gradient (Gradiente horizontal) */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-black/60" />
+        
+        {/* Layer: Extremely Discreet Red Glow (Glow vermelho extremamente discreto) */}
         <div 
-          className="absolute inset-0 opacity-30"
+          className="absolute inset-0 opacity-[0.18]"
           style={{
-            background: 'radial-gradient(circle at 50% 40%, rgba(255, 31, 61, 0.25) 0%, transparent 70%)'
+            background: 'radial-gradient(circle at 50% 35%, rgba(255, 31, 61, 0.3) 0%, transparent 65%)'
           }}
         />
 
-        {/* Depth/Blur Layer - subtle atmospheric blur */}
-        <div className="absolute inset-0 backdrop-blur-[2px]" />
-        
-        {/* Noise texture for premium cinematic feel */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
+        {/* Layer: Atmospheric Texture/Noise (Partículas e texturas) */}
+        <div className="absolute inset-0 opacity-[0.015]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
       </div>
 
-      {/* Grid overlay (preserved structure, adjusted opacity) */}
+      {/* Grid overlay (Preserved structure) */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.05] z-[2]"
+        className="pointer-events-none absolute inset-0 opacity-[0.03] z-[2]"
         style={{
           backgroundImage:
             "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
+          backgroundSize: "64px 64px",
           maskImage:
             "radial-gradient(ellipse 80% 60% at 50% 50%, black, transparent 90%)",
         }}
