@@ -495,10 +495,11 @@ export function PatternValidator({ spins }: { spins: Spin[] }) {
         </aside>
 
             </div>
-          </div>
+          </motion.div>
         )}
-      </div>
-    </Card>
+      </AnimatePresence>
+    </div>
+  </Card>
   );
 }
 

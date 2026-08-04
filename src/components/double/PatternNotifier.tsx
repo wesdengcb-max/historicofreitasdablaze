@@ -390,7 +390,7 @@ export function PatternNotifier({ spins }: { spins: Spin[] }) {
         )}
       </AnimatePresence>
     </div>
-      </div>
+  </Card>
     </Card>
   );
 }
