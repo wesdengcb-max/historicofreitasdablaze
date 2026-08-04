@@ -1062,7 +1062,7 @@ function Index() {
               className={
                 fullscreen
                   ? "fixed inset-0 z-50 flex flex-col bg-background/95 p-4 backdrop-blur-md sm:p-6"
-                  : "overflow-hidden rounded-2xl border border-white/5 bg-black/15"
+                  : "overflow-hidden rounded-2xl border border-white/5 bg-black/15 light:border-black/5 light:bg-black/[0.05]"
               }
             >
               {fullscreen && (
