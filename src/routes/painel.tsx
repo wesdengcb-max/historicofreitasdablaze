@@ -688,12 +688,6 @@ function Index() {
 
           <div className="flex shrink-0 items-center gap-1 sm:gap-3">
             <StatusPill status={status} message={errorMsg} />
-            
-            
-            <div className="flex h-8 items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 sm:h-10 lg:h-11 border border-emerald-500/20">
-              <Wifi className="h-3.5 w-3.5 text-emerald-500" />
-              <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider whitespace-nowrap hidden sm:inline">Análise em Tempo Real</span>
-            </div>
 
             <button
               type="button"
