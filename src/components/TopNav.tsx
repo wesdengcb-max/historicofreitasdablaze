@@ -131,7 +131,7 @@ export function TopNav() {
                 className={`flex h-9 w-9 items-center justify-center rounded-full border transition-all duration-300 ${
                   isVip
                     ? "border-amber-400/50 bg-amber-400/10 text-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.2)]"
-                    : "border-white/10 bg-white/5 text-muted-foreground hover:bg-white/10"
+                    : "border-white/10 bg-white/5 text-muted-foreground hover:bg-white/10 light:border-black/10 light:bg-black/5"
                 }`}
               >
                 <Crown className="h-4 w-4" />
