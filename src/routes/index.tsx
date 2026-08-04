@@ -6,9 +6,9 @@ import kingImg from "@/assets/freitas-king.png.asset.json";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Histórico Freitas — Blaze" },
+      { title: "Histórico Freitas — Liberado" },
       { name: "description", content: "A versão 2.0 do Histórico Freitas está no ar." },
-      { property: "og:title", content: "Histórico Freitas — Blaze" },
+      { property: "og:title", content: "Histórico Freitas — Liberado" },
       { property: "og:description", content: "A versão 2.0 do Histórico Freitas está no ar." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

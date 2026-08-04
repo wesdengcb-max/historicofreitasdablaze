@@ -25,7 +25,7 @@ type Props = {
   onClick?: () => void;
 };
 
-/** Card de resultado no padrão do histórico da Blaze (48px, círculo 32px, hora 11px). */
+/** Card de resultado no padrão do histórico da Blaze (52px, círculo 30px, hora 12px). */
 export const BlazeResultCard = memo(function BlazeResultCard({
   n,
   color,
@@ -55,8 +55,8 @@ export const BlazeResultCard = memo(function BlazeResultCard({
         style={{
           height: `var(--blaze-card-h, ${BLAZE_CARD_TOP_H}px)`,
           borderRadius: 6,
-          border: selected ? `2px solid var(--primary)` : isWhite ? `2px solid ${c.border}` : `none`,
-          background: isWhite ? c.bg : "#233248",
+          border: `2px solid ${selected ? "var(--primary)" : c.border}`,
+          background: c.bg,
           opacity: dimmed ? 0.25 : 1,
         }}
       >
@@ -71,10 +71,10 @@ export const BlazeResultCard = memo(function BlazeResultCard({
           <span
             className="flex items-center justify-center rounded-full font-bold leading-none tabular-nums"
             style={{
-              height: "32px",
-              width: "32px",
+              height: "30px",
+              width: "30px",
               fontSize: "14px",
-              border: isWhite ? `3px solid ${c.ring}` : `2px solid #5a6d84`,
+              border: "3px solid " + c.ring,
               color: c.fg,
             }}
           >
@@ -85,10 +85,10 @@ export const BlazeResultCard = memo(function BlazeResultCard({
 
       {time && (
         <span
-          className={`mt-[5px] text-center leading-none tabular-nums ${
-            timeHighlight ? "font-bold text-primary" : "text-[#8ebcf0]"
+          className={`mt-1 text-center leading-none tabular-nums ${
+            timeHighlight ? "font-bold text-primary" : "text-muted-foreground"
           }`}
-          style={{ fontSize: "var(--blaze-time, 11px)" }}
+          style={{ fontSize: "var(--blaze-time, 12px)" }}
         >
           {time}
         </span>

@@ -742,7 +742,7 @@ function Index() {
           </Card>
         </main>
       ) : (
-      <main className="mx-auto flex w-full max-w-[1366px] flex-col gap-3 px-1.5 py-3 sm:gap-5 sm:px-4 sm:py-6 lg:gap-6 lg:px-8 lg:py-10 bg-[#0d131d]">
+      <main className="mx-auto flex w-full max-w-[1366px] flex-col gap-3 px-1.5 py-3 sm:gap-5 sm:px-4 sm:py-6 lg:gap-6 lg:px-8 lg:py-10">
 
         <section className="space-y-3 sm:space-y-5 lg:space-y-6">
           <Card delay={0.05}>
@@ -858,7 +858,7 @@ function Index() {
           <StrategyTabs spins={visibleSpins} />
 
           <Card
-            title="Giros anteriores"
+            title="Histórico"
             subtitle={`${total} rodadas · horário de Brasília`}
             icon={<TrendingUp className="h-3.5 w-3.5" />}
             delay={0.08}
@@ -1071,11 +1071,11 @@ function Index() {
                   <div className="history-scroll max-w-full overflow-x-auto p-1 [container-type:inline-size] sm:p-2 lg:p-3">
                     <div className="flex flex-col gap-0">
                       {/* Cabeçalho 0-9 interno para Colunas Fixas */}
-                      <div className="grid justify-center gap-[var(--gap-col,8px)] px-[1px] mb-1 sticky top-0 z-10 bg-background/40 backdrop-blur-sm" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "1274px", margin: "0 auto" }}>
+                      <div className="grid justify-center gap-[var(--gap-col,8px)] px-[1px] mb-3 sticky top-0 z-10 bg-background/40 backdrop-blur-sm" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "1274px", margin: "0 auto" }}>
                         {Array.from({ length: 10 }).map((_, ci) => (
                           <div
                             key={`header-inner-${ci}`}
-                            className="flex h-[23px] w-[137px] items-center justify-center rounded-[6px] border border-[#2a3545] bg-transparent text-[14px] font-medium tabular-nums text-white"
+                            className="flex h-[24px] w-full items-center justify-center rounded-[6px] border border-white/5 bg-white/[0.04] text-[13px] font-bold tabular-nums text-[#eaeaea]"
                             style={{ width: "var(--colW, 120px)" }}
                           >
                             {ci}
@@ -1158,7 +1158,7 @@ function Index() {
                                                 })
                                               }
                                             />
-                                            <span className={`mt-[5px] text-[11px] tabular-nums leading-none font-medium h-[11px] flex items-center ${destaqueHorario ? "text-primary font-bold" : "text-[#8ebcf0]"}`}>
+                                            <span className={`mt-1 text-[10px] tabular-nums leading-none font-medium h-[12px] flex items-center ${destaqueHorario ? "text-primary font-bold" : "text-[#7b7c80]"}`}>
                                               {exibirSegundos ? spTimeWithSeconds(spin as Spin) : (spin as Spin).time}
                                             </span>
                                           </div>
@@ -1168,7 +1168,7 @@ function Index() {
                                       if (pending && i === 0) {
                                          return (
                                           <div key={`p-${ci}-${i}`} className="flex flex-col items-center">
-                                            <div className="relative flex h-[48px] w-[48px] items-center justify-center overflow-hidden rounded-[6px] border-[2.5px] border-emerald-400 bg-white shadow-sm">
+                                            <div className="relative flex h-[48px] w-[48px] items-center justify-center overflow-hidden rounded-[6px] border border-white/10 bg-white shadow-sm ring-1 ring-emerald-400/40">
                                               <img
                                                 src={brancoTile.url}
                                                 alt="Sinal"
@@ -1176,7 +1176,7 @@ function Index() {
                                                 draggable={false}
                                               />
                                             </div>
-                                            <span className="mt-[5px] text-[11px] tabular-nums font-medium h-[11px] flex items-center text-[#8ebcf0]">
+                                            <span className="mt-1 text-[10px] tabular-nums font-medium h-[12px] flex items-center text-[#7b7c80]">
                                               {hm}
                                             </span>
                                           </div>
@@ -1196,17 +1196,17 @@ function Index() {
                                                   ? "border-red-500/50 bg-red-500/5"
                                                   : p === "black"
                                                     ? "border-slate-500/50 bg-slate-500/5"
-                                                    : "border-[#3b5270] bg-[#233248]"
+                                                    : "border-white/10"
                                             }`}
                                           >
-                                            <div className={`h-[32px] w-[32px] rounded-full border-2 transition-all ${
-                                              p === "white" ? "bg-white border-white/20" :
-                                              p === "red" ? "bg-red-500 border-red-400/20" :
-                                              p === "black" ? "bg-slate-800 border-slate-700/20" :
-                                              "bg-transparent border-[#5a6d84]"
+                                            <div className={`h-[30px] w-[30px] rounded-full ring-1 ring-inset transition-all ${
+                                              p === "white" ? "bg-white ring-white/20" :
+                                              p === "red" ? "bg-red-500 ring-red-400/20" :
+                                              p === "black" ? "bg-slate-800 ring-slate-700/20" :
+                                              "bg-transparent ring-transparent"
                                             }`} />
                                           </button>
-                                          <span className="mt-[5px] h-[11px] text-[11px] font-medium tabular-nums text-[#8ebcf0]">
+                                          <span className="mt-1 h-3 text-[10px] tabular-nums text-muted-foreground/30">
                                             {hm}
                                           </span>
                                         </div>
