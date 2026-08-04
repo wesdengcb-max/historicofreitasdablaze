@@ -1446,7 +1446,7 @@ const EmptySlot = memo(function EmptySlot({
           ) : (
             <div
               className="h-[32px] w-[32px] rounded-full border-2"
-              style={{ border: `2px solid #5a6d84` }}
+              style={{ border: `2px solid #ffffff` }}
             />
           )
         ) : null}
