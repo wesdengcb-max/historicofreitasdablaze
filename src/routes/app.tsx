@@ -1122,7 +1122,7 @@ function Index() {
                               <div
                                 key={ci}
                                 className="flex flex-col items-center justify-center p-0.5 sm:p-1"
-                                style={{ width: "var(--colW, 120px)", height: "66px", direction: "ltr" }}
+                                style={{ width: "min-content", minWidth: "120px", height: "66px", direction: "ltr" }}
                               >
                                 <div className="relative flex flex-col items-center pt-2">
                                   {badge && (
@@ -1226,12 +1226,12 @@ function Index() {
                   (() => {
                     return (
                        <div
-                         className="history-scroll grid justify-center p-1 [--blaze-card-h:36px] [--blaze-card-w:42px] [--blaze-dot:24px] [--blaze-num:11px] [--blaze-time:10px] sm:p-3 sm:[--blaze-card-h:46px] sm:[--blaze-card-w:48px] sm:[--blaze-dot:28px] sm:[--blaze-num:12px] sm:[--blaze-time:11px] lg:p-4 lg:[--blaze-card-h:50px] lg:[--blaze-card-w:52px] lg:[--blaze-dot:30px] lg:[--blaze-num:13px] lg:[--blaze-time:12px]"
+                         className="history-scroll grid p-1 sm:p-3 lg:p-4"
                          style={{
                            gridTemplateColumns:
-                             `repeat(auto-fill, var(--blaze-card-w, ${BLAZE_CARD_W}px))`,
-                           columnGap: "clamp(4px, 1.2vw, 8px)",
-                           rowGap: "clamp(10px, 2vw, 18px)",
+                             `repeat(auto-fill, minmax(52px, 1fr))`,
+                           columnGap: "8px",
+                           rowGap: "16px",
                            direction: inverse ? "rtl" : "ltr",
                          }}
                        >
