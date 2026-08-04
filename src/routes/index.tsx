@@ -136,7 +136,7 @@ function LandingPage() {
 
       {/* Central Login Card (Based on LoveKing Pro) */}
       <main className="relative z-10 mx-auto flex min-h-[100svh] w-full items-center justify-center px-6 py-8">
-        <div className="glass-card-glow relative w-full max-w-[420px] overflow-hidden rounded-[2.5rem] border border-white/5 bg-[#0C0C0C]/90 p-8 text-center backdrop-blur-xl sm:p-12">
+        <div className="glass-card-glow relative w-full max-w-[420px] overflow-hidden rounded-[2.5rem] border border-white/5 bg-[#0C0C0C]/90 p-8 text-center backdrop-blur-3xl sm:p-12 shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
           {/* Logo */}
           <div className="mb-10 flex justify-center">
             <div className="relative">
