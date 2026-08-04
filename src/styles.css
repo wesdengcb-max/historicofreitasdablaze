@@ -81,6 +81,7 @@ body {
   /* Premium Dark Theme */
   --background: #090909;
   --foreground: #FFFFFF;
+  --time-text: #8ebcf0;
 
   --surface: #111111;
   --surface-2: #0C0C0C;
@@ -129,6 +130,7 @@ body {
   color-scheme: light;
   --background: #FFFFFF;
   --foreground: #111111;
+  --time-text: #6B7280;
 
   --surface:   #F8F8F8;
   --surface-2: #F1F1F1;
