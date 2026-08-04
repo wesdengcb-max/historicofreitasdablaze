@@ -45,7 +45,7 @@ import freitasLogo from "@/assets/freitas-logo.jpg.asset.json";
 import { getSignals, subscribeSignals, type StoredSignal } from "@/lib/signalsStore";
 import { TopNav } from "@/components/TopNav";
 import { type SectionId } from "@/lib/sectionStore";
-import { ThemeToggle } from "@/components/ThemeToggle";
+
 const SinaisPage = lazy(() =>
   import("@/components/sections/SinaisSection").then((m) => ({ default: m.SinaisPage })),
 );
@@ -688,7 +688,7 @@ function Index() {
 
           <div className="flex shrink-0 items-center gap-1 sm:gap-3">
             <StatusPill status={status} message={errorMsg} />
-            <ThemeToggle />
+            
             
             <div className="flex h-8 items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 sm:h-10 lg:h-11 border border-emerald-500/20">
               <Wifi className="h-3.5 w-3.5 text-emerald-500" />
