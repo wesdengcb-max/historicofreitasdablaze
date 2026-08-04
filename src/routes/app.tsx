@@ -918,49 +918,6 @@ function Index() {
               </div>
             )}
 
-            {/* Cabeçalho das estatísticas por coluna */}
-            {viewMode === "colunas" && contarColunas && (
-              <div className="mb-3 w-full border-b border-white/5 pb-3">
-                <div className="grid gap-[8px]" style={{ gridTemplateColumns: "repeat(10, 1fr)", maxWidth: "1366px", width: "100%", marginLeft: "auto", marginRight: "auto" }}>
-                  {Array.from({ length: 10 }).map((_, ci) => {
-                    const stats = colStats[ci];
-                    return (
-                      <div
-                        key={`col-stats-${ci}`}
-                        className="flex w-full flex-col gap-0.5 overflow-hidden rounded-[4px] bg-white/[0.03] p-1 shadow-inner"
-                        style={{ width: "100%" }}
-                      >
-                        <div className="flex items-center justify-between px-0.5 text-[8px] font-bold tabular-nums">
-                          <span className="text-white">B: {stats.white}</span>
-                          <span className="text-white/40">{stats.whitePct.toFixed(0)}%</span>
-                        </div>
-                        <div className="relative h-1 w-full overflow-hidden rounded-full bg-white/5">
-                          <div className="flex h-full w-full">
-                            <div
-                              className="h-full bg-red-500 transition-all duration-500"
-                              style={{ width: `${stats.redPct}%` }}
-                            />
-                            <div
-                              className="h-full bg-slate-800 transition-all duration-500"
-                              style={{ width: `${stats.blackPct}%` }}
-                            />
-                            <div
-                              className="h-full bg-white transition-all duration-500"
-                              style={{ width: `${stats.whitePct}%` }}
-                            />
-                          </div>
-                        </div>
-                        <div className="mt-0.5 flex items-center justify-between px-0.5 text-[7px] font-medium text-muted-foreground/60 tabular-nums uppercase">
-                          <span>V: {stats.red}</span>
-                          <span>P: {stats.black}</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
             {/* Painel de controles alinhado */}
             <div className="mb-3 rounded-2xl border border-white/5 bg-white/[0.02] p-2 sm:mb-4 sm:p-4">
               <div className="grid grid-cols-2 gap-x-3 gap-y-2 text-[11px] sm:gap-x-8 sm:gap-y-3.5 lg:grid-cols-4">
@@ -1023,6 +980,49 @@ function Index() {
                 </div>
               </div>
             </div>
+
+            {/* Cabeçalho das estatísticas por coluna */}
+            {viewMode === "colunas" && contarColunas && (
+              <div className="mb-3 w-full border-b border-white/5 pb-3">
+                <div className="grid gap-[8px]" style={{ gridTemplateColumns: "repeat(10, 1fr)", maxWidth: "1366px", width: "100%", marginLeft: "auto", marginRight: "auto" }}>
+                  {Array.from({ length: 10 }).map((_, ci) => {
+                    const stats = colStats[ci];
+                    return (
+                      <div
+                        key={`col-stats-${ci}`}
+                        className="flex w-full flex-col gap-0.5 overflow-hidden rounded-[4px] bg-white/[0.03] p-1 shadow-inner"
+                        style={{ width: "100%" }}
+                      >
+                        <div className="flex items-center justify-between px-0.5 text-[8px] font-bold tabular-nums">
+                          <span className="text-white">B: {stats.white}</span>
+                          <span className="text-white/40">{stats.whitePct.toFixed(0)}%</span>
+                        </div>
+                        <div className="relative h-1 w-full overflow-hidden rounded-full bg-white/5">
+                          <div className="flex h-full w-full">
+                            <div
+                              className="h-full bg-[#DE2143] transition-all duration-500"
+                              style={{ width: `${stats.redPct}%` }}
+                            />
+                            <div
+                              className="h-full bg-slate-800 transition-all duration-500"
+                              style={{ width: `${stats.blackPct}%` }}
+                            />
+                            <div
+                              className="h-full bg-white transition-all duration-500"
+                              style={{ width: `${stats.whitePct}%` }}
+                            />
+                          </div>
+                        </div>
+                        <div className="mt-0.5 flex items-center justify-between px-0.5 text-[7px] font-medium text-muted-foreground/60 tabular-nums uppercase">
+                          <span>V: {stats.red}</span>
+                          <span>P: {stats.black}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             <div
               className={
