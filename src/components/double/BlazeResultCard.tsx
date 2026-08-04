@@ -83,6 +83,7 @@ export const BlazeResultCard = memo(function BlazeResultCard({
         )}
       </button>
 
+      {time && (
         <span
           className={`mt-[5px] text-center leading-none tabular-nums ${
             timeHighlight ? "font-bold text-primary" : ""
