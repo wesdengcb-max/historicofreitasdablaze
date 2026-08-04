@@ -32,7 +32,7 @@ const ITEMS: Item[] = [
 export function TopNav() {
   const active = useSection();
   return (
-    <nav className="border-b border-white/5 bg-background/60 backdrop-blur-xl">
+    <nav className="border-b border-white/[0.05] bg-[#101114]/80 backdrop-blur-2xl sticky top-0 z-50">
       <div className="mx-auto flex max-w-[1366px] gap-1 overflow-x-auto px-3 py-2 scrollbar-none sm:px-8">
         {ITEMS.map((item) => {
           const Icon = item.icon;
@@ -41,10 +41,10 @@ export function TopNav() {
             <button
               key={item.id}
               onClick={() => setSection(item.id)}
-              className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-semibold transition sm:text-xs ${
+              className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-bold transition sm:text-xs font-outfit ${
                 isActive
-                  ? "bg-gradient-to-r from-red-500/20 to-transparent border border-red-500/40 text-foreground"
-                  : "border border-transparent text-muted-foreground hover:bg-white/[0.04] hover:text-foreground"
+                  ? "bg-[#FF1F3D]/10 border border-[#FF1F3D]/30 text-white shadow-[0_0_15px_rgba(255,31,61,0.1)]"
+                  : "border border-transparent text-[#9CA3AF] hover:bg-white/[0.03] hover:text-white"
               }`}
             >
               <Icon className="h-3.5 w-3.5" />

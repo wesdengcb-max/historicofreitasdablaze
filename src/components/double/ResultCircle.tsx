@@ -18,24 +18,25 @@ type Props = {
   animate?: boolean;
   delay?: number;
   glow?: boolean;
+  className?: string;
 };
 
-export function ResultCircle({ color, n, size = "md", animate = true, delay = 0, glow = false }: Props) {
+export function ResultCircle({ color, n, size = "md", animate = true, delay = 0, glow = false, className }: Props) {
   const base = "relative grid place-items-center overflow-hidden rounded-full font-semibold tabular-nums tile-shadow ring-1 transition-transform duration-200 hover:scale-[1.08]";
 
   const colorClasses =
     color === "red"
       ? "text-white ring-white/10"
       : color === "white"
-        ? "text-[oklch(0.18_0.012_260)] ring-white/40"
+        ? "text-black ring-white/40"
         : "text-white ring-white/10";
 
   const bgStyle =
     color === "red"
-      ? { background: "var(--gradient-red)" }
+      ? { background: "linear-gradient(180deg, #FF3554 0%, #FF1F3D 100%)" }
       : color === "white"
-        ? { background: "var(--gradient-white)" }
-        : { background: "var(--gradient-black)" };
+        ? { background: "#FFFFFF" }
+        : { background: "linear-gradient(180deg, #2A2A2A 0%, #1A1A1A 100%)" };
 
   const glowStyle = glow
     ? color === "red"
@@ -60,7 +61,7 @@ export function ResultCircle({ color, n, size = "md", animate = true, delay = 0,
 
   if (!animate) {
     return (
-      <div className={`${base} ${sizes[size]} ${colorClasses}`} style={{ ...bgStyle, ...glowStyle }}>
+      <div className={`${base} ${sizes[size]} ${colorClasses} ${className || ""}`} style={{ ...bgStyle, ...glowStyle }}>
         {content}
       </div>
     );
@@ -71,7 +72,7 @@ export function ResultCircle({ color, n, size = "md", animate = true, delay = 0,
       initial={{ scale: 0.6, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ duration: 0.35, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={`${base} ${sizes[size]} ${colorClasses}`}
+      className={`${base} ${sizes[size]} ${colorClasses} ${className || ""}`}
       style={{ ...bgStyle, ...glowStyle }}
     >
       {content}

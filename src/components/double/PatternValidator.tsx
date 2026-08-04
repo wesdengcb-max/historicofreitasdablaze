@@ -20,6 +20,7 @@ import {
   HelpCircle,
   PlusCircle,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 import { Card } from "./Card";
 import { ResultCircle } from "./ResultCircle";
@@ -203,75 +204,76 @@ export function PatternValidator({ spins }: { spins: Spin[] }) {
   };
 
   return (
-    <Card
-      title="Validador de padrão"
-      subtitle={
-        open
-          ? mode === "exit"
-            ? "Defina quando entrar (padrão + entrada)"
-            : "Defina quando NÃO entrar"
-          : `${pattern.length} pedra${pattern.length === 1 ? "" : "s"} • ${stats.wins}V / ${stats.losses}D${
-              currentlyMatches ? " • ATIVO" : ""
-            }`
-      }
-      icon={<ShieldCheck className="h-3.5 w-3.5" />}
-      delay={0.18}
-      className="!p-4 sm:!p-6"
-      action={
-        <div className="flex items-center gap-1.5">
+    <Card className="glass-card overflow-hidden !p-0">
+      <div className="flex flex-wrap items-center justify-between border-b border-white/[0.05] bg-white/[0.02] px-6 py-5">
+        <div className="flex items-center gap-4 text-left">
+          <div className="grid h-10 w-10 place-items-center rounded-xl bg-[#FF1F3D]/10 text-[#FF1F3D] shadow-[0_0_15px_rgba(255,31,61,0.1)]">
+            <ShieldCheck className="h-5 w-5" />
+          </div>
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-[0.4em] text-[#FF1F3D] font-outfit">
+              Auditoria de estratégia
+            </div>
+            <h2 className="text-xl font-black text-white font-outfit uppercase tracking-tight">Validador de padrão</h2>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
           <button
             onClick={() => {
               setPattern([]);
               setOpen(true);
             }}
-            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-2.5 py-1.5 text-[11px] font-semibold text-primary-foreground hover:opacity-90"
-            title="Novo padrão"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#FF1F3D] px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white shadow-[0_5px_15px_rgba(255,31,61,0.3)] hover:opacity-90 font-outfit"
           >
-            <PlusCircle className="h-3.5 w-3.5" />
+            <PlusCircle className="h-4 w-4" />
             <span className="hidden sm:inline">NOVO</span>
           </button>
           <button
-            className="hidden items-center gap-1.5 rounded-md border border-white/5 bg-white/[0.03] px-2.5 py-1.5 text-[11px] font-semibold text-muted-foreground hover:text-foreground sm:inline-flex"
-            title="Ajuda"
-          >
-            <HelpCircle className="h-3.5 w-3.5" />
-            AJUDA
-          </button>
-          <button
             onClick={() => setOpen((o) => !o)}
-            className="inline-flex items-center gap-1.5 rounded-md border border-white/5 bg-white/[0.03] px-2.5 py-1.5 text-[11px] font-semibold text-muted-foreground hover:text-foreground"
-            title={open ? "Ocultar" : "Abrir"}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-[#9CA3AF] hover:text-white"
           >
-            {open ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-            <span className="hidden sm:inline">{open ? "OCULTAR" : "ABRIR"}</span>
+            {open ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
-        </div>
-      }
-    >
-      {!open ? null : (
-        <>
-      {/* Header row: name + premium hint */}
-      <div className="mb-4 grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3">
-        <div className="inline-flex items-center gap-2 rounded-lg bg-primary/15 px-3 py-1.5 text-xs font-semibold text-primary ring-1 ring-primary/30">
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-20 bg-transparent outline-none"
-          />
-          <Pencil className="h-3 w-3 opacity-70 shrink-0" />
-        </div>
-        <div className="flex min-w-0 items-center gap-1.5 text-[11px] text-muted-foreground">
-          <Crown className="h-3.5 w-3.5 text-amber-400 shrink-0" />
-          <span className="truncate">Seja premium e gerencie múltiplos padrões</span>
         </div>
       </div>
-
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-[minmax(0,1fr)_minmax(0,280px)] xl:grid-cols-[minmax(0,1fr)_minmax(0,320px)]">
-
-
-
-        {/* LEFT: builder */}
-        <div className="space-y-4">
+      <div className="p-6">
+        <AnimatePresence initial={false} mode="wait">
+          {!open ? (
+            <motion.div
+              key="closed"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="flex items-center justify-center py-4 text-xs font-black uppercase tracking-widest text-[#9CA3AF] font-outfit"
+            >
+              {pattern.length} pedras • {stats.wins}V / {stats.losses}D {currentlyMatches && "• ATIVO"}
+            </motion.div>
+          ) : (
+            <motion.div
+              key="open"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden"
+            >
+            {/* Header row: name + premium hint */}
+            <div className="mb-4 grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3">
+              <div className="inline-flex items-center gap-2 rounded-lg bg-primary/15 px-3 py-1.5 text-xs font-semibold text-primary ring-1 ring-primary/30">
+                <input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-20 bg-transparent outline-none"
+                />
+                <Pencil className="h-3 w-3 opacity-70 shrink-0" />
+              </div>
+              <div className="flex min-w-0 items-center gap-1.5 text-[11px] text-muted-foreground">
+                <Crown className="h-3.5 w-3.5 text-amber-400 shrink-0" />
+                <span className="truncate">Seja premium e gerencie múltiplos padrões</span>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-[minmax(0,1fr)_minmax(0,280px)] xl:grid-cols-[minmax(0,1fr)_minmax(0,320px)]">
+              {/* LEFT: builder */}
+              <div className="space-y-4">
           <div>
             <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Padrão:</p>
             <div className="flex min-h-14 flex-wrap items-center gap-1.5 rounded-xl border border-white/5 bg-white/[0.02] px-3 py-2">
@@ -353,11 +355,11 @@ export function PatternValidator({ spins }: { spins: Spin[] }) {
           </div>
 
           {/* Modo entrada */}
-          <div className="grid grid-cols-2 overflow-hidden rounded-xl border border-white/5">
+          <div className="grid grid-cols-2 overflow-hidden rounded-2xl border border-white/5">
             <button
               onClick={() => setMode("exit")}
-              className={`inline-flex items-center justify-center gap-1.5 px-2 py-2.5 text-[11px] font-semibold transition sm:text-xs ${
-                mode === "exit" ? "bg-primary text-primary-foreground" : "bg-white/[0.03] text-muted-foreground"
+              className={`inline-flex items-center justify-center gap-1.5 px-2 py-3 text-[10px] font-black uppercase tracking-widest transition sm:text-[10px] font-outfit ${
+                mode === "exit" ? "bg-[#FF1F3D] text-white shadow-[0_5px_15px_rgba(255,31,61,0.3)]" : "bg-white/[0.03] text-[#9CA3AF]"
               }`}
             >
               <CheckCircle2 className="h-4 w-4 shrink-0" />
@@ -365,8 +367,8 @@ export function PatternValidator({ spins }: { spins: Spin[] }) {
             </button>
             <button
               onClick={() => setMode("no-exit")}
-              className={`inline-flex items-center justify-center gap-1.5 px-2 py-2.5 text-[11px] font-semibold transition sm:text-xs ${
-                mode === "no-exit" ? "bg-primary text-primary-foreground" : "bg-white/[0.03] text-muted-foreground"
+              className={`inline-flex items-center justify-center gap-1.5 px-2 py-3 text-[10px] font-black uppercase tracking-widest transition sm:text-[10px] font-outfit ${
+                mode === "no-exit" ? "bg-[#FF1F3D] text-white shadow-[0_5px_15px_rgba(255,31,61,0.3)]" : "bg-white/[0.03] text-[#9CA3AF]"
               }`}
             >
               <Circle className="h-4 w-4 shrink-0" />
@@ -492,11 +494,12 @@ export function PatternValidator({ spins }: { spins: Spin[] }) {
           <StatRow label="Seq. derrotas:" value={stats.streakL} />
         </aside>
 
-      </div>
-      </>
-      )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
     </Card>
-
   );
 }
 

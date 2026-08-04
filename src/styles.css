@@ -7,6 +7,7 @@
 
 @theme inline {
   --font-sans: "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-outfit: "Outfit", var(--font-sans);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -41,58 +42,53 @@
 }
 
 :root {
-  --radius: 1rem;
+  --radius: 16px;
 
-  /* Premium dark base — not pure black */
-  --background: oklch(0.165 0.012 260);
-  --foreground: oklch(0.985 0.003 260);
+  /* Premium Dark Theme */
+  --background: #090909;
+  --foreground: #FFFFFF;
 
-  --surface:   oklch(0.205 0.014 260);
-  --surface-2: oklch(0.235 0.016 260);
-  --surface-3: oklch(0.275 0.018 260);
+  --surface: #111111;
+  --surface-2: #0C0C0C;
+  --surface-3: #101114;
 
-  --card: oklch(0.21 0.014 260);
-  --card-foreground: oklch(0.985 0.003 260);
-  --popover: oklch(0.22 0.014 260);
-  --popover-foreground: oklch(0.985 0.003 260);
+  --card: #111111;
+  --card-foreground: #FFFFFF;
+  --popover: #111111;
+  --popover-foreground: #FFFFFF;
 
-  --primary: oklch(0.74 0.16 245);
-  --primary-foreground: oklch(0.16 0.012 260);
+  --primary: #FF1F3D;
+  --primary-foreground: #FFFFFF;
 
-  --secondary: oklch(0.26 0.018 260);
-  --secondary-foreground: oklch(0.985 0.003 260);
+  --secondary: #0C0C0C;
+  --secondary-foreground: #9CA3AF;
 
-  --muted: oklch(0.24 0.014 260);
-  --muted-foreground: oklch(0.72 0.012 260);
+  --muted: #111111;
+  --muted-foreground: #9CA3AF;
 
-  --accent: oklch(0.28 0.02 260);
-  --accent-foreground: oklch(0.985 0.003 260);
+  --accent: #FF2648;
+  --accent-foreground: #FFFFFF;
 
-  --destructive: oklch(0.62 0.23 25);
-  --destructive-foreground: oklch(0.98 0 0);
+  --destructive: #FF1F3D;
+  --destructive-foreground: #FFFFFF;
 
-  --border: oklch(1 0 0 / 0.06);
-  --input: oklch(1 0 0 / 0.08);
-  --ring: oklch(0.74 0.16 245);
+  --border: rgba(255, 255, 255, 0.05);
+  --input: rgba(255, 255, 255, 0.05);
+  --ring: #FF1F3D;
 
-  /* Roulette tile palette */
-  --red: oklch(0.63 0.235 25);
-  --red-foreground: oklch(0.99 0 0);
-  --black-tile: oklch(0.255 0.012 260); /* cinza grafite — não preto absoluto */
-  --white-tile: oklch(0.985 0.003 260);
-  --positive: oklch(0.74 0.17 150);
+  /* Roulette tile palette - slightly adjusted for premium feel */
+  --red: #FF1F3D;
+  --red-foreground: #FFFFFF;
+  --black-tile: #1A1A1A;
+  --white-tile: #FFFFFF;
+  --positive: #00FF88;
 
-  /* Decorative */
-  --gradient-primary: linear-gradient(135deg, oklch(0.74 0.16 245), oklch(0.7 0.18 285));
-  --gradient-red: linear-gradient(140deg, oklch(0.68 0.235 28), oklch(0.55 0.235 18));
-  --gradient-black: linear-gradient(140deg, oklch(0.3 0.014 260), oklch(0.22 0.012 260));
-  --gradient-white: linear-gradient(140deg, oklch(1 0 0), oklch(0.92 0.005 260));
-
-  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.4);
-  --shadow-elegant: 0 20px 60px -24px oklch(0 0 0 / 0.6), 0 2px 8px oklch(0 0 0 / 0.25);
-  --shadow-tile: 0 6px 18px -8px oklch(0 0 0 / 0.65), inset 0 1px 0 oklch(1 0 0 / 0.08);
-  --shadow-glow: 0 0 32px color-mix(in oklab, var(--primary) 38%, transparent);
-  --shadow-red-glow: 0 0 28px color-mix(in oklab, var(--red) 45%, transparent);
+  /* Premium Decorations */
+  --gradient-primary: linear-gradient(180deg, #FF3554 0%, #FF1F3D 100%);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4);
+  --shadow-elegant: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 25px rgba(255, 30, 60, 0.18);
+  --shadow-btn: 0 10px 35px rgba(255, 30, 60, 0.35);
 }
 
 .light {
@@ -149,23 +145,58 @@
   }
   body {
     font-feature-settings: "ss01", "cv11";
-    background-image:
-      radial-gradient(ellipse 90% 55% at 50% -12%, color-mix(in oklab, var(--primary) 10%, transparent), transparent 60%),
-      radial-gradient(ellipse 70% 50% at 100% 110%, color-mix(in oklab, oklch(0.55 0.22 290) 9%, transparent), transparent 60%),
-      linear-gradient(180deg, oklch(0.17 0.012 260) 0%, oklch(0.155 0.012 260) 100%);
+    background-color: #090909;
+    background-image: 
+      radial-gradient(circle at 50% -20%, rgba(255, 31, 61, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 0% 0%, rgba(255, 31, 61, 0.05) 0%, transparent 30%),
+      radial-gradient(circle at 100% 100%, rgba(255, 31, 61, 0.05) 0%, transparent 30%);
     background-attachment: fixed;
     min-height: 100vh;
+    position: relative;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.02;
+    pointer-events: none;
+    z-index: 0;
   }
 
   ::selection { background: color-mix(in oklab, var(--primary) 40%, transparent); color: var(--foreground); }
 }
 
 @utility glass-card {
-  background: linear-gradient(180deg, color-mix(in oklab, var(--surface) 92%, transparent), color-mix(in oklab, var(--surface) 78%, transparent));
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-elegant);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(17, 17, 17, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 25px rgba(255, 30, 60, 0.12);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 16px;
+}
+
+@utility premium-btn {
+  background: linear-gradient(180deg, #FF3554 0%, #FF1F3D 100%);
+  box-shadow: 0 10px 35px rgba(255, 30, 60, 0.35);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@utility premium-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 15px 45px rgba(255, 30, 60, 0.45);
+}
+
+@utility premium-input {
+  background: #111111;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+@utility premium-input:focus {
+  border-color: rgba(255, 40, 70, 0.35);
+  box-shadow: 0 0 15px rgba(255, 30, 60, 0.15);
 }
 
 @utility tile-shadow {
