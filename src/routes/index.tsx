@@ -117,16 +117,28 @@ function LandingPage() {
 
       {/* Central Login Card (Based on LoveKing Pro) */}
       <main className="relative z-10 mx-auto flex min-h-[100svh] w-full items-center justify-center px-6 py-8">
-        <div className="glass-card-glow relative w-full max-w-md overflow-hidden rounded-[2rem] border border-white/5 bg-[#0C0C0C]/90 p-8 text-center backdrop-blur-xl sm:p-12">
+        <div className="glass-card-glow relative w-full max-w-[420px] overflow-hidden rounded-[2.5rem] border border-white/5 bg-[#0C0C0C]/90 p-8 text-center backdrop-blur-xl sm:p-12">
           {/* Logo */}
-          <div className="mb-8 flex justify-center">
+          <div className="mb-10 flex justify-center">
             <div className="relative">
-              <img 
-                src={kingImg.url} 
-                alt="Logo" 
-                className="h-16 w-16 rounded-full object-cover ring-2 ring-[#FF1F3D]/20" 
-              />
-              <div className="absolute -inset-2 rounded-full bg-[#FF1F3D]/20 blur-xl" />
+              <div className="flex items-center gap-2">
+                <img 
+                  src={kingImg.url} 
+                  alt="Logo" 
+                  className="h-10 w-10 rounded-full object-cover" 
+                />
+                <div className="flex flex-col items-start leading-tight">
+                  <div className="flex items-center gap-1">
+                    <span className="text-xl font-black tracking-tighter text-white">love</span>
+                    <span className="relative flex h-6 w-6 items-center justify-center rounded-sm bg-[#FF1F3D] text-[10px] font-black text-white">
+                      K
+                      <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 text-[8px]">👑</div>
+                    </span>
+                    <span className="text-xl font-black tracking-tighter text-white">ing</span>
+                  </div>
+                  <span className="text-[10px] font-black tracking-[0.2em] text-white/40 uppercase ml-auto">pro</span>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -151,15 +163,30 @@ function LandingPage() {
           {/* Form Fields Mockup */}
           <div className="space-y-4 text-left">
             <div className="space-y-2">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-white/30">E-mail</label>
-              <div className="flex h-12 w-full items-center rounded-xl border border-white/5 bg-[#111111] px-4">
-                <div className="h-2 w-24 rounded bg-white/5" />
+              <div className="flex h-14 w-full items-center rounded-2xl border border-white/5 bg-[#111111] px-4 transition-colors focus-within:border-[#FF1F3D]/30">
+                <div className="mr-3 flex h-5 w-5 items-center justify-center rounded-lg bg-white/5 text-white/20">
+                  <span className="text-[10px]">✉</span>
+                </div>
+                <input 
+                  type="text" 
+                  placeholder="Email" 
+                  className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/20"
+                />
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-white/30">Senha</label>
-              <div className="flex h-12 w-full items-center rounded-xl border border-white/5 bg-[#111111] px-4">
-                <div className="h-2 w-32 rounded bg-white/5" />
+              <div className="flex h-14 w-full items-center rounded-2xl border border-white/5 bg-[#111111] px-4 transition-colors focus-within:border-[#FF1F3D]/30">
+                <div className="mr-3 flex h-5 w-5 items-center justify-center rounded-lg bg-white/5 text-white/20">
+                  <span className="text-[10px]">🔒</span>
+                </div>
+                <input 
+                  type="password" 
+                  placeholder="Senha" 
+                  className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/20"
+                />
+                <button className="ml-2 text-white/20 hover:text-white/40">
+                  <span className="text-[10px]">👁</span>
+                </button>
               </div>
             </div>
           </div>
@@ -191,17 +218,17 @@ function LandingPage() {
           </div>
 
           {/* Secondary Action */}
-          <button className="mt-6 flex w-full items-center justify-between rounded-xl border border-white/5 bg-white/5 p-4 transition-colors hover:bg-white/10">
-            <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#FF1F3D]/10 text-[#FF1F3D]">
-                <div className="h-4 w-4 rounded-full bg-[#FF1F3D]" />
+          <button className="mt-6 flex w-full items-center justify-between rounded-2xl border border-white/5 bg-white/5 p-5 transition-all hover:bg-white/10 hover:border-[#FF1F3D]/20 group">
+            <div className="flex items-center gap-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FF1F3D]/10 text-[#FF1F3D] ring-1 ring-[#FF1F3D]/20">
+                <span className="text-sm">👑</span>
               </div>
               <div className="text-left">
-                <div className="text-xs font-bold text-white">Torne-se Revendedor</div>
-                <div className="text-[10px] text-white/30">Ganhe com o sistema</div>
+                <div className="text-xs font-black text-white uppercase tracking-tight">Torne-se Revendedor</div>
+                <div className="text-[10px] text-white/30 font-bold uppercase tracking-widest">Ganhe até R$ 147 por chave</div>
               </div>
             </div>
-            <ArrowRight className="h-4 w-4 text-white/20" />
+            <ArrowRight className="h-4 w-4 text-white/20 transition-transform group-hover:translate-x-1" />
           </button>
         </div>
       </main>
