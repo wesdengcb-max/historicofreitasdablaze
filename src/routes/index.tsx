@@ -115,120 +115,96 @@ function LandingPage() {
         <BarChart3 className="h-5 w-5" />
       </Link>
 
-      {/* Content */}
-      <main className="relative z-10 mx-auto flex min-h-[100svh] max-w-lg flex-col items-center justify-center gap-4 px-6 py-8 text-center sm:gap-6 sm:px-8">
-        <p className="text-[10px] font-black uppercase tracking-[0.5em] text-[#FF1F3D] animate-[fadeIn_0.6s_ease-out_both] sm:text-[12px] font-outfit">
-          Freitas da Blaze
-        </p>
-
-        <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-400/5 px-4 py-1 animate-[fadeIn_0.6s_ease-out_0.15s_both]">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-          </span>
-          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-emerald-300 sm:text-[11px]">
-            No Ar
-          </span>
-        </div>
-
-        {/* Hero image — o Rei da Blaze */}
-        <div className="relative flex aspect-square w-[min(35vh,200px)] items-center justify-center sm:w-[min(38vh,240px)]">
-          {/* red glow halo */}
-          <span
-            aria-hidden
-            className="pointer-events-none absolute left-1/2 top-1/2 h-[120%] w-[120%] rounded-full"
-            style={{
-              background:
-                "radial-gradient(circle, rgba(229,57,53,0.55) 0%, rgba(229,57,53,0.25) 35%, transparent 70%)",
-              filter: "blur(24px)",
-              animation: "kingGlow 4.5s ease-in-out infinite",
-            }}
-          />
-          {/* rotating ring */}
-          <span
-            aria-hidden
-            className="pointer-events-none absolute left-1/2 top-1/2 h-[108%] w-[108%] rounded-full"
-            style={{
-              border: "1px solid rgba(229,57,53,0.35)",
-              boxShadow:
-                "inset 0 0 30px rgba(229,57,53,0.25), 0 0 30px rgba(229,57,53,0.25)",
-              animation: "ringSpin 22s linear infinite",
-            }}
-          />
-          {/* floating portrait */}
-          <div
-            className="relative h-full w-full overflow-hidden rounded-full ring-1 ring-red-500/40 animate-[fadeUp_0.9s_ease-out_0.3s_both]"
-            style={{
-              boxShadow:
-                "0 30px 80px -20px rgba(229,57,53,0.6), inset 0 0 40px rgba(0,0,0,0.6)",
-            }}
-          >
-            <img
-              src={kingImg.url}
-              alt="Freitas da Blaze"
-              draggable={false}
-              className="h-full w-full select-none object-cover"
-              style={{ animation: "kingFloat 6s ease-in-out infinite" }}
-            />
-            {/* diagonal light sweep */}
-            <span
-              aria-hidden
-              className="pointer-events-none absolute inset-y-0 left-0 w-1/3"
-              style={{
-                background:
-                  "linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent)",
-                animation: "sweep 5.5s ease-in-out infinite",
-              }}
-            />
-            {/* inner vignette to blend with page */}
-            <span
-              aria-hidden
-              className="pointer-events-none absolute inset-0 rounded-full"
-              style={{
-                background:
-                  "radial-gradient(circle at 50% 50%, transparent 55%, rgba(0,0,0,0.55) 100%)",
-              }}
-            />
+      {/* Central Login Card (Based on LoveKing Pro) */}
+      <main className="relative z-10 mx-auto flex min-h-[100svh] w-full items-center justify-center px-6 py-8">
+        <div className="glass-card-glow relative w-full max-w-md overflow-hidden rounded-[2rem] border border-white/5 bg-[#0C0C0C]/90 p-8 text-center backdrop-blur-xl sm:p-12">
+          {/* Logo */}
+          <div className="mb-8 flex justify-center">
+            <div className="relative">
+              <img 
+                src={kingImg.url} 
+                alt="Logo" 
+                className="h-16 w-16 rounded-full object-cover ring-2 ring-[#FF1F3D]/20" 
+              />
+              <div className="absolute -inset-2 rounded-full bg-[#FF1F3D]/20 blur-xl" />
+            </div>
           </div>
-        </div>
 
-        <h1
-          className="text-[clamp(3rem,10vw,7rem)] font-black leading-none tracking-tight animate-[fadeUp_0.8s_ease-out_0.35s_both] font-outfit uppercase"
-          style={{
-            background:
-              "linear-gradient(180deg, #FFFFFF 0%, #FF1F3D 100%)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            filter:
-              "drop-shadow(0 0 30px rgba(229,57,53,0.55)) drop-shadow(0 0 80px rgba(229,57,53,0.35))",
-          }}
-        >
-          LIBERADO
-        </h1>
+          <h1 className="mb-2 text-3xl font-bold tracking-tight text-white font-outfit">
+            Entre no <span className="text-[#FF1F3D]">Reino</span>
+          </h1>
+          <p className="mb-8 text-sm text-white/40">
+            Painel oficial Freitas da Blaze
+          </p>
 
-        <p className="max-w-md text-sm text-white/70 sm:text-base animate-[fadeUp_0.6s_ease-out_0.55s_both]">
-          A versão 2.0 do Freitas da Blaze está no ar.
-        </p>
+          {/* Action Tabs Mockup */}
+          <div className="mb-8 grid grid-cols-2 gap-4">
+            <button className="flex items-center justify-center gap-2 rounded-xl bg-[#FF1F3D] py-3 text-sm font-semibold text-white shadow-[0_0_20px_rgba(255,31,61,0.4)] transition-transform hover:scale-[1.02]">
+              <ArrowRight className="h-4 w-4" />
+              Entrar
+            </button>
+            <button className="flex items-center justify-center gap-2 rounded-xl border border-white/5 bg-white/5 py-3 text-sm font-semibold text-white/60 transition-colors hover:bg-white/10">
+              Cadastrar
+            </button>
+          </div>
 
-        <div className="mt-2 animate-[fadeUp_0.6s_ease-out_0.75s_both]">
-          <Link
-            to="/app"
-            preload="intent"
-            onClick={(e) => {
-              e.preventDefault();
-              goWithTransition("/app");
-            }}
-            className="group relative inline-flex items-center gap-3 rounded-full px-8 py-3 text-sm font-semibold text-black transition-transform hover:scale-[1.03] active:scale-[0.98] sm:px-9 sm:py-3.5 sm:text-base"
-            style={{
-              background:
-                "linear-gradient(180deg, #ffb0b0 0%, #ff4d4d 100%)",
-              boxShadow:
-                "0 0 40px rgba(229,57,53,0.55), 0 0 90px rgba(229,57,53,0.35), inset 0 1px 0 rgba(255,255,255,0.55)",
-            }}
-          >
-            <span>Entrar no sistema</span>
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </Link>
+          {/* Form Fields Mockup */}
+          <div className="space-y-4 text-left">
+            <div className="space-y-2">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-white/30">E-mail</label>
+              <div className="flex h-12 w-full items-center rounded-xl border border-white/5 bg-[#111111] px-4">
+                <div className="mr-3 h-4 w-4 text-white/20" />
+                <div className="h-2 w-24 rounded bg-white/5" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-white/30">Senha</label>
+              <div className="flex h-12 w-full items-center rounded-xl border border-white/5 bg-[#111111] px-4">
+                <div className="mr-3 h-4 w-4 text-white/20" />
+                <div className="h-2 w-32 rounded bg-white/5" />
+              </div>
+            </div>
+          </div>
+
+          <button className="mt-4 w-full text-right text-[11px] font-medium text-white/30 hover:text-white/60 transition-colors">
+            Esqueceu a senha?
+          </button>
+
+          {/* Main Action Button */}
+          <div className="mt-8">
+            <Link
+              to="/app"
+              preload="intent"
+              onClick={(e) => {
+                e.preventDefault();
+                goWithTransition("/app");
+              }}
+              className="group relative flex w-full items-center justify-center gap-3 rounded-xl bg-[#FF1F3D] py-4 text-sm font-bold text-white shadow-[0_0_30px_rgba(255,31,61,0.3)] transition-all hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(255,31,61,0.4)] active:scale-[0.98]"
+            >
+              <span>Entrar no Painel</span>
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Link>
+          </div>
+
+          <div className="mt-6 flex items-center gap-4">
+            <div className="h-[1px] flex-1 bg-white/5" />
+            <span className="text-[10px] font-bold text-white/20 uppercase">ou</span>
+            <div className="h-[1px] flex-1 bg-white/5" />
+          </div>
+
+          {/* Secondary Action */}
+          <button className="mt-6 flex w-full items-center justify-between rounded-xl border border-white/5 bg-white/5 p-4 transition-colors hover:bg-white/10">
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#FF1F3D]/10 text-[#FF1F3D]">
+                <kingImg.url className="h-4 w-4" /> {/* Fallback or icon */}
+              </div>
+              <div className="text-left">
+                <div className="text-xs font-bold text-white">Torne-se Revendedor</div>
+                <div className="text-[10px] text-white/30">Ganhe com o sistema</div>
+              </div>
+            </div>
+            <ArrowRight className="h-4 w-4 text-white/20" />
+          </button>
         </div>
       </main>
 
