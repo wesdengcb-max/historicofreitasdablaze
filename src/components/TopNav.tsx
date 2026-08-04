@@ -45,6 +45,22 @@ const ITEMS: Item[] = [
 export function TopNav() {
   const active = useSection();
   const isVip = useVipStatus();
+  const [isDark, setIsDark] = useState(true);
+
+  useEffect(() => {
+    const isLight = document.documentElement.classList.contains("light");
+    setIsDark(!isLight);
+  }, []);
+
+  const toggleTheme = () => {
+    const next = !isDark;
+    setIsDark(next);
+    if (next) {
+      document.documentElement.classList.remove("light");
+    } else {
+      document.documentElement.classList.add("light");
+    }
+  };
 
   const handleSectionClick = (item: Item) => {
     // Only dashboard is public, others require VIP
