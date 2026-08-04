@@ -1523,35 +1523,6 @@ const EmptySlot = memo(function EmptySlot({
 
 
 
-function ThemeToggle() {
-  const [dark, setDark] = useState(true);
-  useEffect(() => {
-    const saved = typeof localStorage !== "undefined" ? localStorage.getItem("theme") : null;
-    const isDark = saved ? saved === "dark" : true;
-    setDark(isDark);
-    document.documentElement.classList.toggle("light", !isDark);
-  }, []);
-  const toggle = () => {
-    const next = !dark;
-    setDark(next);
-    document.documentElement.classList.toggle("light", !next);
-    try {
-      localStorage.setItem("theme", next ? "dark" : "light");
-    } catch {
-      /* noop */
-    }
-  };
-  return (
-    <button
-      type="button"
-      onClick={toggle}
-      className="grid h-11 w-11 place-items-center rounded-xl border border-white/10 bg-white/5 text-muted-foreground transition-colors duration-200 hover:bg-white/[0.09] hover:text-foreground"
-      aria-label={dark ? "Ativar tema claro" : "Ativar tema escuro"}
-    >
-      {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-    </button>
-  );
-}
 
 
 const FieldInput = memo(function FieldInput({
