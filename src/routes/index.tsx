@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, BarChart3 } from "lucide-react";
 import { useMemo, useState } from "react";
 import kingImg from "@/assets/freitas-king.png.asset.json";
-import bgImg from "@/assets/freitas-bg.png.asset.json";
+import whiteHeroImg from "@/assets/freitas-white.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -52,13 +52,13 @@ function LandingPage() {
 
   return (
     <div className="relative min-h-[100svh] w-full overflow-hidden bg-[#090909] text-white">
-      {/* Background Image Layer */}
+      {/* Background Hero Image Layer */}
       <div 
-        className="absolute inset-y-0 right-0 z-0 opacity-40 bg-contain bg-right-bottom bg-no-repeat pointer-events-none"
+        className="absolute inset-y-0 right-0 z-0 opacity-60 bg-contain bg-right-bottom bg-no-repeat pointer-events-none"
         style={{ 
-          backgroundImage: `url(${bgImg.url})`,
-          width: '50%',
-          maxWidth: '800px',
+          backgroundImage: `url(${whiteHeroImg.url})`,
+          width: '60%',
+          maxWidth: '900px',
         }}
       />
       
