@@ -1168,7 +1168,7 @@ function Index() {
                                       if (pending && i === 0) {
                                          return (
                                           <div key={`p-${ci}-${i}`} className="flex flex-col items-center">
-                                            <div className="relative flex h-[48px] w-[48px] items-center justify-center overflow-hidden rounded-[6px] border border-white/10 bg-white shadow-sm ring-1 ring-emerald-400/40">
+                                            <div className="relative flex h-[48px] w-[48px] items-center justify-center overflow-hidden rounded-[6px] border-[2.5px] border-emerald-400 bg-white shadow-sm">
                                               <img
                                                 src={brancoTile.url}
                                                 alt="Sinal"
@@ -1176,7 +1176,7 @@ function Index() {
                                                 draggable={false}
                                               />
                                             </div>
-                                            <span className="mt-1 text-[10px] tabular-nums font-medium h-[12px] flex items-center text-[#7b7c80]">
+                                            <span className="mt-[5px] text-[11px] tabular-nums font-medium h-[11px] flex items-center text-[#8ebcf0]">
                                               {hm}
                                             </span>
                                           </div>
