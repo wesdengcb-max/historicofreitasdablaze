@@ -920,15 +920,15 @@ function Index() {
 
             {/* Cabeçalho das estatísticas por coluna */}
             {viewMode === "colunas" && contarColunas && (
-              <div className="history-scroll mb-3 w-full border-b border-white/5 pb-3">
-                <div className="grid gap-[var(--gap-col,8px)]" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "fit-content", marginLeft: "auto", marginRight: "auto" }}>
+              <div className="mb-3 w-full border-b border-white/5 pb-3">
+                <div className="grid gap-[8px]" style={{ gridTemplateColumns: "repeat(10, 1fr)", maxWidth: "1366px", width: "100%", marginLeft: "auto", marginRight: "auto" }}>
                   {Array.from({ length: 10 }).map((_, ci) => {
                     const stats = colStats[ci];
                     return (
                       <div
                         key={`col-stats-${ci}`}
                         className="flex w-full flex-col gap-0.5 overflow-hidden rounded-[4px] bg-white/[0.03] p-1 shadow-inner"
-                        style={{ width: "var(--colW, 120px)" }}
+                        style={{ width: "100%" }}
                       >
                         <div className="flex items-center justify-between px-0.5 text-[8px] font-bold tabular-nums">
                           <span className="text-white">B: {stats.white}</span>
