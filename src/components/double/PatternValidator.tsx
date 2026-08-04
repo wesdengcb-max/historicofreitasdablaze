@@ -242,6 +242,7 @@ export function PatternValidator({ spins }: { spins: Spin[] }) {
           </div>
         ) : (
           <div className="animate-in fade-in slide-in-from-top-1 duration-200">
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-[minmax(0,1fr)_minmax(0,280px)] xl:grid-cols-[minmax(0,1fr)_minmax(0,320px)]">
       {/* Header row: name + premium hint */}
       <div className="mb-4 grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3">
         <div className="inline-flex items-center gap-2 rounded-lg bg-primary/15 px-3 py-1.5 text-xs font-semibold text-primary ring-1 ring-primary/30">
@@ -484,6 +485,7 @@ export function PatternValidator({ spins }: { spins: Spin[] }) {
           <StatRow label="Seq. derrotas:" value={stats.streakL} />
         </aside>
 
+            </div>
           </div>
         )}
       </div>
