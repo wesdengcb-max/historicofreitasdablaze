@@ -1068,15 +1068,15 @@ function Index() {
                       : "Nenhum resultado no período selecionado."}
                   </div>
                 ) : viewMode === "colunas" ? (
-                  <div className="history-scroll max-w-full overflow-x-auto p-1 sm:p-2 lg:p-3">
+                  <div className="history-scroll w-full overflow-x-auto p-1 sm:p-2 lg:p-3">
                     <div className="flex flex-col gap-0">
                       {/* Cabeçalho 0-9 interno para Colunas Fixas */}
-                      <div className="grid gap-[8px] mb-1 sticky top-0 z-10 bg-background/40 backdrop-blur-sm" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "fit-content", marginLeft: "auto", marginRight: "auto" }}>
+                      <div className="grid gap-[8px] mb-1 sticky top-0 z-10 bg-background/40 backdrop-blur-sm" style={{ gridTemplateColumns: "repeat(10, 1fr)", maxWidth: "1366px", width: "100%", marginLeft: "auto", marginRight: "auto" }}>
                         {Array.from({ length: 10 }).map((_, ci) => (
                           <div
                             key={`header-inner-${ci}`}
                             className="flex h-[23px] w-[137px] items-center justify-center rounded-[6px] border border-[#2a3545] bg-transparent text-[14px] font-medium tabular-nums text-white"
-                            style={{ width: "var(--colW, 120px)" }}
+                            style={{ width: "100%" }}
                           >
                             {ci}
                           </div>
@@ -1085,7 +1085,7 @@ function Index() {
 
                       {gridRows.map((row) => (
                         <div key={row.key} className="flex flex-col gap-0 border-b border-white/[0.02]">
-                          <div className="grid gap-[8px] relative" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "fit-content", marginLeft: "auto", marginRight: "auto" }}>
+                          <div className="grid gap-[8px] relative" style={{ gridTemplateColumns: "repeat(10, 1fr)", maxWidth: "1366px", width: "100%", marginLeft: "auto", marginRight: "auto" }}>
                             {/* Marcador de hora na lateral esquerda, visível apenas se Contar Linhas estiver ativo */}
                             {contarLinhas && (
                               <div className="absolute -left-12 top-1/2 -translate-y-1/2 rotate-180 [writing-mode:vertical-lr] text-[10px] font-black tracking-widest text-muted-foreground/30 uppercase select-none">
@@ -1122,7 +1122,7 @@ function Index() {
                               <div
                                 key={ci}
                                 className="flex flex-col items-center justify-center p-0.5 sm:p-1"
-                                style={{ width: "min-content", minWidth: "120px", height: "66px", direction: "ltr" }}
+                                style={{ width: "100%", height: "66px", direction: "ltr" }}
                               >
                                 <div className="relative flex flex-col items-center pt-2">
                                   {badge && (
