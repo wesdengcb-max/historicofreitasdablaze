@@ -9,7 +9,7 @@ import {
   Activity,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { setSection, useSection, type SectionId } from "@/lib/sectionStore";
+import { type SectionId } from "@/lib/sectionStore";
 
 type Item = {
   id: SectionId;
@@ -29,8 +29,8 @@ const ITEMS: Item[] = [
   { id: "hostman", title: "Hostman Branco", icon: Flame, badge: "NOVO", badgeClass: "bg-red-500 text-white" },
 ];
 
-export function TopNav() {
-  const active = useSection();
+export function TopNav({ activeSection, onSectionChange }: { activeSection: SectionId, onSectionChange: (id: SectionId) => void }) {
+  const active = activeSection;
   return (
     <nav className="border-b border-white/[0.05] bg-[#101114]/80 backdrop-blur-2xl sticky top-0 z-50">
       <div className="mx-auto flex max-w-[1366px] gap-1 overflow-x-auto px-3 py-2 scrollbar-none sm:px-8">
@@ -40,7 +40,7 @@ export function TopNav() {
           return (
             <button
               key={item.id}
-              onClick={() => setSection(item.id)}
+              onClick={() => onSectionChange(item.id)}
               className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-bold transition sm:text-xs font-outfit ${
                 isActive
                   ? "bg-[#FF1F3D]/10 border border-[#FF1F3D]/30 text-white shadow-[0_0_15px_rgba(255,31,61,0.1)]"

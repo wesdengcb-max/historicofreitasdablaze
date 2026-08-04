@@ -723,7 +723,7 @@ function Index() {
         <Suspense fallback={<SectionFallback />}><AnaliseSection /></Suspense>
       ) : section === "estrategias" ? (
         <Suspense fallback={<SectionFallback />}><EstrategiasSection /></Suspense>
-      ) : section !== "dashboard" ? (
+      ) : section !== "historico" ? (
         <main className="mx-auto flex w-full max-w-[1366px] flex-col gap-5 px-3 py-10 sm:gap-6 sm:px-8 sm:py-16">
           <Card delay={0.05}>
             <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
@@ -852,9 +852,6 @@ function Index() {
             </div>
           </Card>
 
-          <div className="mx-auto w-full max-w-[1366px] mb-8">
-             <StrategyTabs spins={visibleSpins} />
-          </div>
 
           <Card
             title="Giros anteriores"
@@ -1292,11 +1289,6 @@ function Index() {
       <WhiteCelebration spin={whiteFlash} onClose={() => setWhiteFlash(null)} />
       <WhiteAlertToggleFx state={alertFx} onDone={() => setAlertFx(null)} />
 
-      <LeftStatsDrawer
-        open={statsOpen}
-        onClose={() => setStatsOpen(false)}
-        spins={visibleSpins}
-      />
     </div>
   );
 }
