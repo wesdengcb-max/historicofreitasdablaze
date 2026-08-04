@@ -947,9 +947,6 @@ function Index() {
                   <Switch checked={whiteAlert} onChange={toggleWhiteAlert} label="Alerta de branco" />
                 </div>
                 <div className="flex min-w-0 items-center">
-                  <Switch checked={whiteAlert} onChange={toggleWhiteAlert} label="Alerta de branco" />
-                </div>
-                <div className="flex min-w-0 items-center">
                   <Switch checked={destaqueHorario} onChange={setDestaqueHorario} label="Destaque horário" />
                 </div>
                 <div className="flex min-w-0 items-center">
