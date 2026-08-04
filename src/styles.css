@@ -152,7 +152,8 @@
 .light .bg-white\/\[0\.03\],
 .light .bg-surface,
 .light .bg-surface-2,
-.light .bg-surface-3 {
+.light .bg-surface-3,
+.light .bg-\[\#101114\] {
   background: #f1f5f9 !important;
 }
 
