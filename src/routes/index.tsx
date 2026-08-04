@@ -54,10 +54,10 @@ function LandingPage() {
     <div className="relative min-h-[100svh] w-full overflow-hidden bg-[#090909] text-white">
       {/* Background Image Layer */}
       <div 
-        className="absolute inset-0 z-0 opacity-60 bg-cover bg-right sm:bg-center bg-no-repeat"
+        className="absolute inset-y-0 right-0 z-0 opacity-40 bg-contain bg-right-bottom bg-no-repeat"
         style={{ 
           backgroundImage: `url(${bgImg.url})`,
-          backgroundSize: 'cover'
+          width: '70%',
         }}
       />
       
@@ -115,7 +115,7 @@ function LandingPage() {
       </Link>
 
       {/* Content */}
-      <main className="relative z-10 ml-auto mr-auto lg:mr-[15%] flex min-h-[100svh] max-w-lg flex-col items-center justify-center gap-4 px-6 py-8 text-center sm:gap-6 sm:px-8">
+      <main className="relative z-10 mx-auto flex min-h-[100svh] max-w-lg flex-col items-center justify-center gap-4 px-6 py-8 text-center sm:gap-6 sm:px-8">
         <p className="text-[10px] font-black uppercase tracking-[0.5em] text-[#FF1F3D] animate-[fadeIn_0.6s_ease-out_both] sm:text-[12px] font-outfit">
           Freitas da Blaze
         </p>
