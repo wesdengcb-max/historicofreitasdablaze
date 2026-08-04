@@ -1352,7 +1352,10 @@ function Index() {
 
 
 
-      <WhiteCelebration spin={whiteFlash} onClose={() => setWhiteFlash(null)} />
+      <WhiteCelebration 
+        spin={whiteFlash} 
+        onClose={() => setWhiteFlash(null)} 
+      />
       <WhiteAlertToggleFx state={alertFx} onDone={() => setAlertFx(null)} />
 
       <LeftStatsDrawer

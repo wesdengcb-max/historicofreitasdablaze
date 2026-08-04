@@ -111,6 +111,12 @@ type Props = {
 
 /** Celebração em tela cheia quando sai um branco. */
 export function WhiteCelebration({ spin, onClose }: Props) {
+  useEffect(() => {
+    if (!spin) return;
+    const t = setTimeout(onClose, 3500); // Fecha automaticamente após 3.5 segundos
+    return () => clearTimeout(t);
+  }, [spin, onClose]);
+
   return (
     <AnimatePresence>
       {spin && (
@@ -188,7 +194,7 @@ export function WhiteCelebration({ spin, onClose }: Props) {
 export function WhiteAlertToggleFx({ state, onDone }: { state: "on" | "off" | null; onDone: () => void }) {
   useEffect(() => {
     if (!state) return;
-    const t = setTimeout(onDone, 2000); // Reduzido para 2 segundos para ser mais ágil
+    const t = setTimeout(onDone, 1200); // Reduzido para 1.2 segundos para ser muito mais ágil e profissional
     return () => clearTimeout(t);
   }, [state, onDone]);
 
