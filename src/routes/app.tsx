@@ -1146,13 +1146,14 @@ function Index() {
                                       {badge.label}
                                     </span>
                                   )}
-                                  <div className="flex items-start gap-[8px] h-[56px]">
+                                  <div className="relative flex h-[56px] items-start gap-[8px]">
                                     {(cell.length >= 2
                                       ? [cell[0], cell[1]]
                                       : cell.length === 1
                                         ? [cell[0], undefined]
                                         : [undefined, undefined]
                                     ).map((spin, i) => {
+
                                       const slotKey = `${hm}-${i}`;
                                       if (spin) {
                                         return (
