@@ -485,8 +485,7 @@ export function PatternValidator({ spins }: { spins: Spin[] }) {
         </aside>
 
         </div>
-        )}
-      </div>
+      )}
     </Card>
 
   );
