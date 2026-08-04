@@ -87,8 +87,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "Histórico Freitas — Blaze" },
       { name: "twitter:description", content: "A versão 2.0 do Histórico Freitas está no ar." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/0413064c-8ee3-4b81-9e68-07446c991901/id-preview-a9288380--39ea3609-e5bc-46a6-93f4-36044ce8cbad.lovable.app-1785125609722.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/0413064c-8ee3-4b81-9e68-07446c991901/id-preview-a9288380--39ea3609-e5bc-46a6-93f4-36044ce8cbad.lovable.app-1785125609722.png" },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/bf06bff2-138a-4a33-8b46-032b91a61bd7/id-preview-720867f3--39ea3609-e5bc-46a6-93f4-36044ce8cbad.lovable.app-1785805331783.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/bf06bff2-138a-4a33-8b46-032b91a61bd7/id-preview-720867f3--39ea3609-e5bc-46a6-93f4-36044ce8cbad.lovable.app-1785805331783.png" },
     ],
     links: [
       {
