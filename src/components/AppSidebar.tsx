@@ -56,8 +56,8 @@ export function AppSidebar() {
   const isActive = (path: string) => currentPath === path;
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-border">
-      <SidebarHeader className="border-b border-border">
+    <Sidebar collapsible="icon" className="border-r border-border bg-[#0C0C0C]">
+      <SidebarHeader className="border-b border-border bg-[#0C0C0C]">
         <div className="flex items-center gap-2 px-1 py-1 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:gap-2">
           <div
             className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-xl bg-white ring-1 ring-white/40"
@@ -66,7 +66,7 @@ export function AppSidebar() {
             <img src={freitasLogo.url} alt="Freitas Blaze" className="h-full w-full object-cover" />
           </div>
           <div className="flex-1 min-w-0 leading-tight group-data-[collapsible=icon]:hidden">
-            <p className="truncate text-sm font-semibold tracking-tight">Freitas da Blaze</p>
+            <p className="truncate text-sm font-bold tracking-tight font-outfit">Freitas da Blaze</p>
             <p className="truncate text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
               Análise do Histórico da Blaze
             </p>
@@ -92,8 +92,8 @@ export function AppSidebar() {
                       tooltip={item.title}
                       className={
                         active
-                          ? "bg-gradient-to-r from-red-500/20 to-transparent border border-red-500/40 text-foreground"
-                          : ""
+                          ? "bg-[#FF1F3D]/10 border border-[#FF1F3D]/30 text-white shadow-[0_0_15px_rgba(255,31,61,0.1)]"
+                          : "hover:bg-white/[0.03] text-[#9CA3AF] hover:text-white"
                       }
                     >
                       <Link to={item.url}>

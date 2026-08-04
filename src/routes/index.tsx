@@ -50,16 +50,17 @@ function LandingPage() {
   );
 
   return (
-    <div className="relative min-h-[100svh] w-full overflow-hidden bg-black text-white">
-      {/* Radial glow background */}
+    <div className="relative min-h-[100svh] w-full overflow-hidden bg-[#090909] text-white">
+      {/* Premium background effects */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 70% 55% at 50% 40%, rgba(229,57,53,0.20), transparent 65%), radial-gradient(ellipse 60% 50% at 50% 100%, rgba(201,168,76,0.10), transparent 70%)",
+            "radial-gradient(circle at 50% -20%, rgba(255, 31, 61, 0.2) 0%, transparent 60%), radial-gradient(circle at 50% 120%, rgba(255, 31, 61, 0.1) 0%, transparent 70%)",
         }}
       />
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
       {/* Grid overlay */}
       <div
         aria-hidden
@@ -104,8 +105,8 @@ function LandingPage() {
       </Link>
 
       {/* Content */}
-      <main className="relative z-10 mx-auto flex min-h-[100svh] max-w-3xl flex-col items-center justify-center gap-3 px-4 py-6 text-center sm:gap-4 sm:px-6">
-        <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-[#c9a84c] animate-[fadeIn_0.6s_ease-out_both] sm:text-[11px]">
+      <main className="relative z-10 mx-auto flex min-h-[100svh] max-w-4xl flex-col items-center justify-center gap-4 px-4 py-8 text-center sm:gap-6 sm:px-6">
+        <p className="text-[10px] font-black uppercase tracking-[0.5em] text-[#FF1F3D] animate-[fadeIn_0.6s_ease-out_both] sm:text-[12px] font-outfit">
           Freitas da Blaze
         </p>
 
@@ -181,10 +182,10 @@ function LandingPage() {
         </div>
 
         <h1
-          className="text-[clamp(3rem,10vw,7rem)] font-black leading-none tracking-tight animate-[fadeUp_0.8s_ease-out_0.35s_both]"
+          className="text-[clamp(3rem,10vw,7rem)] font-black leading-none tracking-tight animate-[fadeUp_0.8s_ease-out_0.35s_both] font-outfit uppercase"
           style={{
             background:
-              "linear-gradient(180deg, #ffd6d6 0%, #ff5b5b 45%, #ffffff 100%)",
+              "linear-gradient(180deg, #FFFFFF 0%, #FF1F3D 100%)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             filter:
