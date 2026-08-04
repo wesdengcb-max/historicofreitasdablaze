@@ -294,23 +294,23 @@ export function PredictiveSignals() {
                 {mode2.map((s) => (
                   <div
                     key={s.key}
-                    className="rounded-xl border border-emerald-400/40 bg-emerald-500/[0.07] px-4 py-3 shadow-[0_0_20px_-6px_rgba(52,211,153,0.6)]"
+                    className="rounded-2xl border border-[#FF1F3D]/20 bg-[#FF1F3D]/5 px-5 py-4 shadow-[0_0_25px_rgba(255,31,61,0.1)] backdrop-blur-sm"
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-xs font-semibold text-foreground">{s.title}</span>
-                      <span className="rounded-md border border-emerald-400/40 bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-emerald-300">
+                      <span className="text-xs font-bold text-white uppercase tracking-tighter">{s.title}</span>
+                      <span className="rounded-full border border-[#FF1F3D]/30 bg-[#FF1F3D]/20 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest text-white">
                         Alta assertividade
                       </span>
                     </div>
-                    <div className="mt-1 text-2xl font-black tabular-nums text-foreground">
+                    <div className="mt-1 text-3xl font-black tabular-nums text-white font-outfit">
                       {s.times.map((t) => fmtClock(t)).join(" / ")}
                     </div>
-                    <div className="mt-1 text-[11px] tabular-nums text-emerald-300">
+                    <div className="mt-1 text-[11px] tabular-nums text-[#FF1F3D] font-black">
                       {s.pct.toFixed(1)}%
                     </div>
                     <div className="mt-2 text-[10px] leading-relaxed text-muted-foreground">
                       Confluência Top 5:{" "}
-                      <span className="font-semibold text-emerald-300">{s.confluence}</span>
+                      <span className="font-bold text-[#FF1F3D]">{s.confluence}</span>
                     </div>
                     <div className="mt-1 flex flex-wrap gap-1">
                       {s.sources.map((p) => (
@@ -318,8 +318,8 @@ export function PredictiveSignals() {
                           key={`${p.analysis}-${p.value}`}
                           className={
                             p.top5
-                              ? "rounded border border-emerald-400/40 bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-bold tabular-nums text-emerald-300"
-                              : "rounded border border-white/10 bg-white/[0.03] px-1.5 py-0.5 text-[9px] font-medium tabular-nums text-muted-foreground"
+                              ? "rounded-full border border-[#FF1F3D]/30 bg-[#FF1F3D]/20 px-2 py-0.5 text-[9px] font-black tabular-nums text-white"
+                              : "rounded-full border border-white/10 bg-white/[0.03] px-2 py-0.5 text-[9px] font-bold tabular-nums text-[#9CA3AF]"
                           }
                         >
                           A{p.analysis}·{p.value} {p.pct.toFixed(0)}%
