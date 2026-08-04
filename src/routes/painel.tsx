@@ -45,6 +45,7 @@ import freitasLogo from "@/assets/freitas-logo.jpg.asset.json";
 import { getSignals, subscribeSignals, type StoredSignal } from "@/lib/signalsStore";
 import { TopNav } from "@/components/TopNav";
 import { type SectionId } from "@/lib/sectionStore";
+import { ThemeToggle } from "@/components/ThemeToggle";
 const SinaisPage = lazy(() =>
   import("@/components/sections/SinaisSection").then((m) => ({ default: m.SinaisPage })),
 );
