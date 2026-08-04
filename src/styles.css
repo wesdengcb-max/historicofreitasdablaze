@@ -43,7 +43,6 @@
   --color-surface-3: var(--surface-3);
   --color-time-text: var(--time-text);
 }
-}
 
 :root {
   --radius: 16px;
