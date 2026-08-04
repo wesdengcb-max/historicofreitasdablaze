@@ -1068,7 +1068,7 @@ function Index() {
                       : "Nenhum resultado no período selecionado."}
                   </div>
                 ) : viewMode === "colunas" ? (
-                  <div className="history-scroll w-full overflow-x-auto p-1 sm:p-2 lg:p-3">
+                  <div className="history-scroll glass-card w-full overflow-x-hidden p-1 sm:p-2 lg:p-3">
                     <div className="flex flex-col gap-0">
                       {/* Cabeçalho 0-9 interno para Colunas Fixas */}
                       <div className="grid gap-[8px] mb-1 sticky top-0 z-10 bg-background/40 backdrop-blur-sm" style={{ gridTemplateColumns: "repeat(10, 1fr)", maxWidth: "1366px", width: "100%", marginLeft: "auto", marginRight: "auto" }}>
