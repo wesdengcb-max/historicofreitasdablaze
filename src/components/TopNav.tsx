@@ -7,9 +7,20 @@ import {
   Network,
   PlayCircle,
   Activity,
+  Crown,
+  Lock,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { setSection, useSection, type SectionId } from "@/lib/sectionStore";
+import { useVipStatus, setVipStatus } from "@/lib/auth/vipStore";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
+
 
 type Item = {
   id: SectionId;
