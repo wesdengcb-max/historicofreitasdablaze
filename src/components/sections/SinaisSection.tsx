@@ -344,24 +344,26 @@ export function SinaisPage() {
 
 
   return (
-    <div className="min-h-screen bg-background p-4 sm:p-6 space-y-6">
+    <div className="min-h-screen bg-[#090909] p-4 sm:p-6 space-y-8">
       {/* Gerador de sinais preditivos */}
       <PredictiveSignals />
 
       {/* Top header */}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-[10px] tracking-widest text-muted-foreground font-mono">
-              [ TRANSMISSION · CONTROL <span className="text-red-500">●</span> ]
+          <div className="flex items-center gap-3 mb-2">
+            <span className="text-[10px] tracking-[0.5em] text-[#FF1F3D] font-black font-outfit uppercase">
+              [ TRANSMISSION · CONTROL ]
             </span>
-            <div className="grid h-8 w-8 place-items-center rounded-lg bg-red-500/10 text-red-500">
-              <Radio className="h-4 w-4" />
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-black tracking-tight">Sinais</h1>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Gerencie sua lista de sinais e estratégias automáticas.
+          <div className="flex items-center gap-3">
+             <div className="grid h-10 w-10 place-items-center rounded-xl bg-[#FF1F3D]/10 text-[#FF1F3D] shadow-[0_0_15px_rgba(255,31,61,0.1)]">
+              <Radio className="h-5 w-5" />
+            </div>
+            <h1 className="text-4xl font-black tracking-tighter text-white font-outfit uppercase">Sinais</h1>
+          </div>
+          <p className="mt-2 text-sm text-[#9CA3AF] font-medium">
+            Gerencie sua lista de sinais e estratégias automáticas de forma premium.
           </p>
           <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-3 py-1 text-xs">
             <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
@@ -372,7 +374,7 @@ export function SinaisPage() {
         <div className="flex items-center gap-3">
           <Popover open={menuOpen} onOpenChange={setMenuOpen}>
             <PopoverTrigger asChild>
-              <Button className="bg-red-500 hover:bg-red-600 text-white rounded-full h-10 px-5 shadow-lg shadow-red-500/30">
+              <Button className="premium-btn text-white rounded-full h-11 px-6 font-bold uppercase tracking-widest text-[11px] font-outfit">
                 <Plus className="h-4 w-4" />
                 Adicionar
                 <ChevronDown className="h-4 w-4" />
@@ -392,16 +394,16 @@ export function SinaisPage() {
           </Popover>
 
 
-          <div className="flex items-center gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2">
-            <div className="grid h-9 w-9 place-items-center rounded-full bg-emerald-500 text-black">
-              <Power className="h-4 w-4" />
+          <div className="flex items-center gap-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 px-5 py-2.5 backdrop-blur-md">
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-500 text-black shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+              <Power className="h-5 w-5" />
             </div>
             <div className="text-xs leading-tight">
-              <div className="text-muted-foreground">
-                ROBÔ · SINAIS <span className="opacity-60">(AUTO)</span>
+              <div className="text-[#9CA3AF] font-bold tracking-widest text-[9px] uppercase">
+                ROBÔ · SINAIS
               </div>
-              <div className="font-black text-emerald-400 text-base">
-                {robotOn ? "ON" : "OFF"}
+              <div className="font-black text-emerald-400 text-lg font-outfit">
+                {robotOn ? "ACTIVE" : "STANDBY"}
               </div>
             </div>
             <Switch checked={robotOn} onCheckedChange={setRobotOn} />
@@ -413,13 +415,13 @@ export function SinaisPage() {
       <BlazeRoulette results={results} />
 
       {/* Estratégias Personalizadas */}
-      <Card className="!p-0 overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-          <div className="flex items-center gap-3">
-            <div className="grid h-9 w-9 place-items-center rounded-lg bg-amber-500/10 text-amber-400">
-              <Cpu className="h-4 w-4" />
+      <Card className="glass-card !p-0 overflow-hidden">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.05] bg-white/[0.02]">
+          <div className="flex items-center gap-4">
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-amber-500/10 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.1)]">
+              <Cpu className="h-5 w-5" />
             </div>
-            <h2 className="font-bold text-lg">Estratégias Personalizadas</h2>
+            <h2 className="font-black text-xl text-white font-outfit uppercase tracking-tight">Estratégias Personalizadas</h2>
           </div>
           <div className="text-[11px] tracking-widest font-mono text-muted-foreground border border-border rounded-full px-3 py-1">
             [ ● 0 ATIVAS ]
@@ -440,13 +442,13 @@ export function SinaisPage() {
       </Card>
 
       {/* Lista de Sinais */}
-      <Card className="!p-0 overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-          <div className="flex items-center gap-3">
-            <div className="grid h-9 w-9 place-items-center rounded-lg bg-red-500/10 text-red-400">
-              <Radio className="h-4 w-4" />
+      <Card className="glass-card !p-0 overflow-hidden">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.05] bg-white/[0.02]">
+          <div className="flex items-center gap-4">
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-[#FF1F3D]/10 text-[#FF1F3D] shadow-[0_0_15px_rgba(255,31,61,0.1)]">
+              <Radio className="h-5 w-5" />
             </div>
-            <h2 className="font-bold text-lg">Lista de Sinais</h2>
+            <h2 className="font-black text-xl text-white font-outfit uppercase tracking-tight">Lista de Sinais</h2>
           </div>
           <div className="text-[11px] tracking-widest font-mono text-red-400 border border-red-500/40 rounded-full px-3 py-1">
             [ ● {visible.length} SINAIS ]
