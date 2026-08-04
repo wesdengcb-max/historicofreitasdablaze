@@ -10,7 +10,7 @@ type Props = {
   autoCloseTime?: number;
 };
 
-export function WhiteAlert({ spin, onClose, autoCloseTime = 5000 }: Props) {
+export function WhiteAlert({ spin, onClose, autoCloseTime = 3000 }: Props) {
   useEffect(() => {
     if (spin) {
       const timer = setTimeout(onClose, autoCloseTime);

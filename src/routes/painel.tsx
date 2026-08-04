@@ -478,7 +478,7 @@ function Index() {
     } catch {
       /* noop */
     }
-    const t = setTimeout(() => setWhiteFlash(null), 5000);
+    const t = setTimeout(() => setWhiteFlash(null), 3000);
     return () => clearTimeout(t);
   }, [spins, whiteAlert]);
 
@@ -1319,7 +1319,7 @@ function Index() {
 
 
 
-      <WhiteAlert spin={whiteFlash} onClose={() => setWhiteFlash(null)} autoCloseTime={5000} />
+      <WhiteAlert spin={whiteFlash} onClose={() => setWhiteFlash(null)} autoCloseTime={3000} />
       <WhiteCelebration spin={whiteFlash} onClose={() => setWhiteFlash(null)} />
       <WhiteAlertToggleFx state={alertFx} onDone={() => setAlertFx(null)} />
 
