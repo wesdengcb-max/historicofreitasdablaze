@@ -1,5 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { setSection } from "@/lib/sectionStore";
+import { useVipStatus } from "@/lib/auth/vipStore";
+import { toast } from "sonner";
+import { Lock } from "lucide-react";
+
 
 import { lazy, memo, Suspense, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import {
@@ -19,8 +29,10 @@ import {
   Clock,
   ChevronDown,
   BarChart3,
+  Crown,
   Send,
 } from "lucide-react";
+
 
 import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
 import { Card } from "@/components/double/Card";
@@ -217,10 +229,23 @@ function Index() {
   const section = useSection();
   const [inverse, setInverse] = useState(false);
   const [viewMode, setViewMode] = useState<"colunas" | "lista">("colunas");
+  const isVip = useVipStatus();
+
   // Em celular/tablet inicia em lista (sentido normal); desktop mantém colunas fixas.
   useEffect(() => {
     if (window.innerWidth < 1024) setViewMode("lista");
   }, []);
+
+  // Protect current section if VIP is lost
+  useEffect(() => {
+    if (section !== "dashboard" && !isVip) {
+      setSection("dashboard");
+      toast.error("Membro VIP Expirado", {
+        description: "Você foi redirecionado para o Histórico pois não possui acesso VIP.",
+      });
+    }
+  }, [section, isVip]);
+
   const [whiteAlert, setWhiteAlert] = useState(false);
   const [alertFx, setAlertFx] = useState<"on" | "off" | null>(null);
   const toggleWhiteAlert = useCallback((next: boolean) => {
@@ -920,10 +945,11 @@ function Index() {
 
             {/* Painel de controles alinhado */}
             <div className="mb-3 rounded-2xl border border-white/5 bg-white/[0.02] p-2 sm:mb-4 sm:p-4">
-              <div className="grid grid-cols-2 gap-x-3 gap-y-2 text-[11px] sm:gap-x-8 sm:gap-y-3.5 lg:grid-cols-4">
+              <div className="grid grid-cols-2 gap-x-3 gap-y-2 text-[11px] sm:gap-x-8 sm:gap-y-3.5 lg:grid-cols-5">
                 <div className="flex min-w-0 items-center">
                   <Switch checked={realtime} onChange={setRealtime} label="Tempo real" />
                 </div>
+
                 <div className="flex min-w-0 items-center">
                   <Switch
                     checked={viewMode === "colunas"}
@@ -949,6 +975,15 @@ function Index() {
                 <div className="flex min-w-0 items-center">
                   <Switch checked={destaqueHorario} onChange={setDestaqueHorario} label="Destaque horário" />
                 </div>
+                <div className="flex min-w-0 items-center">
+                  <div className={`flex items-center gap-2.5 rounded-full border px-3 py-1.5 transition-all ${isVip ? "border-amber-400/30 bg-amber-400/5 text-amber-400" : "border-white/5 bg-white/5 text-muted-foreground opacity-60"}`}>
+                    <Crown className="h-3.5 w-3.5" />
+                    <span className="text-[11px] font-bold uppercase tracking-wider font-outfit">
+                      {isVip ? "VIP Ativo" : "Básico"}
+                    </span>
+                  </div>
+                </div>
+
                 <div className="flex min-w-0 items-center">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -977,6 +1012,7 @@ function Index() {
                 </div>
               </div>
             </div>
+
 
             {/* Cabeçalho das estatísticas por coluna */}
             {viewMode === "colunas" && contarColunas && (
@@ -1123,14 +1159,17 @@ function Index() {
                                       {badge.label}
                                     </span>
                                   )}
-                                  <div className="flex items-start gap-[8px] h-[56px]">
+                                  <div className="relative flex h-[56px] items-start gap-[8px]">
                                     {(cell.length >= 2
                                       ? [cell[0], cell[1]]
                                       : cell.length === 1
                                         ? [cell[0], undefined]
                                         : [undefined, undefined]
                                     ).map((spin, i) => {
+
                                       const slotKey = `${hm}-${i}`;
+                                      const isLocked = !isVip && !spin && !(pending && i === 0);
+
                                       if (spin) {
                                         return (
                                           <div key={(spin as Spin).id} className="flex flex-col items-center">
@@ -1181,28 +1220,48 @@ function Index() {
                                         <div key={`e-${ci}-${i}`} className="flex flex-col items-center">
                                           <button
                                             type="button"
-                                            onClick={() => cycleSlotPrediction(slotKey)}
+                                            onClick={() => {
+                                              if (isLocked) {
+                                                toast.error("Recurso VIP", {
+                                                  description: "A criação de alertas manuais é exclusiva para membros VIP.",
+                                                });
+                                                return;
+                                              }
+                                              cycleSlotPrediction(slotKey);
+                                            }}
                                             className={`relative flex h-[48px] w-[48px] items-center justify-center rounded-[6px] border border-dashed transition-colors hover:border-white/20 ${
-                                              p === "white"
-                                                ? "border-emerald-400/50 bg-emerald-400/5"
-                                                : p === "red"
-                                                  ? "border-red-500/50 bg-red-500/5"
-                                                  : p === "black"
-                                                    ? "border-slate-500/50 bg-slate-500/5"
-                                                    : "border-[#3b5270] bg-[#233248]"
+                                              isLocked
+                                                ? "border-white/5 bg-white/5 opacity-50 cursor-not-allowed"
+                                                : p === "white"
+                                                  ? "border-emerald-400/50 bg-emerald-400/5"
+                                                  : p === "red"
+                                                    ? "border-red-500/50 bg-red-500/5"
+                                                    : p === "black"
+                                                      ? "border-slate-500/50 bg-slate-500/5"
+                                                      : "border-[#3b5270] bg-[#233248]"
                                             }`}
                                           >
-                                            <div className={`h-[32px] w-[32px] rounded-full border-2 transition-all ${
-                                              p === "white" ? "bg-white border-white/20" :
-                                              p === "red" ? "bg-red-500 border-red-400/20" :
-                                              p === "black" ? "bg-slate-800 border-slate-700/20" :
-                                              "bg-transparent border-white"
-                                            }`} />
+                                            {isLocked ? (
+                                              <Lock className="h-4 w-4 text-muted-foreground/40" />
+                                            ) : (
+                                              <div
+                                                className={`h-[32px] w-[32px] rounded-full border-2 transition-all ${
+                                                  p === "white"
+                                                    ? "bg-white border-white/20"
+                                                    : p === "red"
+                                                      ? "bg-red-500 border-red-400/20"
+                                                      : p === "black"
+                                                        ? "bg-slate-800 border-slate-700/20"
+                                                        : "bg-transparent border-white"
+                                                }`}
+                                              />
+                                            )}
                                           </button>
                                           <span className="mt-[5px] h-[11px] text-[11px] font-medium tabular-nums text-[#8ebcf0]">
                                             {hm}
                                           </span>
                                         </div>
+
                                       );
                                     })}
                                   </div>

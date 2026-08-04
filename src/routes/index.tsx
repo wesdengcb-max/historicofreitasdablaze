@@ -1,7 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowRight, BarChart3 } from "lucide-react";
+import { ArrowRight, BarChart3, Crown } from "lucide-react";
 import { useMemo, useState } from "react";
 import kingImg from "@/assets/freitas-white-hero.png.asset.json";
+import { useVipStatus } from "@/lib/auth/vipStore";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -20,7 +22,9 @@ export const Route = createFileRoute("/")({
 
 function LandingPage() {
   const [exitTo, setExitTo] = useState<null | "/app" | "/sinais" | "/estrategias">(null);
+  const isVip = useVipStatus();
   const navigate = useNavigate();
+
 
   const goWithTransition = (to: "/app" | "/sinais" | "/estrategias") => {
     if (exitTo) return;
@@ -73,6 +77,20 @@ function LandingPage() {
         />
       </div>
 
+      {/* VIP Status Icon */}
+      <div className="absolute right-20 top-6 z-20 flex h-11 items-center gap-3">
+        {isVip ? (
+          <div className="flex items-center gap-2 rounded-full border border-amber-400/30 bg-amber-400/10 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-amber-400 backdrop-blur-md font-outfit">
+            <Crown className="h-3.5 w-3.5" />
+            Membro VIP
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 rounded-full border border-white/10 bg-black/40 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/40 backdrop-blur-md font-outfit">
+            Acesso Básico
+          </div>
+        )}
+      </div>
+
       {/* Top right icon */}
       <Link
         to="/app"
@@ -86,6 +104,7 @@ function LandingPage() {
       >
         <BarChart3 className="h-5 w-5" />
       </Link>
+
 
       {/* Content */}
       <main className="relative z-10 mx-auto flex min-h-[100svh] max-w-4xl flex-col items-center justify-center gap-4 px-4 py-8 text-center sm:gap-6 sm:px-6">

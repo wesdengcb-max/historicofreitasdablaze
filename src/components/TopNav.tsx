@@ -7,9 +7,20 @@ import {
   Network,
   PlayCircle,
   Activity,
+  Crown,
+  Lock,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { setSection, useSection, type SectionId } from "@/lib/sectionStore";
+import { useVipStatus, setVipStatus } from "@/lib/auth/vipStore";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
+
 
 type Item = {
   id: SectionId;
@@ -31,33 +42,103 @@ const ITEMS: Item[] = [
 
 export function TopNav() {
   const active = useSection();
+  const isVip = useVipStatus();
+
+  const handleSectionClick = (item: Item) => {
+    // Only dashboard is public, others require VIP
+    if (item.id !== "dashboard" && !isVip) {
+      toast.error("Área Exclusiva", {
+        description: "Você precisa ser Membro VIP para acessar esta aba.",
+      });
+      return;
+    }
+    setSection(item.id);
+  };
+
   return (
-    <nav className="border-b border-white/[0.05] bg-[#101114]/80 backdrop-blur-2xl sticky top-0 z-50">
-      <div className="mx-auto flex max-w-[1366px] gap-1 overflow-x-auto px-3 py-2 scrollbar-none sm:px-8">
-        {ITEMS.map((item) => {
-          const Icon = item.icon;
-          const isActive = active === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => setSection(item.id)}
-              className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-bold transition sm:text-xs font-outfit ${
-                isActive
-                  ? "bg-[#FF1F3D]/10 border border-[#FF1F3D]/30 text-white shadow-[0_0_15px_rgba(255,31,61,0.1)]"
-                  : "border border-transparent text-[#9CA3AF] hover:bg-white/[0.03] hover:text-white"
-              }`}
-            >
-              <Icon className="h-3.5 w-3.5" />
-              <span className="whitespace-nowrap">{item.title}</span>
-              {item.badge && (
-                <Badge className={`ml-1 text-[9px] font-mono tracking-widest px-1.5 py-0 h-4 ${item.badgeClass}`}>
-                  {item.badge}
-                </Badge>
-              )}
-            </button>
-          );
-        })}
+    <nav className="sticky top-0 z-50 border-b border-white/[0.05] bg-[#101114]/80 backdrop-blur-2xl">
+      <div className="mx-auto flex max-w-[1366px] items-center justify-between px-3 py-2 sm:px-8">
+        <div className="flex gap-1 overflow-x-auto scrollbar-none">
+          {ITEMS.map((item) => {
+            const Icon = item.icon;
+            const isActive = active === item.id;
+            const isLocked = item.id !== "dashboard" && !isVip;
+
+            return (
+              <button
+                key={item.id}
+                onClick={() => handleSectionClick(item)}
+                className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-bold transition sm:text-xs font-outfit ${
+                  isActive
+                    ? "bg-[#FF1F3D]/10 border border-[#FF1F3D]/30 text-white shadow-[0_0_15px_rgba(255,31,61,0.1)]"
+                    : "border border-transparent text-[#9CA3AF] hover:bg-white/[0.03] hover:text-white"
+                } ${isLocked ? "opacity-60" : ""}`}
+              >
+                <div className="relative">
+                  <Icon className="h-3.5 w-3.5" />
+                  {isLocked && (
+                    <div className="absolute -right-1 -top-1 rounded-full bg-black/80 p-0.5">
+                      <Lock className="h-2 w-2 text-[#FF1F3D]" />
+                    </div>
+                  )}
+                </div>
+                <span className="whitespace-nowrap">{item.title}</span>
+                {item.badge && (
+                  <Badge
+                    className={`ml-1 h-4 px-1.5 py-0 font-mono text-[9px] tracking-widest ${item.badgeClass}`}
+                  >
+                    {item.badge}
+                  </Badge>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="ml-4 flex shrink-0 items-center">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className={`flex h-9 w-9 items-center justify-center rounded-full border transition-all duration-300 ${
+                  isVip
+                    ? "border-amber-400/50 bg-amber-400/10 text-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.2)]"
+                    : "border-white/10 bg-white/5 text-muted-foreground hover:bg-white/10"
+                }`}
+              >
+                <Crown className="h-4 w-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 border-white/10 bg-[#101114]">
+              <div className="px-2 py-2">
+                <p className="font-outfit text-xs font-black uppercase tracking-widest text-[#FF1F3D]">
+                  Membro VIP
+                </p>
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  {isVip
+                    ? "Assinatura ativa. Aproveite os recursos premium."
+                    : "Desbloqueie todas as análises e sinais exclusivos."}
+                </p>
+              </div>
+              <DropdownMenuItem
+                onClick={() => {
+                  const next = !isVip;
+                  setVipStatus(next);
+                  toast.success(next ? "Modo VIP Ativado" : "Modo VIP Desativado", {
+                    description: next 
+                      ? "Agora você tem acesso total ao sistema." 
+                      : "Recursos premium foram bloqueados.",
+                  });
+                }}
+                className="mt-1 flex cursor-pointer items-center gap-2 font-bold text-white focus:bg-[#FF1F3D]/20 focus:text-white"
+              >
+                <Crown className={`h-4 w-4 ${isVip ? "text-amber-400" : ""}`} />
+                <span>{isVip ? "Desativar VIP (Demo)" : "Ativar VIP (Demo)"}</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
     </nav>
   );
 }
+
