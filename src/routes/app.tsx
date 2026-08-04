@@ -1071,7 +1071,7 @@ function Index() {
                   <div className="history-scroll max-w-full overflow-x-auto p-1 [container-type:inline-size] sm:p-2 lg:p-3">
                     <div className="flex flex-col gap-0">
                       {/* Cabeçalho 0-9 interno para Colunas Fixas */}
-                      <div className="grid justify-center gap-[var(--gap-col,8px)] px-[1px] mb-1 sticky top-0 z-10 bg-background/40 backdrop-blur-sm" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "1274px", margin: "0 auto" }}>
+                      <div className="grid justify-center gap-[8px] px-[1px] mb-1 sticky top-0 z-10 bg-background/40 backdrop-blur-sm" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "1274px", margin: "0 auto" }}>
                         {Array.from({ length: 10 }).map((_, ci) => (
                           <div
                             key={`header-inner-${ci}`}
@@ -1085,7 +1085,7 @@ function Index() {
 
                       {gridRows.map((row) => (
                         <div key={row.key} className="flex flex-col gap-0 border-b border-white/[0.02]">
-                          <div className="grid justify-center gap-[var(--gap-col,8px)] relative px-[1px]" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "1274px", margin: "0 auto" }}>
+                          <div className="grid justify-center gap-[8px] relative px-[1px]" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "1274px", margin: "0 auto" }}>
                             {/* Marcador de hora na lateral esquerda, visível apenas se Contar Linhas estiver ativo */}
                             {contarLinhas && (
                               <div className="absolute -left-12 top-1/2 -translate-y-1/2 rotate-180 [writing-mode:vertical-lr] text-[10px] font-black tracking-widest text-muted-foreground/30 uppercase select-none">
@@ -1130,7 +1130,7 @@ function Index() {
                                       {badge.label}
                                     </span>
                                   )}
-                                  <div className="flex items-start gap-[var(--gap-col,8px)] h-[56px]">
+                                  <div className="flex items-start gap-[8px] h-[56px]">
                                     {(cell.length >= 2
                                       ? [cell[0], cell[1]]
                                       : cell.length === 1
@@ -1353,7 +1353,7 @@ const TipMinerCard = memo(function TipMinerCard({
           isHit ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : ""
         }`}
         style={{
-          width: "var(--stone, 52px)",
+          width: "var(--stone, 48px)",
           height: "var(--stone-h, 48px)",
           background: isWhite ? "#ffffff" : bg,
           opacity: isActive ? 1 : 0.25,
@@ -1431,7 +1431,7 @@ const EmptySlot = memo(function EmptySlot({
             : "border border-dashed border-white/10 bg-white/[0.02] hover:bg-white/[0.06]"
         }`}
         style={{
-          width: "var(--stone, 52px)",
+          width: "var(--stone, 48px)",
           height: "var(--stone-h, 48px)",
           background: prediction ? (isWhite ? "#ffffff" : bg) : undefined
         }}
@@ -1446,8 +1446,8 @@ const EmptySlot = memo(function EmptySlot({
             />
           ) : (
             <div
-              className="h-[calc(var(--stone-size,44px)*0.75)] w-[calc(var(--stone-size,44px)*0.75)] rounded-full"
-              style={{ border: `2px solid ${ring}` }}
+              className="h-[32px] w-[32px] rounded-full border-2"
+              style={{ border: `2px solid #5a6d84` }}
             />
           )
         ) : null}
