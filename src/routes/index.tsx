@@ -196,7 +196,7 @@ function LandingPage() {
           <button className="mt-6 flex w-full items-center justify-between rounded-xl border border-white/5 bg-white/5 p-4 transition-colors hover:bg-white/10">
             <div className="flex items-center gap-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#FF1F3D]/10 text-[#FF1F3D]">
-                <kingImg.url className="h-4 w-4" /> {/* Fallback or icon */}
+                <div className="h-4 w-4 rounded-full bg-[#FF1F3D]" />
               </div>
               <div className="text-left">
                 <div className="text-xs font-bold text-white">Torne-se Revendedor</div>
