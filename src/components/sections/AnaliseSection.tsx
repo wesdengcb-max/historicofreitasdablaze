@@ -40,8 +40,7 @@ function diffMinutes(a: Date, b: Date) {
 }
 
 /**
- * Gatilhos só podem ser Ativos ou Completos (14 contagens).
- * Não há mais o estado 'encerrado' por tempo.
+ * Gatilhos são considerados completos apenas quando atingem as 14 contagens.
  */
 function cycleStatus(c: Cycle): "completo" | "ativo" {
   if (c.gaps.length >= MAX_ZEROS) return "completo";
