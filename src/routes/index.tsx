@@ -8,10 +8,10 @@ import heroImg from "@/assets/freitas-white-hero.png.asset.json";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Histórico Freitas — Blaze" },
-      { name: "description", content: "A versão 2.0 do Histórico Freitas está no ar." },
-      { property: "og:title", content: "Histórico Freitas — Blaze" },
-      { property: "og:description", content: "A versão 2.0 do Histórico Freitas está no ar." },
+      { title: "Freitas White PRO - Portal de Acesso VIP" },
+      { name: "description", content: "Acesso exclusivo à inteligência de sinais e análise preditiva avançada." },
+      { property: "og:title", content: "Freitas White PRO - Portal de Acesso VIP" },
+      { property: "og:description", content: "Domine as probabilidades com a plataforma oficial Freitas White." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex, nofollow" },
@@ -136,10 +136,10 @@ function LandingPage() {
           </div>
 
           <h1 className="mb-2 text-3xl font-bold tracking-tight text-white font-outfit">
-            Entre no <span className="text-[#FF1F3D]">Reino</span>
+            Acesso <span className="text-[#FF1F3D]">VIP</span>
           </h1>
           <p className="mb-8 text-sm text-white/40">
-            Painel oficial Freitas da Blaze
+            Domine as probabilidades com Freitas White PRO
           </p>
 
           {/* Action Tabs Mockup */}
@@ -184,7 +184,7 @@ function LandingPage() {
               }}
               className="group relative flex w-full items-center justify-center gap-3 rounded-xl bg-[#FF1F3D] py-4 text-sm font-bold text-white shadow-[0_0_30px_rgba(255,31,61,0.3)] transition-all hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(255,31,61,0.4)] active:scale-[0.98]"
             >
-              <span>Entrar no Painel</span>
+              <span>ENTRAR NO PAINEL</span>
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
