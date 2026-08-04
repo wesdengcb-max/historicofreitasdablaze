@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 import { lazy, memo, Suspense, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
@@ -27,8 +27,6 @@ import { Card } from "@/components/double/Card";
 import { ResultCircle } from "@/components/double/ResultCircle";
 import { Switch } from "@/components/double/Switch";
 import { WhiteCelebration, WhiteAlertToggleFx } from "@/components/double/WhiteCelebration";
-import { StrategyTabs } from "@/components/double/StrategyTabs";
-import { LeftStatsDrawer } from "@/components/double/LeftStatsDrawer";
 
 
 import { colorOf, fmtTime, type Spin } from "@/components/double/types";
@@ -44,7 +42,6 @@ import freitasLogo from "@/assets/freitas-logo.jpg.asset.json";
 
 import { getSignals, subscribeSignals, type StoredSignal } from "@/lib/signalsStore";
 import { TopNav } from "@/components/TopNav";
-import { useSection } from "@/lib/sectionStore";
 const SinaisPage = lazy(() =>
   import("@/components/sections/SinaisSection").then((m) => ({ default: m.SinaisPage })),
 );
@@ -214,7 +211,7 @@ function computeRange(
 }
 
 function Index() {
-  const section = useSection();
+  const [section, setSection] = useState<"historico" | "analise" | "sinais" | "estrategias">("historico");
   const [inverse, setInverse] = useState(false);
   const [viewMode, setViewMode] = useState<"colunas" | "lista">("colunas");
   // Em celular/tablet inicia em lista (sentido normal); desktop mantém colunas fixas.

@@ -19,10 +19,10 @@ export const Route = createFileRoute("/")({
 });
 
 function LandingPage() {
-  const [exitTo, setExitTo] = useState<null | "/app" | "/sinais" | "/estrategias">(null);
+  const [exitTo, setExitTo] = useState<null | "/painel">(null);
   const navigate = useNavigate();
 
-  const goWithTransition = (to: "/app" | "/sinais" | "/estrategias") => {
+  const goWithTransition = (to: "/painel") => {
     if (exitTo) return;
     setExitTo(to);
     window.setTimeout(() => {
@@ -75,11 +75,11 @@ function LandingPage() {
 
       {/* Top right icon */}
       <Link
-        to="/app"
+        to="/painel"
         preload="intent"
         onClick={(e) => {
           e.preventDefault();
-          goWithTransition("/app");
+          goWithTransition("/painel");
         }}
         className="absolute right-6 top-6 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-red-500/40 bg-black/40 text-red-500 backdrop-blur transition hover:border-red-500 hover:bg-red-500/10"
         aria-label="Abrir painel"
@@ -124,11 +124,11 @@ function LandingPage() {
 
         <div className="mt-2 animate-[fadeUp_0.6s_ease-out_0.75s_both]">
           <Link
-            to="/app"
+            to="/painel"
             preload="intent"
             onClick={(e) => {
               e.preventDefault();
-              goWithTransition("/app");
+              goWithTransition("/painel");
             }}
             className="group relative inline-flex items-center gap-3 rounded-full px-8 py-3 text-sm font-semibold text-black transition-transform hover:scale-[1.03] active:scale-[0.98] sm:px-9 sm:py-3.5 sm:text-base"
             style={{
