@@ -1,12 +1,12 @@
 import {
   LayoutDashboard,
   BarChart3,
-  DollarSign,
   Flame,
   Radio,
   Network,
   PlayCircle,
   Activity,
+  Lock,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { type SectionId } from "@/lib/sectionStore";
