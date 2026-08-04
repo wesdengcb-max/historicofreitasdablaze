@@ -103,12 +103,12 @@ export function BlazeRoulette({ results }: { results: Result[] }) {
   const translateX = centerOffset - pos * STEP;
 
   return (
-    <div className="rounded-2xl border border-border bg-surface/60 backdrop-blur px-4 pt-4 pb-5 sm:px-6 sm:pt-5 sm:pb-6">
+    <div className="glass-card px-4 pt-4 pb-5 sm:px-6 sm:pt-6 sm:pb-8">
       <RouletteHeader latestIso={latest?.createdAt} spinning={spinning} />
 
       <div
         ref={containerRef}
-        className="relative mt-4 overflow-hidden rounded-xl bg-[oklch(0.16_0.014_260)] border border-white/5"
+        className="relative mt-4 overflow-hidden rounded-2xl bg-[#090909] border border-white/[0.05]"
         style={{ height: TILE_W + 32 }}
       >
         {/* Center pointer */}
@@ -119,8 +119,8 @@ export function BlazeRoulette({ results }: { results: Result[] }) {
         <div className="pointer-events-none absolute left-1/2 bottom-1 z-20 h-2 w-2 -translate-x-1/2 rotate-45 bg-white/80 rounded-[2px]" />
 
         {/* Side fades */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-16 z-10 bg-gradient-to-r from-[oklch(0.16_0.014_260)] to-transparent" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-16 z-10 bg-gradient-to-l from-[oklch(0.16_0.014_260)] to-transparent" />
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-24 z-10 bg-gradient-to-r from-[#090909] to-transparent" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-24 z-10 bg-gradient-to-l from-[#090909] to-transparent" />
 
         <div
           className="absolute inset-y-0 flex items-center will-change-transform"
@@ -149,10 +149,10 @@ function TileView({ tile, centered }: { tile: Tile; centered?: boolean }) {
   const { n, color } = tile;
   const bgVar =
     color === "red"
-      ? "var(--gradient-red)"
+      ? "linear-gradient(180deg, #FF3554 0%, #FF1F3D 100%)"
       : color === "black"
-        ? "var(--gradient-black)"
-        : "linear-gradient(160deg, oklch(0.35 0.02 260), oklch(0.22 0.014 260))";
+        ? "linear-gradient(180deg, #2A2A2A 0%, #1A1A1A 100%)"
+        : "linear-gradient(180deg, #FFFFFF 0%, #D9D9D9 100%)";
   return (
     <div
       className={`relative shrink-0 grid place-items-center rounded-2xl border overflow-hidden ${
@@ -174,7 +174,7 @@ function TileView({ tile, centered }: { tile: Tile; centered?: boolean }) {
           draggable={false}
         />
       ) : (
-        <div className="grid place-items-center h-[62%] w-[62%] rounded-full border border-white/55 text-white font-black text-xl tabular-nums">
+        <div className="grid place-items-center h-[62%] w-[62%] rounded-full border-2 border-white/50 text-white font-black text-2xl tabular-nums font-outfit">
           {n}
         </div>
       )}
@@ -185,7 +185,7 @@ function TileView({ tile, centered }: { tile: Tile; centered?: boolean }) {
 function PreviousResults({ results }: { results: Result[] }) {
   return (
     <div className="mt-5">
-      <div className="text-[10px] tracking-[0.22em] text-muted-foreground font-mono mb-2">
+      <div className="text-[10px] tracking-[0.4em] text-[#FF1F3D] font-black font-outfit mb-3">
         GIROS ANTERIORES
       </div>
       <div className="flex flex-row-reverse items-center justify-end gap-1.5 overflow-hidden">
@@ -250,19 +250,19 @@ function RouletteHeader({
     : Math.min(100, ((elapsedSec % AVG_CYCLE_SEC) / AVG_CYCLE_SEC) * 100);
 
   return (
-    <div className="relative h-11 overflow-hidden rounded-lg border border-border bg-surface-2">
+    <div className="relative h-11 overflow-hidden rounded-xl border border-white/[0.05] bg-[#0C0C0C]">
       <div
         className="absolute inset-y-0 left-0 transition-[width] duration-300 ease-out"
         style={{
           width: `${progress}%`,
-          background:
-            "linear-gradient(90deg, oklch(0.55 0.22 25 / 0.85), oklch(0.68 0.235 28 / 0.85))",
+          background: "linear-gradient(90deg, #FF3554 0%, #FF1F3D 100%)",
+          boxShadow: "0 0 15px rgba(255,31,61,0.3)",
         }}
       />
-      <div className="relative flex h-full items-center justify-center gap-2 text-sm font-semibold tracking-wide">
+      <div className="relative flex h-full items-center justify-center gap-3 text-xs font-black uppercase tracking-[0.2em] text-white font-outfit">
         <span
           className={`inline-block h-2 w-2 rounded-full ${
-            spinning ? "bg-white" : "bg-red-400"
+            spinning ? "bg-white shadow-[0_0_10px_white]" : "bg-[#FF1F3D] shadow-[0_0_10px_#FF1F3D]"
           } ${spinning ? "animate-pulse" : ""}`}
         />
         {spinning ? "Girando…" : `Girando Em ${mm}:${ss}`}
