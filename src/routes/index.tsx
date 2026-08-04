@@ -52,11 +52,11 @@ function LandingPage() {
   return (
     <div className="relative min-h-[100svh] w-full overflow-hidden bg-black text-white">
       {/* Hero Image as Background */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0 flex items-center justify-center">
         <img
           src={kingImg.url}
           alt=""
-          className="h-full w-full object-cover opacity-60"
+          className="h-full w-full object-contain opacity-70 md:h-[90%] md:w-[90%]"
         />
         {/* Professional overlays for readability */}
         <div 
