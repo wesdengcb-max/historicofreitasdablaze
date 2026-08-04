@@ -258,11 +258,8 @@ export function PatternValidator({ spins }: { spins: Spin[] }) {
               </div>
             </div>
             <div className="grid grid-cols-1 gap-5 md:grid-cols-[minmax(0,1fr)_minmax(0,280px)] xl:grid-cols-[minmax(0,1fr)_minmax(0,320px)]">
-
-
-
-        {/* LEFT: builder */}
-        <div className="space-y-4">
+              {/* LEFT: builder */}
+              <div className="space-y-4">
           <div>
             <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Padrão:</p>
             <div className="flex min-h-14 flex-wrap items-center gap-1.5 rounded-xl border border-white/5 bg-white/[0.02] px-3 py-2">
