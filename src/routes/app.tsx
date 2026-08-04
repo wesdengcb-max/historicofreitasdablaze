@@ -929,7 +929,7 @@ function Index() {
             </div>
 
             {filter === "custom" && (
-              <div className="mb-3 grid gap-2 rounded-xl border border-white/5 bg-white/[0.02] p-3 sm:mb-4 sm:grid-cols-[repeat(4,1fr)_auto] sm:items-end">
+              <div className="mb-3 grid gap-2 rounded-xl border border-white/5 bg-white/[0.02] p-3 sm:mb-4 sm:grid-cols-[repeat(4,1fr)_auto] sm:items-end light:border-black/10 light:bg-black/[0.02]">
                 <FieldInput label="Data inicial" type="date" value={customStart} onChange={setCustomStart} />
                 <FieldInput label="Data final" type="date" value={customEnd} onChange={setCustomEnd} />
                 <FieldInput label="Hora inicial" type="time" value={timeStart} onChange={setTimeStart} placeholder="00:00" />
@@ -1548,7 +1548,7 @@ const FieldInput = memo(function FieldInput({
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className="h-9 rounded-lg border border-white/10 bg-black/30 px-3 text-[12px] text-foreground outline-none transition-colors focus:border-white/25"
+        className="h-9 rounded-lg border border-white/10 bg-black/30 px-3 text-[12px] text-foreground outline-none transition-colors focus:border-white/25 light:border-black/10 light:bg-black/5 light:text-black light:focus:border-black/20"
       />
     </label>
   );
