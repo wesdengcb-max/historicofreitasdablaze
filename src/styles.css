@@ -93,36 +93,36 @@
 
 .light {
   color-scheme: light;
-  --background: oklch(0.985 0.003 260);
-  --foreground: oklch(0.2 0.012 260);
+  --background: #f8fafc;
+  --foreground: #0f172a;
 
-  --surface:   oklch(1 0 0);
-  --surface-2: oklch(0.97 0.005 260);
-  --surface-3: oklch(0.94 0.007 260);
+  --surface:   #ffffff;
+  --surface-2: #f1f5f9;
+  --surface-3: #e2e8f0;
 
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.2 0.012 260);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.2 0.012 260);
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
 
-  --primary: oklch(0.58 0.18 250);
-  --primary-foreground: oklch(0.985 0.003 260);
+  --primary: #FF1F3D; /* Keep primary red */
+  --primary-foreground: #FFFFFF;
 
-  --secondary: oklch(0.94 0.008 260);
-  --secondary-foreground: oklch(0.2 0.012 260);
+  --secondary: #f1f5f9;
+  --secondary-foreground: #0f172a;
 
-  --muted: oklch(0.95 0.006 260);
-  --muted-foreground: oklch(0.45 0.012 260);
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
 
-  --accent: oklch(0.94 0.01 260);
-  --accent-foreground: oklch(0.2 0.012 260);
+  --accent: #f1f5f9;
+  --accent-foreground: #0f172a;
 
-  --border: oklch(0 0 0 / 0.08);
-  --input: oklch(0 0 0 / 0.1);
-  --ring: oklch(0.58 0.18 250);
+  --border: rgba(0, 0, 0, 0.08);
+  --input: rgba(0, 0, 0, 0.1);
+  --ring: #FF1F3D;
 
-  --black-tile: oklch(0.22 0.012 260);
-  --white-tile: oklch(1 0 0);
+  --black-tile: #1A1A1A; /* Maintain tile colors */
+  --white-tile: #FFFFFF;
 }
 
 .light body {
@@ -175,9 +175,9 @@
   color: #94a3b8 !important;
 }
 
-/* Ensure result cards (stones) keep their colors */
+/* Specific exclusion for the result cards (stones) */
 .light .blaze-result-card span {
-  /* Do not override inline colors */
+  color: inherit !important;
 }
 
 .light .premium-btn {
