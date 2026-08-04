@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 import { lazy, memo, Suspense, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
@@ -27,8 +27,6 @@ import { Card } from "@/components/double/Card";
 import { ResultCircle } from "@/components/double/ResultCircle";
 import { Switch } from "@/components/double/Switch";
 import { WhiteCelebration, WhiteAlertToggleFx } from "@/components/double/WhiteCelebration";
-import { StrategyTabs } from "@/components/double/StrategyTabs";
-import { LeftStatsDrawer } from "@/components/double/LeftStatsDrawer";
 
 
 import { colorOf, fmtTime, type Spin } from "@/components/double/types";
@@ -44,7 +42,7 @@ import freitasLogo from "@/assets/freitas-logo.jpg.asset.json";
 
 import { getSignals, subscribeSignals, type StoredSignal } from "@/lib/signalsStore";
 import { TopNav } from "@/components/TopNav";
-import { useSection } from "@/lib/sectionStore";
+import { type SectionId } from "@/lib/sectionStore";
 const SinaisPage = lazy(() =>
   import("@/components/sections/SinaisSection").then((m) => ({ default: m.SinaisPage })),
 );
@@ -65,7 +63,7 @@ function SectionFallback() {
 
 
 
-export const Route = createFileRoute("/app")({
+export const Route = createFileRoute("/painel")({
   head: () => ({
     meta: [
       { title: "Freitas da Blaze — Análise do Histórico da Blaze" },
@@ -214,7 +212,7 @@ function computeRange(
 }
 
 function Index() {
-  const section = useSection();
+  const [section, setSection] = useState<SectionId>("historico");
   const [inverse, setInverse] = useState(false);
   const [viewMode, setViewMode] = useState<"colunas" | "lista">("colunas");
   // Em celular/tablet inicia em lista (sentido normal); desktop mantém colunas fixas.
@@ -718,7 +716,7 @@ function Index() {
         </div>
       </header>
 
-      <TopNav />
+      <TopNav activeSection={section} onSectionChange={setSection} />
 
       {section === "sinais" ? (
         <Suspense fallback={<SectionFallback />}><SinaisPage /></Suspense>
@@ -726,7 +724,7 @@ function Index() {
         <Suspense fallback={<SectionFallback />}><AnaliseSection /></Suspense>
       ) : section === "estrategias" ? (
         <Suspense fallback={<SectionFallback />}><EstrategiasSection /></Suspense>
-      ) : section !== "dashboard" ? (
+      ) : section !== "historico" ? (
         <main className="mx-auto flex w-full max-w-[1366px] flex-col gap-5 px-3 py-10 sm:gap-6 sm:px-8 sm:py-16">
           <Card delay={0.05}>
             <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
@@ -855,9 +853,6 @@ function Index() {
             </div>
           </Card>
 
-          <div className="mx-auto w-full max-w-[1366px] mb-8">
-             <StrategyTabs spins={visibleSpins} />
-          </div>
 
           <Card
             title="Giros anteriores"
@@ -1295,11 +1290,6 @@ function Index() {
       <WhiteCelebration spin={whiteFlash} onClose={() => setWhiteFlash(null)} />
       <WhiteAlertToggleFx state={alertFx} onDone={() => setAlertFx(null)} />
 
-      <LeftStatsDrawer
-        open={statsOpen}
-        onClose={() => setStatsOpen(false)}
-        spins={visibleSpins}
-      />
     </div>
   );
 }
