@@ -742,7 +742,7 @@ function Index() {
           </Card>
         </main>
       ) : (
-      <main className="mx-auto flex w-full max-w-[1366px] flex-col gap-3 px-1.5 py-3 sm:gap-5 sm:px-4 sm:py-6 lg:gap-6 lg:px-8 lg:py-10">
+      <main className="mx-auto flex w-full max-w-[1366px] flex-col gap-3 px-1.5 py-3 sm:gap-5 sm:px-4 sm:py-6 lg:gap-6 lg:px-8 lg:py-10 bg-[#0d131d]">
 
         <section className="space-y-3 sm:space-y-5 lg:space-y-6">
           <Card delay={0.05}>
@@ -858,7 +858,7 @@ function Index() {
           <StrategyTabs spins={visibleSpins} />
 
           <Card
-            title="Histórico"
+            title="Giros anteriores"
             subtitle={`${total} rodadas · horário de Brasília`}
             icon={<TrendingUp className="h-3.5 w-3.5" />}
             delay={0.08}
@@ -1071,11 +1071,11 @@ function Index() {
                   <div className="history-scroll max-w-full overflow-x-auto p-1 [container-type:inline-size] sm:p-2 lg:p-3">
                     <div className="flex flex-col gap-0">
                       {/* Cabeçalho 0-9 interno para Colunas Fixas */}
-                      <div className="grid justify-center gap-[var(--gap-col,8px)] px-[1px] mb-3 sticky top-0 z-10 bg-background/40 backdrop-blur-sm" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "1274px", margin: "0 auto" }}>
+                      <div className="grid justify-center gap-[var(--gap-col,8px)] px-[1px] mb-1 sticky top-0 z-10 bg-background/40 backdrop-blur-sm" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "1274px", margin: "0 auto" }}>
                         {Array.from({ length: 10 }).map((_, ci) => (
                           <div
                             key={`header-inner-${ci}`}
-                            className="flex h-[24px] w-full items-center justify-center rounded-[6px] border border-white/5 bg-white/[0.04] text-[13px] font-bold tabular-nums text-[#eaeaea]"
+                            className="flex h-[23px] w-[137px] items-center justify-center rounded-[6px] border border-[#2a3545] bg-transparent text-[14px] font-medium tabular-nums text-white"
                             style={{ width: "var(--colW, 120px)" }}
                           >
                             {ci}
@@ -1158,7 +1158,7 @@ function Index() {
                                                 })
                                               }
                                             />
-                                            <span className={`mt-1 text-[10px] tabular-nums leading-none font-medium h-[12px] flex items-center ${destaqueHorario ? "text-primary font-bold" : "text-[#7b7c80]"}`}>
+                                            <span className={`mt-[5px] text-[11px] tabular-nums leading-none font-medium h-[11px] flex items-center ${destaqueHorario ? "text-primary font-bold" : "text-[#8ebcf0]"}`}>
                                               {exibirSegundos ? spTimeWithSeconds(spin as Spin) : (spin as Spin).time}
                                             </span>
                                           </div>
