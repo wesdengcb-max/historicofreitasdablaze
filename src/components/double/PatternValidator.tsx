@@ -483,11 +483,11 @@ export function PatternValidator({ spins }: { spins: Spin[] }) {
           <StatRow label="Seq. derrotas:" value={stats.streakL} />
         </aside>
 
-        </div>
+            </div>
+          </div>
+        )}
       </div>
-    )}
-  </div>
-</Card>
+    </Card>
   );
 }
 
