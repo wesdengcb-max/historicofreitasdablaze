@@ -1155,6 +1155,8 @@ function Index() {
                                     ).map((spin, i) => {
 
                                       const slotKey = `${hm}-${i}`;
+                                      const isLocked = !isVip && !spin && !(pending && i === 0);
+
                                       if (spin) {
                                         return (
                                           <div key={(spin as Spin).id} className="flex flex-col items-center">
