@@ -29,8 +29,10 @@ import {
   Clock,
   ChevronDown,
   BarChart3,
+  Crown,
   Send,
 } from "lucide-react";
+
 
 import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
 import { Card } from "@/components/double/Card";
