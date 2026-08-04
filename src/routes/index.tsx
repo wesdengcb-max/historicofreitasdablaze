@@ -163,15 +163,30 @@ function LandingPage() {
           {/* Form Fields Mockup */}
           <div className="space-y-4 text-left">
             <div className="space-y-2">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-white/30">E-mail</label>
-              <div className="flex h-12 w-full items-center rounded-xl border border-white/5 bg-[#111111] px-4">
-                <div className="h-2 w-24 rounded bg-white/5" />
+              <div className="flex h-14 w-full items-center rounded-2xl border border-white/5 bg-[#111111] px-4 transition-colors focus-within:border-[#FF1F3D]/30">
+                <div className="mr-3 flex h-5 w-5 items-center justify-center rounded-lg bg-white/5 text-white/20">
+                  <span className="text-[10px]">✉</span>
+                </div>
+                <input 
+                  type="text" 
+                  placeholder="Email" 
+                  className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/20"
+                />
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-white/30">Senha</label>
-              <div className="flex h-12 w-full items-center rounded-xl border border-white/5 bg-[#111111] px-4">
-                <div className="h-2 w-32 rounded bg-white/5" />
+              <div className="flex h-14 w-full items-center rounded-2xl border border-white/5 bg-[#111111] px-4 transition-colors focus-within:border-[#FF1F3D]/30">
+                <div className="mr-3 flex h-5 w-5 items-center justify-center rounded-lg bg-white/5 text-white/20">
+                  <span className="text-[10px]">🔒</span>
+                </div>
+                <input 
+                  type="password" 
+                  placeholder="Senha" 
+                  className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/20"
+                />
+                <button className="ml-2 text-white/20 hover:text-white/40">
+                  <span className="text-[10px]">👁</span>
+                </button>
               </div>
             </div>
           </div>
