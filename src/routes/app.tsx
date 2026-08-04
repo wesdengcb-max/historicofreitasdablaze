@@ -227,10 +227,23 @@ function Index() {
   const section = useSection();
   const [inverse, setInverse] = useState(false);
   const [viewMode, setViewMode] = useState<"colunas" | "lista">("colunas");
+  const isVip = useVipStatus();
+
   // Em celular/tablet inicia em lista (sentido normal); desktop mantém colunas fixas.
   useEffect(() => {
     if (window.innerWidth < 1024) setViewMode("lista");
   }, []);
+
+  // Protect current section if VIP is lost
+  useEffect(() => {
+    if (section !== "dashboard" && !isVip) {
+      setSection("dashboard");
+      toast.error("Membro VIP Expirado", {
+        description: "Você foi redirecionado para o Histórico pois não possui acesso VIP.",
+      });
+    }
+  }, [section, isVip]);
+
   const [whiteAlert, setWhiteAlert] = useState(false);
   const [alertFx, setAlertFx] = useState<"on" | "off" | null>(null);
   const toggleWhiteAlert = useCallback((next: boolean) => {
