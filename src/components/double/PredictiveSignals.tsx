@@ -195,17 +195,17 @@ export function PredictiveSignals() {
   }, [active, engine]);
 
   return (
-    <Card className="!p-0 overflow-hidden">
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border px-5 py-4">
-        <div className="flex items-center gap-3">
-          <div className="grid h-9 w-9 place-items-center rounded-lg bg-emerald-500/10 text-emerald-400">
-            <Sparkles className="h-4 w-4" />
+    <Card className="glass-card !p-0 overflow-hidden">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.05] bg-white/[0.02] px-6 py-5">
+        <div className="flex items-center gap-4">
+          <div className="grid h-10 w-10 place-items-center rounded-xl bg-[#FF1F3D]/10 text-[#FF1F3D] shadow-[0_0_15px_rgba(255,31,61,0.1)]">
+            <Sparkles className="h-5 w-5" />
           </div>
           <div>
-            <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+            <div className="text-[10px] font-black uppercase tracking-[0.4em] text-[#FF1F3D] font-outfit">
               Gerador preditivo
             </div>
-            <h2 className="text-base font-bold text-foreground">Próximo branco</h2>
+            <h2 className="text-xl font-black text-white font-outfit uppercase tracking-tight">Próximo branco</h2>
           </div>
         </div>
         <button
@@ -214,8 +214,8 @@ export function PredictiveSignals() {
           onClick={generate}
           className={
             hasOpportunity && !loading
-              ? "relative rounded-xl border-2 border-emerald-400 bg-emerald-500/10 px-6 py-3 text-sm font-black uppercase tracking-[0.18em] text-emerald-300 shadow-[0_0_24px_rgba(52,211,153,0.55)] transition hover:bg-emerald-500/20 animate-pulse"
-              : "rounded-xl border border-white/10 bg-white/[0.03] px-6 py-3 text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground opacity-60"
+              ? "relative premium-btn rounded-xl px-8 py-3.5 text-xs font-black uppercase tracking-[0.2em] text-white animate-pulse font-outfit"
+              : "rounded-xl border border-white/10 bg-white/[0.03] px-8 py-3.5 text-xs font-black uppercase tracking-[0.2em] text-[#9CA3AF] opacity-60 font-outfit"
           }
         >
           {loading ? (
@@ -264,13 +264,13 @@ export function PredictiveSignals() {
                 {mode1.map((s) => (
                   <div
                     key={s.key}
-                    className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3"
+                    className="rounded-2xl border border-white/[0.05] bg-white/[0.02] px-5 py-4 backdrop-blur-sm"
                   >
                     <div className="text-xs font-semibold text-muted-foreground">{s.title}</div>
-                    <div className="mt-1 text-2xl font-black tabular-nums text-foreground">
+                    <div className="mt-1 text-3xl font-black tabular-nums text-white font-outfit">
                       {fmtClock(s.at)}
                     </div>
-                    <div className="mt-1 text-[11px] tabular-nums text-emerald-300">
+                    <div className="mt-1 text-[11px] tabular-nums text-[#FF1F3D] font-bold">
                       {s.pct.toFixed(1)}% · janela {s.label}
                     </div>
                   </div>
