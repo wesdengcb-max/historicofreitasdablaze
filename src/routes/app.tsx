@@ -499,8 +499,9 @@ function Index() {
     } catch {
       /* noop */
     }
-    const t = setTimeout(() => setWhiteFlash(null), 8000);
+    const t = setTimeout(() => setWhiteFlash(null), 5000); // Reduzido para 5 segundos
     return () => clearTimeout(t);
+
   }, [spins, whiteAlert]);
 
   // spins já é dedup no setter (loadInitial/loadMore/poll/realtime), evita O(n) por render.
