@@ -231,7 +231,7 @@ function AnalysisPanel({
         </div>
       ) : (
         <>
-          <div className="h-72 w-full rounded-xl border border-white/10 bg-white/[0.02] p-3">
+          <div className="h-72 w-full rounded-xl border border-white/10 bg-white/[0.02] p-3 light:border-black/10 light:bg-black/[0.02]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData} margin={{ top: 10, right: 16, bottom: 4, left: -12 }}>
                 <CartesianGrid stroke="rgba(255,255,255,0.06)" strokeDasharray="3 3" />
@@ -263,12 +263,12 @@ function AnalysisPanel({
           </div>
 
           <div className="mt-5 overflow-x-auto rounded-xl border border-white/10">
-            <div className="border-b border-white/10 bg-white/[0.03] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+            <div className="border-b border-white/10 bg-white/[0.03] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground light:border-black/10 light:bg-black/[0.05] light:text-black/60">
               Top {TOP_N} · grupos (M-1, M, M+1)
             </div>
             <table className="w-full text-xs tabular-nums">
               <thead>
-                <tr className="border-b border-white/10 bg-white/[0.02] text-muted-foreground">
+                <tr className="border-b border-white/10 bg-white/[0.02] text-muted-foreground light:border-black/10 light:bg-black/[0.02] light:text-black/60">
                   <th className="px-3 py-2 text-left font-medium">#</th>
                   <th className="px-3 py-2 text-left font-medium">Minutos</th>
                   <th className="px-3 py-2 text-right font-medium">Linhas</th>
@@ -292,12 +292,12 @@ function AnalysisPanel({
           </div>
 
           <div className="mt-5 overflow-x-auto rounded-xl border border-white/10">
-            <div className="border-b border-white/10 bg-white/[0.03] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+            <div className="border-b border-white/10 bg-white/[0.03] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground light:border-black/10 light:bg-black/[0.05] light:text-black/60">
               Detalhes dos ciclos · últimos {MAX_DETAIL_ROWS} gatilhos · até {MAX_ZEROS} contagens até 0
             </div>
             <table className="w-full text-xs tabular-nums">
               <thead>
-                <tr className="border-b border-white/10 bg-white/[0.02] text-muted-foreground">
+                <tr className="border-b border-white/10 bg-white/[0.02] text-muted-foreground light:border-black/10 light:bg-black/[0.02] light:text-black/60">
                   <th className="px-3 py-2 text-left font-medium">#</th>
                   <th className="px-3 py-2 text-left font-medium">Gatilho</th>
                   <th className="px-3 py-2 text-left font-medium">Detalhe</th>
