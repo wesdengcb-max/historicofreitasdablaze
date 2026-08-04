@@ -42,7 +42,7 @@ export const BlazeResultCard = memo(function BlazeResultCard({
 
   return (
     <div
-      className="flex animate-in flex-col items-center fade-in slide-in-from-bottom-2"
+      className="blaze-result-card flex animate-in flex-col items-center fade-in slide-in-from-bottom-2"
       style={{
         width: `var(--blaze-card-w, ${BLAZE_CARD_W}px)`,
         animationDelay: delay > 0 ? `${delay}s` : undefined,
