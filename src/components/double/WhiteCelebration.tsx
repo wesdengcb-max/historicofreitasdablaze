@@ -188,7 +188,7 @@ export function WhiteCelebration({ spin, onClose }: Props) {
 export function WhiteAlertToggleFx({ state, onDone }: { state: "on" | "off" | null; onDone: () => void }) {
   useEffect(() => {
     if (!state) return;
-    const t = setTimeout(onDone, 3000); // Exibe por 3 segundos e some sozinho
+    const t = setTimeout(onDone, 2000); // Reduzido para 2 segundos para ser mais ágil
     return () => clearTimeout(t);
   }, [state, onDone]);
 
@@ -201,8 +201,8 @@ export function WhiteAlertToggleFx({ state, onDone }: { state: "on" | "off" | nu
           exit={{ opacity: 0, y: -24, scale: 0.9 }}
           transition={{ 
             type: "spring", 
-            stiffness: 300, 
-            damping: 25,
+            stiffness: 400, 
+            damping: 30,
             mass: 0.8 
           }}
           className="pointer-events-none fixed left-1/2 top-6 z-[100] -translate-x-1/2"
@@ -234,3 +234,4 @@ export function WhiteAlertToggleFx({ state, onDone }: { state: "on" | "off" | nu
     </AnimatePresence>
   );
 }
+
