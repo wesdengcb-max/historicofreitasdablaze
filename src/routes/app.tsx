@@ -945,7 +945,7 @@ function Index() {
             )}
 
             {/* Painel de controles alinhado */}
-            <div className="mb-3 rounded-2xl border border-white/5 bg-white/[0.02] p-2 sm:mb-4 sm:p-4 light:border-black/5 light:bg-black/[0.02]">>
+            <div className="mb-3 rounded-2xl border border-white/5 bg-white/[0.02] p-2 sm:mb-4 sm:p-4 light:border-black/5 light:bg-black/[0.02]">
               <div className="grid grid-cols-2 gap-x-3 gap-y-2 text-[11px] sm:gap-x-8 sm:gap-y-3.5 lg:grid-cols-5">
                 <div className="flex min-w-0 items-center">
                   <Switch checked={realtime} onChange={setRealtime} label="Tempo real" />
