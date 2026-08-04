@@ -51,16 +51,27 @@ function LandingPage() {
 
   return (
     <div className="relative min-h-[100svh] w-full overflow-hidden bg-black text-white">
-      {/* Black Background without extra overlays as requested */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(circle at 50% 50%, rgba(255, 0, 0, 0.15) 0%, transparent 80%)",
-        }}
-      />
-
+      {/* Hero Image as Background */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src={kingImg.url}
+          alt=""
+          className="h-full w-full object-cover opacity-60"
+        />
+        {/* Professional overlays for readability */}
+        <div 
+          className="absolute inset-0" 
+          style={{
+            background: "linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.8) 50%, #000 100%)"
+          }} 
+        />
+        <div 
+          className="absolute inset-0" 
+          style={{
+            background: "radial-gradient(circle at 50% 50%, transparent 0%, rgba(0,0,0,0.4) 100%)"
+          }} 
+        />
+      </div>
 
       {/* Top right icon */}
       <Link
@@ -70,7 +81,7 @@ function LandingPage() {
           e.preventDefault();
           goWithTransition("/app");
         }}
-        className="absolute right-6 top-6 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-[#c9a84c]/40 bg-black/40 text-[#c9a84c] backdrop-blur transition hover:border-[#c9a84c] hover:bg-[#c9a84c]/10"
+        className="absolute right-6 top-6 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-red-500/40 bg-black/40 text-red-500 backdrop-blur transition hover:border-red-500 hover:bg-red-500/10"
         aria-label="Abrir painel"
       >
         <BarChart3 className="h-5 w-5" />
@@ -92,16 +103,6 @@ function LandingPage() {
           </span>
         </div>
 
-        {/* Hero image — Freitas White */}
-        <div className="relative flex w-full max-w-[600px] items-center justify-center animate-[fadeUp_0.9s_ease-out_0.3s_both]">
-          <div className="relative w-full aspect-square md:aspect-[4/3] overflow-hidden rounded-2xl shadow-2xl shadow-red-900/20">
-            <img
-              src={kingImg.url}
-              alt="Freitas White"
-              className="h-full w-full object-contain"
-            />
-          </div>
-        </div>
 
         <h1
           className="text-[clamp(3rem,10vw,7rem)] font-black leading-none tracking-tight animate-[fadeUp_0.8s_ease-out_0.35s_both] font-outfit uppercase"
