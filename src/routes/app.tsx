@@ -712,7 +712,15 @@ function Index() {
 
           <div className="flex shrink-0 items-center gap-1 sm:gap-3">
             <StatusPill status={status} message={errorMsg} />
-            
+            <button
+              type="button"
+              onClick={() => toggleWhiteAlert(!whiteAlert)}
+              className="grid h-8 w-8 place-items-center rounded-xl border border-white/5 bg-white/5 text-muted-foreground transition-colors duration-200 hover:bg-white/[0.08] hover:text-foreground sm:h-10 sm:w-10 lg:h-11 lg:w-11 light:border-black/5 light:bg-black/5 light:text-black/60 light:hover:bg-black/[0.08] light:hover:text-black"
+              aria-label="Notificar branco"
+              title={whiteAlert ? "Alerta de branco: ligado" : "Alerta de branco: desligado"}
+            >
+              <Bell className={`h-4 w-4 ${whiteAlert ? "text-[#FF1F3D]" : ""}`} />
+            </button>
             <button
               type="button"
               onClick={() => setStatsOpen((v) => !v)}
@@ -735,20 +743,7 @@ function Index() {
         </div>
       </header>
 
-      <div className="relative">
-        <TopNav />
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 sm:right-8">
-          <button
-            type="button"
-            onClick={() => toggleWhiteAlert(!whiteAlert)}
-            className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 bg-white/5 text-muted-foreground transition-all hover:bg-white/10 light:border-black/10 light:bg-black/5"
-            aria-label="Notificar branco"
-            title={whiteAlert ? "Alerta de branco: ligado" : "Alerta de branco: desligado"}
-          >
-            <Bell className={`h-4 w-4 ${whiteAlert ? "text-[#FF1F3D]" : ""}`} />
-          </button>
-        </div>
-      </div>
+      <TopNav />
 
       {section === "sinais" ? (
         <Suspense fallback={<SectionFallback />}><SinaisPage /></Suspense>

@@ -116,7 +116,7 @@ export function TopNav() {
           })}
         </div>
 
-        <div className="ml-4 flex shrink-0 items-center gap-2 pr-10 sm:pr-12">
+        <div className="ml-4 flex shrink-0 items-center gap-2">
           <button
             onClick={toggleTheme}
             className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-muted-foreground transition-all hover:bg-white/10 light:border-black/10 light:bg-black/5"
