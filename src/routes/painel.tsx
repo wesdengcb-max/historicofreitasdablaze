@@ -20,6 +20,8 @@ import {
   ChevronDown,
   BarChart3,
   Send,
+  Crown,
+  Lock,
 } from "lucide-react";
 
 import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
