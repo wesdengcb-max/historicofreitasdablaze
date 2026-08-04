@@ -52,36 +52,55 @@ function LandingPage() {
 
   return (
     <div className="relative min-h-[100svh] w-full overflow-hidden bg-[#090909] text-white">
-      {/* Background Image Layer */}
+      {/* Red Background Glow Efeito (Based on Reference) */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        {/* Main top-center glow */}
+        <div 
+          className="absolute -top-[20%] left-1/2 -translate-x-1/2 w-[80%] h-[60%] opacity-40 blur-[120px]"
+          style={{ background: 'radial-gradient(circle, rgba(255, 31, 61, 0.3) 0%, transparent 70%)' }}
+        />
+        {/* Left red beam/glow */}
+        <div 
+          className="absolute top-[20%] -left-[10%] w-[50%] h-[60%] opacity-20 blur-[100px]"
+          style={{ background: 'radial-gradient(circle, rgba(255, 31, 61, 0.2) 0%, transparent 70%)' }}
+        />
+        {/* Right red beam/glow */}
+        <div 
+          className="absolute top-[10%] -right-[10%] w-[50%] h-[70%] opacity-25 blur-[120px]"
+          style={{ background: 'radial-gradient(circle, rgba(255, 31, 61, 0.25) 0%, transparent 70%)' }}
+        />
+        
+        {/* Subtle diagonal lines (grid/beams) as seen in reference */}
+        <div className="absolute inset-0 opacity-[0.05]" 
+          style={{ 
+            backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(255, 31, 61, 0.2) 40px, rgba(255, 31, 61, 0.2) 41px)`,
+          }} 
+        />
+      </div>
+
+      {/* Background Image Layer - Positioned to the right behind the card */}
       <div 
-        className="absolute inset-y-0 right-0 z-0 opacity-40 bg-contain bg-right-bottom bg-no-repeat pointer-events-none"
+        className="absolute inset-y-0 right-0 z-[1] opacity-50 bg-contain bg-right-bottom bg-no-repeat pointer-events-none mix-blend-screen"
         style={{ 
           backgroundImage: `url(${bgImg.url})`,
-          width: '50%',
-          maxWidth: '800px',
+          width: '55%',
+          maxWidth: '900px',
         }}
       />
       
-      {/* Premium background effects */}
+      {/* Noise and grain texture */}
+      <div className="absolute inset-0 opacity-[0.02] pointer-events-none z-[2]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
+      
+      {/* Subtle Grid Overlay */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 z-0"
-        style={{
-          background:
-            "radial-gradient(circle at 50% -20%, rgba(255, 31, 61, 0.2) 0%, transparent 60%), radial-gradient(circle at 50% 120%, rgba(255, 31, 61, 0.1) 0%, transparent 70%)",
-        }}
-      />
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none z-0" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
-      {/* Grid overlay */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.08]"
+        className="pointer-events-none absolute inset-0 opacity-[0.03] z-[2]"
         style={{
           backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)",
-          backgroundSize: "48px 48px",
+            "linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px)",
+          backgroundSize: "60px 60px",
           maskImage:
-            "radial-gradient(ellipse 70% 50% at 50% 50%, black, transparent 80%)",
+            "radial-gradient(ellipse 80% 60% at 50% 50%, black, transparent 90%)",
         }}
       />
 
