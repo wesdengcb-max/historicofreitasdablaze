@@ -216,7 +216,6 @@ export function PatternValidator({ spins }: { spins: Spin[] }) {
             <h2 className="text-xl font-black text-white font-outfit uppercase tracking-tight">Validador de padrão</h2>
           </div>
         </div>
-      action={
         <div className="flex items-center gap-2">
           <button
             onClick={() => {
