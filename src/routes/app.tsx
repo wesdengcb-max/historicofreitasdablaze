@@ -1076,7 +1076,7 @@ function Index() {
                   <button
                     type="button"
                     onClick={() => setFullscreen(false)}
-                    className="grid h-10 w-10 place-items-center rounded-xl border border-white/10 bg-white/5 text-muted-foreground transition-colors hover:bg-white/[0.09] hover:text-foreground"
+                    className="grid h-10 w-10 place-items-center rounded-xl border border-white/10 bg-white/5 text-muted-foreground transition-colors hover:bg-white/[0.09] hover:text-foreground light:border-black/10 light:bg-black/5 light:text-black/60 light:hover:bg-black/[0.08] light:hover:text-black"
                     aria-label="Fechar tela cheia"
                   >
                     <X className="h-4 w-4" />
