@@ -982,6 +982,7 @@ function Index() {
                   </div>
                 </div>
 
+                <div className="flex min-w-0 items-center">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button
@@ -1009,6 +1010,7 @@ function Index() {
                 </div>
               </div>
             </div>
+
 
             {/* Cabeçalho das estatísticas por coluna */}
             {viewMode === "colunas" && contarColunas && (
