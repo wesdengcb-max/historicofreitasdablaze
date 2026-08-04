@@ -218,17 +218,17 @@ function LandingPage() {
           </div>
 
           {/* Secondary Action */}
-          <button className="mt-6 flex w-full items-center justify-between rounded-xl border border-white/5 bg-white/5 p-4 transition-colors hover:bg-white/10">
-            <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#FF1F3D]/10 text-[#FF1F3D]">
-                <div className="h-4 w-4 rounded-full bg-[#FF1F3D]" />
+          <button className="mt-6 flex w-full items-center justify-between rounded-2xl border border-white/5 bg-white/5 p-5 transition-all hover:bg-white/10 hover:border-[#FF1F3D]/20 group">
+            <div className="flex items-center gap-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FF1F3D]/10 text-[#FF1F3D] ring-1 ring-[#FF1F3D]/20">
+                <span className="text-sm">👑</span>
               </div>
               <div className="text-left">
-                <div className="text-xs font-bold text-white">Torne-se Revendedor</div>
-                <div className="text-[10px] text-white/30">Ganhe com o sistema</div>
+                <div className="text-xs font-black text-white uppercase tracking-tight">Torne-se Revendedor</div>
+                <div className="text-[10px] text-white/30 font-bold uppercase tracking-widest">Ganhe até R$ 147 por chave</div>
               </div>
             </div>
-            <ArrowRight className="h-4 w-4 text-white/20" />
+            <ArrowRight className="h-4 w-4 text-white/20 transition-transform group-hover:translate-x-1" />
           </button>
         </div>
       </main>
