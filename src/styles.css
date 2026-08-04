@@ -177,10 +177,6 @@
   color: #94a3b8 !important;
 }
 
-/* Specific exclusion for the result cards (stones) */
-.light .blaze-result-card span {
-  color: inherit !important;
-}
 
 .light .premium-btn {
   color: white !important;
