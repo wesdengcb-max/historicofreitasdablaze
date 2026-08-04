@@ -7,6 +7,30 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --color-surface: #ffffff;
+  --color-surface-muted: #f9fafb;
+  --color-border: #e5e7eb;
+  --color-foreground: #111827;
+  --color-muted-foreground: #6b7280;
+  
+  light: {
+    --color-surface: #ffffff;
+    --color-surface-muted: #f9fafb;
+    --color-border: #e5e7eb;
+    --color-foreground: #111827;
+    --color-muted-foreground: #6b7280;
+  }
+  
+  dark: {
+    --color-surface: #111111;
+    --color-surface-muted: rgba(255, 255, 255, 0.03);
+    --color-border: rgba(255, 255, 255, 0.08);
+    --color-foreground: #ffffff;
+    --color-muted-foreground: #9ca3af;
+  }
+}
+
+@theme inline {
   --font-sans: "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-outfit: "Outfit", var(--font-sans);
   --radius-sm: calc(var(--radius) - 4px);
