@@ -818,7 +818,7 @@ function Index() {
                             style={{
                               width: `${Math.min(100, it.pct)}%`,
                               background: isLeader
-                                ? "linear-gradient(90deg, #FF3554, #FF1F3D)"
+                                ? "linear-gradient(90deg, #DE2143, #FF1F3D)"
                                 : it.tint,
                             }}
                           />
@@ -911,7 +911,7 @@ function Index() {
                 <button
                   type="button"
                   onClick={applyCustom}
-                  className="h-9 rounded-lg bg-primary px-4 text-[12px] font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+                  className="h-9 rounded-lg bg-[#DE2143] px-4 text-[12px] font-semibold text-primary-foreground transition-opacity hover:opacity-90"
                 >
                   Pesquisar
                 </button>
