@@ -30,9 +30,9 @@ const NUMBERS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 const ALL_NUMBERS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 const MIN_CYCLES = 10;
 const TOP_N = 5;
-const MAX_ZEROS = 14;           // coleta até 14 zeros após o gatilho (sem limite de tempo)
-const MAX_DETAIL_ROWS = 10;     // FIFO detalhes
-const MAX_PATTERN_CYCLES = 14;  // Análise 2: últimas 14 ocorrências
+const MAX_ZEROS = 14;           
+const MAX_DETAIL_ROWS = 10;     
+const MAX_PATTERN_CYCLES = 14;
 const BRAZIL_TIME_ZONE = "America/Sao_Paulo";
 
 function diffMinutes(a: Date, b: Date) {
@@ -410,11 +410,11 @@ export function AnaliseSection() {
 
   return (
     <main className="mx-auto flex w-full max-w-[1366px] flex-col gap-5 px-3 py-8 sm:gap-6 sm:px-8 sm:py-10">
-      <Card delay={0.03}>
-        <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+      <Card className="glass-card p-6">
+        <div className="mb-2 text-[10px] font-black uppercase tracking-[0.4em] text-[#FF1F3D] font-outfit">
           Catalogador de latência
         </div>
-        <h2 className="text-lg font-semibold text-foreground sm:text-xl">
+        <h2 className="text-2xl font-black text-white sm:text-3xl font-outfit uppercase tracking-tighter">
           Ciclos de espera até o branco (0) · até {MAX_ZEROS} contagens
         </h2>
         <p className="mt-1 text-xs text-muted-foreground">
@@ -432,12 +432,12 @@ export function AnaliseSection() {
               <button
                 key={n}
                 onClick={() => setSelected(n)}
-                className={`flex flex-col items-center justify-center rounded-xl border px-2 py-3 text-center transition ${
+                className={`flex flex-col items-center justify-center rounded-xl border px-2 py-3 text-center transition-all duration-300 font-outfit ${
                   isSel
-                    ? "border-emerald-400/60 bg-emerald-500/15 text-foreground"
+                    ? "border-[#FF1F3D]/60 bg-[#FF1F3D]/20 text-white shadow-[0_0_20px_rgba(255,31,61,0.2)] scale-105"
                     : ok
-                      ? "border-white/10 bg-white/[0.03] text-foreground hover:bg-white/[0.06]"
-                      : "border-white/5 bg-white/[0.02] text-muted-foreground opacity-60"
+                      ? "border-white/10 bg-white/[0.03] text-white hover:bg-white/[0.08] hover:border-white/20"
+                      : "border-white/5 bg-white/[0.01] text-[#9CA3AF] opacity-50"
                 }`}
               >
                 <span className="text-lg font-bold tabular-nums">{n}</span>
