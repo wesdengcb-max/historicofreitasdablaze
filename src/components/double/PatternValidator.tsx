@@ -242,6 +242,31 @@ export function PatternValidator({ spins }: { spins: Spin[] }) {
           </div>
         ) : (
           <div className="animate-in fade-in slide-in-from-top-1 duration-200">
+          <button
+            onClick={() => {
+              setPattern([]);
+              setOpen(true);
+            }}
+            className="inline-flex items-center gap-2 rounded-xl bg-[#FF1F3D] px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white shadow-[0_5px_15px_rgba(255,31,61,0.3)] hover:opacity-90 font-outfit"
+          >
+            <PlusCircle className="h-4 w-4" />
+            <span className="hidden sm:inline">NOVO</span>
+          </button>
+          <button
+            onClick={() => setOpen((o) => !o)}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-[#9CA3AF] hover:text-white"
+          >
+            {open ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </button>
+        </div>
+      </div>
+      <div className="p-6">
+        {!open ? (
+          <div className="flex items-center justify-center py-4 text-xs font-black uppercase tracking-widest text-[#9CA3AF] font-outfit">
+            {pattern.length} pedras • {stats.wins}V / {stats.losses}D {currentlyMatches && "• ATIVO"}
+          </div>
+        ) : (
+          <div className="animate-in fade-in slide-in-from-top-1 duration-200">
       {/* Header row: name + premium hint */}
       <div className="mb-4 grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3">
         <div className="inline-flex items-center gap-2 rounded-lg bg-primary/15 px-3 py-1.5 text-xs font-semibold text-primary ring-1 ring-primary/30">
@@ -484,8 +509,9 @@ export function PatternValidator({ spins }: { spins: Spin[] }) {
           <StatRow label="Seq. derrotas:" value={stats.streakL} />
         </aside>
 
-        </div>
-      )}
+          </div>
+        )}
+      </div>
     </Card>
 
   );
