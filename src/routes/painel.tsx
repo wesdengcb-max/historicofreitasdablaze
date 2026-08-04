@@ -1541,7 +1541,7 @@ const StatusPill = memo(function StatusPill({
 }) {
   const cls =
     status === "live"
-      ? "border-positive/25 bg-positive/10 text-positive"
+      ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-500"
       : status === "error"
         ? "border-destructive/30 bg-destructive/10 text-destructive"
         : "border-white/10 bg-white/5 text-muted-foreground";
