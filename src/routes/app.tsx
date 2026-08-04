@@ -1207,28 +1207,48 @@ function Index() {
                                         <div key={`e-${ci}-${i}`} className="flex flex-col items-center">
                                           <button
                                             type="button"
-                                            onClick={() => cycleSlotPrediction(slotKey)}
+                                            onClick={() => {
+                                              if (isLocked) {
+                                                toast.error("Recurso VIP", {
+                                                  description: "A criação de alertas manuais é exclusiva para membros VIP.",
+                                                });
+                                                return;
+                                              }
+                                              cycleSlotPrediction(slotKey);
+                                            }}
                                             className={`relative flex h-[48px] w-[48px] items-center justify-center rounded-[6px] border border-dashed transition-colors hover:border-white/20 ${
-                                              p === "white"
-                                                ? "border-emerald-400/50 bg-emerald-400/5"
-                                                : p === "red"
-                                                  ? "border-red-500/50 bg-red-500/5"
-                                                  : p === "black"
-                                                    ? "border-slate-500/50 bg-slate-500/5"
-                                                    : "border-[#3b5270] bg-[#233248]"
+                                              isLocked
+                                                ? "border-white/5 bg-white/5 opacity-50 cursor-not-allowed"
+                                                : p === "white"
+                                                  ? "border-emerald-400/50 bg-emerald-400/5"
+                                                  : p === "red"
+                                                    ? "border-red-500/50 bg-red-500/5"
+                                                    : p === "black"
+                                                      ? "border-slate-500/50 bg-slate-500/5"
+                                                      : "border-[#3b5270] bg-[#233248]"
                                             }`}
                                           >
-                                            <div className={`h-[32px] w-[32px] rounded-full border-2 transition-all ${
-                                              p === "white" ? "bg-white border-white/20" :
-                                              p === "red" ? "bg-red-500 border-red-400/20" :
-                                              p === "black" ? "bg-slate-800 border-slate-700/20" :
-                                              "bg-transparent border-white"
-                                            }`} />
+                                            {isLocked ? (
+                                              <Lock className="h-4 w-4 text-muted-foreground/40" />
+                                            ) : (
+                                              <div
+                                                className={`h-[32px] w-[32px] rounded-full border-2 transition-all ${
+                                                  p === "white"
+                                                    ? "bg-white border-white/20"
+                                                    : p === "red"
+                                                      ? "bg-red-500 border-red-400/20"
+                                                      : p === "black"
+                                                        ? "bg-slate-800 border-slate-700/20"
+                                                        : "bg-transparent border-white"
+                                                }`}
+                                              />
+                                            )}
                                           </button>
                                           <span className="mt-[5px] h-[11px] text-[11px] font-medium tabular-nums text-[#8ebcf0]">
                                             {hm}
                                           </span>
                                         </div>
+
                                       );
                                     })}
                                   </div>
