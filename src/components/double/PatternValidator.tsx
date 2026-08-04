@@ -242,22 +242,22 @@ export function PatternValidator({ spins }: { spins: Spin[] }) {
           </div>
         ) : (
           <div className="animate-in fade-in slide-in-from-top-1 duration-200">
+            {/* Header row: name + premium hint */}
+            <div className="mb-4 grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3">
+              <div className="inline-flex items-center gap-2 rounded-lg bg-primary/15 px-3 py-1.5 text-xs font-semibold text-primary ring-1 ring-primary/30">
+                <input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-20 bg-transparent outline-none"
+                />
+                <Pencil className="h-3 w-3 opacity-70 shrink-0" />
+              </div>
+              <div className="flex min-w-0 items-center gap-1.5 text-[11px] text-muted-foreground">
+                <Crown className="h-3.5 w-3.5 text-amber-400 shrink-0" />
+                <span className="truncate">Seja premium e gerencie múltiplos padrões</span>
+              </div>
+            </div>
             <div className="grid grid-cols-1 gap-5 md:grid-cols-[minmax(0,1fr)_minmax(0,280px)] xl:grid-cols-[minmax(0,1fr)_minmax(0,320px)]">
-      {/* Header row: name + premium hint */}
-      <div className="mb-4 grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3">
-        <div className="inline-flex items-center gap-2 rounded-lg bg-primary/15 px-3 py-1.5 text-xs font-semibold text-primary ring-1 ring-primary/30">
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-20 bg-transparent outline-none"
-          />
-          <Pencil className="h-3 w-3 opacity-70 shrink-0" />
-        </div>
-        <div className="flex min-w-0 items-center gap-1.5 text-[11px] text-muted-foreground">
-          <Crown className="h-3.5 w-3.5 text-amber-400 shrink-0" />
-          <span className="truncate">Seja premium e gerencie múltiplos padrões</span>
-        </div>
-      </div>
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-[minmax(0,1fr)_minmax(0,280px)] xl:grid-cols-[minmax(0,1fr)_minmax(0,320px)]">
 
