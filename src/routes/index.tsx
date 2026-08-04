@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, BarChart3 } from "lucide-react";
 import { useMemo, useState } from "react";
 import kingImg from "@/assets/freitas-king.png.asset.json";
-import bgImg from "@/assets/freitas-bg.png.asset.json";
+import whiteHeroImg from "@/assets/freitas-white.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
