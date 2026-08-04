@@ -123,6 +123,11 @@
 
   --black-tile: #1A1A1A;
   --white-tile: #FFFFFF;
+  --time-text: #8EBCF0;
+}
+
+.light {
+  --time-text: #5A8FCF;
 }
 
 .light body {
