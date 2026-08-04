@@ -17,7 +17,7 @@ export function Card({ title, subtitle, icon, action, children, delay = 0, class
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={`rounded-[8px] border border-[#2a3545] bg-[#121923] p-[26px] ${className}`}
+      className={`glass-card glass-card-glow p-[26px] ${className}`}
     >
       {(title || action) && (
         <header className="mb-4 flex items-center justify-between gap-4">
