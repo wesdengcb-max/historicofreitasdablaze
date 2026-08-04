@@ -206,6 +206,33 @@ function LandingPage() {
         </div>
       </main>
 
+      {/* Footer Stats (Based on Reference) */}
+      <footer className="absolute bottom-0 left-0 z-20 w-full border-t border-white/5 bg-black/40 px-6 py-4 backdrop-blur-md">
+        <div className="mx-auto flex max-w-[1366px] flex-wrap items-center justify-center gap-8 text-[10px] font-bold tracking-[0.1em] text-white/30 uppercase sm:justify-between sm:text-[11px]">
+          <div className="flex items-center gap-8">
+            <div className="flex items-center gap-2">
+              <div className="h-1.5 w-1.5 rounded-full bg-[#FF1F3D]" />
+              <span>Criptografia AES-256</span>
+            </div>
+            <div className="hidden items-center gap-2 sm:flex">
+              <span className="font-outfit text-white/20">UPTIME</span>
+              <span className="text-white">99.9%</span>
+            </div>
+            <div className="hidden items-center gap-2 sm:flex">
+              <span className="font-outfit text-white/20">LATÊNCIA</span>
+              <span className="text-white">&lt;50ms</span>
+            </div>
+            <div className="hidden items-center gap-2 lg:flex">
+              <span className="font-outfit text-white/20">CHAVES EMITIDAS</span>
+              <span className="text-white">+18.4k</span>
+            </div>
+          </div>
+          <div className="font-outfit tracking-normal">
+            © 2026 <span className="text-white/60">Freitas da Blaze</span>
+          </div>
+        </div>
+      </footer>
+
       {/* Page-exit transition (slides across from left) */}
       {exitTo && (
         <div
