@@ -1550,7 +1550,7 @@ const StatusPill = memo(function StatusPill({
   return (
     <span
       title={message}
-      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-medium ${cls}`}
+      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-bold uppercase tracking-wider h-8 sm:h-10 lg:h-11 ${cls}`}
     >
       {status === "error" ? <WifiOff className="h-3.5 w-3.5" /> : <Wifi className="h-3.5 w-3.5" />}
       <span className="hidden sm:inline">{label}</span>
