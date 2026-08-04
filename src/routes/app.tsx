@@ -743,20 +743,7 @@ function Index() {
         </div>
       </header>
 
-      <div className="relative">
-        <TopNav />
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 sm:right-8">
-          <button
-            type="button"
-            onClick={() => toggleWhiteAlert(!whiteAlert)}
-            className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 bg-white/5 text-muted-foreground transition-all hover:bg-white/10 light:border-black/10 light:bg-black/5"
-            aria-label="Notificar branco"
-            title={whiteAlert ? "Alerta de branco: ligado" : "Alerta de branco: desligado"}
-          >
-            <Bell className={`h-4 w-4 ${whiteAlert ? "text-[#FF1F3D]" : ""}`} />
-          </button>
-        </div>
-      </div>
+      <TopNav />
 
       {section === "sinais" ? (
         <Suspense fallback={<SectionFallback />}><SinaisPage /></Suspense>
