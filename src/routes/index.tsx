@@ -51,72 +51,55 @@ function LandingPage() {
   );
 
   return (
-    <div className="relative min-h-[100svh] w-full overflow-hidden bg-[#000000] text-white">
-      {/* 1. Main Background Image - 100% screen, cover and centered */}
+    <div className="relative min-h-[100svh] w-full overflow-hidden bg-[#090909] text-white">
+      {/* Background Image Layer */}
       <div 
-        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat transition-all duration-1000"
+        className="absolute inset-y-0 right-0 z-0 opacity-40 bg-contain bg-right-bottom bg-no-repeat pointer-events-none"
         style={{ 
           backgroundImage: `url(${bgImg.url})`,
-          filter: 'brightness(0.65) contrast(1.1)', // Character partly hidden by darkness
+          width: '50%',
+          maxWidth: '800px',
         }}
       />
       
-      {/* 2. Composition Layers (Reproducing Reference Photo faithfully) */}
-      <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden">
-        {/* Layer: Heavy Dark Overlay (60-70% opacity) */}
-        <div className="absolute inset-0 bg-black/65" />
-        
-        {/* Layer: Top Red Glow (Radial Gradient from top center) */}
-        <div 
-          className="absolute -top-[10%] left-1/2 -translate-x-1/2 w-full h-[60%] opacity-25"
+      {/* Premium background effects */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{
+          background:
+            "radial-gradient(circle at 50% -20%, rgba(255, 31, 61, 0.2) 0%, transparent 60%), radial-gradient(circle at 50% 120%, rgba(255, 31, 61, 0.1) 0%, transparent 70%)",
+        }}
+      />
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none z-0" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
+      {/* Grid overlay */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.08]"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)",
+          backgroundSize: "48px 48px",
+          maskImage:
+            "radial-gradient(ellipse 70% 50% at 50% 50%, black, transparent 80%)",
+        }}
+      />
+
+      {/* Particles */}
+      {particles.map((p) => (
+        <span
+          key={p.id}
+          className={`absolute rounded-full ${p.color} animate-[floaty_var(--d)_ease-in-out_infinite]`}
           style={{
-            background: 'radial-gradient(circle at 50% 0%, rgba(255, 31, 61, 0.4) 0%, transparent 70%)'
+            left: `${p.left}%`,
+            top: `${p.top}%`,
+            width: p.size,
+            height: p.size,
+            animationDuration: `${p.duration}s`,
+            animationDelay: `${p.delay}s`,
           }}
         />
-
-        {/* Layer: Bottom-Left Discreet Red Glow */}
-        <div 
-          className="absolute -bottom-[10%] -left-[10%] w-[50%] h-[50%] opacity-15"
-          style={{
-            background: 'radial-gradient(circle at 0% 100%, rgba(255, 31, 61, 0.3) 0%, transparent 70%)'
-          }}
-        />
-
-        {/* Layer: Red Glow behind the card (Creates depth) */}
-        <div 
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] opacity-20"
-          style={{
-            background: 'radial-gradient(circle at 50% 50%, rgba(255, 31, 61, 0.4) 0%, transparent 70%)'
-          }}
-        />
-
-        {/* Layer: Diagonal Red Lines (Thin and discreet) */}
-        <svg className="absolute inset-0 w-full h-full opacity-10" preserveAspectRatio="none">
-          <line x1="-10%" y1="30%" x2="110%" y2="45%" stroke="#FF1F3D" strokeWidth="1" />
-          <line x1="-10%" y1="55%" x2="110%" y2="70%" stroke="#FF1F3D" strokeWidth="1" />
-        </svg>
-
-        {/* Layer: Vignette (Darkened edges, illuminated center) */}
-        <div 
-          className="absolute inset-0"
-          style={{
-            background: 'radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.6) 70%, rgba(0,0,0,0.95) 100%)'
-          }}
-        />
-
-        {/* Layer: Discreet Grid (Lines ~1px, low opacity) */}
-        <div
-          className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px)",
-            backgroundSize: "80px 80px",
-          }}
-        />
-
-        {/* Layer: Soft Atmospheric Noise */}
-        <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
-      </div>
+      ))}
 
       {/* Top right icon */}
       <Link
@@ -134,28 +117,16 @@ function LandingPage() {
 
       {/* Central Login Card (Based on LoveKing Pro) */}
       <main className="relative z-10 mx-auto flex min-h-[100svh] w-full items-center justify-center px-6 py-8">
-        <div className="glass-card-glow relative w-full max-w-[420px] overflow-hidden rounded-[2.5rem] border border-white/5 bg-[#0C0C0C]/90 p-8 text-center backdrop-blur-[40px] sm:p-12 shadow-[0_20px_60px_rgba(0,0,0,0.9)] ring-1 ring-white/10">
+        <div className="glass-card-glow relative w-full max-w-md overflow-hidden rounded-[2rem] border border-white/5 bg-[#0C0C0C]/90 p-8 text-center backdrop-blur-xl sm:p-12">
           {/* Logo */}
-          <div className="mb-10 flex justify-center">
+          <div className="mb-8 flex justify-center">
             <div className="relative">
-              <div className="flex items-center gap-2">
-                <img 
-                  src={kingImg.url} 
-                  alt="Logo" 
-                  className="h-10 w-10 rounded-full object-cover" 
-                />
-                <div className="flex flex-col items-start leading-tight">
-                  <div className="flex items-center gap-1">
-                    <span className="text-xl font-black tracking-tighter text-white">love</span>
-                    <span className="relative flex h-6 w-6 items-center justify-center rounded-sm bg-[#FF1F3D] text-[10px] font-black text-white">
-                      K
-                      <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 text-[8px]">👑</div>
-                    </span>
-                    <span className="text-xl font-black tracking-tighter text-white">ing</span>
-                  </div>
-                  <span className="text-[10px] font-black tracking-[0.2em] text-white/40 uppercase ml-auto">pro</span>
-                </div>
-              </div>
+              <img 
+                src={kingImg.url} 
+                alt="Logo" 
+                className="h-16 w-16 rounded-full object-cover ring-2 ring-[#FF1F3D]/20" 
+              />
+              <div className="absolute -inset-2 rounded-full bg-[#FF1F3D]/20 blur-xl" />
             </div>
           </div>
 
@@ -180,30 +151,15 @@ function LandingPage() {
           {/* Form Fields Mockup */}
           <div className="space-y-4 text-left">
             <div className="space-y-2">
-              <div className="flex h-14 w-full items-center rounded-2xl border border-white/5 bg-[#111111] px-4 transition-colors focus-within:border-[#FF1F3D]/30">
-                <div className="mr-3 flex h-5 w-5 items-center justify-center rounded-lg bg-white/5 text-white/20">
-                  <span className="text-[10px]">✉</span>
-                </div>
-                <input 
-                  type="text" 
-                  placeholder="Email" 
-                  className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/20"
-                />
+              <label className="text-[11px] font-bold uppercase tracking-wider text-white/30">E-mail</label>
+              <div className="flex h-12 w-full items-center rounded-xl border border-white/5 bg-[#111111] px-4">
+                <div className="h-2 w-24 rounded bg-white/5" />
               </div>
             </div>
             <div className="space-y-2">
-              <div className="flex h-14 w-full items-center rounded-2xl border border-white/5 bg-[#111111] px-4 transition-colors focus-within:border-[#FF1F3D]/30">
-                <div className="mr-3 flex h-5 w-5 items-center justify-center rounded-lg bg-white/5 text-white/20">
-                  <span className="text-[10px]">🔒</span>
-                </div>
-                <input 
-                  type="password" 
-                  placeholder="Senha" 
-                  className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/20"
-                />
-                <button className="ml-2 text-white/20 hover:text-white/40">
-                  <span className="text-[10px]">👁</span>
-                </button>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-white/30">Senha</label>
+              <div className="flex h-12 w-full items-center rounded-xl border border-white/5 bg-[#111111] px-4">
+                <div className="h-2 w-32 rounded bg-white/5" />
               </div>
             </div>
           </div>
@@ -235,47 +191,20 @@ function LandingPage() {
           </div>
 
           {/* Secondary Action */}
-          <button className="mt-6 flex w-full items-center justify-between rounded-2xl border border-white/5 bg-white/5 p-5 transition-all hover:bg-white/10 hover:border-[#FF1F3D]/20 group">
-            <div className="flex items-center gap-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FF1F3D]/10 text-[#FF1F3D] ring-1 ring-[#FF1F3D]/20">
-                <span className="text-sm">👑</span>
+          <button className="mt-6 flex w-full items-center justify-between rounded-xl border border-white/5 bg-white/5 p-4 transition-colors hover:bg-white/10">
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#FF1F3D]/10 text-[#FF1F3D]">
+                <div className="h-4 w-4 rounded-full bg-[#FF1F3D]" />
               </div>
               <div className="text-left">
-                <div className="text-xs font-black text-white uppercase tracking-tight">Torne-se Revendedor</div>
-                <div className="text-[10px] text-white/30 font-bold uppercase tracking-widest">Ganhe até R$ 147 por chave</div>
+                <div className="text-xs font-bold text-white">Torne-se Revendedor</div>
+                <div className="text-[10px] text-white/30">Ganhe com o sistema</div>
               </div>
             </div>
-            <ArrowRight className="h-4 w-4 text-white/20 transition-transform group-hover:translate-x-1" />
+            <ArrowRight className="h-4 w-4 text-white/20" />
           </button>
         </div>
       </main>
-
-      {/* Footer Stats (Based on Reference) */}
-      <footer className="absolute bottom-0 left-0 z-20 w-full border-t border-white/5 bg-black/40 px-6 py-4 backdrop-blur-md">
-        <div className="mx-auto flex max-w-[1366px] flex-wrap items-center justify-center gap-8 text-[10px] font-bold tracking-[0.1em] text-white/30 uppercase sm:justify-between sm:text-[11px]">
-          <div className="flex items-center gap-8">
-            <div className="flex items-center gap-2">
-              <div className="h-1.5 w-1.5 rounded-full bg-[#FF1F3D]" />
-              <span>Criptografia AES-256</span>
-            </div>
-            <div className="hidden items-center gap-2 sm:flex">
-              <span className="font-outfit text-white/20">UPTIME</span>
-              <span className="text-white">99.9%</span>
-            </div>
-            <div className="hidden items-center gap-2 sm:flex">
-              <span className="font-outfit text-white/20">LATÊNCIA</span>
-              <span className="text-white">&lt;50ms</span>
-            </div>
-            <div className="hidden items-center gap-2 lg:flex">
-              <span className="font-outfit text-white/20">CHAVES EMITIDAS</span>
-              <span className="text-white">+18.4k</span>
-            </div>
-          </div>
-          <div className="font-outfit tracking-normal">
-            © 2026 <span className="text-white/60">Freitas da Blaze</span>
-          </div>
-        </div>
-      </footer>
 
       {/* Page-exit transition (slides across from left) */}
       {exitTo && (
