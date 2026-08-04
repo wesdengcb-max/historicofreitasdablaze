@@ -18,7 +18,7 @@ export function Switch({ checked, onChange, label, id }: Props) {
         onClick={() => onChange(!checked)}
         className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border transition-colors duration-300 ${
           checked
-            ? "border-primary/40 bg-primary/85"
+            ? "border-[#DE2143]/40 bg-[#DE2143]/85"
             : "border-white/10 bg-white/5"
         }`}
       >

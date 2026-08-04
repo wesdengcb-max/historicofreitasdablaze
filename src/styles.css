@@ -84,7 +84,7 @@
   --positive: #00FF88;
 
   /* Premium Decorations */
-  --gradient-primary: linear-gradient(180deg, #FF3554 0%, #FF1F3D 100%);
+  --gradient-primary: linear-gradient(180deg, #DE2143 0%, #FF1F3D 100%);
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4);
   --shadow-elegant: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
   --shadow-glow: 0 0 25px rgba(255, 30, 60, 0.18);
@@ -177,7 +177,7 @@
 }
 
 @utility premium-btn {
-  background: linear-gradient(180deg, #FF3554 0%, #FF1F3D 100%);
+  background: linear-gradient(180deg, #DE2143 0%, #FF1F3D 100%);
   box-shadow: 0 10px 35px rgba(255, 30, 60, 0.35);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
