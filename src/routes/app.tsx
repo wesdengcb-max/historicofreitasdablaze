@@ -1196,17 +1196,17 @@ function Index() {
                                                   ? "border-red-500/50 bg-red-500/5"
                                                   : p === "black"
                                                     ? "border-slate-500/50 bg-slate-500/5"
-                                                    : "border-white/10"
+                                                    : "border-[#3b5270] bg-[#233248]"
                                             }`}
                                           >
-                                            <div className={`h-[30px] w-[30px] rounded-full ring-1 ring-inset transition-all ${
-                                              p === "white" ? "bg-white ring-white/20" :
-                                              p === "red" ? "bg-red-500 ring-red-400/20" :
-                                              p === "black" ? "bg-slate-800 ring-slate-700/20" :
-                                              "bg-transparent ring-transparent"
+                                            <div className={`h-[32px] w-[32px] rounded-full border-2 transition-all ${
+                                              p === "white" ? "bg-white border-white/20" :
+                                              p === "red" ? "bg-red-500 border-red-400/20" :
+                                              p === "black" ? "bg-slate-800 border-slate-700/20" :
+                                              "bg-transparent border-[#5a6d84]"
                                             }`} />
                                           </button>
-                                          <span className="mt-1 h-3 text-[10px] tabular-nums text-muted-foreground/30">
+                                          <span className="mt-[5px] h-[11px] text-[11px] font-medium tabular-nums text-[#8ebcf0]">
                                             {hm}
                                           </span>
                                         </div>
