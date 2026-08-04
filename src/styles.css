@@ -180,11 +180,11 @@
   background: linear-gradient(180deg, #FF3554 0%, #FF1F3D 100%);
   box-shadow: 0 10px 35px rgba(255, 30, 60, 0.35);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
 
-@utility premium-btn:hover {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 15px 45px rgba(255, 30, 60, 0.45);
+  &:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 15px 45px rgba(255, 30, 60, 0.45);
+  }
 }
 
 @utility premium-input {
@@ -192,11 +192,11 @@
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 12px;
   transition: all 0.3s ease;
-}
 
-@utility premium-input:focus {
-  border-color: rgba(255, 40, 70, 0.35);
-  box-shadow: 0 0 15px rgba(255, 30, 60, 0.15);
+  &:focus {
+    border-color: rgba(255, 40, 70, 0.35);
+    box-shadow: 0 0 15px rgba(255, 30, 60, 0.15);
+  }
 }
 
 @utility tile-shadow {
