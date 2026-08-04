@@ -1,7 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowRight, BarChart3 } from "lucide-react";
+import { ArrowRight, BarChart3, Crown } from "lucide-react";
 import { useMemo, useState } from "react";
 import kingImg from "@/assets/freitas-white-hero.png.asset.json";
+import { useVipStatus } from "@/lib/auth/vipStore";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
