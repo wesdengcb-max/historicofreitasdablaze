@@ -50,27 +50,27 @@ function LandingPage() {
   );
 
   return (
-    <div className="relative min-h-[100svh] w-full overflow-hidden bg-[#090909] text-white">
+    <div className="relative min-h-[100svh] w-full overflow-hidden bg-[#050505] text-white">
       {/* Premium background effects */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(circle at 50% -20%, rgba(255, 31, 61, 0.2) 0%, transparent 60%), radial-gradient(circle at 50% 120%, rgba(255, 31, 61, 0.1) 0%, transparent 70%)",
+            "radial-gradient(circle at 50% 0%, rgba(255, 31, 61, 0.25) 0%, transparent 70%), radial-gradient(circle at 0% 100%, rgba(255, 31, 61, 0.1) 0%, transparent 50%), radial-gradient(circle at 100% 100%, rgba(255, 31, 61, 0.1) 0%, transparent 50%)",
         }}
       />
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
-      {/* Grid overlay */}
+      <div className="absolute inset-0 opacity-[0.05] pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
+      {/* Grid overlay - Enhanced contrast and depth */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.08]"
+        className="pointer-events-none absolute inset-0 opacity-[0.12]"
         style={{
           backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)",
-          backgroundSize: "48px 48px",
+            "linear-gradient(rgba(255,31,61,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,31,61,0.2) 1px, transparent 1px)",
+          backgroundSize: "64px 64px",
           maskImage:
-            "radial-gradient(ellipse 70% 50% at 50% 50%, black, transparent 80%)",
+            "radial-gradient(ellipse 80% 60% at 50% 50%, black 20%, transparent 95%)",
         }}
       />
 
