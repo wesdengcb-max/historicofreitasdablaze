@@ -168,12 +168,32 @@
 }
 
 @utility glass-card {
-  background: rgba(17, 17, 17, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 0 25px rgba(255, 30, 60, 0.12);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(17, 17, 17, 0.85);
+  border: 1px solid rgba(222, 33, 67, 0.2);
+  box-shadow: 
+    0 0 0 1px rgba(222, 33, 67, 0.1),
+    0 0 20px rgba(222, 33, 67, 0.15),
+    inset 0 0 12px rgba(222, 33, 67, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+@utility glass-card-glow {
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(222, 33, 67, 0.4), transparent 40%, transparent 60%, rgba(222, 33, 67, 0.4));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
 }
 
 @utility premium-btn {
