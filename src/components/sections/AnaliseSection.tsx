@@ -194,19 +194,21 @@ function AnalysisPanel({
   const chartData = top5.map((it) => ({ label: it.label, count: it.count }));
 
   return (
-    <Card delay={0.05}>
-      <div className="mb-4 flex items-baseline justify-between gap-3">
-        <div>
-          <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-            {eyebrow}
+    <Card className="glass-card overflow-hidden">
+      <div className="p-6">
+        <div className="mb-6 flex items-baseline justify-between gap-3">
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-[0.4em] text-[#FF1F3D] mb-1 font-outfit">
+              {eyebrow}
+            </div>
+            <h3 className="text-xl font-black text-white font-outfit uppercase tracking-tight">{title}</h3>
+            {subtitle && <p className="mt-1 text-xs text-[#9CA3AF]">{subtitle}</p>}
+            <p className="mt-1 text-[11px] text-[#9CA3AF] font-medium">
+              {windowed.length} gatilhos (últimos {MAX_DETAIL_ROWS}) · <span className="text-white">{fullyCompleted} completos</span> ·{" "}
+              <span className="text-white">{totalGaps} zeros coletados</span>
+              {avg !== null ? ` · média ${avg} min` : ""}
+            </p>
           </div>
-          <h3 className="text-lg font-semibold text-foreground">{title}</h3>
-          {subtitle && <p className="mt-1 text-xs text-muted-foreground">{subtitle}</p>}
-          <p className="mt-1 text-xs text-muted-foreground">
-            {windowed.length} gatilhos (últimos {MAX_DETAIL_ROWS}) · {fullyCompleted} completos ·{" "}
-            {totalGaps} zeros coletados
-            {avg !== null ? ` · média ${avg} min` : ""}
-          </p>
         </div>
         {!eligible && windowed.length > 0 && eligibleHint && (
           <span className="rounded-md border border-amber-400/30 bg-amber-500/10 px-2 py-1 text-[10px] font-semibold text-amber-300">
