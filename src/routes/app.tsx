@@ -499,7 +499,7 @@ function Index() {
     } catch {
       /* noop */
     }
-    const t = setTimeout(() => setWhiteFlash(null), 5000); // Reduzido para 5 segundos
+    const t = setTimeout(() => setWhiteFlash(null), 3000); // Reduzido para 3 segundos para sumir mais rápido
     return () => clearTimeout(t);
 
   }, [spins, whiteAlert]);
