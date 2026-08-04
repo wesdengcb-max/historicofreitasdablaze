@@ -1381,12 +1381,11 @@ const TipMinerCard = memo(function TipMinerCard({
           <div
             className="flex items-center justify-center rounded-full font-bold leading-none tabular-nums"
             style={{ 
-              height: "30px", 
-              width: "30px", 
-              border: `2px solid ${ring}`, 
+              height: "32px", 
+              width: "32px", 
+              border: `2px solid #5a6d84`, 
               color: fg, 
-              fontSize: "13px" 
-
+              fontSize: "14px" 
             }}
           >
             {spin.n}
