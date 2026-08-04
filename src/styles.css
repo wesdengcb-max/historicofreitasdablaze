@@ -16,47 +16,15 @@
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-
-  --color-primary: #FF1F3D;
-  --color-primary-foreground: #ffffff;
-  
-  --color-surface: var(--surface);
-  --color-surface-muted: var(--surface-muted);
-  --color-border: var(--border-color);
-  --color-muted-foreground: var(--muted-foreground-color);
-}
-
-:root {
-  --background: #090909;
-  --foreground: #ffffff;
-  --surface: #111111;
-  --surface-muted: rgba(255, 255, 255, 0.03);
-  --border-color: rgba(255, 255, 255, 0.08);
-  --muted-foreground-color: #9ca3af;
-  --time-text: #8ebcf0;
-  --radius: 16px;
-}
-
-.light {
-  --background: #ffffff;
-  --foreground: #111111;
-  --surface: #f3f4f6;
-  --surface-muted: rgba(0, 0, 0, 0.03);
-  --border-color: rgba(0, 0, 0, 0.08);
-  --muted-foreground-color: #666666;
-  --time-text: #4b5563;
-}
-
-body {
-  background-color: var(--background);
-  color: var(--foreground);
-}
-
-.glass-card {
-  background-color: var(--surface);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius);
-}
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
@@ -73,6 +41,8 @@ body {
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
   --color-surface-3: var(--surface-3);
+  --color-time-text: var(--time-text);
+}
 }
 
 :root {
