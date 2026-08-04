@@ -1352,7 +1352,7 @@ function Index() {
 
 
 
-      <WhiteCelebration spin={whiteFlash} onClose={() => setWhiteFlash(null)} />
+      <WhiteCelebration spin={whiteFlash} onClose={() => setWhiteFlash(null)} // O WhiteFlash já tem um timer de auto-fechamento no componente se desejado, mas aqui garantimos o controle manual também />
       <WhiteAlertToggleFx state={alertFx} onDone={() => setAlertFx(null)} />
 
       <LeftStatsDrawer
