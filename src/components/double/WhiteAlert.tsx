@@ -47,13 +47,13 @@ export function WhiteAlert({ spin, onClose, autoCloseTime = 5000 }: Props) {
             </div>
 
             <div className="leading-tight">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/60">
                 Alerta de Branco
               </p>
-              <p className="mt-1 text-base font-semibold text-foreground">
-                Branco confirmado · {spin.time}
+              <p className="text-base font-black tracking-tight text-white">
+                BRANCO CONFIRMADO
               </p>
-              <p className="text-xs text-muted-foreground">IA Freitas</p>
+              <p className="text-[10px] text-white/50">IA Freitas · {spin.time}</p>
             </div>
             <button
               type="button"
