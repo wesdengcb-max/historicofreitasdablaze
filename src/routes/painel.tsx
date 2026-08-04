@@ -211,7 +211,7 @@ function computeRange(
 }
 
 function Index() {
-  const [section, setSection] = useState<"historico" | "analise" | "sinais" | "estrategias">("historico");
+  const [section, setSection] = useState<SectionId>("historico");
   const [inverse, setInverse] = useState(false);
   const [viewMode, setViewMode] = useState<"colunas" | "lista">("colunas");
   // Em celular/tablet inicia em lista (sentido normal); desktop mantém colunas fixas.
@@ -715,7 +715,7 @@ function Index() {
         </div>
       </header>
 
-      <TopNav activeSection={section} onSectionChange={setSection as any} />
+      <TopNav activeSection={section} onSectionChange={setSection} />
 
       {section === "sinais" ? (
         <Suspense fallback={<SectionFallback />}><SinaisPage /></Suspense>
