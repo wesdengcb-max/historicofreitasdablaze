@@ -919,8 +919,8 @@ function Index() {
                   onClick={() => setFilter(id)}
                   className={`rounded-full border px-2 py-1 text-[10px] font-medium transition-colors sm:px-3 sm:py-1.5 sm:text-[11px] ${
                     filter === id
-                      ? "border-white/20 bg-white/10 text-foreground"
-                      : "border-white/5 bg-white/[0.03] text-muted-foreground hover:text-foreground"
+                      ? "border-white/20 bg-white/10 text-foreground light:border-black/20 light:bg-black/10 light:text-black"
+                      : "border-white/5 bg-white/[0.03] text-muted-foreground hover:text-foreground light:border-black/5 light:bg-black/[0.02] light:hover:text-black"
                   }`}
                 >
                   {label}
