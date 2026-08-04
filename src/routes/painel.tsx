@@ -715,7 +715,7 @@ function Index() {
         </div>
       </header>
 
-      <TopNav />
+      <TopNav activeSection={section} onSectionChange={setSection as any} />
 
       {section === "sinais" ? (
         <Suspense fallback={<SectionFallback />}><SinaisPage /></Suspense>
