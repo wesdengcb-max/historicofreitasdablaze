@@ -131,6 +131,12 @@
     radial-gradient(circle at 50% -20%, rgba(255, 31, 61, 0.05) 0%, transparent 50%),
     linear-gradient(180deg, #FFFFFF 0%, #F8F9FA 100%);
   color: #111111;
+  min-height: 100vh;
+}
+
+.light body::before {
+  opacity: 0.01;
+  filter: invert(1);
 }
 
 .light .glass-card {
@@ -150,26 +156,52 @@
   color: #111111;
 }
 
+.light nav {
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
 .light .text-muted-foreground {
   color: #6B7280;
 }
 
-.light .border-white\/\[0\.08\] {
-  border-color: rgba(0, 0, 0, 0.08);
+.light .border-white\/\[0\.08\],
+.light .border-white\/\[0\.05\] {
+  border-color: rgba(0, 0, 0, 0.08) !important;
 }
 
-.light .bg-black\/40 {
-  background-color: rgba(255, 255, 255, 0.6);
+.light .bg-black\/40,
+.light .bg-white\/5,
+.light .bg-white\/10 {
+  background-color: rgba(0, 0, 0, 0.05) !important;
 }
 
 .light .text-white\/70,
 .light .text-white\/60,
-.light .text-white\/40 {
-  color: rgba(0, 0, 0, 0.6);
+.light .text-white\/40,
+.light .text-\[\#9CA3AF\] {
+  color: rgba(0, 0, 0, 0.6) !important;
 }
 
 .light .text-white {
+  color: #111111 !important;
+}
+
+.light .hover\:text-white:hover {
+  color: #000000 !important;
+}
+
+.light .hover\:bg-white\/\[0\.03\]:hover {
+  background-color: rgba(0, 0, 0, 0.03) !important;
+}
+
+.light button:not(.premium-btn):not(.bg-\[\#FF1F3D\]\/10) {
   color: #111111;
+}
+
+.light .bg-\[\#FF1F3D\]\/10 {
+  background-color: rgba(255, 31, 61, 0.1) !important;
+  color: #FF1F3D !important;
 }
 
 .dark { color-scheme: dark; }
