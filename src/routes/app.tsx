@@ -716,7 +716,7 @@ function Index() {
             <button
               type="button"
               onClick={() => toggleWhiteAlert(!whiteAlert)}
-              className="grid h-8 w-8 place-items-center rounded-xl border border-white/5 bg-white/5 text-muted-foreground transition-colors duration-200 hover:bg-white/[0.08] hover:text-foreground sm:h-10 sm:w-10 lg:h-11 lg:w-11"
+              className="grid h-8 w-8 place-items-center rounded-xl border border-white/5 bg-white/5 text-muted-foreground transition-colors duration-200 hover:bg-white/[0.08] hover:text-foreground sm:h-10 sm:w-10 lg:h-11 lg:w-11 light:border-black/5 light:bg-black/5 light:text-black/60 light:hover:bg-black/[0.08] light:hover:text-black"
               aria-label="Notificar branco"
               title={whiteAlert ? "Alerta de branco: ligado" : "Alerta de branco: desligado"}
             >
