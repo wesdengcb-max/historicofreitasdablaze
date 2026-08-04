@@ -119,14 +119,26 @@ function LandingPage() {
       <main className="relative z-10 mx-auto flex min-h-[100svh] w-full items-center justify-center px-6 py-8">
         <div className="glass-card-glow relative w-full max-w-[420px] overflow-hidden rounded-[2.5rem] border border-white/5 bg-[#0C0C0C]/90 p-8 text-center backdrop-blur-xl sm:p-12">
           {/* Logo */}
-          <div className="mb-8 flex justify-center">
+          <div className="mb-10 flex justify-center">
             <div className="relative">
-              <img 
-                src={kingImg.url} 
-                alt="Logo" 
-                className="h-16 w-16 rounded-full object-cover ring-2 ring-[#FF1F3D]/20" 
-              />
-              <div className="absolute -inset-2 rounded-full bg-[#FF1F3D]/20 blur-xl" />
+              <div className="flex items-center gap-2">
+                <img 
+                  src={kingImg.url} 
+                  alt="Logo" 
+                  className="h-10 w-10 rounded-full object-cover" 
+                />
+                <div className="flex flex-col items-start leading-tight">
+                  <div className="flex items-center gap-1">
+                    <span className="text-xl font-black tracking-tighter text-white">love</span>
+                    <span className="relative flex h-6 w-6 items-center justify-center rounded-sm bg-[#FF1F3D] text-[10px] font-black text-white">
+                      K
+                      <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 text-[8px]">👑</div>
+                    </span>
+                    <span className="text-xl font-black tracking-tighter text-white">ing</span>
+                  </div>
+                  <span className="text-[10px] font-black tracking-[0.2em] text-white/40 uppercase ml-auto">pro</span>
+                </div>
+              </div>
             </div>
           </div>
 
