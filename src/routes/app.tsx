@@ -712,7 +712,7 @@ function Index() {
 
           <div className="flex shrink-0 items-center gap-1 sm:gap-3">
             <StatusPill status={status} message={errorMsg} />
-            <ThemeToggle />
+            
             <button
               type="button"
               onClick={() => toggleWhiteAlert(!whiteAlert)}
