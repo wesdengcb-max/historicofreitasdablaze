@@ -9,6 +9,8 @@ import {
   Activity,
   Crown,
   Lock,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { setSection, useSection, type SectionId } from "@/lib/sectionStore";
