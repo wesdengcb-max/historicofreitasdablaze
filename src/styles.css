@@ -207,7 +207,7 @@
   overscroll-behavior-x: contain;
   scrollbar-width: thin;
 }
-@media (min-width: 1280px) {
+@media (min-width: 1366px) {
   .history-scroll { overflow-x: hidden; }
 }
 
