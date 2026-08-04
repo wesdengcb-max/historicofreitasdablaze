@@ -152,7 +152,7 @@ export function PatternNotifier({ spins }: { spins: Spin[] }) {
             {pattern.length} pedras • {occurrences.length} ocorrências {playing && "• MONITORANDO"}
           </div>
         ) : (
-        <>
+          <div className="animate-in fade-in slide-in-from-top-1 duration-200">
           <div className="mb-4 grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3">
             <div className="inline-flex items-center gap-2 rounded-lg bg-primary/15 px-3 py-1.5 text-xs font-semibold text-primary ring-1 ring-primary/30">
               <input
@@ -371,7 +371,7 @@ export function PatternNotifier({ spins }: { spins: Spin[] }) {
                 </ul>
               )}
             </aside>
-          </div>
+            </div>
         )}
       </div>
     </Card>
