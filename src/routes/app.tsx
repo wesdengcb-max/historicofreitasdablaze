@@ -818,7 +818,7 @@ function Index() {
                             style={{
                               width: `${Math.min(100, it.pct)}%`,
                               background: isLeader
-                                ? "linear-gradient(90deg,#10b981,#34d399)"
+                                ? "linear-gradient(90deg, #FF3554, #FF1F3D)"
                                 : it.tint,
                             }}
                           />
@@ -834,11 +834,11 @@ function Index() {
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] text-muted-foreground">
                 <span className="inline-flex items-center gap-2">
                   <Flame className="h-3.5 w-3.5" />
-                  Último branco há <b className="text-foreground">{lastWhiteAgo}</b> rodadas
+                  Último branco há <b className="text-[#FF1F3D] font-black">{lastWhiteAgo}</b> rodadas
                 </span>
                 <span className="inline-flex items-center gap-2">
                   <Activity className="h-3.5 w-3.5" />
-                  Brancos seguidos <b className="text-foreground">{countConsecutive(visibleSpins, "white")}</b>
+                  Brancos seguidos <b className="text-[#FF1F3D] font-black">{countConsecutive(visibleSpins, "white")}</b>
                 </span>
               </div>
               <div className="flex flex-wrap items-center gap-1.5 sm:justify-end">
@@ -847,7 +847,7 @@ function Index() {
                 </span>
                 {freq.map((f) => (
                   <div key={f.n} className="flex items-center gap-1">
-                    <ResultCircle color={colorOf(f.n)} n={f.n} size="sm" animate={false} />
+                    <ResultCircle color={colorOf(f.n)} n={f.n} size="sm" animate={false} className="shadow-[0_0_10px_rgba(255,31,61,0.2)]" />
                     <span className="text-[10px] tabular-nums text-muted-foreground">{f.count}</span>
                   </div>
                 ))}
@@ -855,7 +855,9 @@ function Index() {
             </div>
           </Card>
 
-          <StrategyTabs spins={visibleSpins} />
+          <div className="mx-auto w-full max-w-[1366px] mb-8">
+             <StrategyTabs spins={visibleSpins} />
+          </div>
 
           <Card
             title="Giros anteriores"
