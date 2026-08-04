@@ -3,6 +3,7 @@
 @import "tw-animate-css";
 @import "@fontsource-variable/inter";
 
+@custom-variant light (&:is(.light *));
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -12,6 +13,7 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -39,6 +41,7 @@
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
   --color-surface-3: var(--surface-3);
+  --color-time-text: var(--time-text);
 }
 
 :root {
@@ -47,6 +50,7 @@
   /* Premium Dark Theme */
   --background: #090909;
   --foreground: #FFFFFF;
+  --time-text: #8ebcf0;
 
   --surface: #111111;
   --surface-2: #0C0C0C;
@@ -93,45 +97,198 @@
 
 .light {
   color-scheme: light;
-  --background: oklch(0.985 0.003 260);
-  --foreground: oklch(0.2 0.012 260);
+  --background: #FFFFFF;
+  --foreground: #111111;
+  --time-text: #6B7280;
 
-  --surface:   oklch(1 0 0);
-  --surface-2: oklch(0.97 0.005 260);
-  --surface-3: oklch(0.94 0.007 260);
+  --surface:   #F8F8F8;
+  --surface-2: #F1F1F1;
+  --surface-3: #EBEBEB;
 
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.2 0.012 260);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.2 0.012 260);
+  --card: #FFFFFF;
+  --card-foreground: #111111;
+  --popover: #FFFFFF;
+  --popover-foreground: #111111;
 
-  --primary: oklch(0.58 0.18 250);
-  --primary-foreground: oklch(0.985 0.003 260);
+  --primary: #FF1F3D;
+  --primary-foreground: #FFFFFF;
 
-  --secondary: oklch(0.94 0.008 260);
-  --secondary-foreground: oklch(0.2 0.012 260);
+  --secondary: #F1F1F1;
+  --secondary-foreground: #4B5563;
 
-  --muted: oklch(0.95 0.006 260);
-  --muted-foreground: oklch(0.45 0.012 260);
+  --muted: #F1F1F1;
+  --muted-foreground: #6B7280;
 
-  --accent: oklch(0.94 0.01 260);
-  --accent-foreground: oklch(0.2 0.012 260);
+  --accent: #FF2648;
+  --accent-foreground: #FFFFFF;
 
-  --border: oklch(0 0 0 / 0.08);
-  --input: oklch(0 0 0 / 0.1);
-  --ring: oklch(0.58 0.18 250);
+  --border: rgba(0, 0, 0, 0.08);
+  --input: rgba(0, 0, 0, 0.08);
+  --ring: #FF1F3D;
 
-  --black-tile: oklch(0.22 0.012 260);
-  --white-tile: oklch(1 0 0);
+  --black-tile: #1A1A1A;
+  --white-tile: #FFFFFF;
+  --time-text: #8EBCF0;
+}
+
+.light {
+  --time-text: #5A8FCF;
 }
 
 .light body {
-  background-image:
-    radial-gradient(ellipse 90% 55% at 50% -12%, color-mix(in oklab, var(--primary) 8%, transparent), transparent 60%),
-    linear-gradient(180deg, oklch(0.99 0.003 260) 0%, oklch(0.965 0.005 260) 100%);
+  background-color: #FFFFFF;
+  background-image: 
+    radial-gradient(circle at 50% -20%, rgba(255, 31, 61, 0.05) 0%, transparent 50%),
+    linear-gradient(180deg, #FFFFFF 0%, #F8F9FA 100%);
+  color: #111111;
+  min-height: 100vh;
+}
+
+.light body::before {
+  opacity: 0.01;
+  filter: invert(1);
+}
+
+.light .glass-card {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(222, 33, 67, 0.15);
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.05), 
+    0 2px 4px -1px rgba(0, 0, 0, 0.03),
+    0 0 20px rgba(222, 33, 67, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.light .premium-input {
+  background: #F8F8F8;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  color: #111111;
+}
+
+.light nav {
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+.light .text-muted-foreground {
+  color: #6B7280;
+}
+
+.light .border-white\/\[0\.08\],
+.light .border-white\/\[0\.05\] {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+.light .bg-black\/40,
+.light .bg-white\/5,
+.light .bg-white\/10 {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.light .text-white\/70,
+.light .text-white\/60,
+.light .text-white\/40,
+.light .text-\[\#9CA3AF\] {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+.light .text-white {
+  color: #111111 !important;
+}
+
+.light .hover\:text-white:hover {
+  color: #000000 !important;
+}
+
+.light .hover\:bg-white\/\[0\.03\]:hover {
+  background-color: rgba(0, 0, 0, 0.03) !important;
+}
+
+.light button:not(.premium-btn):not(.bg-\[\#FF1F3D\]\/10) {
+  color: #111111;
+}
+
+.light .bg-\[\#FF1F3D\]\/10 {
+  background-color: rgba(255, 31, 61, 0.1) !important;
+  color: #FF1F3D !important;
 }
 
 .dark { color-scheme: dark; }
+
+.light .glass-card {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+.light .glass-card-glow::before {
+  background: linear-gradient(135deg, rgba(222, 33, 67, 0.2), transparent 40%, transparent 60%, rgba(222, 33, 67, 0.2)) !important;
+}
+
+.light .bg-surface,
+.light .bg-surface\/60 {
+  background-color: #F8F8F8 !important;
+}
+
+.light .border-border {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+.light .bg-white\/\[0\.02\],
+.light .bg-white\/\[0\.03\],
+.light .bg-white\/\[0\.01\] {
+  background-color: rgba(0, 0, 0, 0.02) !important;
+}
+
+.light .text-muted-foreground {
+  color: #666666 !important;
+}
+
+.light .text-foreground,
+.light .text-white {
+  color: #111111 !important;
+}
+
+.light h1, .light h2, .light h3 {
+  color: #000000 !important;
+}
+
+.light .bg-emerald-500\/5 {
+  background-color: rgba(16, 185, 129, 0.08) !important;
+}
+
+.light .bg-emerald-500\/10 {
+  background-color: rgba(16, 185, 129, 0.12) !important;
+}
+
+.light .bg-red-500\/5,
+.light .bg-red-500\/10 {
+  background-color: rgba(239, 68, 68, 0.08) !important;
+}
+
+.light .bg-surface {
+  background-color: #ffffff !important;
+}
+
+.light .AnaliseSection_Card {
+  background-color: #ffffff !important;
+}
+
+.light .bg-black {
+  background-color: #ffffff !important;
+}
+
+.light .bg-\[\#090909\] {
+  background-color: #ffffff !important;
+}
+
+.light .bg-\[\#101114\]\/80 {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.light .AnaliseSection_Main {
+  background-color: #ffffff !important;
+}
 
 @layer base {
   * { border-color: var(--color-border); }

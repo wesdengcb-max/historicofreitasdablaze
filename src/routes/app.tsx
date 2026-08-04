@@ -1405,7 +1405,7 @@ const TipMinerCard = memo(function TipMinerCard({
       <button
         type="button"
         onClick={onClick}
-        className={`flex items-center justify-center overflow-hidden rounded-[6px] border border-white/[0.08] shadow-sm transition-[transform,opacity] duration-200 hover:-translate-y-0.5 animate-in fade-in zoom-in-95 ${
+        className={`flex items-center justify-center overflow-hidden rounded-[6px] border border-white/[0.08] light:border-black/[0.08] shadow-sm transition-[transform,opacity] duration-200 hover:-translate-y-0.5 animate-in fade-in zoom-in-95 ${
           isHit ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : ""
         }`}
         style={{
@@ -1452,9 +1452,12 @@ const TipMinerCard = memo(function TipMinerCard({
       {showTime && (
         <span
           className={`mt-1 leading-none tabular-nums ${
-            timeHighlight ? "font-bold text-primary" : "text-muted-foreground"
+            timeHighlight ? "font-bold text-primary" : ""
           }`}
-          style={{ fontSize: "12px" }}
+          style={{ 
+            fontSize: "12px",
+            color: timeHighlight ? undefined : "var(--time-text)"
+          }}
         >
           {showSeconds ? spTimeWithSeconds(spin) : spin.time}
         </span>
