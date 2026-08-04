@@ -20,6 +20,7 @@ import {
   HelpCircle,
   PlusCircle,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 import { Card } from "./Card";
 import { ResultCircle } from "./ResultCircle";
