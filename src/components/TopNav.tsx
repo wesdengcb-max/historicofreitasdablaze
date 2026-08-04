@@ -1,4 +1,3 @@
-import { useState, useEffect, useCallback } from "react";
 import {
   LayoutDashboard,
   BarChart3,
@@ -10,8 +9,6 @@ import {
   Activity,
   Crown,
   Lock,
-  Sun,
-  Moon,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { setSection, useSection, type SectionId } from "@/lib/sectionStore";
@@ -46,24 +43,6 @@ const ITEMS: Item[] = [
 export function TopNav() {
   const active = useSection();
   const isVip = useVipStatus();
-  const [isDark, setIsDark] = useState(true);
-
-  useEffect(() => {
-    const isLight = document.documentElement.classList.contains("light");
-    setIsDark(!isLight);
-  }, []);
-
-  const toggleTheme = useCallback(() => {
-    setIsDark(prev => {
-      const next = !prev;
-      if (next) {
-        document.documentElement.classList.remove("light");
-      } else {
-        document.documentElement.classList.add("light");
-      }
-      return next;
-    });
-  }, []);
 
   const handleSectionClick = (item: Item) => {
     // Only dashboard is public, others require VIP
@@ -116,28 +95,20 @@ export function TopNav() {
           })}
         </div>
 
-        <div className="ml-4 flex shrink-0 items-center gap-2">
-          <button
-            onClick={toggleTheme}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-muted-foreground transition-all hover:bg-white/10 light:border-black/10 light:bg-black/5"
-            aria-label="Alternar tema"
-          >
-            {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          </button>
-
+        <div className="ml-4 flex shrink-0 items-center">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
                 className={`flex h-9 w-9 items-center justify-center rounded-full border transition-all duration-300 ${
                   isVip
                     ? "border-amber-400/50 bg-amber-400/10 text-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.2)]"
-                    : "border-white/10 bg-white/5 text-muted-foreground hover:bg-white/10 light:border-black/10 light:bg-black/5"
+                    : "border-white/10 bg-white/5 text-muted-foreground hover:bg-white/10"
                 }`}
               >
                 <Crown className="h-4 w-4" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 border-white/10 bg-[#101114] light:bg-white light:border-black/10">
+            <DropdownMenuContent align="end" className="w-56 border-white/10 bg-[#101114]">
               <div className="px-2 py-2">
                 <p className="font-outfit text-xs font-black uppercase tracking-widest text-[#FF1F3D]">
                   Membro VIP
@@ -158,7 +129,7 @@ export function TopNav() {
                       : "Recursos premium foram bloqueados.",
                   });
                 }}
-                className="mt-1 flex cursor-pointer items-center gap-2 font-bold text-white light:text-black focus:bg-[#FF1F3D]/20 focus:text-white light:focus:text-black"
+                className="mt-1 flex cursor-pointer items-center gap-2 font-bold text-white focus:bg-[#FF1F3D]/20 focus:text-white"
               >
                 <Crown className={`h-4 w-4 ${isVip ? "text-amber-400" : ""}`} />
                 <span>{isVip ? "Desativar VIP (Demo)" : "Ativar VIP (Demo)"}</span>

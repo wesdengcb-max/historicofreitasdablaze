@@ -86,12 +86,9 @@ export const BlazeResultCard = memo(function BlazeResultCard({
       {time && (
         <span
           className={`mt-[5px] text-center leading-none tabular-nums ${
-            timeHighlight ? "font-bold text-primary" : ""
+            timeHighlight ? "font-bold text-primary" : "text-[#8ebcf0]"
           }`}
-          style={{ 
-            fontSize: "var(--blaze-time, 11px)",
-            color: timeHighlight ? undefined : "var(--time-text)"
-          }}
+          style={{ fontSize: "var(--blaze-time, 11px)" }}
         >
           {time}
         </span>

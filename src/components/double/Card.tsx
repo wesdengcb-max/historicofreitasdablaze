@@ -28,8 +28,8 @@ export function Card({ title, subtitle, icon, action, children, delay = 0, class
               </span>
             )}
             <div className="min-w-0">
-              {title && <h2 className="truncate text-[14px] font-medium tracking-tight text-foreground">{title}</h2>}
-              {subtitle && <p className="truncate text-[11px] text-muted-foreground">{subtitle}</p>}
+              {title && <h2 className="truncate text-[14px] font-medium tracking-tight text-[#eaeaea]">{title}</h2>}
+              {subtitle && <p className="truncate text-[11px] text-[#8ebcf0]">{subtitle}</p>}
             </div>
           </div>
           {action}
