@@ -1111,7 +1111,7 @@ function Index() {
                         {Array.from({ length: 10 }).map((_, ci) => (
                           <div
                             key={`header-inner-${ci}`}
-                            className="flex h-[23px] w-[137px] items-center justify-center rounded-[6px] border border-white/5 bg-white/[0.03] text-[14px] font-medium tabular-nums text-foreground light:text-black"
+                            className="flex h-[23px] w-[137px] items-center justify-center rounded-[6px] border border-white/5 bg-white/[0.03] text-[14px] font-medium tabular-nums text-foreground light:text-black light:border-black/10 light:bg-black/5"
                             style={{ width: "100%" }}
                           >
                             {ci}
