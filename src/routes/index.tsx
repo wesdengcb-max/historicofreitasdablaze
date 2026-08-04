@@ -53,11 +53,14 @@ function LandingPage() {
 
   return (
     <div className="relative min-h-[100svh] w-full overflow-hidden bg-[#090909] text-white">
-      {/* Background Image Layer - Focused Hero */}
+      {/* Background Image Layer - Professional Placement */}
       <div 
-        className="absolute inset-0 z-0 opacity-60 bg-cover bg-center md:bg-right bg-no-repeat pointer-events-none"
+        className="absolute inset-0 z-0 opacity-80 pointer-events-none"
         style={{ 
           backgroundImage: `url(${heroImg.url})`,
+          backgroundSize: 'contain',
+          backgroundPosition: 'center right',
+          backgroundRepeat: 'no-repeat',
         }}
       />
       
