@@ -8,8 +8,8 @@ export const BLAZE_GAP_X = 8;
 export const BLAZE_GAP_Y = 14;
 
 const PALETTE: Record<Color, { bg: string; border: string; ring: string; fg: string }> = {
-  red: { bg: "#DE2143", border: "#ff5f7a", ring: "#ffffff", fg: "#ffffff" },
-  black: { bg: "#16171d", border: "#3a3d4a", ring: "#ffffff", fg: "#ffffff" },
+  red: { bg: "#233248", border: "#3b5270", ring: "#ffffff", fg: "#ffffff" },
+  black: { bg: "#233248", border: "#3b5270", ring: "#ffffff", fg: "#ffffff" },
   white: { bg: "#ffffff", border: "#d9dbe3", ring: "#16171d", fg: "#16171d" },
 };
 
