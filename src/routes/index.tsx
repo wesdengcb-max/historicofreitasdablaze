@@ -3,6 +3,7 @@ import { ArrowRight, BarChart3 } from "lucide-react";
 import { useMemo, useState } from "react";
 import kingImg from "@/assets/freitas-king.png.asset.json";
 import bgImg from "@/assets/freitas-bg.png.asset.json";
+import heroImg from "@/assets/freitas-white-hero.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -52,15 +53,16 @@ function LandingPage() {
 
   return (
     <div className="relative min-h-[100svh] w-full overflow-hidden bg-[#090909] text-white">
-      {/* Background Image Layer */}
+      {/* Background Image Layer - Focused Hero */}
       <div 
-        className="absolute inset-y-0 right-0 z-0 opacity-40 bg-contain bg-right-bottom bg-no-repeat pointer-events-none"
+        className="absolute inset-0 z-0 opacity-60 bg-cover bg-center md:bg-right bg-no-repeat pointer-events-none"
         style={{ 
-          backgroundImage: `url(${bgImg.url})`,
-          width: '50%',
-          maxWidth: '800px',
+          backgroundImage: `url(${heroImg.url})`,
         }}
       />
+      
+      {/* Dark overlay to ensure card readability */}
+      <div className="absolute inset-0 z-0 bg-black/40 backdrop-blur-[2px]" />
       
       {/* Premium background effects */}
       <div
