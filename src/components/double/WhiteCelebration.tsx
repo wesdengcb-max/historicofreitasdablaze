@@ -188,7 +188,7 @@ export function WhiteCelebration({ spin, onClose }: Props) {
 export function WhiteAlertToggleFx({ state, onDone }: { state: "on" | "off" | null; onDone: () => void }) {
   useEffect(() => {
     if (!state) return;
-    const t = setTimeout(onDone, 1600);
+    const t = setTimeout(onDone, 3000); // Exibe por 3 segundos e some sozinho
     return () => clearTimeout(t);
   }, [state, onDone]);
 
@@ -196,25 +196,36 @@ export function WhiteAlertToggleFx({ state, onDone }: { state: "on" | "off" | nu
     <AnimatePresence>
       {state && (
         <motion.div
-          initial={{ opacity: 0, y: -18, scale: 0.94 }}
+          initial={{ opacity: 0, y: -24, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -14, scale: 0.96 }}
-          transition={{ type: "spring", stiffness: 260, damping: 20 }}
-          className="pointer-events-none fixed left-1/2 top-5 z-[70] -translate-x-1/2"
+          exit={{ opacity: 0, y: -24, scale: 0.9 }}
+          transition={{ 
+            type: "spring", 
+            stiffness: 300, 
+            damping: 25,
+            mass: 0.8 
+          }}
+          className="pointer-events-none fixed left-1/2 top-6 z-[100] -translate-x-1/2"
         >
-          <div className="glass-card flex items-center gap-3 rounded-2xl px-4 py-2.5">
-            <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full bg-white ring-1 ring-white/50">
+          <div 
+            className="glass-card flex items-center gap-4 rounded-2xl px-5 py-3 shadow-2xl"
+            style={{ 
+              boxShadow: "0 20px 50px -12px rgba(0,0,0,0.5), 0 0 20px rgba(255,255,255,0.1)",
+              border: "1px solid rgba(255,255,255,0.15)"
+            }}
+          >
+            <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-white ring-2 ring-white/50">
               <img src={brancoVip.url} alt="" className="h-full w-full object-cover" />
               {state === "on" && (
-                <span className="absolute inset-0 animate-ping rounded-full bg-white/50" />
+                <span className="absolute inset-0 animate-ping rounded-full bg-white/60" />
               )}
             </div>
             <div className="leading-tight">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/60">
                 Alerta de Branco
               </p>
-              <p className="text-sm font-semibold text-foreground">
-                {state === "on" ? "Ativado — fique de olho!" : "Desativado"}
+              <p className={`text-base font-black tracking-tight ${state === "on" ? "text-white" : "text-white/80"}`}>
+                {state === "on" ? "ATIVADO" : "DESATIVADO"}
               </p>
             </div>
           </div>
