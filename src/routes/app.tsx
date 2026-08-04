@@ -1257,6 +1257,7 @@ function Index() {
                                      return next;
                                    })
                                  }
+                                 overrideColors={true}
                                />
                              </div>
                            );
@@ -1333,9 +1334,9 @@ const TipMinerCard = memo(function TipMinerCard({
   const isWhite = spin.color === "white";
   const bg =
     spin.color === "red"
-      ? "#DE2143"
+      ? "#233248"
       : spin.color === "black"
-        ? "#16171d"
+        ? "#233248"
         : "#ffffff";
   const ring = isWhite ? "#16171d" : "#ffffff";
   const fg = isWhite ? "#16171d" : "#ffffff";

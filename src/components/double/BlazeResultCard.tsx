@@ -23,6 +23,7 @@ type Props = {
   selected?: boolean;
   delay?: number;
   onClick?: () => void;
+  overrideColors?: boolean;
 };
 
 /** Card de resultado no padrão do histórico da Blaze (48px, círculo 32px, hora 11px). */
@@ -36,8 +37,15 @@ export const BlazeResultCard = memo(function BlazeResultCard({
   selected = false,
   delay = 0,
   onClick,
+  overrideColors = false,
 }: Props) {
-  const c = PALETTE[color];
+  const c = overrideColors
+    ? color === "red"
+      ? { bg: "#DE2143", border: "#ff5f7a", ring: "#ffffff", fg: "#ffffff" }
+      : color === "black"
+        ? { bg: "#16171d", border: "#3a3d4a", ring: "#ffffff", fg: "#ffffff" }
+        : PALETTE[color]
+    : PALETTE[color];
   const isWhite = color === "white";
 
   return (
