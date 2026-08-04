@@ -824,7 +824,7 @@ function Index() {
                         className={`rounded-xl border p-2 transition-colors sm:p-2.5 ${
                           isLeader
                             ? "border-emerald-400/70 shadow-[0_0_0_1px_rgba(16,185,129,0.35),0_8px_24px_-12px_rgba(16,185,129,0.45)]"
-                            : "border-white/5 bg-white/[0.02]"
+                            : "border-white/5 bg-white/[0.02] light:border-black/5 light:bg-black/[0.02]"
                         }`}
                       >
                         <div className="flex min-w-0 items-center gap-2">
