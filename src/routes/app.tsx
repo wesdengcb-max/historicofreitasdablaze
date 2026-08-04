@@ -1,5 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { setSection } from "@/lib/sectionStore";
+import { useVipStatus } from "@/lib/auth/vipStore";
+import { toast } from "sonner";
+import { Lock } from "lucide-react";
+
 
 import { lazy, memo, Suspense, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import {
