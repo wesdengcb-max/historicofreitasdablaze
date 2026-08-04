@@ -54,10 +54,10 @@ function LandingPage() {
     <div className="relative min-h-[100svh] w-full overflow-hidden bg-[#090909] text-white">
       {/* Background Image Layer */}
       <div 
-        className="absolute inset-0 z-0 opacity-60 bg-cover bg-right sm:bg-center bg-no-repeat"
+        className="absolute inset-y-0 right-0 z-0 opacity-40 bg-contain bg-right-bottom bg-no-repeat"
         style={{ 
           backgroundImage: `url(${bgImg.url})`,
-          backgroundSize: 'cover'
+          width: '70%',
         }}
       />
       
