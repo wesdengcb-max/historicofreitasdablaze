@@ -8,8 +8,8 @@ export const BLAZE_GAP_X = 8;
 export const BLAZE_GAP_Y = 14;
 
 const PALETTE: Record<Color, { bg: string; border: string; ring: string; fg: string }> = {
-  red: { bg: "#DE2143", border: "#ff5f7a", ring: "#ffffff", fg: "#ffffff" },
-  black: { bg: "#16171d", border: "#3a3d4a", ring: "#ffffff", fg: "#ffffff" },
+  red: { bg: "#233248", border: "#3b5270", ring: "#ffffff", fg: "#ffffff" },
+  black: { bg: "#233248", border: "#3b5270", ring: "#ffffff", fg: "#ffffff" },
   white: { bg: "#ffffff", border: "#d9dbe3", ring: "#16171d", fg: "#16171d" },
 };
 
@@ -23,6 +23,7 @@ type Props = {
   selected?: boolean;
   delay?: number;
   onClick?: () => void;
+  overrideColors?: boolean;
 };
 
 /** Card de resultado no padrão do histórico da Blaze (48px, círculo 32px, hora 11px). */
@@ -36,8 +37,15 @@ export const BlazeResultCard = memo(function BlazeResultCard({
   selected = false,
   delay = 0,
   onClick,
+  overrideColors = false,
 }: Props) {
-  const c = PALETTE[color];
+  const c = overrideColors
+    ? color === "red"
+      ? { bg: "#DE2143", border: "#ff5f7a", ring: "#ffffff", fg: "#ffffff" }
+      : color === "black"
+        ? { bg: "#16171d", border: "#3a3d4a", ring: "#ffffff", fg: "#ffffff" }
+        : PALETTE[color]
+    : PALETTE[color];
   const isWhite = color === "white";
 
   return (
