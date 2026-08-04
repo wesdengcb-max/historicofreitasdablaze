@@ -259,8 +259,6 @@ export function PatternValidator({ spins }: { spins: Spin[] }) {
             </div>
             <div className="grid grid-cols-1 gap-5 md:grid-cols-[minmax(0,1fr)_minmax(0,280px)] xl:grid-cols-[minmax(0,1fr)_minmax(0,320px)]">
 
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-[minmax(0,1fr)_minmax(0,280px)] xl:grid-cols-[minmax(0,1fr)_minmax(0,320px)]">
-
 
 
         {/* LEFT: builder */}
