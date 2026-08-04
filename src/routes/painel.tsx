@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 import { lazy, memo, Suspense, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
@@ -217,6 +217,7 @@ function computeRange(
 function Index() {
   const [section, setSection] = useState<SectionId>("historico");
   const [isVip, setIsVip] = useState(false);
+  const navigate = useNavigate();
   const [inverse, setInverse] = useState(false);
   const [viewMode, setViewMode] = useState<"colunas" | "lista">("colunas");
   // Em celular/tablet inicia em lista (sentido normal); desktop mantém colunas fixas.
@@ -732,7 +733,21 @@ function Index() {
         </div>
       </header>
 
-      <TopNav activeSection={section} onSectionChange={setSection} isVip={isVip} />
+      <TopNav 
+        activeSection={section} 
+        onSectionChange={(id) => {
+          if (id === "historico") {
+            setSection(id);
+          } else if (isVip) {
+            setSection(id);
+          } else {
+            // Se não for VIP, redireciona para a home para login/compra
+            // ou poderíamos mostrar um modal, mas o pedido implica bloqueio
+            navigate({ to: "/" });
+          }
+        }} 
+        isVip={isVip} 
+      />
 
       {section === "sinais" ? (
         <Suspense fallback={<SectionFallback />}><SinaisPage /></Suspense>
