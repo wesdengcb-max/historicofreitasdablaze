@@ -944,7 +944,7 @@ function Index() {
                   <Switch checked={exibirSegundos} onChange={setExibirSegundos} label="Exibir segundos" />
                 </div>
                 <div className="flex min-w-0 items-center">
-                  <Switch checked={contarLinhas} onChange={setContarLinhas} label="Contar linhas" />
+                  <Switch checked={whiteAlert} onChange={toggleWhiteAlert} label="Alerta de branco" />
                 </div>
                 <div className="flex min-w-0 items-center">
                   <Switch checked={whiteAlert} onChange={toggleWhiteAlert} label="Alerta de branco" />
