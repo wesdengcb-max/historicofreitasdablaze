@@ -974,6 +974,14 @@ function Index() {
                   <Switch checked={destaqueHorario} onChange={setDestaqueHorario} label="Destaque horário" />
                 </div>
                 <div className="flex min-w-0 items-center">
+                  <div className={`flex items-center gap-2.5 rounded-full border px-3 py-1.5 transition-all ${isVip ? "border-amber-400/30 bg-amber-400/5 text-amber-400" : "border-white/5 bg-white/5 text-muted-foreground opacity-60"}`}>
+                    <Crown className="h-3.5 w-3.5" />
+                    <span className="text-[11px] font-bold uppercase tracking-wider font-outfit">
+                      {isVip ? "VIP Ativo" : "Básico"}
+                    </span>
+                  </div>
+                </div>
+
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button
