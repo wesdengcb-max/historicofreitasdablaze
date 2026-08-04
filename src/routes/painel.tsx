@@ -258,7 +258,7 @@ function Index() {
   const [status, setStatus] = useState<"loading" | "live" | "error">("loading");
   const [errorMsg, setErrorMsg] = useState("");
   const [whiteFlash, setWhiteFlash] = useState<Spin | null>(null);
-  const [statsOpen, setStatsOpen] = useState(false);
+  const [statsOpen, setStatsOpen] = useState(true);
   const [countdown, setCountdown] = useState(15);
 
   // Filtros
@@ -702,7 +702,13 @@ function Index() {
             </button>
             <button
               type="button"
-              onClick={() => setStatsOpen((v) => !v)}
+              onClick={() => {
+                if (isVip) {
+                  setStatsOpen((v) => !v);
+                } else {
+                  navigate({ to: "/" });
+                }
+              }}
               className="grid h-8 w-8 place-items-center rounded-xl border border-white/5 bg-white/5 text-muted-foreground transition-colors duration-200 hover:bg-white/[0.08] hover:text-foreground sm:h-10 sm:w-10 lg:h-11 lg:w-11"
               aria-label="Abrir estatísticas"
             >
@@ -860,7 +866,8 @@ function Index() {
               );
             })()}
 
-            <div className="mt-3 grid gap-2 border-t border-white/5 pt-3 sm:grid-cols-[1fr_auto] sm:items-center sm:gap-4">
+            {statsOpen && (
+              <div className="mt-3 grid gap-2 border-t border-white/5 pt-3 sm:grid-cols-[1fr_auto] sm:items-center sm:gap-4 animate-in fade-in slide-in-from-top-1 duration-300">
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] text-muted-foreground">
                 <span className="inline-flex items-center gap-2">
                   <Flame className="h-3.5 w-3.5" />
@@ -882,7 +889,8 @@ function Index() {
                   </div>
                 ))}
               </div>
-            </div>
+              </div>
+            )}
           </Card>
 
 
