@@ -113,7 +113,7 @@ type Props = {
 export function WhiteCelebration({ spin, onClose }: Props) {
   useEffect(() => {
     if (!spin) return;
-    const t = setTimeout(onClose, 3500); // Fecha automaticamente após 3.5 segundos
+    const t = setTimeout(onClose, 2500); // Fecha automaticamente após 2.5 segundos (mais rápido)
     return () => clearTimeout(t);
   }, [spin, onClose]);
 
@@ -194,7 +194,7 @@ export function WhiteCelebration({ spin, onClose }: Props) {
 export function WhiteAlertToggleFx({ state, onDone }: { state: "on" | "off" | null; onDone: () => void }) {
   useEffect(() => {
     if (!state) return;
-    const t = setTimeout(onDone, 1200); // Reduzido para 1.2 segundos para ser muito mais ágil e profissional
+    const t = setTimeout(onDone, 900); // Reduzido para 0.9 segundos para ser extremamente ágil
     return () => clearTimeout(t);
   }, [state, onDone]);
 
