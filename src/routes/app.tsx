@@ -919,7 +919,7 @@ function Index() {
             {/* Cabeçalho das estatísticas por coluna */}
             {viewMode === "colunas" && contarColunas && (
               <div className="history-scroll mb-3 w-full border-b border-white/5 pb-3">
-                <div className="grid justify-center gap-[var(--gap-col,8px)] px-[1px]" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "1274px", margin: "0 auto" }}>
+                <div className="grid gap-[var(--gap-col,8px)]" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "fit-content" }}>
                   {Array.from({ length: 10 }).map((_, ci) => {
                     const stats = colStats[ci];
                     return (
@@ -1068,10 +1068,10 @@ function Index() {
                       : "Nenhum resultado no período selecionado."}
                   </div>
                 ) : viewMode === "colunas" ? (
-                  <div className="history-scroll max-w-full overflow-x-auto p-1 [container-type:inline-size] sm:p-2 lg:p-3">
+                  <div className="history-scroll max-w-full overflow-x-auto p-1 sm:p-2 lg:p-3">
                     <div className="flex flex-col gap-0">
                       {/* Cabeçalho 0-9 interno para Colunas Fixas */}
-                      <div className="grid justify-center gap-[8px] px-[1px] mb-1 sticky top-0 z-10 bg-background/40 backdrop-blur-sm" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "1274px", margin: "0 auto" }}>
+                      <div className="grid gap-[8px] mb-1 sticky top-0 z-10 bg-background/40 backdrop-blur-sm" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "fit-content" }}>
                         {Array.from({ length: 10 }).map((_, ci) => (
                           <div
                             key={`header-inner-${ci}`}
@@ -1085,7 +1085,7 @@ function Index() {
 
                       {gridRows.map((row) => (
                         <div key={row.key} className="flex flex-col gap-0 border-b border-white/[0.02]">
-                          <div className="grid justify-center gap-[8px] relative px-[1px]" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "1274px", margin: "0 auto" }}>
+                          <div className="grid gap-[8px] relative" style={{ gridTemplateColumns: "repeat(10, var(--colW, 120px))", width: "fit-content" }}>
                             {/* Marcador de hora na lateral esquerda, visível apenas se Contar Linhas estiver ativo */}
                             {contarLinhas && (
                               <div className="absolute -left-12 top-1/2 -translate-y-1/2 rotate-180 [writing-mode:vertical-lr] text-[10px] font-black tracking-widest text-muted-foreground/30 uppercase select-none">
