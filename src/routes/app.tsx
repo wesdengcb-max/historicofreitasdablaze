@@ -281,6 +281,30 @@ function Index() {
   const [whiteFlash, setWhiteFlash] = useState<Spin | null>(null);
   const [statsOpen, setStatsOpen] = useState(false);
   const [countdown, setCountdown] = useState(15);
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+
+  const toggleTheme = () => {
+    const next = theme === "dark" ? "light" : "dark";
+    setTheme(next);
+    document.documentElement.classList.toggle("light", next === "light");
+    document.documentElement.classList.toggle("dark", next === "dark");
+  };
+
+  const ThemeToggle = () => (
+    <button
+      type="button"
+      onClick={toggleTheme}
+      className="grid h-8 w-8 place-items-center rounded-xl border border-white/5 bg-white/5 text-muted-foreground transition-all duration-300 hover:bg-white/[0.08] hover:text-foreground active:scale-90 sm:h-10 sm:w-10 lg:h-11 lg:w-11"
+      aria-label="Trocar brilho"
+      title="Alternar entre modo claro e escuro"
+    >
+      {theme === "dark" ? (
+        <Sun className="h-4 w-4" />
+      ) : (
+        <Moon className="h-4 w-4" />
+      )}
+    </button>
+  );
 
   // Filtros
   const [filter, setFilter] = useState<FilterId>("hoje");
@@ -712,7 +736,7 @@ function Index() {
 
           <div className="flex shrink-0 items-center gap-1 sm:gap-3">
             <StatusPill status={status} message={errorMsg} />
-            <ThemeToggle />
+             <ThemeToggle />
             <button
               type="button"
               onClick={() => toggleWhiteAlert(!whiteAlert)}

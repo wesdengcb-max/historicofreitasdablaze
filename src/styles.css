@@ -126,9 +126,71 @@
 }
 
 .light body {
-  background-image:
-    radial-gradient(ellipse 90% 55% at 50% -12%, color-mix(in oklab, var(--primary) 8%, transparent), transparent 60%),
-    linear-gradient(180deg, oklch(0.99 0.003 260) 0%, oklch(0.965 0.005 260) 100%);
+  background: #ffffff !important;
+  color: #090909 !important;
+}
+
+.light .glass-card {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(222, 33, 67, 0.1) !important;
+  color: #090909 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+}
+
+.light .text-muted-foreground {
+  color: #64748b !important;
+}
+
+.light .text-foreground {
+  color: #090909 !important;
+}
+
+.light header {
+  background: #ffffff !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+.light nav {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+.light button:not(.premium-btn) {
+  background: #f1f5f9 !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  color: #475569 !important;
+}
+
+.light h1, .light h2, .light p, .light span {
+  color: #090909 !important;
+}
+
+.light .border-white\/5, .light .border-white\/10 {
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+.light .bg-white\/5, .light .bg-white\/\[0\.02\], .light .bg-white\/\[0\.03\] {
+  background: #f8fafc !important;
+}
+
+.light .premium-btn {
+  color: white !important;
+}
+
+.light .history-metrics {
+  color: #090909 !important;
+}
+
+.light .text-white {
+  color: #090909 !important;
+}
+
+.light .text-white\/40 {
+  color: #64748b !important;
+}
+
+.light .shadow-glow {
+  box-shadow: 0 0 15px rgba(222, 33, 67, 0.1) !important;
 }
 
 .dark { color-scheme: dark; }
