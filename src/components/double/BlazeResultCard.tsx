@@ -74,7 +74,7 @@ export const BlazeResultCard = memo(function BlazeResultCard({
               height: "32px",
               width: "32px",
               fontSize: "14px",
-              border: isWhite ? `3px solid ${c.ring}` : `2px solid #5a6d84`,
+              border: isWhite ? `3px solid ${c.ring}` : `2px solid #ffffff`,
               color: c.fg,
             }}
           >

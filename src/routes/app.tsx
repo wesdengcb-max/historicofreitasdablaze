@@ -1203,7 +1203,7 @@ function Index() {
                                               p === "white" ? "bg-white border-white/20" :
                                               p === "red" ? "bg-red-500 border-red-400/20" :
                                               p === "black" ? "bg-slate-800 border-slate-700/20" :
-                                              "bg-transparent border-[#5a6d84]"
+                                              "bg-transparent border-white"
                                             }`} />
                                           </button>
                                           <span className="mt-[5px] h-[11px] text-[11px] font-medium tabular-nums text-[#8ebcf0]">
@@ -1383,7 +1383,7 @@ const TipMinerCard = memo(function TipMinerCard({
             style={{ 
               height: "32px", 
               width: "32px", 
-              border: `2px solid #5a6d84`, 
+              border: `2px solid #ffffff`, 
               color: fg, 
               fontSize: "14px" 
             }}
