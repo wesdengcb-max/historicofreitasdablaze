@@ -20,7 +20,7 @@ export function StrategyTabs({ spins }: { spins: Spin[] }) {
     <div className="space-y-4">
       <div
         role="tablist"
-        className="flex gap-1 overflow-x-auto rounded-xl border border-white/5 bg-white/[0.02] p-1 scrollbar-none"
+        className="flex gap-2 overflow-x-auto rounded-2xl border border-white/[0.05] bg-white/[0.02] p-1.5 scrollbar-none backdrop-blur-md"
       >
         {TABS.map((t) => {
           const active = tab === t.id;
@@ -32,12 +32,12 @@ export function StrategyTabs({ spins }: { spins: Spin[] }) {
               aria-selected={active}
               onClick={() => !t.soon && setTab((cur) => (cur === t.id ? null : t.id))}
               disabled={t.soon}
-              className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-semibold transition sm:text-xs ${
+              className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl px-4 py-2.5 text-[11px] font-black uppercase tracking-widest transition sm:text-[11px] font-outfit ${
                 active
-                  ? "bg-primary text-primary-foreground shadow-sm"
+                  ? "bg-[#FF1F3D] text-white shadow-[0_5px_15px_rgba(255,31,61,0.3)]"
                   : t.soon
-                  ? "cursor-not-allowed text-muted-foreground/50"
-                  : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground"
+                  ? "cursor-not-allowed text-[#9CA3AF]/30"
+                  : "text-[#9CA3AF] hover:bg-white/[0.04] hover:text-white"
               }`}
               title={t.soon ? "Em breve" : t.label}
             >
@@ -59,7 +59,7 @@ export function StrategyTabs({ spins }: { spins: Spin[] }) {
             type="button"
             onClick={() => setTab(null)}
             aria-label="Minimizar"
-            className="absolute right-2 top-2 z-10 inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/10 bg-white/[0.04] text-muted-foreground transition hover:bg-white/[0.08] hover:text-foreground"
+            className="absolute right-3 top-3 z-10 inline-flex h-8 w-8 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-[#9CA3AF] transition hover:bg-white/[0.08] hover:text-white"
           >
             <ChevronDown className="h-4 w-4" />
           </button>
