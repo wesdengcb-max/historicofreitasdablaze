@@ -261,6 +261,7 @@ function Index() {
   const [fullscreen, setFullscreen] = useState(false);
   const [futureSlots, setFutureSlots] = useState<0 | 10 | 20 | 30>(0);
   const [highlightN, setHighlightN] = useState<Set<number>>(() => new Set());
+  const [highlightKey, setHighlightKey] = useState<string | null>(null);
   const [slotPredictions, setSlotPredictions] = useState<Record<string, "white" | "red" | "black">>({});
   const cycleSlotPrediction = (key: string) =>
     setSlotPredictions((prev) => {
