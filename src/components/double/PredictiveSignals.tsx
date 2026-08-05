@@ -306,20 +306,37 @@ export function PredictiveSignals() {
               </p>
             ) : (
               <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                {mode1.map((s) => (
-                  <div
-                    key={s.key}
-                    className="rounded-2xl border border-white/[0.05] bg-white/[0.02] px-5 py-4 backdrop-blur-sm"
-                  >
-                    <div className="text-xs font-semibold text-muted-foreground">{s.title}</div>
-                    <div className="mt-1 text-3xl font-black tabular-nums text-white font-outfit">
-                      {fmtClock(s.at)}
+                {mode1.map((s) => {
+                  const medal = getMedalStyles(s.analysisCount);
+                  return (
+                    <div
+                      key={s.key}
+                      className={`rounded-2xl border px-5 py-4 backdrop-blur-sm transition-all duration-300 ${
+                        medal 
+                          ? medal.classes 
+                          : "border-white/[0.05] bg-white/[0.02]"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="text-xs font-semibold text-muted-foreground opacity-80">{s.title}</div>
+                        {medal && (
+                          <span className={`rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-widest ${medal.badge}`}>
+                            {medal.label}
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-1 text-3xl font-black tabular-nums text-white font-outfit">
+                        {fmtClock(s.at)}
+                      </div>
+                      <div className="mt-1 text-[11px] tabular-nums font-bold flex items-center gap-1.5">
+                        <span className={medal ? "text-inherit" : "text-[#FF1F3D]"}>
+                          {s.pct.toFixed(1)}%
+                        </span>
+                        <span className="opacity-50 text-[10px]">· janela {s.label}</span>
+                      </div>
                     </div>
-                    <div className="mt-1 text-[11px] tabular-nums text-[#FF1F3D] font-bold">
-                      {s.pct.toFixed(1)}% · janela {s.label}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </section>
@@ -336,43 +353,60 @@ export function PredictiveSignals() {
               </p>
             ) : (
               <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                {mode2.map((s) => (
-                  <div
-                    key={s.key}
-                    className="rounded-2xl border border-[#FF1F3D]/20 bg-[#FF1F3D]/5 px-5 py-4 shadow-[0_0_25px_rgba(255,31,61,0.1)] backdrop-blur-sm"
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-xs font-bold text-white uppercase tracking-tighter">{s.title}</span>
-                      <span className="rounded-full border border-[#FF1F3D]/30 bg-[#FF1F3D]/20 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest text-white">
-                        Alta assertividade
-                      </span>
-                    </div>
-                    <div className="mt-1 text-3xl font-black tabular-nums text-white font-outfit">
-                      {s.times.map((t) => fmtClock(t)).join(" / ")}
-                    </div>
-                    <div className="mt-1 text-[11px] tabular-nums text-[#FF1F3D] font-black">
-                      {s.pct.toFixed(1)}%
-                    </div>
-                    <div className="mt-2 text-[10px] leading-relaxed text-muted-foreground">
-                      Confluência Top 5:{" "}
-                      <span className="font-bold text-[#FF1F3D]">{s.confluence}</span>
-                    </div>
-                    <div className="mt-1 flex flex-wrap gap-1">
-                      {s.sources.map((p) => (
-                        <span
-                          key={`${p.analysis}-${p.value}`}
-                          className={
-                            p.top5
-                              ? "rounded-full border border-[#FF1F3D]/30 bg-[#FF1F3D]/20 px-2 py-0.5 text-[9px] font-black tabular-nums text-white"
-                              : "rounded-full border border-white/10 bg-white/[0.03] px-2 py-0.5 text-[9px] font-bold tabular-nums text-[#9CA3AF]"
-                          }
-                        >
-                          A{p.analysis}·{p.value} {p.pct.toFixed(0)}%
+                {mode2.map((s) => {
+                  const medal = getMedalStyles(s.analysisCount);
+                  return (
+                    <div
+                      key={s.key}
+                      className={`rounded-2xl border px-5 py-4 backdrop-blur-sm transition-all duration-300 ${
+                        medal 
+                          ? medal.classes 
+                          : "border-[#FF1F3D]/20 bg-[#FF1F3D]/5 shadow-[0_0_25px_rgba(255,31,61,0.1)]"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-xs font-bold text-white uppercase tracking-tighter">{s.title}</span>
+                        {medal ? (
+                          <span className={`rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-widest ${medal.badge}`}>
+                            {medal.label}
+                          </span>
+                        ) : (
+                          <span className="rounded-full border border-[#FF1F3D]/30 bg-[#FF1F3D]/20 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest text-white">
+                            Alta assertividade
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-1 text-3xl font-black tabular-nums text-white font-outfit">
+                        {s.times.map((t) => fmtClock(t)).join(" / ")}
+                      </div>
+                      <div className="mt-1 text-[11px] tabular-nums font-black">
+                        <span className={medal ? "text-inherit" : "text-[#FF1F3D]"}>
+                          {s.pct.toFixed(1)}%
                         </span>
-                      ))}
+                      </div>
+                      <div className="mt-2 text-[10px] leading-relaxed text-muted-foreground opacity-80">
+                        Confluência Top 5:{" "}
+                        <span className={`font-bold ${medal ? "text-inherit" : "text-[#FF1F3D]"}`}>{s.confluence}</span>
+                      </div>
+                      <div className="mt-1 flex flex-wrap gap-1">
+                        {s.sources.map((p) => (
+                          <span
+                            key={`${p.analysis}-${p.value}`}
+                            className={
+                              p.top5
+                                ? `rounded-full border px-2 py-0.5 text-[9px] font-black tabular-nums ${
+                                    medal ? "border-current/30 bg-current/10 text-inherit" : "border-[#FF1F3D]/30 bg-[#FF1F3D]/20 text-white"
+                                  }`
+                                : "rounded-full border border-white/10 bg-white/[0.03] px-2 py-0.5 text-[9px] font-bold tabular-nums text-[#9CA3AF]"
+                            }
+                          >
+                            A{p.analysis}·{p.value} {p.pct.toFixed(0)}%
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </section>
