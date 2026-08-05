@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, BarChart3, Crown } from "lucide-react";
 import { useMemo, useState } from "react";
 import kingImg from "@/assets/freitas-white-hero.png.asset.json";
+import logoFreitas from "@/assets/logo-freitas.png.asset.json";
 import { useVipStatus } from "@/lib/auth/vipStore";
 
 
@@ -91,19 +92,16 @@ function LandingPage() {
         )}
       </div>
 
-      {/* Top right icon */}
-      <Link
-        to="/app"
-        preload="intent"
-        onClick={(e) => {
-          e.preventDefault();
-          goWithTransition("/app");
-        }}
-        className="absolute right-6 top-6 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-red-500/40 bg-black/40 text-red-500 backdrop-blur transition hover:border-red-500 hover:bg-red-500/10"
-        aria-label="Abrir painel"
-      >
-        <BarChart3 className="h-5 w-5" />
-      </Link>
+      {/* Top right icon - Replaced with logo */}
+      <div className="absolute right-6 top-6 z-20">
+        <div className="logo-glow flex h-14 w-14 items-center justify-center rounded-full bg-black/60 backdrop-blur-xl">
+          <img 
+            src={logoFreitas.url} 
+            alt="Logo Freitas" 
+            className="h-10 w-10 object-contain brightness-110"
+          />
+        </div>
+      </div>
 
 
       {/* Content */}
