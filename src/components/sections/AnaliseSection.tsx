@@ -531,9 +531,9 @@ export function AnaliseSection() {
       />
 
       <AnalysisPanel
-        eyebrow={`Análise 4 · Minuto '0'`}
-        title="Primeira Pedra do Minuto '0'"
-        subtitle={`Gatilho: primeira pedra registrada exatamente no minuto 0 de cada hora. Últimas 20 contagens.`}
+        eyebrow={`Análise 4 · Primeira Pedra da Dezena`}
+        title="Primeira Pedra na Virada do Minuto"
+        subtitle={`Gatilho: minutos 00, 10, 20, 30, 40, 50. Analisa até 20 tempos de Branco.`}
         loading={loading}
         err={err}
         emptyLabel={`Ainda sem registros da Análise 4 no histórico.`}

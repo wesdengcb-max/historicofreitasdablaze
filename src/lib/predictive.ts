@@ -72,19 +72,22 @@ export function buildA3(rows: Row[]): Cycle[] {
   return out;
 }
 
-/** Análise 4 — primeira pedra do minuto 0 de cada hora. */
+/** Análise 4 — Primeira Pedra da Dezena (virada do minuto 00, 10, 20, 30, 40, 50). */
 export function buildA4(rows: Row[]): Cycle[] {
   const out: Cycle[] = [];
-  const hoursProcessed = new Set<string>();
+  const processedKeys = new Set<string>();
 
   rows.forEach((r, i) => {
     const dt = parseUtcDate(r.created_at);
     if (Number.isNaN(dt.getTime())) return;
-    if (dt.getMinutes() !== 0) return;
+    
+    const minutes = dt.getMinutes();
+    // Gatilho: minutos terminados em 0 (00, 10, 20, 30, 40, 50)
+    if (minutes % 10 !== 0) return;
 
-    const hourKey = `${dt.getFullYear()}-${dt.getMonth()}-${dt.getDate()}-${dt.getHours()}`;
-    if (hoursProcessed.has(hourKey)) return;
-    hoursProcessed.add(hourKey);
+    const key = `${dt.getFullYear()}-${dt.getMonth()}-${dt.getDate()}-${dt.getHours()}-${minutes}`;
+    if (processedKeys.has(key)) return;
+    processedKeys.add(key);
 
     const n = Number(r.roll);
     if (!Number.isFinite(n) || n < 0 || n > 14) return;
