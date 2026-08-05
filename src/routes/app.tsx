@@ -1243,15 +1243,22 @@ function Index() {
                                               showSeconds={exibirSegundos}
                                               timeHighlight={destaqueHorario}
                                               showTime={false}
-                                              onClick={() =>
+                                              onClick={() => {
+                                                const n = (spin as Spin).n;
+                                                // Se clicar em uma pedra e já houver uma coluna selecionada,
+                                                // limpa a coluna e foca apenas na pedra.
+                                                if (highlightKey) {
+                                                  setHighlightKey(null);
+                                                  setHighlightN(new Set([n]));
+                                                  return;
+                                                }
                                                 setHighlightN((h) => {
                                                   const next = new Set(h);
-                                                  const n = (spin as Spin).n;
                                                   if (next.has(n)) next.delete(n);
                                                   else next.add(n);
                                                   return next;
-                                                })
-                                              }
+                                                });
+                                              }}
                                             />
                                             <span className={`mt-[5px] text-[11px] tabular-nums leading-none font-medium h-[11px] flex items-center ${destaqueHorario ? "text-primary font-bold" : "text-[#8ebcf0]"}`}>
                                               {exibirSegundos ? spTimeWithSeconds(spin as Spin) : (spin as Spin).time}
