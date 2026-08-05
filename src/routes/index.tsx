@@ -79,9 +79,9 @@ function LandingPage() {
       </div>
 
       {/* VIP Status Icon */}
-      <div className="absolute right-20 top-6 z-20 flex h-11 items-center gap-3">
+      <div className="absolute right-6 top-6 z-20 flex items-center gap-3 sm:right-12">
         {isVip ? (
-          <div className="flex items-center gap-2 rounded-full border border-amber-400/30 bg-amber-400/10 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-amber-400 backdrop-blur-md font-outfit">
+          <div className="flex items-center gap-2 rounded-full border border-amber-400/30 bg-amber-400/10 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-amber-400 backdrop-blur-md font-outfit shadow-[0_0_20px_rgba(251,191,36,0.15)]">
             <Crown className="h-3.5 w-3.5" />
             Membro VIP
           </div>
@@ -90,13 +90,6 @@ function LandingPage() {
             Acesso Básico
           </div>
         )}
-      </div>
-
-      {/* Top right icon - Crown status */}
-      <div className="absolute right-6 top-6 z-20">
-        <div className="logo-glow flex h-14 w-14 items-center justify-center rounded-full bg-black/60 backdrop-blur-xl">
-          <Crown className={`h-8 w-8 ${isVip ? "text-amber-400" : "text-white/20"}`} />
-        </div>
       </div>
 
 
