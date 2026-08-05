@@ -60,15 +60,6 @@ export function TopNav() {
   return (
     <nav className="relative z-50 border-b border-white/[0.05] bg-[#101114]/80 backdrop-blur-2xl">
       <div className="mx-auto flex max-w-[1366px] items-center justify-between px-3 py-2 sm:px-8">
-        <div className="mr-6 hidden lg:block">
-          <div className="logo-glow relative flex h-10 w-10 items-center justify-center rounded-full bg-black/40 backdrop-blur-md">
-            <img 
-              src={logoFreitas.url} 
-              alt="Freitas" 
-              className="h-7 w-7 object-contain"
-            />
-          </div>
-        </div>
         <div className="flex flex-1 gap-1 overflow-x-auto scrollbar-none">
           {ITEMS.map((item) => {
             const Icon = item.icon;
