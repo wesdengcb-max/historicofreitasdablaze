@@ -100,11 +100,6 @@ export const HistoryGrid = memo(({ spins, numerado, exibirSegundos, inverse }: H
                     </div>
                   ))}
                 </div>
-
-
-                    </div>
-                  ))}
-                </div>
              </div>
            ))}
          </div>
