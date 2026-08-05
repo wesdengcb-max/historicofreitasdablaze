@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"; // MDE AJUDE A MUDAR ALGO NO SITE
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, BarChart3, Crown } from "lucide-react";
 import { useMemo, useState } from "react";
 import kingImg from "@/assets/freitas-white-hero.png.asset.json";

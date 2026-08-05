@@ -364,16 +364,22 @@ export function AnaliseSection() {
     let alive = true;
     (async () => {
       setLoading(true);
-      const { data, error } = await supabase
-        .from("gatilhos_analise")
-        .select("analise, pedra, gaps");
-      
-      if (!alive) return;
-      if (error) {
-        setErr(error.message);
-        setLoading(false);
-        return;
-      }
+      try {
+        const { data, error } = await supabase
+          .from("gatilhos_analise")
+          .select("analise, pedra, gaps");
+        
+        if (!alive) return;
+        if (error) {
+          if (error.message.includes("schema cache")) {
+            setErr("Sincronizando banco de dados... Por favor, aguarde alguns instantes.");
+          } else {
+            setErr(error.message);
+          }
+          setLoading(false);
+          return;
+        }
+
 
       const s: Record<number, { total: number; fullyCompleted: number; totalGaps: number; sumGaps: number }> = {};
       ALL_NUMBERS.forEach(n => s[n] = { total: 0, fullyCompleted: 0, totalGaps: 0, sumGaps: 0 });
