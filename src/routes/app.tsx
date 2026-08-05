@@ -1046,9 +1046,27 @@ function Index() {
                   {Array.from({ length: 10 }).map((_, ci) => {
                     const stats = colStats[ci];
                     return (
-                      <div
+                      <button
                         key={`col-stats-${ci}`}
-                        className="flex w-full flex-col gap-0.5 overflow-hidden rounded-[4px] bg-white/[0.03] p-1 shadow-inner"
+                        onClick={() => {
+                          setHighlightN((prev) => {
+                            const next = new Set(prev);
+                            const numbersInCol = new Set<number>();
+                            gridRows.forEach(row => {
+                              row.cells[ci].forEach(spin => {
+                                numbersInCol.add(spin.n);
+                              });
+                            });
+                            const allSelected = Array.from(numbersInCol).every(n => next.has(n));
+                            if (allSelected && numbersInCol.size > 0) {
+                              numbersInCol.forEach(n => next.delete(n));
+                            } else {
+                              numbersInCol.forEach(n => next.add(n));
+                            }
+                            return next;
+                          });
+                        }}
+                        className="flex w-full flex-col gap-0.5 overflow-hidden rounded-[4px] bg-white/[0.03] p-1 shadow-inner text-left transition-colors hover:bg-white/[0.08]"
                         style={{ width: "100%" }}
                       >
                         <div className="flex items-center justify-between px-0.5 text-[8px] font-bold tabular-nums">
@@ -1075,7 +1093,7 @@ function Index() {
                           <span>V: {stats.red}</span>
                           <span>P: {stats.black}</span>
                         </div>
-                      </div>
+                      </button>
                     );
                   })}
                 </div>
