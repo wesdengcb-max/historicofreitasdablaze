@@ -6,11 +6,13 @@ import {
   buildA1,
   buildA2,
   buildA3,
+  buildA4,
   computeTop,
   cyclesOf,
   fmtClock,
   latestByValue,
   MAX_ZEROS,
+  MAX_ZEROS_A4,
   type Cycle,
   type Row,
 } from "@/lib/predictive";
@@ -21,7 +23,7 @@ type Mode2Signal = {
   title: string;
   times: Date[];
   pct: number;
-  sources: Array<{ analysis: 1 | 2 | 3; value: number; pct: number; top5: boolean }>;
+  sources: Array<{ analysis: 1 | 2 | 3 | 4; value: number; pct: number; top5: boolean }>;
   confluence: string;
 };
 
@@ -137,7 +139,7 @@ export function PredictiveSignals() {
     // ---- Modo 2: Estratégia de Coincidência ----
     // Requisito mínimo: mais de 1 análise ativa projetando o mesmo minuto.
     // Filtro de validação: o minuto precisa estar no Top 5 de pelo menos uma delas.
-    type Proj = { analysis: 1 | 2 | 3; value: number; pct: number; top5: boolean };
+    type Proj = { analysis: 1 | 2 | 3 | 4; value: number; pct: number; top5: boolean };
     const byMinute = new Map<number, Proj[]>();
 
     for (const item of active) {
