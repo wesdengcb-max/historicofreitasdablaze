@@ -3,7 +3,6 @@ import { ArrowRight, BarChart3, Crown } from "lucide-react";
 import { useMemo, useState } from "react";
 import kingImg from "@/assets/freitas-white-hero.png.asset.json";
 import logoFreitas from "@/assets/logo-freitas.png.asset.json";
-import bgPremium from "@/assets/bg-premium-lasers.png.asset.json";
 import { useVipStatus } from "@/lib/auth/vipStore";
 
 
@@ -57,20 +56,24 @@ function LandingPage() {
 
   return (
     <div className="relative min-h-[100svh] w-full overflow-hidden bg-black text-white">
-      {/* Background is now globally applied via styles.css */}
-
-      {/* Hero Image as Foreground */}
-      <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
+      {/* Hero Image as Background */}
+      <div className="absolute inset-0 z-0 flex items-center justify-center">
         <img
           src={kingImg.url}
           alt=""
           className="h-full w-full object-contain opacity-70 md:h-[90%] md:w-[90%]"
         />
-        {/* Simple masks for the image */}
+        {/* Professional overlays for readability */}
         <div 
           className="absolute inset-0" 
           style={{
-            background: "linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 50%, #000 100%)"
+            background: "linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.8) 50%, #000 100%)"
+          }} 
+        />
+        <div 
+          className="absolute inset-0" 
+          style={{
+            background: "radial-gradient(circle at 50% 50%, transparent 0%, rgba(0,0,0,0.4) 100%)"
           }} 
         />
       </div>
