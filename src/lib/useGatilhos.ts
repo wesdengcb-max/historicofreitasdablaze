@@ -41,6 +41,8 @@ export function useGatilhos(analise: string, pedra: number) {
         .from("gatilhos_analise")
         .select("id, analise, pedra, minuto, fuso_horario, trigger_at, detalhe, gaps")
         .eq("analise", analise)
+        .gte("pedra", 0)
+        .lte("pedra", 14)
         .eq("pedra", pedra)
         .order("trigger_at", { ascending: false })
         .limit(MAX_GATILHOS);
