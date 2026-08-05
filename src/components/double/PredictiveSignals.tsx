@@ -17,7 +17,7 @@ import {
   type Row,
 } from "@/lib/predictive";
 
-type Mode1Signal = { key: string; title: string; at: Date; pct: number; label: string };
+type Mode1Signal = { key: string; title: string; at: Date; pct: number; label: string; analysisCount: number };
 type Mode2Signal = {
   key: string;
   title: string;
@@ -25,9 +25,10 @@ type Mode2Signal = {
   pct: number;
   sources: Array<{ analysis: 1 | 2 | 3 | 4; value: number; pct: number; top5: boolean }>;
   confluence: string;
+  analysisCount: number;
 };
 
-const MIN_ASSERTIVIDADE = 30;
+const MIN_ASSERTIVIDADE = 50;
 
 function addMinutes(d: Date, m: number) {
   const out = new Date(d.getTime() + m * 60_000);
@@ -39,6 +40,25 @@ function addMinutes(d: Date, m: number) {
 const CANDIDATE_DEPTH = 10;
 /** Somente as N primeiras contam como Top 5 validador. */
 const TOP5_DEPTH = 5;
+
+const getMedalStyles = (count: number) => {
+  if (count >= 4) return { 
+    label: "Ouro", 
+    classes: "border-yellow-400 bg-yellow-950/50 text-yellow-300 shadow-yellow-500/20",
+    badge: "bg-yellow-400/20 text-yellow-300 border-yellow-400/30"
+  };
+  if (count === 3) return { 
+    label: "Prata", 
+    classes: "border-slate-300 bg-slate-800/40 text-slate-100",
+    badge: "bg-slate-300/20 text-slate-100 border-slate-300/30"
+  };
+  if (count === 2) return { 
+    label: "Bronze", 
+    classes: "border-amber-700 bg-amber-950/30 text-amber-300",
+    badge: "bg-amber-700/20 text-amber-300 border-amber-700/30"
+  };
+  return null;
+};
 
 export function PredictiveSignals() {
   const [rows, setRows] = useState<Row[]>([]);
@@ -110,21 +130,31 @@ export function PredictiveSignals() {
     // ---- Modo 1: Top 1 (posição central M) de cada análise ativa, unificado por horário ----
     const byTime = new Map<
       number,
-      { values: number[]; pct: number; label: string }
+      { values: number[]; analyses: Set<number>; pct: number; label: string }
     >();
     for (const item of active) {
       const hist = cyclesOf(engine[item.analysis], item.value);
       if (!hist.length) continue;
       const top1 = computeTop(hist, 1)[0];
       if (!top1) continue;
+      
+      // FILTRO DE ASSERTIVIDADE RÍGIDO (Top 1 em 50%)
+      if (top1.pct < MIN_ASSERTIVIDADE) continue;
+      
       const at = addMinutes(item.open.triggerAt, top1.m);
-      if (at.getTime() <= now.getTime()) continue; // elimina horários passados
+      if (at.getTime() <= now.getTime()) continue; 
       const t = at.getTime();
       const cur = byTime.get(t);
       if (!cur) {
-        byTime.set(t, { values: [item.value], pct: top1.pct, label: top1.label });
+        byTime.set(t, { 
+          values: [item.value], 
+          analyses: new Set([item.analysis]),
+          pct: top1.pct, 
+          label: top1.label 
+        });
       } else {
         if (!cur.values.includes(item.value)) cur.values.push(item.value);
+        cur.analyses.add(item.analysis);
         if (top1.pct > cur.pct) {
           cur.pct = top1.pct;
           cur.label = top1.label;
@@ -141,6 +171,7 @@ export function PredictiveSignals() {
           at: new Date(t),
           pct: info.pct,
           label: info.label,
+          analysisCount: info.analyses.size,
         };
       });
     setMode1(m1);
@@ -148,8 +179,6 @@ export function PredictiveSignals() {
     const usedTimes = new Set<number>(m1.map((s) => s.at.getTime()));
 
     // ---- Modo 2: Estratégia de Coincidência ----
-    // Requisito mínimo: mais de 1 análise ativa projetando o mesmo minuto.
-    // Filtro de validação: o minuto precisa estar no Top 5 de pelo menos uma delas.
     type Proj = { analysis: 1 | 2 | 3 | 4; value: number; pct: number; top5: boolean };
     const byMinute = new Map<number, Proj[]>();
 
@@ -173,15 +202,17 @@ export function PredictiveSignals() {
 
     const m2: Mode2Signal[] = [];
     for (const [at, projs] of byMinute) {
-      // 1) precisa de mais de 1 análise ativa em comum nesse minuto
       const distinctAnalyses = new Set(projs.map((p) => p.analysis));
       if (distinctAnalyses.size < 2) continue;
-      // 2) o minuto precisa estar no Top 5 de pelo menos uma das análises
+      
       const validators = projs.filter((p) => p.top5);
       if (!validators.length) continue;
 
       const pct = projs.reduce((s, p) => s + p.pct, 0) / projs.length;
+      
+      // FILTRO DE ASSERTIVIDADE RÍGIDO (50%)
       if (pct < MIN_ASSERTIVIDADE) continue;
+      
       if (usedTimes.has(at)) continue;
       usedTimes.add(at);
 
@@ -201,6 +232,7 @@ export function PredictiveSignals() {
         pct,
         sources,
         confluence,
+        analysisCount: distinctAnalyses.size,
       });
     }
     m2.sort((a, b) => a.times[0].getTime() - b.times[0].getTime());
@@ -274,20 +306,37 @@ export function PredictiveSignals() {
               </p>
             ) : (
               <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                {mode1.map((s) => (
-                  <div
-                    key={s.key}
-                    className="rounded-2xl border border-white/[0.05] bg-white/[0.02] px-5 py-4 backdrop-blur-sm"
-                  >
-                    <div className="text-xs font-semibold text-muted-foreground">{s.title}</div>
-                    <div className="mt-1 text-3xl font-black tabular-nums text-white font-outfit">
-                      {fmtClock(s.at)}
+                {mode1.map((s) => {
+                  const medal = getMedalStyles(s.analysisCount);
+                  return (
+                    <div
+                      key={s.key}
+                      className={`rounded-2xl border px-5 py-4 backdrop-blur-sm transition-all duration-300 ${
+                        medal 
+                          ? medal.classes 
+                          : "border-white/[0.05] bg-white/[0.02]"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="text-xs font-semibold text-muted-foreground opacity-80">{s.title}</div>
+                        {medal && (
+                          <span className={`rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-widest ${medal.badge}`}>
+                            {medal.label}
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-1 text-3xl font-black tabular-nums text-white font-outfit">
+                        {fmtClock(s.at)}
+                      </div>
+                      <div className="mt-1 text-[11px] tabular-nums font-bold flex items-center gap-1.5">
+                        <span className={medal ? "text-inherit" : "text-[#FF1F3D]"}>
+                          {s.pct.toFixed(1)}%
+                        </span>
+                        <span className="opacity-50 text-[10px]">· janela {s.label}</span>
+                      </div>
                     </div>
-                    <div className="mt-1 text-[11px] tabular-nums text-[#FF1F3D] font-bold">
-                      {s.pct.toFixed(1)}% · janela {s.label}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </section>
@@ -304,43 +353,60 @@ export function PredictiveSignals() {
               </p>
             ) : (
               <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                {mode2.map((s) => (
-                  <div
-                    key={s.key}
-                    className="rounded-2xl border border-[#FF1F3D]/20 bg-[#FF1F3D]/5 px-5 py-4 shadow-[0_0_25px_rgba(255,31,61,0.1)] backdrop-blur-sm"
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-xs font-bold text-white uppercase tracking-tighter">{s.title}</span>
-                      <span className="rounded-full border border-[#FF1F3D]/30 bg-[#FF1F3D]/20 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest text-white">
-                        Alta assertividade
-                      </span>
-                    </div>
-                    <div className="mt-1 text-3xl font-black tabular-nums text-white font-outfit">
-                      {s.times.map((t) => fmtClock(t)).join(" / ")}
-                    </div>
-                    <div className="mt-1 text-[11px] tabular-nums text-[#FF1F3D] font-black">
-                      {s.pct.toFixed(1)}%
-                    </div>
-                    <div className="mt-2 text-[10px] leading-relaxed text-muted-foreground">
-                      Confluência Top 5:{" "}
-                      <span className="font-bold text-[#FF1F3D]">{s.confluence}</span>
-                    </div>
-                    <div className="mt-1 flex flex-wrap gap-1">
-                      {s.sources.map((p) => (
-                        <span
-                          key={`${p.analysis}-${p.value}`}
-                          className={
-                            p.top5
-                              ? "rounded-full border border-[#FF1F3D]/30 bg-[#FF1F3D]/20 px-2 py-0.5 text-[9px] font-black tabular-nums text-white"
-                              : "rounded-full border border-white/10 bg-white/[0.03] px-2 py-0.5 text-[9px] font-bold tabular-nums text-[#9CA3AF]"
-                          }
-                        >
-                          A{p.analysis}·{p.value} {p.pct.toFixed(0)}%
+                {mode2.map((s) => {
+                  const medal = getMedalStyles(s.analysisCount);
+                  return (
+                    <div
+                      key={s.key}
+                      className={`rounded-2xl border px-5 py-4 backdrop-blur-sm transition-all duration-300 ${
+                        medal 
+                          ? medal.classes 
+                          : "border-[#FF1F3D]/20 bg-[#FF1F3D]/5 shadow-[0_0_25px_rgba(255,31,61,0.1)]"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-xs font-bold text-white uppercase tracking-tighter">{s.title}</span>
+                        {medal ? (
+                          <span className={`rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-widest ${medal.badge}`}>
+                            {medal.label}
+                          </span>
+                        ) : (
+                          <span className="rounded-full border border-[#FF1F3D]/30 bg-[#FF1F3D]/20 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest text-white">
+                            Alta assertividade
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-1 text-3xl font-black tabular-nums text-white font-outfit">
+                        {s.times.map((t) => fmtClock(t)).join(" / ")}
+                      </div>
+                      <div className="mt-1 text-[11px] tabular-nums font-black">
+                        <span className={medal ? "text-inherit" : "text-[#FF1F3D]"}>
+                          {s.pct.toFixed(1)}%
                         </span>
-                      ))}
+                      </div>
+                      <div className="mt-2 text-[10px] leading-relaxed text-muted-foreground opacity-80">
+                        Confluência Top 5:{" "}
+                        <span className={`font-bold ${medal ? "text-inherit" : "text-[#FF1F3D]"}`}>{s.confluence}</span>
+                      </div>
+                      <div className="mt-1 flex flex-wrap gap-1">
+                        {s.sources.map((p) => (
+                          <span
+                            key={`${p.analysis}-${p.value}`}
+                            className={
+                              p.top5
+                                ? `rounded-full border px-2 py-0.5 text-[9px] font-black tabular-nums ${
+                                    medal ? "border-current/30 bg-current/10 text-inherit" : "border-[#FF1F3D]/30 bg-[#FF1F3D]/20 text-white"
+                                  }`
+                                : "rounded-full border border-white/10 bg-white/[0.03] px-2 py-0.5 text-[9px] font-bold tabular-nums text-[#9CA3AF]"
+                            }
+                          >
+                            A{p.analysis}·{p.value} {p.pct.toFixed(0)}%
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </section>
