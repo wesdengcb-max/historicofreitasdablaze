@@ -1155,25 +1155,20 @@ function Index() {
                           <button
                             key={`header-inner-${ci}`}
                             onClick={() => {
+                              const key = `col-${ci}`;
+                              if (highlightKey === key) {
+                                setHighlightKey(null);
+                                setHighlightN(new Set());
+                                return;
+                              }
+                              setHighlightKey(key);
                               setHighlightN((prev) => {
-                                const next = new Set(prev);
-                                // Pegamos todos os números presentes nesta coluna (ci) em todas as linhas (gridRows)
-                                const numbersInCol = new Set<number>();
+                                const next = new Set();
                                 gridRows.forEach(row => {
                                   row.cells[ci].forEach(spin => {
-                                    numbersInCol.add(spin.n);
+                                    next.add(spin.n);
                                   });
                                 });
-
-                                // Se todos os números da coluna já estão selecionados, removemos eles.
-                                // Caso contrário, adicionamos todos.
-                                const allSelected = Array.from(numbersInCol).every(n => next.has(n));
-                                
-                                if (allSelected && numbersInCol.size > 0) {
-                                  numbersInCol.forEach(n => next.delete(n));
-                                } else {
-                                  numbersInCol.forEach(n => next.add(n));
-                                }
                                 return next;
                               });
                             }}
