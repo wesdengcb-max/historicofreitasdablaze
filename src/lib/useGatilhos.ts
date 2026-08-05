@@ -41,8 +41,6 @@ export function useGatilhos(analise: string, pedra: number) {
         .from("gatilhos_analise")
         .select("id, analise, pedra, minuto, fuso_horario, trigger_at, detalhe, gaps")
         .eq("analise", analise)
-        .gte("pedra", 0)
-        .lte("pedra", 14)
         .eq("pedra", pedra)
         .order("trigger_at", { ascending: false })
         .limit(MAX_GATILHOS);
@@ -54,11 +52,10 @@ export function useGatilhos(analise: string, pedra: number) {
           setError(err.message);
         }
         console.error("[useGatilhos] Supabase error:", err);
-        return;
+      } else {
+        setError(null);
+        setRows(((data ?? []) as GatilhoRow[]).slice().reverse());
       }
-      
-      setError(null);
-      setRows(((data ?? []) as GatilhoRow[]).slice().reverse());
     } catch (e) {
       setError("Erro ao conectar com o servidor.");
       console.error("[useGatilhos] Load error:", e);
