@@ -1057,15 +1057,15 @@ function Index() {
                             return;
                           }
                           setHighlightKey(key);
-                          setHighlightN(() => {
-                            const next = new Set<number>();
-                            gridRows.forEach(row => {
-                              row.cells[ci].forEach(spin => {
-                                next.add(spin.n);
-                              });
-                            });
-                            return next;
+                          // Selecionar todos os números de ambas as pedras desta coluna (posição 0 e 1)
+                          const next = new Set<number>();
+                          gridRows.forEach(row => {
+                            const cells = row.cells[ci];
+                            // Pega os números das duas primeiras pedras da célula (pedra esquerda e pedra direita)
+                            if (cells[0]) next.add(cells[0].n);
+                            if (cells[1]) next.add(cells[1].n);
                           });
+                          setHighlightN(next);
                         }}
                         className={`flex w-full flex-col gap-0.5 overflow-hidden rounded-[4px] p-1 shadow-inner text-left transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-primary/25 ring-1 ring-primary/40 shadow-[0_0_15px_rgba(255,31,61,0.2)]" : "bg-white/[0.03] hover:bg-white/[0.08]"}`}
                         style={{ width: "100%" }}
