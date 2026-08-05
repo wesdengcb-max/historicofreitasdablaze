@@ -83,18 +83,24 @@ export const HistoryGrid = memo(({ spins, numerado, exibirSegundos, inverse }: H
                 <div className="sticky left-0 py-2 text-[11px] font-black text-white/40 font-mono tracking-tighter">
                   {row.label}
                 </div>
-                <div className="grid grid-cols-10 gap-x-2">
+                <div className="grid grid-cols-10 gap-x-3">
                   {row.cells.map((cell, idx) => (
-                    <div key={idx} className="flex flex-col gap-1.5 items-center min-h-[60px] p-1 rounded-lg hover:bg-white/[0.02] transition-colors">
-                       {cell.map(spin => (
-                         <BlazeResultCard 
-                            key={spin.id} 
-                            n={spin.n}
-                            color={colorOf(spin.n)}
-                            time={exibirSegundos ? spTimeWithSeconds(spin) : (spin.time || "00:00")}
-                            numbered={numerado} 
-                         />
-                       ))}
+                    <div key={idx} className="flex flex-col gap-2 min-w-[110px] items-center p-1.5 rounded-xl hover:bg-white/[0.03] transition-colors border border-transparent hover:border-white/5">
+                       <div className="flex flex-wrap gap-2 justify-center">
+                         {cell.map(spin => (
+                           <BlazeResultCard 
+                              key={spin.id} 
+                              n={spin.n}
+                              color={colorOf(spin.n)}
+                              time={exibirSegundos ? spTimeWithSeconds(spin) : (spin.time || "00:00")}
+                              numbered={numerado} 
+                           />
+                         ))}
+                       </div>
+                    </div>
+                  ))}
+                </div>
+
 
                     </div>
                   ))}
