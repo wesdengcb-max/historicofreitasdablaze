@@ -89,12 +89,13 @@ export const HistoryGrid = memo(({ spins, numerado, exibirSegundos, inverse }: H
                        {cell.map(spin => (
                          <BlazeResultCard 
                             key={spin.id} 
-                            spin={spin} 
+                            n={spin.n}
+                            color={colorOf(spin.n)}
+                            time={exibirSegundos ? spTimeWithSeconds(spin.createdAt ?? "") : (spin.time || "00:00")}
                             numbered={numerado} 
-                            showTime 
-                            showSeconds={exibirSegundos} 
                          />
                        ))}
+
                     </div>
                   ))}
                 </div>
