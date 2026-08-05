@@ -6,11 +6,13 @@ import {
   buildA1,
   buildA2,
   buildA3,
+  buildA4,
   computeTop,
   cyclesOf,
   fmtClock,
   latestByValue,
   MAX_ZEROS,
+  MAX_ZEROS_A4,
   type Cycle,
   type Row,
 } from "@/lib/predictive";
@@ -21,7 +23,7 @@ type Mode2Signal = {
   title: string;
   times: Date[];
   pct: number;
-  sources: Array<{ analysis: 1 | 2 | 3; value: number; pct: number; top5: boolean }>;
+  sources: Array<{ analysis: 1 | 2 | 3 | 4; value: number; pct: number; top5: boolean }>;
   confluence: string;
 };
 
@@ -72,16 +74,18 @@ export function PredictiveSignals() {
     const a1 = buildA1(rows);
     const a2 = buildA2(rows);
     const a3 = buildA3(rows);
-    return { 1: a1, 2: a2, 3: a3 } as Record<1 | 2 | 3, Cycle[]>;
+    const a4 = buildA4(rows);
+    return { 1: a1, 2: a2, 3: a3, 4: a4 } as Record<1 | 2 | 3 | 4, Cycle[]>;
   }, [rows]);
 
-  /** Ciclos em aberto (status < 14/14) por análise + valor. */
+  /** Ciclos em aberto (status < MAX_ZEROS) por análise + valor. */
   const active = useMemo(() => {
-    const out: Array<{ analysis: 1 | 2 | 3; value: number; open: Cycle }> = [];
-    ([1, 2, 3] as const).forEach((a) => {
+    const out: Array<{ analysis: 1 | 2 | 3 | 4; value: number; open: Cycle }> = [];
+    ([1, 2, 3, 4] as const).forEach((a) => {
       const latest = latestByValue(engine[a]);
       latest.forEach((cycle, value) => {
-        if (cycle.gaps.length < MAX_ZEROS) out.push({ analysis: a, value, open: cycle });
+        const limit = a === 4 ? MAX_ZEROS_A4 : MAX_ZEROS;
+        if (cycle.gaps.length < limit) out.push({ analysis: a, value, open: cycle });
       });
     });
     return out;
@@ -137,7 +141,7 @@ export function PredictiveSignals() {
     // ---- Modo 2: Estratégia de Coincidência ----
     // Requisito mínimo: mais de 1 análise ativa projetando o mesmo minuto.
     // Filtro de validação: o minuto precisa estar no Top 5 de pelo menos uma delas.
-    type Proj = { analysis: 1 | 2 | 3; value: number; pct: number; top5: boolean };
+    type Proj = { analysis: 1 | 2 | 3 | 4; value: number; pct: number; top5: boolean };
     const byMinute = new Map<number, Proj[]>();
 
     for (const item of active) {

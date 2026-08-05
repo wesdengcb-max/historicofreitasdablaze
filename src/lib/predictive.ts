@@ -3,21 +3,23 @@ export type Row = { id: number; roll: string; color: string; created_at: string 
 
 export type Cycle = {
   value: number;
-  analysis: 1 | 2 | 3;
+  analysis: 1 | 2 | 3 | 4;
   triggerAt: Date;
   gaps: number[];
 };
 
 export const MAX_ZEROS = 14;
+export const MAX_ZEROS_A4 = 20;
 export const MAX_CYCLES = 14;
 
 function diffMinutes(a: Date, b: Date) {
   return Math.max(0, Math.round((b.getTime() - a.getTime()) / 60000));
 }
 
-function collectGaps(rows: Row[], i: number, dt: Date): number[] {
+function collectGaps(rows: Row[], i: number, dt: Date, analysis: number = 1): number[] {
   const gaps: number[] = [];
-  for (let k = 1; i + k < rows.length && gaps.length < MAX_ZEROS; k++) {
+  const limit = analysis === 4 ? MAX_ZEROS_A4 : MAX_ZEROS;
+  for (let k = 1; i + k < rows.length && gaps.length < limit; k++) {
     if (Number(rows[i + k].roll) !== 0) continue;
     const zdt = parseUtcDate(rows[i + k].created_at);
     if (Number.isNaN(zdt.getTime())) continue;
@@ -35,7 +37,7 @@ export function buildA1(rows: Row[]): Cycle[] {
     const dt = parseUtcDate(r.created_at);
     if (Number.isNaN(dt.getTime())) return;
     if (dt.getMinutes() % 10 !== n) return;
-    out.push({ value: n, analysis: 1, triggerAt: dt, gaps: collectGaps(rows, i, dt) });
+    out.push({ value: n, analysis: 1, triggerAt: dt, gaps: collectGaps(rows, i, dt, 1) });
   });
   return out;
 }
@@ -49,7 +51,7 @@ export function buildA2(rows: Row[]): Cycle[] {
     if (!Number.isFinite(cur) || cur < 0 || cur > 14 || cur !== prev) continue;
     const dt = parseUtcDate(rows[i].created_at);
     if (Number.isNaN(dt.getTime())) continue;
-    out.push({ value: cur, analysis: 2, triggerAt: dt, gaps: collectGaps(rows, i, dt) });
+    out.push({ value: cur, analysis: 2, triggerAt: dt, gaps: collectGaps(rows, i, dt, 2) });
   }
   return out;
 }
@@ -65,8 +67,30 @@ export function buildA3(rows: Row[]): Cycle[] {
     const dt = parseUtcDate(rows[i].created_at);
     if (Number.isNaN(dt.getTime()) || Number.isNaN(dtPrev.getTime())) continue;
     if (dtPrev.getMinutes() % 10 !== cur && dt.getMinutes() % 10 !== cur) continue;
-    out.push({ value: cur, analysis: 3, triggerAt: dt, gaps: collectGaps(rows, i, dt) });
+    out.push({ value: cur, analysis: 3, triggerAt: dt, gaps: collectGaps(rows, i, dt, 3) });
   }
+  return out;
+}
+
+/** Análise 4 — primeira pedra do minuto 0 de cada hora. */
+export function buildA4(rows: Row[]): Cycle[] {
+  const out: Cycle[] = [];
+  const hoursProcessed = new Set<string>();
+
+  rows.forEach((r, i) => {
+    const dt = parseUtcDate(r.created_at);
+    if (Number.isNaN(dt.getTime())) return;
+    if (dt.getMinutes() !== 0) return;
+
+    const hourKey = `${dt.getFullYear()}-${dt.getMonth()}-${dt.getDate()}-${dt.getHours()}`;
+    if (hoursProcessed.has(hourKey)) return;
+    hoursProcessed.add(hourKey);
+
+    const n = Number(r.roll);
+    if (!Number.isFinite(n) || n < 0 || n > 14) return;
+
+    out.push({ value: n, analysis: 4, triggerAt: dt, gaps: collectGaps(rows, i, dt, 4) });
+  });
   return out;
 }
 

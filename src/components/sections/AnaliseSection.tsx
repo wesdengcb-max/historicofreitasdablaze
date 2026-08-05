@@ -145,8 +145,9 @@ type PanelProps = {
   eligibleHint?: string;
   showFullBadge?: boolean; // Analysis 1 usa "Completo (10/10)"
   analiseKey: string;      // identificador no banco (analise1/2/3)
-  pedra: number;           // número selecionado
+  pedra: number | string;  // número selecionado
   now: Date;
+  maxZeros?: number;
 };
 
 function AnalysisPanel({
@@ -162,8 +163,9 @@ function AnalysisPanel({
   analiseKey,
   pedra,
   now,
+  maxZeros = MAX_ZEROS,
 }: PanelProps) {
-  const { rows: dbRows, error: dbError } = useGatilhos(analiseKey, pedra);
+  const { rows: dbRows, error: dbError } = useGatilhos(analiseKey, Number(pedra));
 
   // A tela assume um papel PASSIVO, apenas lendo o que está no banco.
   const windowed = useMemo<Cycle[]>(() => {
@@ -177,15 +179,15 @@ function AnalysisPanel({
         triggerLabel: `${r.pedra}`,
         triggerDetail: r.detalhe ?? `min ${String(r.minuto).padStart(2, "0")}`,
         gaps,
-        pending: gaps.length >= MAX_ZEROS ? 0 : 1,
+        pending: gaps.length >= maxZeros ? 0 : 1,
         elapsed: diffMinutes(at, now),
       };
     });
-  }, [dbRows, now]);
+  }, [dbRows, now, maxZeros]);
 
   const { rows: top5, totalRows } = useMemo(() => computeTop5(windowed), [windowed]);
   const details = windowed;
-  const fullyCompleted = windowed.filter((c) => cycleStatus(c) === "completo").length;
+  const fullyCompleted = windowed.filter((c) => c.gaps.length >= maxZeros).length;
   const totalGaps = windowed.reduce((a, c) => a + c.gaps.length, 0);
   const avg = totalGaps
     ? Math.round(windowed.reduce((a, c) => a + c.gaps.reduce((x, y) => x + y, 0), 0) / totalGaps)
@@ -293,7 +295,7 @@ function AnalysisPanel({
 
           <div className="mt-5 overflow-x-auto rounded-xl border border-white/10">
             <div className="border-b border-white/10 bg-white/[0.03] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
-              Detalhes dos ciclos · últimos {MAX_DETAIL_ROWS} gatilhos · até {MAX_ZEROS} contagens até 0
+              Detalhes dos ciclos · últimos {MAX_DETAIL_ROWS} gatilhos · até {maxZeros} contagens até 0
             </div>
             <table className="w-full text-xs tabular-nums">
               <thead>
@@ -310,7 +312,7 @@ function AnalysisPanel({
                   .slice()
                   .reverse()
                   .map((c) => {
-                    const status = cycleStatus(c);
+                    const isComplete = c.gaps.length >= maxZeros;
                     return (
                       <tr
                         key={`${c.triggerAt.getTime()}-${c.triggerLabel}`}
@@ -323,13 +325,13 @@ function AnalysisPanel({
                           {c.gaps.length ? c.gaps.join(" · ") : "—"}
                         </td>
                         <td className="px-3 py-2">
-                          {status === "completo" ? (
+                          {isComplete ? (
                             <span className="text-emerald-300">
                               {showFullBadge ? `Completo (${c.gaps.length})` : "Completo"}
                             </span>
                           ) : (
                             <span className="text-amber-300">
-                              ativo · {c.gaps.length}/{MAX_ZEROS} · {c.elapsed} min
+                              ativo · {c.gaps.length}/{maxZeros} · {c.elapsed} min
                             </span>
                           )}
                         </td>
@@ -348,7 +350,7 @@ function AnalysisPanel({
 export function AnaliseSection() {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
-  const [selected, setSelected] = useState<number>(1);
+  const [selected, setSelected] = useState<number | string>(1);
   const [now, setNow] = useState<Date>(() => new Date());
 
   useEffect(() => {
@@ -417,8 +419,9 @@ export function AnaliseSection() {
     return () => { alive = false; };
   }, []);
 
-  const isMinuteEligible = selected >= 0 && selected <= 9;
-  const stat = stats[selected] ?? { total: 0, fullyCompleted: 0, avg: null };
+  const isMinuteEligible = typeof selected === 'number' && selected >= 0 && selected <= 9;
+  const statKey = typeof selected === 'number' ? selected : 0;
+  const stat = stats[statKey] ?? { total: 0, fullyCompleted: 0, avg: null };
   const eligible = isMinuteEligible && stat.fullyCompleted >= MIN_CYCLES;
 
   return (
@@ -428,7 +431,7 @@ export function AnaliseSection() {
           Catalogador de latência
         </div>
         <h2 className="text-2xl font-black text-white sm:text-3xl font-outfit uppercase tracking-tighter">
-          Ciclos de espera até o branco (0) · até {MAX_ZEROS} contagens
+          Ciclos de espera até o branco (0)
         </h2>
         <p className="mt-1 text-xs text-muted-foreground">
           Gatilho: o número sai num minuto cuja unidade é igual a ele (ex.: 1 no
@@ -507,23 +510,39 @@ export function AnaliseSection() {
         eyebrow={`Análise 3 · repetição + minuto casado (${selected})`}
         title="Tempo até o 0 após repetição com unidade do minuto igual"
         subtitle={
-          selected <= 9
+          (typeof selected === 'number' && selected <= 9)
             ? `Gatilho: pedra ${selected} repete e ao menos uma sai em minuto terminado em ${selected}. Últimas ${MAX_PATTERN_CYCLES} ocorrências.`
             : "Análise aplicável apenas para pedras de 0 a 9."
         }
         loading={loading}
         err={err}
         emptyLabel={
-          selected <= 9
+          (typeof selected === 'number' && selected <= 9)
             ? `Ainda sem repetições da pedra ${selected} em minuto casado.`
             : "Análise aplicável apenas para pedras de 0 a 9."
         }
-        eligible={selected <= 9 && stat.total >= MIN_CYCLES}
+        eligible={(typeof selected === 'number' && selected <= 9) && stat.total >= MIN_CYCLES}
         eligibleHint={`precisa ${MIN_CYCLES}+ ocorrências`}
         showFullBadge={false}
         analiseKey="analise3"
         pedra={selected}
         now={now}
+      />
+
+      <AnalysisPanel
+        eyebrow={`Análise 4 · Minuto '0'`}
+        title="Primeira Pedra do Minuto '0'"
+        subtitle={`Gatilho: primeira pedra registrada exatamente no minuto 0 de cada hora. Últimas 20 contagens.`}
+        loading={loading}
+        err={err}
+        emptyLabel={`Ainda sem registros da Análise 4 no histórico.`}
+        eligible={stat.total >= MIN_CYCLES}
+        eligibleHint={`precisa ${MIN_CYCLES}+ ocorrências`}
+        showFullBadge={true}
+        analiseKey="analise4"
+        pedra={selected}
+        now={now}
+        maxZeros={20}
       />
     </main>
   );
