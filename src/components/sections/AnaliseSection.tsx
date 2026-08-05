@@ -348,7 +348,7 @@ function AnalysisPanel({
 export function AnaliseSection() {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
-  const [selected, setSelected] = useState<number>(1);
+  const [selected, setSelected] = useState<number | string>(1);
   const [now, setNow] = useState<Date>(() => new Date());
 
   useEffect(() => {
