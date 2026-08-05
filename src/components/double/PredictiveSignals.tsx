@@ -111,21 +111,31 @@ export function PredictiveSignals() {
     // ---- Modo 1: Top 1 (posição central M) de cada análise ativa, unificado por horário ----
     const byTime = new Map<
       number,
-      { values: number[]; pct: number; label: string }
+      { values: number[]; analyses: Set<number>; pct: number; label: string }
     >();
     for (const item of active) {
       const hist = cyclesOf(engine[item.analysis], item.value);
       if (!hist.length) continue;
       const top1 = computeTop(hist, 1)[0];
       if (!top1) continue;
+      
+      // FILTRO DE ASSERTIVIDADE RÍGIDO (Top 1 em 50%)
+      if (top1.pct < MIN_ASSERTIVIDADE) continue;
+      
       const at = addMinutes(item.open.triggerAt, top1.m);
-      if (at.getTime() <= now.getTime()) continue; // elimina horários passados
+      if (at.getTime() <= now.getTime()) continue; 
       const t = at.getTime();
       const cur = byTime.get(t);
       if (!cur) {
-        byTime.set(t, { values: [item.value], pct: top1.pct, label: top1.label });
+        byTime.set(t, { 
+          values: [item.value], 
+          analyses: new Set([item.analysis]),
+          pct: top1.pct, 
+          label: top1.label 
+        });
       } else {
         if (!cur.values.includes(item.value)) cur.values.push(item.value);
+        cur.analyses.add(item.analysis);
         if (top1.pct > cur.pct) {
           cur.pct = top1.pct;
           cur.label = top1.label;
@@ -142,6 +152,7 @@ export function PredictiveSignals() {
           at: new Date(t),
           pct: info.pct,
           label: info.label,
+          analysisCount: info.analyses.size,
         };
       });
     setMode1(m1);
@@ -149,8 +160,6 @@ export function PredictiveSignals() {
     const usedTimes = new Set<number>(m1.map((s) => s.at.getTime()));
 
     // ---- Modo 2: Estratégia de Coincidência ----
-    // Requisito mínimo: mais de 1 análise ativa projetando o mesmo minuto.
-    // Filtro de validação: o minuto precisa estar no Top 5 de pelo menos uma delas.
     type Proj = { analysis: 1 | 2 | 3 | 4; value: number; pct: number; top5: boolean };
     const byMinute = new Map<number, Proj[]>();
 
@@ -174,15 +183,17 @@ export function PredictiveSignals() {
 
     const m2: Mode2Signal[] = [];
     for (const [at, projs] of byMinute) {
-      // 1) precisa de mais de 1 análise ativa em comum nesse minuto
       const distinctAnalyses = new Set(projs.map((p) => p.analysis));
       if (distinctAnalyses.size < 2) continue;
-      // 2) o minuto precisa estar no Top 5 de pelo menos uma das análises
+      
       const validators = projs.filter((p) => p.top5);
       if (!validators.length) continue;
 
       const pct = projs.reduce((s, p) => s + p.pct, 0) / projs.length;
+      
+      // FILTRO DE ASSERTIVIDADE RÍGIDO (50%)
       if (pct < MIN_ASSERTIVIDADE) continue;
+      
       if (usedTimes.has(at)) continue;
       usedTimes.add(at);
 
@@ -202,6 +213,7 @@ export function PredictiveSignals() {
         pct,
         sources,
         confluence,
+        analysisCount: distinctAnalyses.size,
       });
     }
     m2.sort((a, b) => a.times[0].getTime() - b.times[0].getTime());
