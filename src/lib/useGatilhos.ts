@@ -31,9 +31,11 @@ export type GatilhoInput = {
  */
 export function useGatilhos(analise: string, pedra: number) {
   const [rows, setRows] = useState<GatilhoRow[]>([]);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
+    setLoading(true);
     try {
       const { data, error: err } = await supabase
         .from("gatilhos_analise")
@@ -44,12 +46,12 @@ export function useGatilhos(analise: string, pedra: number) {
         .limit(MAX_GATILHOS);
         
       if (err) {
-        // Fallback para erro de cache/schema - exibe erro amigável sem quebrar
         if (err.message.includes("schema cache")) {
           setError("Sincronizando banco de dados... Por favor, aguarde alguns instantes.");
         } else {
           setError(err.message);
         }
+        console.error("[useGatilhos] Supabase error:", err);
         return;
       }
       
@@ -58,6 +60,8 @@ export function useGatilhos(analise: string, pedra: number) {
     } catch (e) {
       setError("Erro ao conectar com o servidor.");
       console.error("[useGatilhos] Load error:", e);
+    } finally {
+      setLoading(false);
     }
   }, [analise, pedra]);
 
@@ -83,7 +87,7 @@ export function useGatilhos(analise: string, pedra: number) {
     };
   }, [analise, pedra, load]);
 
-  return { rows, error };
+  return { rows, loading, error };
 }
 
 // Evita reenviar o mesmo lote repetidamente entre re-renders.

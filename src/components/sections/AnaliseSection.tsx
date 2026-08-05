@@ -165,7 +165,7 @@ function AnalysisPanel({
   now,
   maxZeros = MAX_ZEROS,
 }: PanelProps) {
-  const { rows: dbRows, error: dbError } = useGatilhos(analiseKey, Number(pedra));
+  const { rows: dbRows, loading: dbLoading, error: dbError } = useGatilhos(analiseKey, Number(pedra));
 
   // A tela assume um papel PASSIVO, apenas lendo o que está no banco.
   const windowed = useMemo<Cycle[]>(() => {
@@ -219,9 +219,9 @@ function AnalysisPanel({
         )}
       </div>
 
-      {loading ? (
+      {loading || dbLoading ? (
         <div className="flex items-center justify-center py-20 text-muted-foreground">
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Carregando histórico…
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> {loading ? "Carregando estatísticas..." : "Sincronizando banco de dados..."}
         </div>
       ) : err || dbError ? (
         <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
@@ -408,12 +408,13 @@ export function AnaliseSection() {
         });
 
         setStats(finalStats);
-        setLoading(false);
       } catch (e) {
         if (alive) {
           setErr("Falha na conexão com o catálogo.");
-          setLoading(false);
+          console.error("[AnaliseSection] Fetch error:", e);
         }
+      } finally {
+        if (alive) setLoading(false);
       }
     })();
     return () => { alive = false; };
