@@ -91,7 +91,7 @@ export const HistoryGrid = memo(({ spins, numerado, exibirSegundos, inverse }: H
                             key={spin.id} 
                             n={spin.n}
                             color={colorOf(spin.n)}
-                            time={exibirSegundos ? spTimeWithSeconds(spin.createdAt ?? "") : (spin.time || "00:00")}
+                            time={exibirSegundos ? spTimeWithSeconds(spin) : (spin.time || "00:00")}
                             numbered={numerado} 
                          />
                        ))}
