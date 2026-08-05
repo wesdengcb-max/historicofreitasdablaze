@@ -277,15 +277,3 @@ function FilterDropdown({ filter, setFilter }: any) {
 }
 
 // Heavy component - extracted and simplified
-const HistoryGrid = memo(({ spins, realtime, inverse }: any) => {
-  return (
-    <div className="overflow-x-auto rounded-2xl border border-white/5 bg-surface/30">
-      <div className="min-w-[1200px] p-4">
-        {/* Simplified grid rendering logic from original app.tsx but optimized */}
-        <div className="grid grid-cols-10 gap-4">
-          {/* Grid rows mapping logic goes here, similar to original but more defensive */}
-        </div>
-      </div>
-    </div>
-  );
-});
