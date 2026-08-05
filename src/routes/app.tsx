@@ -32,6 +32,8 @@ import {
   BlazeResultCard,
 } from "@/components/double/BlazeResultCard";
 import freitasLogo from "@/assets/freitas-logo.jpg.asset.json";
+import { HistoryGrid } from "@/components/double/HistoryGrid";
+
 import { getSignals, subscribeSignals } from "@/lib/signalsStore";
 import { TopNav } from "@/components/TopNav";
 import { useSection } from "@/lib/sectionStore";
