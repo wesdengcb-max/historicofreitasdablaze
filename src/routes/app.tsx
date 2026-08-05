@@ -1486,7 +1486,7 @@ const TipMinerCard = memo(function TipMinerCard({
   const fg = isWhite ? "#16171d" : "#ffffff";
   const hasSelection = !!highlightN && highlightN.size > 0;
   const isHit = !!highlightN && highlightN.has(spin.n);
-  const isActive = !hasSelection || isHit;
+  const isActive = true; // Always active in Colunas Fixas as requested
 
   const delayStyle = delay > 0 ? { animationDelay: `${delay}s` } : undefined;
   return (
