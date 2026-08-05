@@ -59,11 +59,21 @@ export function PredictiveSignals() {
       if (!alive) return;
       if (error) {
         setErr(error.message);
+        console.error("[PredictiveSignals] Supabase error:", error);
         setLoading(false);
         return;
       }
       setRows(((data ?? []) as Row[]).slice().reverse());
       setLoading(false);
+    } catch (e) {
+      if (alive) {
+        setErr("Erro ao carregar resultados.");
+        console.error("[PredictiveSignals] Fetch error:", e);
+        setLoading(false);
+      }
+    } finally {
+      if (alive) setLoading(false);
+    }
     })();
     return () => {
       alive = false;
