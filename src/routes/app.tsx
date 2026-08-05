@@ -1163,15 +1163,15 @@ function Index() {
                                 return;
                               }
                               setHighlightKey(key);
-                              setHighlightN(() => {
-                                const next = new Set<number>();
-                                gridRows.forEach(row => {
-                                  row.cells[ci].forEach(spin => {
-                                    next.add(spin.n);
-                                  });
-                                });
-                                return next;
+                              // Selecionar todos os números de ambas as pedras desta coluna (posição 0 e 1)
+                              const next = new Set<number>();
+                              gridRows.forEach(row => {
+                                const cells = row.cells[ci];
+                                // Pega os números das duas primeiras pedras da célula (pedra esquerda e pedra direita)
+                                if (cells[0]) next.add(cells[0].n);
+                                if (cells[1]) next.add(cells[1].n);
                               });
+                              setHighlightN(next);
                             }}
                           >
                             {ci}
