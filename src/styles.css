@@ -296,14 +296,8 @@
   --cell-min: var(--cell-min-h);
 }
 
-@media (max-width: 1023px) {
-  /* Em mobile, mantemos as proporções mas permitimos escala se necessário
-     ou apenas scroll horizontal se o container for pequeno */
-  .history-metrics {
-    --stone-size: 48px;
-    --cell-min: 68px;
-  }
-}
+/* Removidas as métricas responsivas para garantir layout idêntico ao desktop em todos os dispositivos */
+
 
 
 /* Rolagem horizontal suave do histórico */

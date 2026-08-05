@@ -231,9 +231,9 @@ function Index() {
   const [viewMode, setViewMode] = useState<"colunas" | "lista">("colunas");
   const isVip = useVipStatus();
 
-  // Em celular/tablet inicia em lista (sentido normal); desktop mantém colunas fixas.
+  // Removido o switch automático para lista em mobile para manter layout de PC em todos os dispositivos
   useEffect(() => {
-    if (window.innerWidth < 1024) setViewMode("lista");
+    // setViewMode("colunas"); // Força o modo colunas por padrão
   }, []);
 
   // Protect current section if VIP is lost
@@ -1042,7 +1042,7 @@ function Index() {
             {/* Cabeçalho das estatísticas por coluna */}
             {viewMode === "colunas" && contarColunas && (
               <div className="mb-3 w-full border-b border-white/5 pb-3 overflow-x-auto scrollbar-none">
-                <div className="grid grid-cols-10 gap-[8px] min-w-[720px] lg:min-w-0" style={{ maxWidth: "1366px", width: "100%", marginLeft: "auto", marginRight: "auto" }}>
+                <div className="grid grid-cols-10 gap-[8px] min-w-[1200px]" style={{ maxWidth: "1366px", width: "100%", marginLeft: "auto", marginRight: "auto" }}>
                   {Array.from({ length: 10 }).map((_, ci) => {
                     const stats = colStats[ci];
                     return (
@@ -1131,7 +1131,7 @@ function Index() {
                   <div className="history-scroll glass-card glass-card-glow w-full overflow-x-hidden p-1 sm:p-2 lg:p-3">
                     <div className="flex flex-col gap-0 overflow-x-auto scrollbar-none">
                       {/* Cabeçalho 0-9 interno para Colunas Fixas */}
-                      <div className="grid grid-cols-10 gap-[8px] mb-1 sticky top-0 z-10 bg-background/40 backdrop-blur-sm min-w-[720px] lg:min-w-0" style={{ maxWidth: "1366px", width: "100%", marginLeft: "auto", marginRight: "auto" }}>
+                      <div className="grid grid-cols-10 gap-[8px] mb-1 sticky top-0 z-10 bg-background/40 backdrop-blur-sm min-w-[1200px]" style={{ maxWidth: "1366px", width: "100%", marginLeft: "auto", marginRight: "auto" }}>
                         {Array.from({ length: 10 }).map((_, ci) => (
                           <div
                             key={`header-inner-${ci}`}
@@ -1144,7 +1144,7 @@ function Index() {
 
                       {gridRows.map((row) => (
                         <div key={row.key} className="flex flex-col gap-0 border-b border-white/[0.02]">
-                          <div className="grid grid-cols-10 gap-[8px] relative min-w-[720px] lg:min-w-0" style={{ maxWidth: "1366px", width: "100%", marginLeft: "auto", marginRight: "auto" }}>
+                          <div className="grid grid-cols-10 gap-[8px] relative min-w-[1200px]" style={{ maxWidth: "1366px", width: "100%", marginLeft: "auto", marginRight: "auto" }}>
                             {row.cells.map((cell, ci) => {
                             const [hh, mmPrefix] = row.label.split(":");
                             const hm = `${hh}:${mmPrefix[0]}${ci}`;
