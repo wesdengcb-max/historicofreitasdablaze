@@ -1144,7 +1144,7 @@ function Index() {
 
                       {gridRows.map((row) => (
                         <div key={row.key} className="flex flex-col gap-0 border-b border-white/[0.02]">
-                          <div className="grid gap-[8px] relative" style={{ gridTemplateColumns: "repeat(10, 1fr)", maxWidth: "1366px", width: "100%", marginLeft: "auto", marginRight: "auto" }}>
+                          <div className="grid grid-cols-10 gap-[8px] relative min-w-[720px] lg:min-w-0" style={{ maxWidth: "1366px", width: "100%", marginLeft: "auto", marginRight: "auto" }}>
                             {row.cells.map((cell, ci) => {
                             const [hh, mmPrefix] = row.label.split(":");
                             const hm = `${hh}:${mmPrefix[0]}${ci}`;
