@@ -1057,15 +1057,15 @@ function Index() {
                             return;
                           }
                           setHighlightKey(key);
-                          setHighlightN(() => {
-                            const next = new Set<number>();
-                            gridRows.forEach(row => {
-                              row.cells[ci].forEach(spin => {
-                                next.add(spin.n);
-                              });
-                            });
-                            return next;
+                          // Selecionar todos os números de ambas as pedras desta coluna (posição 0 e 1)
+                          const next = new Set<number>();
+                          gridRows.forEach(row => {
+                            const cells = row.cells[ci];
+                            // Pega os números das duas primeiras pedras da célula (pedra esquerda e pedra direita)
+                            if (cells[0]) next.add(cells[0].n);
+                            if (cells[1]) next.add(cells[1].n);
                           });
+                          setHighlightN(next);
                         }}
                         className={`flex w-full flex-col gap-0.5 overflow-hidden rounded-[4px] p-1 shadow-inner text-left transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-primary/25 ring-1 ring-primary/40 shadow-[0_0_15px_rgba(255,31,61,0.2)]" : "bg-white/[0.03] hover:bg-white/[0.08]"}`}
                         style={{ width: "100%" }}
@@ -1163,15 +1163,15 @@ function Index() {
                                 return;
                               }
                               setHighlightKey(key);
-                              setHighlightN(() => {
-                                const next = new Set<number>();
-                                gridRows.forEach(row => {
-                                  row.cells[ci].forEach(spin => {
-                                    next.add(spin.n);
-                                  });
-                                });
-                                return next;
+                              // Selecionar todos os números de ambas as pedras desta coluna (posição 0 e 1)
+                              const next = new Set<number>();
+                              gridRows.forEach(row => {
+                                const cells = row.cells[ci];
+                                // Pega os números das duas primeiras pedras da célula (pedra esquerda e pedra direita)
+                                if (cells[0]) next.add(cells[0].n);
+                                if (cells[1]) next.add(cells[1].n);
                               });
+                              setHighlightN(next);
                             }}
                           >
                             {ci}
@@ -1243,15 +1243,22 @@ function Index() {
                                               showSeconds={exibirSegundos}
                                               timeHighlight={destaqueHorario}
                                               showTime={false}
-                                              onClick={() =>
+                                              onClick={() => {
+                                                const n = (spin as Spin).n;
+                                                // Se clicar em uma pedra e já houver uma coluna selecionada,
+                                                // limpa a coluna e foca apenas na pedra.
+                                                if (highlightKey) {
+                                                  setHighlightKey(null);
+                                                  setHighlightN(new Set([n]));
+                                                  return;
+                                                }
                                                 setHighlightN((h) => {
                                                   const next = new Set(h);
-                                                  const n = (spin as Spin).n;
                                                   if (next.has(n)) next.delete(n);
                                                   else next.add(n);
                                                   return next;
-                                                })
-                                              }
+                                                });
+                                              }}
                                             />
                                             <span className={`mt-[5px] text-[11px] tabular-nums leading-none font-medium h-[11px] flex items-center ${destaqueHorario ? "text-primary font-bold" : "text-[#8ebcf0]"}`}>
                                               {exibirSegundos ? spTimeWithSeconds(spin as Spin) : (spin as Spin).time}
