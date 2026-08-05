@@ -41,6 +41,25 @@ const CANDIDATE_DEPTH = 10;
 /** Somente as N primeiras contam como Top 5 validador. */
 const TOP5_DEPTH = 5;
 
+const getMedalStyles = (count: number) => {
+  if (count >= 4) return { 
+    label: "Ouro", 
+    classes: "border-yellow-400 bg-yellow-950/50 text-yellow-300 shadow-yellow-500/20",
+    badge: "bg-yellow-400/20 text-yellow-300 border-yellow-400/30"
+  };
+  if (count === 3) return { 
+    label: "Prata", 
+    classes: "border-slate-300 bg-slate-800/40 text-slate-100",
+    badge: "bg-slate-300/20 text-slate-100 border-slate-300/30"
+  };
+  if (count === 2) return { 
+    label: "Bronze", 
+    classes: "border-amber-700 bg-amber-950/30 text-amber-300",
+    badge: "bg-amber-700/20 text-amber-300 border-amber-700/30"
+  };
+  return null;
+};
+
 export function PredictiveSignals() {
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
