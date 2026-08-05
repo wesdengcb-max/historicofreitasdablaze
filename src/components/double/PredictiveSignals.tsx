@@ -17,7 +17,7 @@ import {
   type Row,
 } from "@/lib/predictive";
 
-type Mode1Signal = { key: string; title: string; at: Date; pct: number; label: string };
+type Mode1Signal = { key: string; title: string; at: Date; pct: number; label: string; analysisCount: number };
 type Mode2Signal = {
   key: string;
   title: string;
@@ -25,9 +25,10 @@ type Mode2Signal = {
   pct: number;
   sources: Array<{ analysis: 1 | 2 | 3 | 4; value: number; pct: number; top5: boolean }>;
   confluence: string;
+  analysisCount: number;
 };
 
-const MIN_ASSERTIVIDADE = 30;
+const MIN_ASSERTIVIDADE = 50;
 
 function addMinutes(d: Date, m: number) {
   const out = new Date(d.getTime() + m * 60_000);
