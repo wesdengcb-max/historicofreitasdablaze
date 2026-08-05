@@ -9,6 +9,7 @@ export type Cycle = {
 };
 
 export const MAX_ZEROS = 14;
+export const MAX_ZEROS_A4 = 20;
 export const MAX_CYCLES = 14;
 
 function diffMinutes(a: Date, b: Date) {
