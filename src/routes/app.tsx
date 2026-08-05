@@ -1133,12 +1133,35 @@ function Index() {
                       {/* Cabeçalho 0-9 interno para Colunas Fixas */}
                       <div className="grid grid-cols-10 gap-[8px] mb-1 sticky top-0 z-10 bg-background/40 backdrop-blur-sm min-w-[1200px]" style={{ maxWidth: "1366px", width: "100%", marginLeft: "auto", marginRight: "auto" }}>
                         {Array.from({ length: 10 }).map((_, ci) => (
-                          <div
+                          <button
                             key={`header-inner-${ci}`}
-                            className="flex h-[23px] w-full items-center justify-center rounded-[6px] border border-white/5 bg-white/[0.03] text-[14px] font-medium tabular-nums text-white"
+                            onClick={() => {
+                              setHighlightN((prev) => {
+                                const next = new Set(prev);
+                                // Pegamos todos os números presentes nesta coluna (ci) em todas as linhas (gridRows)
+                                const numbersInCol = new Set<number>();
+                                gridRows.forEach(row => {
+                                  row.cells[ci].forEach(spin => {
+                                    numbersInCol.add(spin.n);
+                                  });
+                                });
+
+                                // Se todos os números da coluna já estão selecionados, removemos eles.
+                                // Caso contrário, adicionamos todos.
+                                const allSelected = Array.from(numbersInCol).every(n => next.has(n));
+                                
+                                if (allSelected && numbersInCol.size > 0) {
+                                  numbersInCol.forEach(n => next.delete(n));
+                                } else {
+                                  numbersInCol.forEach(n => next.add(n));
+                                }
+                                return next;
+                              });
+                            }}
+                            className="flex h-[23px] w-full items-center justify-center rounded-[6px] border border-white/5 bg-white/[0.03] text-[14px] font-medium tabular-nums text-white hover:bg-white/10 transition-colors"
                           >
                             {ci}
-                          </div>
+                          </button>
                         ))}
                       </div>
 
