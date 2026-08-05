@@ -57,25 +57,31 @@ function LandingPage() {
   return (
     <div className="relative min-h-[100svh] w-full overflow-hidden bg-black text-white">
       {/* Hero Image as Background */}
-      <div className="absolute inset-0 z-0 flex items-center justify-center">
+      <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
         <img
           src={kingImg.url}
           alt=""
-          className="h-full w-full object-contain opacity-70 md:h-[90%] md:w-[90%]"
+          className="h-full w-full object-contain opacity-30 blur-[6px] md:h-[90%] md:w-[90%]"
         />
-        {/* Professional overlays for readability */}
+        {/* Professional overlays for readability and premium look */}
         <div 
           className="absolute inset-0" 
           style={{
-            background: "linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.8) 50%, #000 100%)"
+            background: "linear-gradient(to bottom, #050505 0%, rgba(5,5,5,0.7) 40%, rgba(5,5,5,0.7) 60%, #050505 100%)"
           }} 
         />
         <div 
           className="absolute inset-0" 
           style={{
-            background: "radial-gradient(circle at 50% 50%, transparent 0%, rgba(0,0,0,0.4) 100%)"
+            background: "radial-gradient(circle at 50% 50%, transparent 20%, #050505 100%)"
           }} 
         />
+        {/* Decorative elements - diagonal laser and subtle shapes */}
+        <div className="absolute top-0 left-0 w-full h-full opacity-20">
+            <div className="absolute top-[-10%] left-[20%] w-[1px] h-[120%] bg-primary rotate-[35deg] blur-sm" />
+            <div className="absolute bottom-[10%] right-[10%] w-24 h-24 border border-primary/20 rotate-12 blur-[1px]" />
+            <div className="absolute top-[15%] left-[5%] w-16 h-16 border border-primary/10 -rotate-12 blur-[2px]" />
+        </div>
       </div>
 
       {/* VIP Status Icon */}
