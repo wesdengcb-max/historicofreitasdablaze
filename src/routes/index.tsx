@@ -57,15 +57,7 @@ function LandingPage() {
 
   return (
     <div className="relative min-h-[100svh] w-full overflow-hidden bg-black text-white">
-      {/* Premium Laser Background */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
-        <img 
-          src={bgPremium.url} 
-          alt="" 
-          className="h-full w-full object-cover opacity-60 mix-blend-screen"
-        />
-        <div className="absolute inset-0 bg-black/40" />
-      </div>
+      {/* Background is now globally applied via styles.css */}
 
       {/* Hero Image as Foreground */}
       <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
