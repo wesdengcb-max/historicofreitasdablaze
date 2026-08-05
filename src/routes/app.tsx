@@ -1131,12 +1131,11 @@ function Index() {
                   <div className="history-scroll glass-card glass-card-glow w-full overflow-x-hidden p-1 sm:p-2 lg:p-3">
                     <div className="flex flex-col gap-0">
                       {/* Cabeçalho 0-9 interno para Colunas Fixas */}
-                      <div className="grid gap-[8px] mb-1 sticky top-0 z-10 bg-background/40 backdrop-blur-sm" style={{ gridTemplateColumns: "repeat(10, 1fr)", maxWidth: "1366px", width: "100%", marginLeft: "auto", marginRight: "auto" }}>
+                      <div className="grid grid-cols-10 gap-[8px] mb-1 sticky top-0 z-10 bg-background/40 backdrop-blur-sm" style={{ maxWidth: "1366px", width: "100%", marginLeft: "auto", marginRight: "auto" }}>
                         {Array.from({ length: 10 }).map((_, ci) => (
                           <div
                             key={`header-inner-${ci}`}
-                            className="flex h-[23px] w-[137px] items-center justify-center rounded-[6px] border border-white/5 bg-white/[0.03] text-[14px] font-medium tabular-nums text-white"
-                            style={{ width: "100%" }}
+                            className="flex h-[23px] w-full items-center justify-center rounded-[6px] border border-white/5 bg-white/[0.03] text-[14px] font-medium tabular-nums text-white"
                           >
                             {ci}
                           </div>
