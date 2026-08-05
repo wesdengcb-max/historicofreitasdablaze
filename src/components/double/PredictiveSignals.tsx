@@ -51,29 +51,28 @@ export function PredictiveSignals() {
   useEffect(() => {
     let alive = true;
     (async () => {
-      const { data, error } = await supabase
-        .from("blaze_results")
-        .select("id, roll, color, created_at")
-        .order("created_at", { ascending: false })
-        .limit(5000);
-      if (!alive) return;
-      if (error) {
-        setErr(error.message);
-        console.error("[PredictiveSignals] Supabase error:", error);
-        setLoading(false);
-        return;
+      try {
+        const { data, error } = await supabase
+          .from("blaze_results")
+          .select("id, roll, color, created_at")
+          .order("created_at", { ascending: false })
+          .limit(5000);
+        if (!alive) return;
+        if (error) {
+          setErr(error.message);
+          console.error("[PredictiveSignals] Supabase error:", error);
+          setLoading(false);
+          return;
+        }
+        setRows(((data ?? []) as Row[]).slice().reverse());
+      } catch (e) {
+        if (alive) {
+          setErr("Erro ao carregar resultados.");
+          console.error("[PredictiveSignals] Fetch error:", e);
+        }
+      } finally {
+        if (alive) setLoading(false);
       }
-      setRows(((data ?? []) as Row[]).slice().reverse());
-      setLoading(false);
-    } catch (e) {
-      if (alive) {
-        setErr("Erro ao carregar resultados.");
-        console.error("[PredictiveSignals] Fetch error:", e);
-        setLoading(false);
-      }
-    } finally {
-      if (alive) setLoading(false);
-    }
     })();
     return () => {
       alive = false;

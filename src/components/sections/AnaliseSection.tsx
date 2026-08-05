@@ -408,12 +408,13 @@ export function AnaliseSection() {
         });
 
         setStats(finalStats);
-        setLoading(false);
       } catch (e) {
         if (alive) {
           setErr("Falha na conexão com o catálogo.");
-          setLoading(false);
+          console.error("[AnaliseSection] Fetch error:", e);
         }
+      } finally {
+        if (alive) setLoading(false);
       }
     })();
     return () => { alive = false; };
