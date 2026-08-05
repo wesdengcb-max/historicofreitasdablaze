@@ -55,19 +55,11 @@ function LandingPage() {
   );
 
   return (
-    <div className="relative min-h-[100svh] w-full overflow-hidden bg-[#050505] text-white">
+    <div className="relative min-h-[100svh] w-full overflow-hidden bg-black text-white">
       {/* Background Decorative Elements */}
       <div className="absolute inset-0 z-0">
-        {/* Deep radial glow in the center */}
-        <div 
-          className="absolute left-1/2 top-1/2 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/2 opacity-30 blur-[120px]"
-          style={{
-            background: "radial-gradient(circle, rgba(255, 31, 61, 0.15) 0%, transparent 70%)"
-          }}
-        />
-        
         {/* Subtle noise/texture for professional feel */}
-        <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none"
+        <div className="absolute inset-0 opacity-[0.02] pointer-events-none"
              style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
       </div>
 
@@ -76,19 +68,13 @@ function LandingPage() {
         <img
           src={kingImg.url}
           alt=""
-          className="h-full w-full object-contain opacity-80 mix-blend-lighten md:h-[95%] md:w-[95%]"
+          className="h-full w-full object-contain opacity-70 md:h-[90%] md:w-[90%]"
         />
-        {/* Refined gradient mask - cleaner, less "smudged" */}
+        {/* Simple masks for the image */}
         <div 
           className="absolute inset-0" 
           style={{
-            background: "linear-gradient(to bottom, rgba(5,5,5,0.2) 0%, rgba(5,5,5,0.6) 40%, rgba(5,5,5,0.95) 90%, #050505 100%)"
-          }} 
-        />
-        <div 
-          className="absolute inset-0" 
-          style={{
-            background: "radial-gradient(circle at 50% 50%, transparent 20%, rgba(5,5,5,0.4) 60%, #050505 100%)"
+            background: "linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 50%, #000 100%)"
           }} 
         />
       </div>

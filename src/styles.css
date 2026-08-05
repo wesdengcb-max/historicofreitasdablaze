@@ -200,12 +200,7 @@
   }
   body {
     font-feature-settings: "ss01", "cv11";
-    background-color: #050505;
-    background-image: 
-      radial-gradient(circle at 50% -10%, rgba(255, 31, 61, 0.12) 0%, transparent 40%),
-      radial-gradient(circle at 0% 0%, rgba(255, 31, 61, 0.03) 0%, transparent 25%),
-      radial-gradient(circle at 100% 100%, rgba(255, 31, 61, 0.03) 0%, transparent 25%);
-    background-attachment: fixed;
+    background-color: #000000;
     min-height: 100vh;
     position: relative;
   }
