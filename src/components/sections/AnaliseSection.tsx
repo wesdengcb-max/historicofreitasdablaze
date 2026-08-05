@@ -364,44 +364,55 @@ export function AnaliseSection() {
     let alive = true;
     (async () => {
       setLoading(true);
-      const { data, error } = await supabase
-        .from("gatilhos_analise")
-        .select("analise, pedra, gaps");
-      
-      if (!alive) return;
-      if (error) {
-        setErr(error.message);
-        setLoading(false);
-        return;
-      }
-
-      const s: Record<number, { total: number; fullyCompleted: number; totalGaps: number; sumGaps: number }> = {};
-      ALL_NUMBERS.forEach(n => s[n] = { total: 0, fullyCompleted: 0, totalGaps: 0, sumGaps: 0 });
-
-      (data as any[] ?? []).forEach(r => {
-        const n = r.pedra;
-        if (s[n]) {
-          s[n].total++;
-          const gaps = r.gaps ?? [];
-          if (gaps.length > 0) {
-            s[n].fullyCompleted++;
-            s[n].totalGaps += gaps.length;
-            s[n].sumGaps += gaps.reduce((a: number, b: number) => a + b, 0);
+      try {
+        const { data, error } = await supabase
+          .from("gatilhos_analise")
+          .select("analise, pedra, gaps");
+        
+        if (!alive) return;
+        if (error) {
+          if (error.message.includes("schema cache")) {
+            setErr("Sincronizando banco de dados... Por favor, aguarde alguns instantes.");
+          } else {
+            setErr(error.message);
           }
+          setLoading(false);
+          return;
         }
-      });
 
-      const finalStats: Record<number, { total: number; fullyCompleted: number; avg: number | null }> = {};
-      ALL_NUMBERS.forEach(n => {
-        finalStats[n] = {
-          total: s[n].total,
-          fullyCompleted: s[n].fullyCompleted,
-          avg: s[n].totalGaps ? Math.round(s[n].sumGaps / s[n].totalGaps) : null
-        };
-      });
+        const s: Record<number, { total: number; fullyCompleted: number; totalGaps: number; sumGaps: number }> = {};
+        ALL_NUMBERS.forEach(n => s[n] = { total: 0, fullyCompleted: 0, totalGaps: 0, sumGaps: 0 });
 
-      setStats(finalStats);
-      setLoading(false);
+        (data as any[] ?? []).forEach(r => {
+          const n = r.pedra;
+          if (s[n]) {
+            s[n].total++;
+            const gaps = r.gaps ?? [];
+            if (gaps.length > 0) {
+              s[n].fullyCompleted++;
+              s[n].totalGaps += gaps.length;
+              s[n].sumGaps += gaps.reduce((a: number, b: number) => a + b, 0);
+            }
+          }
+        });
+
+        const finalStats: Record<number, { total: number; fullyCompleted: number; avg: number | null }> = {};
+        ALL_NUMBERS.forEach(n => {
+          finalStats[n] = {
+            total: s[n].total,
+            fullyCompleted: s[n].fullyCompleted,
+            avg: s[n].totalGaps ? Math.round(s[n].sumGaps / s[n].totalGaps) : null
+          };
+        });
+
+        setStats(finalStats);
+        setLoading(false);
+      } catch (e) {
+        if (alive) {
+          setErr("Falha na conexão com o catálogo.");
+          setLoading(false);
+        }
+      }
     })();
     return () => { alive = false; };
   }, []);

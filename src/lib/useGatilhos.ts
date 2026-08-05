@@ -34,19 +34,31 @@ export function useGatilhos(analise: string, pedra: number) {
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const { data, error: err } = await supabase
-      .from("gatilhos_analise")
-      .select("id, analise, pedra, minuto, fuso_horario, trigger_at, detalhe, gaps")
-      .eq("analise", analise)
-      .eq("pedra", pedra)
-      .order("trigger_at", { ascending: false })
-      .limit(MAX_GATILHOS);
-    if (err) {
-      setError(err.message);
-      return;
+    try {
+      const { data, error: err } = await supabase
+        .from("gatilhos_analise")
+        .select("id, analise, pedra, minuto, fuso_horario, trigger_at, detalhe, gaps")
+        .eq("analise", analise)
+        .eq("pedra", pedra)
+        .order("trigger_at", { ascending: false })
+        .limit(MAX_GATILHOS);
+        
+      if (err) {
+        // Fallback para erro de cache/schema - exibe erro amigável sem quebrar
+        if (err.message.includes("schema cache")) {
+          setError("Sincronizando banco de dados... Por favor, aguarde alguns instantes.");
+        } else {
+          setError(err.message);
+        }
+        return;
+      }
+      
+      setError(null);
+      setRows(((data ?? []) as GatilhoRow[]).slice().reverse());
+    } catch (e) {
+      setError("Erro ao conectar com o servidor.");
+      console.error("[useGatilhos] Load error:", e);
     }
-    setError(null);
-    setRows(((data ?? []) as GatilhoRow[]).slice().reverse());
   }, [analise, pedra]);
 
   // Carrega ao montar / trocar de pedra
