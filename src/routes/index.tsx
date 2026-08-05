@@ -92,14 +92,10 @@ function LandingPage() {
         )}
       </div>
 
-      {/* Top right icon - Replaced with logo */}
+      {/* Top right icon - Crown status */}
       <div className="absolute right-6 top-6 z-20">
         <div className="logo-glow flex h-14 w-14 items-center justify-center rounded-full bg-black/60 backdrop-blur-xl">
-          <img 
-            src={logoFreitas.url} 
-            alt="Logo Freitas" 
-            className="h-10 w-10 object-contain brightness-110"
-          />
+          <Crown className={`h-8 w-8 ${isVip ? "text-amber-400" : "text-white/20"}`} />
         </div>
       </div>
 
