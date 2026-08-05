@@ -1154,6 +1154,7 @@ function Index() {
                         {Array.from({ length: 10 }).map((_, ci) => (
                           <button
                             key={`header-inner-${ci}`}
+                            className={`flex h-[23px] w-full items-center justify-center rounded-[6px] border border-white/5 text-[14px] font-medium tabular-nums transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-primary/40 text-white shadow-[0_0_10px_rgba(255,31,61,0.3)] ring-1 ring-primary/50" : "bg-white/[0.03] text-white hover:bg-white/10"}`}
                             onClick={() => {
                               const key = `col-${ci}`;
                               if (highlightKey === key) {
