@@ -586,6 +586,13 @@ function Index() {
       const minute = Number(parts.find((p) => p.type === "minute")?.value ?? "0");
       const tens = Math.floor(minute / 10);
       const unit = minute % 10;
+
+      // Filtro de Coluna no modo Colunas Fixas
+      if (viewMode === "colunas" && highlightKey?.startsWith("col-")) {
+        const colIndex = parseInt(highlightKey.split("-")[1], 10);
+        if (unit !== colIndex) continue;
+      }
+
       const key = `${hour}:${tens}`;
       let row = rowMap.get(key);
       if (!row) {
@@ -607,6 +614,14 @@ function Index() {
       const hour = Number(parts.find((p) => p.type === "hour")?.value ?? "0");
       const minute = Number(parts.find((p) => p.type === "minute")?.value ?? "0");
       const tens = Math.floor(minute / 10);
+      const unit = minute % 10;
+
+      // Filtro de Coluna no modo Colunas Fixas para sinais
+      if (viewMode === "colunas" && highlightKey?.startsWith("col-")) {
+        const colIndex = parseInt(highlightKey.split("-")[1], 10);
+        if (unit !== colIndex) continue;
+      }
+
       const key = `${hour}:${tens}`;
       if (!rowMap.has(key)) {
         rowMap.set(key, {
@@ -630,6 +645,11 @@ function Index() {
         const minute = Number(parts.find((p) => p.type === "minute")?.value ?? "0");
         const tens = Math.floor(minute / 10);
         const key = `${hour}:${tens}`;
+        
+        // No filtro de coluna, a lógica de blocos futuros pode ser complexa.
+        // Mantemos a simplicidade: se o bloco de 10min existe, ele é exibido.
+        // O unit filter acima já garante que apenas a coluna certa dentro desse bloco apareça.
+
         if (!rowMap.has(key)) {
           rowMap.set(key, {
             key,
@@ -654,7 +674,7 @@ function Index() {
       }
     }
     return rows.sort((a, b) => b.order - a.order);
-  }, [deferredSpins, storedSignals, futureSlots]);
+  }, [deferredSpins, storedSignals, futureSlots, viewMode, highlightKey]);
 
 
   const applyCustom = () => setAppliedTick((v) => v + 1);
