@@ -22,7 +22,7 @@ import {
   ChevronDown
 } from "lucide-react";
 
-import { lazy, memo, Suspense, useCallback, useEffect, useMemo, useState, useSyncExternalStore, useDeferredValue } from "react";
+import { lazy, memo, Suspense, useCallback, useEffect, useMemo, useState, useSyncExternalStore, useDeferredValue, useRef } from "react";
 import { Card } from "@/components/double/Card";
 import { ResultCircle } from "@/components/double/ResultCircle";
 import { Switch } from "@/components/double/Switch";
