@@ -261,6 +261,7 @@ function Index() {
   const [fullscreen, setFullscreen] = useState(false);
   const [futureSlots, setFutureSlots] = useState<0 | 10 | 20 | 30>(0);
   const [highlightN, setHighlightN] = useState<Set<number>>(() => new Set());
+  const [highlightKey, setHighlightKey] = useState<string | null>(null);
   const [slotPredictions, setSlotPredictions] = useState<Record<string, "white" | "red" | "black">>({});
   const cycleSlotPrediction = (key: string) =>
     setSlotPredictions((prev) => {
@@ -1049,24 +1050,24 @@ function Index() {
                       <button
                         key={`col-stats-${ci}`}
                         onClick={() => {
-                          setHighlightN((prev) => {
-                            const next = new Set(prev);
-                            const numbersInCol = new Set<number>();
+                          const key = `col-${ci}`;
+                          if (highlightKey === key) {
+                            setHighlightKey(null);
+                            setHighlightN(new Set());
+                            return;
+                          }
+                          setHighlightKey(key);
+                          setHighlightN(() => {
+                            const next = new Set<number>();
                             gridRows.forEach(row => {
                               row.cells[ci].forEach(spin => {
-                                numbersInCol.add(spin.n);
+                                next.add(spin.n);
                               });
                             });
-                            const allSelected = Array.from(numbersInCol).every(n => next.has(n));
-                            if (allSelected && numbersInCol.size > 0) {
-                              numbersInCol.forEach(n => next.delete(n));
-                            } else {
-                              numbersInCol.forEach(n => next.add(n));
-                            }
                             return next;
                           });
                         }}
-                        className="flex w-full flex-col gap-0.5 overflow-hidden rounded-[4px] bg-white/[0.03] p-1 shadow-inner text-left transition-colors hover:bg-white/[0.08]"
+                        className={`flex w-full flex-col gap-0.5 overflow-hidden rounded-[4px] p-1 shadow-inner text-left transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-primary/25 ring-1 ring-primary/40 shadow-[0_0_15px_rgba(255,31,61,0.2)]" : "bg-white/[0.03] hover:bg-white/[0.08]"}`}
                         style={{ width: "100%" }}
                       >
                         <div className="flex items-center justify-between px-0.5 text-[8px] font-bold tabular-nums">
@@ -1153,30 +1154,25 @@ function Index() {
                         {Array.from({ length: 10 }).map((_, ci) => (
                           <button
                             key={`header-inner-${ci}`}
+                            className={`flex h-[23px] w-full items-center justify-center rounded-[6px] border border-white/5 text-[14px] font-medium tabular-nums transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-primary/40 text-white shadow-[0_0_10px_rgba(255,31,61,0.3)] ring-1 ring-primary/50" : "bg-white/[0.03] text-white hover:bg-white/10"}`}
                             onClick={() => {
-                              setHighlightN((prev) => {
-                                const next = new Set(prev);
-                                // Pegamos todos os números presentes nesta coluna (ci) em todas as linhas (gridRows)
-                                const numbersInCol = new Set<number>();
+                              const key = `col-${ci}`;
+                              if (highlightKey === key) {
+                                setHighlightKey(null);
+                                setHighlightN(new Set());
+                                return;
+                              }
+                              setHighlightKey(key);
+                              setHighlightN(() => {
+                                const next = new Set<number>();
                                 gridRows.forEach(row => {
                                   row.cells[ci].forEach(spin => {
-                                    numbersInCol.add(spin.n);
+                                    next.add(spin.n);
                                   });
                                 });
-
-                                // Se todos os números da coluna já estão selecionados, removemos eles.
-                                // Caso contrário, adicionamos todos.
-                                const allSelected = Array.from(numbersInCol).every(n => next.has(n));
-                                
-                                if (allSelected && numbersInCol.size > 0) {
-                                  numbersInCol.forEach(n => next.delete(n));
-                                } else {
-                                  numbersInCol.forEach(n => next.add(n));
-                                }
                                 return next;
                               });
                             }}
-                            className="flex h-[23px] w-full items-center justify-center rounded-[6px] border border-white/5 bg-white/[0.03] text-[14px] font-medium tabular-nums text-white hover:bg-white/10 transition-colors"
                           >
                             {ci}
                           </button>
@@ -1218,7 +1214,9 @@ function Index() {
                                 className="flex flex-col items-center justify-center p-0.5 sm:p-1"
                                 style={{ width: "100%", height: "66px", direction: "ltr" }}
                               >
-                                <div className="relative flex flex-col items-center pt-2">
+                                <div 
+                                  className={`relative flex flex-col items-center pt-2 rounded-lg transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-primary/20 ring-1 ring-primary/40 shadow-[0_0_15px_rgba(255,31,61,0.2)]" : ""}`}
+                                >
                                   {badge && (
                                     <span className={`absolute top-0 z-10 inline-flex h-3 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-3.5 sm:px-1.5 sm:text-[8px] ${badgeCls}`}>
                                       {badge.label}
