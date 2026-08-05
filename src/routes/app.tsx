@@ -1162,8 +1162,8 @@ function Index() {
                                 return;
                               }
                               setHighlightKey(key);
-                              setHighlightN((prev) => {
-                                const next = new Set();
+                              setHighlightN(() => {
+                                const next = new Set<number>();
                                 gridRows.forEach(row => {
                                   row.cells[ci].forEach(spin => {
                                     next.add(spin.n);
