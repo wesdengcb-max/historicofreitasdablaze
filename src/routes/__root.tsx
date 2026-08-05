@@ -8,7 +8,6 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
-import mainBgAsset from "../assets/main-bg.png.asset.json";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -112,11 +111,6 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
-        <style>{`
-          :root {
-            --main-bg-url: url("${mainBgAsset.url}");
-          }
-        `}</style>
       </head>
       <body>
         {children}
