@@ -1173,7 +1173,6 @@ function Index() {
                                 return next;
                               });
                             }}
-                            className="flex h-[23px] w-full items-center justify-center rounded-[6px] border border-white/5 bg-white/[0.03] text-[14px] font-medium tabular-nums text-white hover:bg-white/10 transition-colors"
                           >
                             {ci}
                           </button>
