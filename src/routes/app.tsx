@@ -226,7 +226,7 @@ function Index() {
 
 const ControlToggle = memo(({ label, active, onChange }: any) => (
   <label className="flex items-center gap-2 cursor-pointer select-none">
-    <Switch checked={active} onCheckedChange={onChange} />
+    <Switch checked={active} onChange={onChange} />
     <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{label}</span>
   </label>
 ));
