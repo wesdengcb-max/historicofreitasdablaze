@@ -128,6 +128,27 @@ function Index() {
     };
   }, [deferredSpins]);
 
+  const [whiteFlash, setWhiteFlash] = useState<Spin | null>(null);
+  const lastWhiteId = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (deferredSpins.length === 0) return;
+    const newestWhite = deferredSpins.find((s) => s.color === "white");
+    if (!newestWhite) return;
+    if (!lastWhiteId.current) {
+      lastWhiteId.current = newestWhite.id;
+      return;
+    }
+    if (newestWhite.id === lastWhiteId.current) return;
+    lastWhiteId.current = newestWhite.id;
+    if (!whiteAlert) return;
+    
+    setWhiteFlash(newestWhite);
+    // Beep logic removed for simplicity in this optimization turn
+    const t = setTimeout(() => setWhiteFlash(null), 3000);
+    return () => clearTimeout(t);
+  }, [deferredSpins, whiteAlert]);
+
   if (section === "sinais") return <Suspense fallback={<SectionFallback />}><SinaisPage /></Suspense>;
   if (section === "analise") return <Suspense fallback={<SectionFallback />}><AnaliseSection /></Suspense>;
   if (section === "estrategias") return <Suspense fallback={<SectionFallback />}><EstrategiasSection /></Suspense>;
@@ -138,7 +159,7 @@ function Index() {
         <div className="mx-auto flex h-14 max-w-[1366px] items-center justify-between px-4 sm:px-8">
            <div className="flex items-center gap-3">
             <img src={freitasLogo.url} alt="Freitas" className="h-9 w-9 rounded-xl object-cover ring-1 ring-white/20" />
-            <div className="hidden sm:block">
+            <div className="hidden sm:block text-left">
               <p className="text-sm font-bold">Freitas da Blaze</p>
               <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Histórico Realtime</p>
             </div>
@@ -161,7 +182,7 @@ function Index() {
       <main className="mx-auto max-w-[1366px] p-4 space-y-4">
         <Card className="p-4 sm:p-6 bg-surface/50 backdrop-blur-md border-white/5">
           <div className="flex justify-between items-center mb-6">
-            <div>
+            <div className="text-left">
               <h1 className="text-xl font-bold">{countdown > 3 ? "Apostas abertas" : "Girando..."}</h1>
               <p className="text-xs text-muted-foreground">Próximo giro em {countdown}s • {stats.total} rodadas</p>
             </div>
@@ -175,20 +196,41 @@ function Index() {
           </div>
         </Card>
 
-        {/* Filters and Controls */}
-        <div className="flex flex-wrap gap-2">
-           <FilterDropdown filter={filter} setFilter={setFilter} />
-           {/* Controls simplified for performance */}
+        <div className="flex flex-wrap items-center gap-3 justify-between">
+           <div className="flex items-center gap-2">
+             <FilterDropdown filter={filter} setFilter={setFilter} />
+             <button onClick={() => setRealtime(!realtime)} className={`px-4 py-2 rounded-xl text-xs font-bold border transition-colors ${realtime ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-white/5 border-white/10 text-muted-foreground'}`}>
+               {realtime ? 'LIVE ON' : 'LIVE OFF'}
+             </button>
+           </div>
+           
+           <div className="flex items-center gap-4">
+              <ControlToggle label="Numerado" active={numerado} onChange={setNumerado} />
+              <ControlToggle label="Segundos" active={exibirSegundos} onChange={setExibirSegundos} />
+              <ControlToggle label="Inverso" active={inverse} onChange={setInverse} />
+           </div>
         </div>
 
-        {/* History Grid - Memoized for heavy rendering */}
-        <HistoryGrid spins={deferredSpins} realtime={realtime} inverse={inverse} />
+        <HistoryGrid 
+          spins={deferredSpins} 
+          numerado={numerado} 
+          exibirSegundos={exibirSegundos} 
+          inverse={inverse} 
+        />
       </main>
       
-      {whiteAlert && <WhiteCelebration active={stats.last?.color === "white"} />}
+      <WhiteCelebration spin={whiteFlash} onClose={() => setWhiteFlash(null)} />
     </div>
   );
 }
+
+const ControlToggle = memo(({ label, active, onChange }: any) => (
+  <label className="flex items-center gap-2 cursor-pointer select-none">
+    <Switch checked={active} onCheckedChange={onChange} />
+    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{label}</span>
+  </label>
+));
+
 
 const StatCard = memo(({ color, pct, count }: any) => (
   <div className="p-3 rounded-xl bg-white/5 border border-white/5">
