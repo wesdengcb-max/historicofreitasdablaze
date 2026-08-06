@@ -130,10 +130,10 @@ export function PredictiveSignals() {
     // ---- Modo 1: Top 1 (posição central M) de cada análise ativa, unificado por horário ----
     const byTime = new Map<
       number,
-      { values: number[]; analyses: Set<number>; pct: number; label: string }
+      { values: number[]; analyses: Set<number>; pct: number; label: string; sources: Array<{ analysis: number; value: number }> }
     >();
     for (const item of active) {
-      const hist = cyclesOf(engine[item.analysis], item.value);
+      const hist = cyclesOf(engine[item.analysis], item.value, item.analysis);
       if (!hist.length) continue;
       const top1 = computeTop(hist, 1)[0];
       if (!top1) continue;
@@ -150,11 +150,13 @@ export function PredictiveSignals() {
           values: [item.value], 
           analyses: new Set([item.analysis]),
           pct: top1.pct, 
-          label: top1.label 
+          label: top1.label,
+          sources: [{ analysis: item.analysis, value: item.value }]
         });
       } else {
         if (!cur.values.includes(item.value)) cur.values.push(item.value);
         cur.analyses.add(item.analysis);
+        cur.sources.push({ analysis: item.analysis, value: item.value });
         if (top1.pct > cur.pct) {
           cur.pct = top1.pct;
           cur.label = top1.label;
