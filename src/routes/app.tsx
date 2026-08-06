@@ -5,11 +5,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { setSection } from "@/lib/sectionStore";
-import { useVipStatus } from "@/lib/auth/vipStore";
-import { toast } from "sonner";
-import { Lock } from "lucide-react";
-
 
 import { lazy, memo, Suspense, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import {
@@ -33,7 +28,10 @@ import {
   Send,
 } from "lucide-react";
 
-
+import { useVipStatus } from "@/lib/auth/vipStore";
+import { toast } from "sonner";
+import { Lock } from "lucide-react";
+import { setSection } from "@/lib/sectionStore";
 import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
 import { Card } from "@/components/double/Card";
 import { ResultCircle } from "@/components/double/ResultCircle";
@@ -57,15 +55,9 @@ import freitasLogo from "@/assets/freitas-logo.jpg.asset.json";
 import { getSignals, subscribeSignals, type StoredSignal } from "@/lib/signalsStore";
 import { TopNav } from "@/components/TopNav";
 import { useSection } from "@/lib/sectionStore";
-const SinaisPage = lazy(() =>
-  import("@/components/sections/SinaisSection").then((m) => ({ default: m.SinaisPage })),
-);
-const AnaliseSection = lazy(() =>
-  import("@/components/sections/AnaliseSection").then((m) => ({ default: m.AnaliseSection })),
-);
-const EstrategiasSection = lazy(() =>
-  import("@/components/sections/EstrategiasSection").then((m) => ({ default: m.EstrategiasSection })),
-);
+const SinaisPage = lazy(() => import("@/components/sections/SinaisSection"));
+const AnaliseSection = lazy(() => import("@/components/sections/AnaliseSection"));
+const EstrategiasSection = lazy(() => import("@/components/sections/EstrategiasSection"));
 
 function SectionFallback() {
   return (
@@ -93,8 +85,8 @@ export const Route = createFileRoute("/app")({
   component: Index,
 });
 
-const POLL_MS = 5000;
-const PAGE_SIZE = 300;
+const POLL_MS = 10000;
+const PAGE_SIZE = 150;
 
 type Row = {
   id: number;
@@ -419,7 +411,7 @@ function Index() {
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "blaze_results" },
-        (payload) => {
+        (payload: any) => {
           const r = payload.new as Row;
           const key = String(r?.id);
           if (!r || seen.current.has(key)) return;

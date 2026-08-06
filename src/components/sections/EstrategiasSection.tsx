@@ -149,7 +149,7 @@ function evaluate(strategy: Strategy, seq: C[]): Entry[] {
 
 const SAMPLE_OPTS = [50, 100, 200, 500, 0] as const;
 
-export function EstrategiasSection() {
+export default function EstrategiasSection() {
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
