@@ -32,6 +32,7 @@ import { useVipStatus } from "@/lib/auth/vipStore";
 import { toast } from "sonner";
 import { Lock } from "lucide-react";
 import { setSection } from "@/lib/sectionStore";
+import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
 import { Card } from "@/components/double/Card";
 import { ResultCircle } from "@/components/double/ResultCircle";
 import { Switch } from "@/components/double/Switch";
