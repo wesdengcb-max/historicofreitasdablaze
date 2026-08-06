@@ -1252,6 +1252,11 @@ function Index() {
                                             <TipMinerCard
                                               spin={spin as Spin}
                                               highlightN={highlightN}
+                                              isActive={
+                                                highlightKey 
+                                                  ? highlightKey === `col-${ci}`
+                                                  : (highlightN.size > 0 ? highlightN.has((spin as Spin).n) : true)
+                                              }
                                               numbered={numerado}
                                               showSeconds={exibirSegundos}
                                               timeHighlight={destaqueHorario}
@@ -1457,6 +1462,7 @@ const TipMinerCard = memo(function TipMinerCard({
   showSeconds = false,
   timeHighlight = false,
   highlightN,
+  isActive: isActiveProp,
   onClick,
 }: {
   spin: Spin;
@@ -1466,6 +1472,7 @@ const TipMinerCard = memo(function TipMinerCard({
   showSeconds?: boolean;
   timeHighlight?: boolean;
   highlightN?: Set<number> | null;
+  isActive?: boolean;
   onClick?: () => void;
 }) {
   const isWhite = spin.color === "white";
@@ -1477,9 +1484,9 @@ const TipMinerCard = memo(function TipMinerCard({
         : "#ffffff";
   const ring = isWhite ? "#16171d" : "#ffffff";
   const fg = isWhite ? "#16171d" : "#ffffff";
-  const hasSelection = !!highlightN && highlightN.size > 0;
+  
   const isHit = !!highlightN && highlightN.has(spin.n);
-  const isActive = !hasSelection || isHit;
+  const isActive = isActiveProp !== undefined ? isActiveProp : true;
 
   const delayStyle = delay > 0 ? { animationDelay: `${delay}s` } : undefined;
   return (
