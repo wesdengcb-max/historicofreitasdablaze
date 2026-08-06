@@ -587,11 +587,8 @@ function Index() {
       const tens = Math.floor(minute / 10);
       const unit = minute % 10;
 
-      // Filtro de Coluna no modo Colunas Fixas
-      if (viewMode === "colunas" && highlightKey?.startsWith("col-")) {
-        const colIndex = parseInt(highlightKey.split("-")[1], 10);
-        if (unit !== colIndex) continue;
-      }
+      // Filtro de Coluna no modo Colunas Fixas removido para permitir ver todas as pedras
+      // (a seleção visual agora é feita via opacidade/dimmed)
 
       const key = `${hour}:${tens}`;
       let row = rowMap.get(key);
@@ -616,11 +613,7 @@ function Index() {
       const tens = Math.floor(minute / 10);
       const unit = minute % 10;
 
-      // Filtro de Coluna no modo Colunas Fixas para sinais
-      if (viewMode === "colunas" && highlightKey?.startsWith("col-")) {
-        const colIndex = parseInt(highlightKey.split("-")[1], 10);
-        if (unit !== colIndex) continue;
-      }
+      // Filtro de Coluna no modo Colunas Fixas para sinais removido
 
       const key = `${hour}:${tens}`;
       if (!rowMap.has(key)) {
