@@ -348,7 +348,7 @@ function AnalysisPanel({
   );
 }
 
-export function AnaliseSection() {
+export default function AnaliseSection() {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
   const [selected, setSelected] = useState<number | string>(1);

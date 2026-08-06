@@ -186,7 +186,7 @@ function buildSignals(results: Result[]): Signal[] {
   return out.sort((a, b) => a.entryDate.getTime() - b.entryDate.getTime());
 }
 
-export function SinaisPage() {
+export default function SinaisSection() {
   const [results, setResults] = useState<Result[]>([]);
   const [tick, setTick] = useState(0);
   const [selected, setSelected] = useState<Set<string>>(new Set());
