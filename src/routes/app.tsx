@@ -1286,8 +1286,9 @@ function Index() {
                                       }
                                       
                                       if (pending && i === 0) {
+                                         const isSlotActive = highlightKey ? (highlightKey === `col-${ci}`) : (highlightN.size === 0);
                                          return (
-                                          <div key={`p-${ci}-${i}`} className="flex flex-col items-center">
+                                          <div key={`p-${ci}-${i}`} className="flex flex-col items-center" style={{ opacity: isSlotActive ? 1 : 0.25 }}>
                                             <div className="relative flex h-[48px] w-[48px] items-center justify-center overflow-hidden rounded-[6px] border-[2.5px] border-emerald-400 bg-white shadow-sm">
                                               <img
                                                 src={brancoTile.url}
@@ -1304,8 +1305,9 @@ function Index() {
                                       }
 
                                       const p = slotPredictions[slotKey];
+                                      const isSlotActive = highlightKey ? (highlightKey === `col-${ci}`) : (highlightN.size === 0);
                                       return (
-                                        <div key={`e-${ci}-${i}`} className="flex flex-col items-center">
+                                        <div key={`e-${ci}-${i}`} className="flex flex-col items-center" style={{ opacity: isSlotActive ? 1 : 0.25 }}>
                                           <button
                                             type="button"
                                             onClick={() => {
