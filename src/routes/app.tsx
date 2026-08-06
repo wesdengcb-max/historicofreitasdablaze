@@ -1497,7 +1497,7 @@ const TipMinerCard = memo(function TipMinerCard({
         type="button"
         onClick={onClick}
         className={`flex items-center justify-center overflow-hidden rounded-[6px] border border-white/[0.08] shadow-sm transition-[transform,opacity] duration-200 hover:-translate-y-0.5 animate-in fade-in zoom-in-95 ${
-          isHit ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : ""
+          isHit && isActive ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : ""
         }`}
         style={{
           width: "var(--stone, 48px)",
