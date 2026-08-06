@@ -5,11 +5,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { setSection } from "@/lib/sectionStore";
-import { useVipStatus } from "@/lib/auth/vipStore";
-import { toast } from "sonner";
-import { Lock } from "lucide-react";
-
 
 import { lazy, memo, Suspense, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import {
@@ -33,8 +28,10 @@ import {
   Send,
 } from "lucide-react";
 
-
-import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
+import { useVipStatus } from "@/lib/auth/vipStore";
+import { toast } from "sonner";
+import { Lock } from "lucide-react";
+import { setSection } from "@/lib/sectionStore";
 import { Card } from "@/components/double/Card";
 import { ResultCircle } from "@/components/double/ResultCircle";
 import { Switch } from "@/components/double/Switch";
