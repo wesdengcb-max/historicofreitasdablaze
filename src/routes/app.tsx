@@ -411,7 +411,7 @@ function Index() {
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "blaze_results" },
-        (payload) => {
+        (payload: any) => {
           const r = payload.new as Row;
           const key = String(r?.id);
           if (!r || seen.current.has(key)) return;
