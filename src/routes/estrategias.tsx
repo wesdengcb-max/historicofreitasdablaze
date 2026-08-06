@@ -102,7 +102,7 @@ function genStrategies(): Strategy[] {
 
 const ALL_STRATEGIES = genStrategies();
 
-function EstrategiasPage() {
+export default function EstrategiasPage() {
   const [robotOn, setRobotOn] = useState(false);
   const [gale, setGale] = useState<"sem" | "g1" | "g2">("g2");
   const [minAssert, setMinAssert] = useState(0);
