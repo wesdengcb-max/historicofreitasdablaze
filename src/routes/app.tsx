@@ -1080,7 +1080,7 @@ function Index() {
                           });
                           setHighlightN(next);
                         }}
-                        className={`flex w-full flex-col gap-0.5 overflow-hidden rounded-[4px] p-1 shadow-inner text-left transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-primary/25 ring-1 ring-primary/40 shadow-[0_0_15px_rgba(255,31,61,0.2)]" : "bg-white/[0.03] hover:bg-white/[0.08]"}`}
+                        className={`flex w-full flex-col gap-0.5 overflow-hidden rounded-[4px] p-1 shadow-inner text-left transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-primary/25 shadow-[0_0_15px_rgba(255,31,61,0.2)]" : "bg-white/[0.03] hover:bg-white/[0.08]"}`}
                         style={{ width: "100%" }}
                       >
                         <div className="flex items-center justify-between px-0.5 text-[8px] font-bold tabular-nums">
@@ -1167,7 +1167,7 @@ function Index() {
                         {Array.from({ length: 10 }).map((_, ci) => (
                           <button
                             key={`header-inner-${ci}`}
-                            className={`flex h-[23px] w-full items-center justify-center rounded-[6px] border border-white/5 text-[14px] font-medium tabular-nums transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-primary/40 text-white shadow-[0_0_10px_rgba(255,31,61,0.3)] ring-1 ring-primary/50" : "bg-white/[0.03] text-white hover:bg-white/10"}`}
+                            className={`flex h-[23px] w-full items-center justify-center rounded-[6px] border border-white/5 text-[14px] font-medium tabular-nums transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-primary/40 text-white shadow-[0_0_10px_rgba(255,31,61,0.3)]" : "bg-white/[0.03] text-white hover:bg-white/10"}`}
                             onClick={() => {
                               const key = `col-${ci}`;
                               if (highlightKey === key) {
@@ -1497,7 +1497,7 @@ const TipMinerCard = memo(function TipMinerCard({
         type="button"
         onClick={onClick}
         className={`flex items-center justify-center overflow-hidden rounded-[6px] border border-white/[0.08] shadow-sm transition-[transform,opacity] duration-200 hover:-translate-y-0.5 animate-in fade-in zoom-in-95 ${
-          isHit ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : ""
+          isHit && isActive ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : ""
         }`}
         style={{
           width: "var(--stone, 48px)",
