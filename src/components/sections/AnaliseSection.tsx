@@ -126,6 +126,7 @@ function buildDetailRows(cycles: Cycle[]): Cycle[] {
 }
 
 function fmtTime(d: Date) {
+  if (Number.isNaN(d.getTime())) return "--:--";
   return d.toLocaleTimeString("pt-BR", {
     timeZone: BRAZIL_TIME_ZONE,
     hour: "2-digit",
@@ -170,7 +171,7 @@ function AnalysisPanel({
   // A tela assume um papel PASSIVO, apenas lendo o que está no banco.
   const windowed = useMemo<Cycle[]>(() => {
     return dbRows.map((r: GatilhoRow, i) => {
-      const at = new Date(r.trigger_at);
+      const at = parseUtcDate(r.trigger_at);
       const gaps = r.gaps ?? [];
       
       return {

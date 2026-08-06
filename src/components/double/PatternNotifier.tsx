@@ -74,7 +74,7 @@ export function PatternNotifier({ spins }: { spins: Spin[] }) {
       const shouldFire = mode === "exit" ? matched : !matched && news.length > 0;
       if (matched && mode === "exit") {
         setOccurrences((o) => [
-          { id: `${spins[0].id}-${Date.now()}`, at: new Date().toLocaleTimeString("pt-BR", { hour12: false }) },
+          { id: `${spins[0].id}-${Date.now()}`, at: new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false }) },
           ...o,
         ].slice(0, 50));
         if (sound) beep();

@@ -1252,6 +1252,11 @@ function Index() {
                                             <TipMinerCard
                                               spin={spin as Spin}
                                               highlightN={highlightN}
+                                              isActive={
+                                                highlightKey 
+                                                  ? highlightKey === `col-${ci}`
+                                                  : (highlightN.size > 0 ? highlightN.has((spin as Spin).n) : true)
+                                              }
                                               numbered={numerado}
                                               showSeconds={exibirSegundos}
                                               timeHighlight={destaqueHorario}
@@ -1281,8 +1286,9 @@ function Index() {
                                       }
                                       
                                       if (pending && i === 0) {
+                                         const isSlotActive = highlightKey ? (highlightKey === `col-${ci}`) : (highlightN.size === 0);
                                          return (
-                                          <div key={`p-${ci}-${i}`} className="flex flex-col items-center">
+                                          <div key={`p-${ci}-${i}`} className="flex flex-col items-center" style={{ opacity: isSlotActive ? 1 : 0.25 }}>
                                             <div className="relative flex h-[48px] w-[48px] items-center justify-center overflow-hidden rounded-[6px] border-[2.5px] border-emerald-400 bg-white shadow-sm">
                                               <img
                                                 src={brancoTile.url}
@@ -1299,8 +1305,9 @@ function Index() {
                                       }
 
                                       const p = slotPredictions[slotKey];
+                                      const isSlotActive = highlightKey ? (highlightKey === `col-${ci}`) : (highlightN.size === 0);
                                       return (
-                                        <div key={`e-${ci}-${i}`} className="flex flex-col items-center">
+                                        <div key={`e-${ci}-${i}`} className="flex flex-col items-center" style={{ opacity: isSlotActive ? 1 : 0.25 }}>
                                           <button
                                             type="button"
                                             onClick={() => {
@@ -1457,6 +1464,7 @@ const TipMinerCard = memo(function TipMinerCard({
   showSeconds = false,
   timeHighlight = false,
   highlightN,
+  isActive: isActiveProp,
   onClick,
 }: {
   spin: Spin;
@@ -1466,6 +1474,7 @@ const TipMinerCard = memo(function TipMinerCard({
   showSeconds?: boolean;
   timeHighlight?: boolean;
   highlightN?: Set<number> | null;
+  isActive?: boolean;
   onClick?: () => void;
 }) {
   const isWhite = spin.color === "white";
@@ -1477,9 +1486,9 @@ const TipMinerCard = memo(function TipMinerCard({
         : "#ffffff";
   const ring = isWhite ? "#16171d" : "#ffffff";
   const fg = isWhite ? "#16171d" : "#ffffff";
-  const hasSelection = !!highlightN && highlightN.size > 0;
+  
   const isHit = !!highlightN && highlightN.has(spin.n);
-  const isActive = !hasSelection || isHit;
+  const isActive = isActiveProp !== undefined ? isActiveProp : true;
 
   const delayStyle = delay > 0 ? { animationDelay: `${delay}s` } : undefined;
   return (
