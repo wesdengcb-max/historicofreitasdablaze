@@ -17,7 +17,7 @@ import {
   type Row,
 } from "@/lib/predictive";
 
-type Mode1Signal = { key: string; title: string; at: Date; pct: number; label: string; analysisCount: number };
+type Mode1Signal = { key: string; title: string; at: Date; pct: number; label: string; analysisCount: number; sources: Array<{ analysis: number; value: number }> };
 type Mode2Signal = {
   key: string;
   title: string;
@@ -172,6 +172,7 @@ export function PredictiveSignals() {
           pct: info.pct,
           label: info.label,
           analysisCount: info.analyses.size,
+          sources: info.sources,
         };
       });
     setMode1(m1);
@@ -183,7 +184,7 @@ export function PredictiveSignals() {
     const byMinute = new Map<number, Proj[]>();
 
     for (const item of active) {
-      const hist = cyclesOf(engine[item.analysis], item.value);
+      const hist = cyclesOf(engine[item.analysis], item.value, item.analysis);
       if (!hist.length) continue;
       const list = computeTop(hist, CANDIDATE_DEPTH);
       list.forEach((g, idx) => {
@@ -333,6 +334,13 @@ export function PredictiveSignals() {
                           {s.pct.toFixed(1)}%
                         </span>
                         <span className="opacity-50 text-[10px]">· janela {s.label}</span>
+                      </div>
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {s.sources.map((src, idx) => (
+                          <span key={idx} className="rounded-full border border-white/10 bg-white/[0.05] px-1.5 py-0.5 text-[9px] font-black text-white/70">
+                            A{src.analysis}·{src.value}
+                          </span>
+                        ))}
                       </div>
                     </div>
                   );

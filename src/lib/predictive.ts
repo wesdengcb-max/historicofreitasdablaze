@@ -155,8 +155,8 @@ export function latestByValue(cycles: Cycle[]): Map<number, Cycle> {
   return map;
 }
 
-export function cyclesOf(cycles: Cycle[], value: number): Cycle[] {
-  return cycles.filter((c) => c.value === value).slice(-MAX_CYCLES);
+export function cyclesOf(cycles: Cycle[], value: number, analysis?: number): Cycle[] {
+  return cycles.filter((c) => c.value === value && (!analysis || c.analysis === analysis)).slice(-MAX_CYCLES);
 }
 
 export function fmtClock(d: Date) {

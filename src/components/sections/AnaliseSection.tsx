@@ -167,6 +167,9 @@ function AnalysisPanel({
   maxZeros = MAX_ZEROS,
 }: PanelProps) {
   const { rows: dbRows, loading: dbLoading, error: dbError } = useGatilhos(analiseKey, Number(pedra));
+  
+  // Força loading false se houver erro de cache para destravar a UI
+  const isSyncing = dbLoading && (!dbError || !dbError.includes("schema cache"));
 
   // A tela assume um papel PASSIVO, apenas lendo o que está no banco.
   const windowed = useMemo<Cycle[]>(() => {
@@ -213,18 +216,14 @@ function AnalysisPanel({
             </p>
           </div>
         </div>
-        {!eligible && windowed.length > 0 && eligibleHint && (
-          <span className="rounded-md border border-amber-400/30 bg-amber-500/10 px-2 py-1 text-[10px] font-semibold text-amber-300">
-            {eligibleHint}
-          </span>
-        )}
+        {/* Removido aviso de ciclos insuficientes */}
       </div>
 
-      {loading || dbLoading ? (
+      {isSyncing ? (
         <div className="flex items-center justify-center py-20 text-muted-foreground">
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> {loading ? "Carregando estatísticas..." : "Sincronizando banco de dados..."}
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> {loading ? "Carregando estatísticas..." : "Sincronizando..."}
         </div>
-      ) : err || dbError ? (
+      ) : err || (dbError && !dbError.includes("schema cache")) ? (
         <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
           {err ?? dbError}
         </div>
@@ -426,7 +425,7 @@ export default function AnaliseSection() {
   const isMinuteEligible = typeof selected === 'number' && selected >= 0 && selected <= 9;
   const statKey = typeof selected === 'number' ? selected : 0;
   const stat = stats[statKey] ?? { total: 0, fullyCompleted: 0, avg: null };
-  const eligible = isMinuteEligible && stat.fullyCompleted >= MIN_CYCLES;
+  const eligible = isMinuteEligible; // Removida trava de 10 ciclos
 
   return (
     <main className="mx-auto flex w-full max-w-[1366px] flex-col gap-5 px-3 py-8 sm:gap-6 sm:px-8 sm:py-10">
@@ -439,14 +438,13 @@ export default function AnaliseSection() {
         </h2>
         <p className="mt-1 text-xs text-muted-foreground">
           Gatilho: o número sai num minuto cuja unidade é igual a ele (ex.: 1 no
-          minuto 51). Contamos os minutos até o próximo 0. Só é considerado
-          relevante quem tiver pelo menos {MIN_CYCLES} ciclos completos.
+          minuto 51). Contamos os minutos até o próximo 0.
         </p>
 
         <div className="mt-5 grid grid-cols-5 gap-2 sm:grid-cols-8 md:grid-cols-[repeat(15,minmax(0,1fr))]">
           {ALL_NUMBERS.map((n) => {
             const st = stats[n] ?? { total: 0, fullyCompleted: 0, avg: null };
-            const ok = n <= 9 && st.fullyCompleted >= MIN_CYCLES;
+            const ok = n <= 9; // Removida trava visual de 10 ciclos
             const isSel = selected === n;
             return (
               <button
