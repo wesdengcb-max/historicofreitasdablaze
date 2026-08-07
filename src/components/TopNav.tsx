@@ -59,7 +59,7 @@ export function TopNav() {
 
   return (
     <nav className="relative z-50 border-b border-white/[0.05] bg-[#101114]/80 backdrop-blur-2xl">
-      <div className="mx-auto flex max-w-[1366px] items-center justify-between px-3 py-2 sm:px-8">
+      <div className="flex w-full items-center justify-between px-4 py-2 sm:px-6">
         <div className="flex flex-1 gap-1 overflow-x-auto scrollbar-none">
           {ITEMS.map((item) => {
             const Icon = item.icon;
