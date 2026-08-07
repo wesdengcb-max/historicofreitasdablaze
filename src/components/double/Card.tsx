@@ -39,4 +39,4 @@ export const Card = memo(function Card({ title, subtitle, icon, action, children
       {children}
     </motion.section>
   );
-}
+});
