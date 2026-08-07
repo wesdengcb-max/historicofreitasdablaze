@@ -124,7 +124,7 @@
   background: rgba(255, 255, 255, 0.95) !important;
   border: 1px solid rgba(0, 0, 0, 0.08) !important;
   color: #0f172a !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
 }
 
 .light header {
@@ -251,25 +251,7 @@
   }
 }
 
-@utility logo-glow {
-  position: relative;
-  &::before {
-    content: "";
-    position: absolute;
-    inset: -4px;
-    border-radius: 9999px;
-    padding: 2px;
-    background: linear-gradient(135deg, #FF1F3D, #DE2143, #c9a84c, #FF1F3D);
-    background-size: 300% 300%;
-    animation: gradientMove 3s ease infinite, logoPulse 2s ease-in-out infinite;
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-    box-shadow: 0 0 15px rgba(255, 31, 61, 0.4);
-  }
-}
+/* Removido logo-glow antigo */
 
 @keyframes gradientMove {
   0% { background-position: 0% 50%; }

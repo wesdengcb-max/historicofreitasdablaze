@@ -18,7 +18,7 @@ export const Card = memo(function Card({ title, subtitle, icon, action, children
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={`glass-card glass-card-glow p-[26px] ${className}`}
+      className={`glass-card p-[26px] ${className}`}
     >
       {(title || action) && (
         <header className="mb-4 flex items-center justify-between gap-4">
@@ -30,7 +30,7 @@ export const Card = memo(function Card({ title, subtitle, icon, action, children
             )}
             <div className="min-w-0">
               {title && <h2 className="truncate text-[14px] font-medium tracking-tight text-[#eaeaea]">{title}</h2>}
-              {subtitle && <p className="truncate text-[11px] text-[#8ebcf0]">{subtitle}</p>}
+              {subtitle && <p className="truncate text-[11px] text-muted-foreground">{subtitle}</p>}
             </div>
           </div>
           {action}
