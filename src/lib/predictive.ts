@@ -166,5 +166,22 @@ export function fmtClock(d: Date) {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
-  });
+});
+}
+
+/** 
+ * Verifica se os últimos dois gatilhos (ou um deles) daquela análise 
+ * tiveram o mesmo 'value' que o gatilho atual. 
+ */
+export function checkHighTendency(cycles: Cycle[], value: number): boolean {
+  if (cycles.length < 2) return false;
+  // Pegamos os gatilhos recentes que NÃO são o atual (o atual está no final ou em aberto)
+  // Mas como buildAX retorna todos, o último do array costuma ser o gatilho ativo.
+  // Vamos olhar o penúltimo e o antepenúltimo se disponíveis.
+  const last = cycles[cycles.length - 1];
+  const penult = cycles[cycles.length - 2];
+  const antepenult = cycles[cycles.length - 3];
+
+  // Se o valor apareceu no penúltimo ou antepenúltimo gatilho da mesma análise
+  return (penult?.value === value) || (antepenult?.value === value);
 }

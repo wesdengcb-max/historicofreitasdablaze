@@ -13,11 +13,21 @@ import {
   latestByValue,
   MAX_ZEROS,
   MAX_ZEROS_A4,
+  checkHighTendency,
   type Cycle,
   type Row,
 } from "@/lib/predictive";
 
-type Mode1Signal = { key: string; title: string; at: Date; pct: number; label: string; analysisCount: number; sources: Array<{ analysis: number; value: number }> };
+type Mode1Signal = { 
+  key: string; 
+  title: string; 
+  at: Date; 
+  pct: number; 
+  label: string; 
+  analysisCount: number; 
+  sources: Array<{ analysis: number; value: number }>;
+  isHighTendency: boolean;
+};
 type Mode2Signal = {
   key: string;
   title: string;
@@ -26,9 +36,12 @@ type Mode2Signal = {
   sources: Array<{ analysis: 1 | 2 | 3 | 4; value: number; pct: number; top5: boolean }>;
   confluence: string;
   analysisCount: number;
+  isHighTendency: boolean;
 };
 
-const MIN_ASSERTIVIDADE = 50;
+const MIN_ASSERTIVIDADE_TOP1 = 65;
+const MIN_ASSERTIVIDADE_CONFLUENCIA = 55;
+const MIN_GATILHOS = 9;
 
 function addMinutes(d: Date, m: number) {
   const out = new Date(d.getTime() + m * 60_000);
@@ -175,6 +188,7 @@ export function PredictiveSignals() {
           label: info.label,
           analysisCount: info.analyses.size,
           sources: info.sources,
+          isHighTendency: info.isHighTendency
         };
       });
     setMode1(m1);
@@ -186,8 +200,10 @@ export function PredictiveSignals() {
     const byMinute = new Map<number, Proj[]>();
 
     for (const item of active) {
-      const hist = cyclesOf(engine[item.analysis], item.value, item.analysis);
-      if (!hist.length) continue;
+      const hist = engine[item.analysis].filter(c => c.value === item.value);
+      // FILTRO DE MASSA CRÍTICA (Mínimo de 9 gatilhos)
+      if (hist.length < MIN_GATILHOS) continue;
+
       const list = computeTop(hist, CANDIDATE_DEPTH);
       list.forEach((g, idx) => {
         const at = addMinutes(item.open.triggerAt, g.m).getTime();
@@ -213,8 +229,8 @@ export function PredictiveSignals() {
 
       const pct = projs.reduce((s, p) => s + p.pct, 0) / projs.length;
       
-      // FILTRO DE ASSERTIVIDADE RÍGIDO (50%)
-      if (pct < MIN_ASSERTIVIDADE) continue;
+      // FILTRO DE ASSERTIVIDADE RÍGIDO (55% para confluências)
+      if (pct < MIN_ASSERTIVIDADE_CONFLUENCIA) continue;
       
       if (usedTimes.has(at)) continue;
       usedTimes.add(at);
@@ -225,6 +241,9 @@ export function PredictiveSignals() {
         .sort((a, b) => b.pct - a.pct)
         .map((p) => `A${p.analysis}·${p.value}`)
         .join(", ");
+      
+      const isHighTendency = projs.some(p => checkHighTendency(engine[p.analysis], p.value));
+
       m2.push({
         key: `m2-${at}`,
         title: Array.from(distinctAnalyses)
@@ -236,6 +255,7 @@ export function PredictiveSignals() {
         sources,
         confluence,
         analysisCount: distinctAnalyses.size,
+        isHighTendency
       });
     }
     m2.sort((a, b) => a.times[0].getTime() - b.times[0].getTime());
@@ -328,8 +348,15 @@ export function PredictiveSignals() {
                           </span>
                         )}
                       </div>
-                      <div className="mt-1 text-3xl font-black tabular-nums text-white font-outfit">
-                        {fmtClock(s.at)}
+                      <div className="mt-1 flex items-center justify-between">
+                        <div className="text-3xl font-black tabular-nums text-white font-outfit">
+                          {fmtClock(s.at)}
+                        </div>
+                        {s.isHighTendency && (
+                          <span className="flex items-center gap-1 rounded-md bg-red-500/20 px-1.5 py-0.5 text-[9px] font-black text-red-400 animate-pulse border border-red-500/30">
+                            🔥 Alta Tendência
+                          </span>
+                        )}
                       </div>
                       <div className="mt-1 text-[11px] tabular-nums font-bold flex items-center gap-1.5">
                         <span className={medal ? "text-inherit" : "text-[#FF1F3D]"}>
@@ -386,8 +413,15 @@ export function PredictiveSignals() {
                           </span>
                         )}
                       </div>
-                      <div className="mt-1 text-3xl font-black tabular-nums text-white font-outfit">
-                        {s.times.map((t) => fmtClock(t)).join(" / ")}
+                      <div className="mt-1 flex items-center justify-between">
+                        <div className="text-3xl font-black tabular-nums text-white font-outfit">
+                          {s.times.map((t) => fmtClock(t)).join(" / ")}
+                        </div>
+                        {s.isHighTendency && (
+                          <span className="flex items-center gap-1 rounded-md bg-red-500/20 px-1.5 py-0.5 text-[9px] font-black text-red-400 animate-pulse border border-red-500/30">
+                            🔥 Alta Tendência
+                          </span>
+                        )}
                       </div>
                       <div className="mt-1 text-[11px] tabular-nums font-black">
                         <span className={medal ? "text-inherit" : "text-[#FF1F3D]"}>
