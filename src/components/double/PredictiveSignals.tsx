@@ -143,20 +143,25 @@ export function PredictiveSignals() {
     // ---- Modo 1: Top 1 (posição central M) de cada análise ativa, unificado por horário ----
     const byTime = new Map<
       number,
-      { values: number[]; analyses: Set<number>; pct: number; label: string; sources: Array<{ analysis: number; value: number }> }
+      { values: number[]; analyses: Set<number>; pct: number; label: string; sources: Array<{ analysis: number; value: number }>; isHighTendency: boolean }
     >();
     for (const item of active) {
-      const hist = cyclesOf(engine[item.analysis], item.value, item.analysis);
-      if (!hist.length) continue;
+      const hist = engine[item.analysis].filter(c => c.value === item.value);
+      // FILTRO DE MASSA CRÍTICA (Mínimo de 9 gatilhos)
+      if (hist.length < MIN_GATILHOS) continue;
+
       const top1 = computeTop(hist, 1)[0];
       if (!top1) continue;
       
-      // FILTRO DE ASSERTIVIDADE RÍGIDO (Top 1 em 50%)
-      if (top1.pct < MIN_ASSERTIVIDADE) continue;
+      // FILTRO DE ASSERTIVIDADE RÍGIDO (Top 1 em 65%)
+      if (top1.pct < MIN_ASSERTIVIDADE_TOP1) continue;
       
       const at = addMinutes(item.open.triggerAt, top1.m);
       if (at.getTime() <= now.getTime()) continue; 
       const t = at.getTime();
+
+      const isTendency = checkHighTendency(engine[item.analysis], item.value);
+
       const cur = byTime.get(t);
       if (!cur) {
         byTime.set(t, { 
@@ -164,12 +169,14 @@ export function PredictiveSignals() {
           analyses: new Set([item.analysis]),
           pct: top1.pct, 
           label: top1.label,
-          sources: [{ analysis: item.analysis, value: item.value }]
+          sources: [{ analysis: item.analysis, value: item.value }],
+          isHighTendency: isTendency
         });
       } else {
         if (!cur.values.includes(item.value)) cur.values.push(item.value);
         cur.analyses.add(item.analysis);
         cur.sources.push({ analysis: item.analysis, value: item.value });
+        if (isTendency) cur.isHighTendency = true;
         if (top1.pct > cur.pct) {
           cur.pct = top1.pct;
           cur.label = top1.label;
