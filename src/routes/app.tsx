@@ -119,15 +119,30 @@ function rowToSpin(r: Row): Spin {
   };
 }
 
-function dedupeByIdImpl<T extends { id: number | string }>(items: T[]): T[] {
-  const byId = new Map<string, T>();
-  for (const item of items) {
-    const key = String(item.id);
-    if (!key || key === "undefined" || key === "null") continue;
-    if (!byId.has(key)) byId.set(key, item);
-  }
-  return Array.from(byId.values());
+function dedupeById<T extends { id: number | string }>(items: T[]): T[] {
+  return dedupeByIdImpl(items);
 }
+
+const spSecondsFormatter = new Intl.DateTimeFormat("pt-BR", {
+  timeZone: "America/Sao_Paulo",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  hour12: false,
+});
+
+function spTimeWithSeconds(spin: Spin): string {
+  const raw = (spin.createdAt ?? "").trim();
+  if (!raw) return spin.time;
+  const hasTz = /Z$|[+-]\d{2}:?\d{2}$/.test(raw);
+  const d = new Date(hasTz ? raw : `${raw.replace(" ", "T")}Z`);
+  if (Number.isNaN(d.getTime())) return spin.time;
+  return spSecondsFormatter.format(d);
+}
+
+import brancoTile from "@/assets/branco-tile.png.asset.json";
+import freitasLogo from "@/assets/freitas-logo.jpg.asset.json";
+
 
 // Retorna YYYY-MM-DD para uma data no fuso America/Sao_Paulo.
 function spYmd(d: Date = new Date()): string {
