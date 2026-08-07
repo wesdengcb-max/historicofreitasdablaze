@@ -1421,7 +1421,7 @@ function Index() {
                                       }
 
                                       const p = slotPredictions[slotKey];
-                                      const isSlotActive = highlightKey ? (highlightKey === `col-${ci}`) : (highlightN.size === 0);
+                                      const isSlotActive = highlightKey ? (highlightKey.startsWith(`col-${ci}`)) : (highlightN.size === 0);
                                       return (
                                         <div key={`e-${ci}-${i}`} className="flex flex-col items-center" style={{ opacity: isSlotActive ? 1 : 0.25 }}>
                                           <button
