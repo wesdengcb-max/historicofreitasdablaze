@@ -745,36 +745,80 @@ function Index() {
   const historyGridTemplate = `repeat(10, var(--colW, 120px))`;
 
   // Contagens auxiliares dos toggles "Contar colunas" / "Contar linhas".
-  const colCounts = useMemo(() => {
-    const acc = Array.from({ length: 10 }, () => 0);
-    for (const row of gridRows) {
-      row.cells.forEach((cell, i) => {
-        acc[i] += cell.length;
-      });
-    }
-    return acc;
-  }, [gridRows]);
-
-  /** Percentual de vermelho / preto / branco por coluna (00–09). */
   const colStats = useMemo(() => {
-    const acc = Array.from({ length: 10 }, () => ({ red: 0, black: 0, white: 0, total: 0 }));
+    // Agora cada coluna tem duas posições independentes
+    const acc = Array.from({ length: 10 }, () => [
+      { red: 0, black: 0, white: 0, total: 0 }, // Posição 0 (pedra esquerda)
+      { red: 0, black: 0, white: 0, total: 0 }, // Posição 1 (pedra direita)
+    ]);
+
     for (const row of gridRows) {
-      row.cells.forEach((cell, i) => {
-        for (const spin of cell) {
-          if (spin.color === "red") acc[i].red += 1;
-          else if (spin.color === "black") acc[i].black += 1;
-          else if (spin.color === "white") acc[i].white += 1;
-          else continue;
-          acc[i].total += 1;
+      row.cells.forEach((cell, ci) => {
+        // Incrementa estatísticas para a primeira pedra (posição 0)
+        const spin0 = cell[0];
+        if (spin0) {
+          const p = acc[ci][0];
+          if (spin0.color === "red") p.red += 1;
+          else if (spin0.color === "black") p.black += 1;
+          else if (spin0.color === "white") p.white += 1;
+          p.total += 1;
+        }
+
+        // Incrementa estatísticas para a segunda pedra (posição 1)
+        const spin1 = cell[1];
+        if (spin1) {
+          const p = acc[ci][1];
+          if (spin1.color === "red") p.red += 1;
+          else if (spin1.color === "black") p.black += 1;
+          else if (spin1.color === "white") p.white += 1;
+          p.total += 1;
         }
       });
     }
-    return acc.map((c) => ({
-      ...c,
-      redPct: c.total ? (c.red / c.total) * 100 : 0,
-      blackPct: c.total ? (c.black / c.total) * 100 : 0,
-      whitePct: c.total ? (c.white / c.total) * 100 : 0,
-    }));
+
+    return acc.map((positions) => 
+      positions.map((p) => ({
+        ...p,
+        redPct: p.total ? (p.red / p.total) * 100 : 0,
+        blackPct: p.total ? (p.black / p.total) * 100 : 0,
+        whitePct: p.total ? (p.white / p.total) * 100 : 0,
+      }))
+    );
+  }, [gridRows]);
+
+  const rowStats = useMemo(() => {
+    // Estatísticas para a lateral esquerda (por linha)
+    return gridRows.map((row) => {
+      const stats = [
+        { red: 0, black: 0, white: 0, total: 0 }, // Posição 0
+        { red: 0, black: 0, white: 0, total: 0 }, // Posição 1
+      ];
+
+      row.cells.forEach((cell) => {
+        const spin0 = cell[0];
+        if (spin0) {
+          if (spin0.color === "red") stats[0].red += 1;
+          else if (spin0.color === "black") stats[0].black += 1;
+          else if (spin0.color === "white") stats[0].white += 1;
+          stats[0].total += 1;
+        }
+
+        const spin1 = cell[1];
+        if (spin1) {
+          if (spin1.color === "red") stats[1].red += 1;
+          else if (spin1.color === "black") stats[1].black += 1;
+          else if (spin1.color === "white") stats[1].white += 1;
+          stats[1].total += 1;
+        }
+      });
+
+      return stats.map(s => ({
+        ...s,
+        redPct: s.total ? (s.red / s.total) * 100 : 0,
+        blackPct: s.total ? (s.black / s.total) * 100 : 0,
+        whitePct: s.total ? (s.white / s.total) * 100 : 0,
+      }));
+    });
   }, [gridRows]);
 
   const signalsByHM = useMemo(() => {
@@ -1080,6 +1124,9 @@ function Index() {
                   <Switch checked={exibirSegundos} onChange={setExibirSegundos} label="Exibir segundos" />
                 </div>
                 <div className="flex shrink-0 items-center">
+                  <Switch checked={contarLinhas} onChange={setContarLinhas} label="Contar linhas" />
+                </div>
+                <div className="flex shrink-0 items-center">
                   <Switch checked={whiteAlert} onChange={toggleWhiteAlert} label="Alerta de branco" />
                 </div>
                 <div className="flex shrink-0 items-center">
@@ -1129,56 +1176,55 @@ function Index() {
               <div className="mb-3 w-full border-b border-white/5 pb-3 overflow-x-auto scrollbar-none">
                 <div className="grid grid-cols-10 gap-[8px] min-w-[1200px] w-full">
                   {Array.from({ length: 10 }).map((_, ci) => {
-                    const stats = colStats[ci];
+                    const statsPair = colStats[ci];
                     return (
-                      <button
-                        key={`col-stats-${ci}`}
-                        onClick={() => {
-                          const key = `col-${ci}`;
-                          if (highlightKey === key) {
-                            setHighlightKey(null);
-                            setHighlightN(new Set());
-                            return;
-                          }
-                          setHighlightKey(key);
-                          // Selecionar todos os números de ambas as pedras desta coluna (posição 0 e 1)
-                          const next = new Set<number>();
-                          gridRows.forEach(row => {
-                            const cells = row.cells[ci];
-                            // Pega os números das duas primeiras pedras da célula (pedra esquerda e pedra direita)
-                            if (cells[0]) next.add(cells[0].n);
-                            if (cells[1]) next.add(cells[1].n);
-                          });
-                          setHighlightN(next);
-                        }}
-                        className={`flex w-full flex-col gap-0.5 overflow-hidden rounded-[4px] p-1 shadow-inner text-left transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-primary/25 shadow-[0_0_15px_rgba(255,31,61,0.2)]" : "bg-white/[0.03] hover:bg-white/[0.08]"}`}
-                        style={{ width: "100%" }}
-                      >
-                        <div className="flex items-center justify-between px-0.5 text-[8px] font-bold tabular-nums">
-                          <span className="text-white">B: {stats.white}</span>
-                          <span className="text-white/40">{stats.whitePct.toFixed(0)}%</span>
-                        </div>
-                        <div className="relative h-1 w-full overflow-hidden rounded-full bg-white/5">
-                          <div className="flex h-full w-full">
-                            <div
-                              className="h-full bg-[#DE2143] transition-all duration-500"
-                              style={{ width: `${stats.redPct}%` }}
-                            />
-                            <div
-                              className="h-full bg-slate-800 transition-all duration-500"
-                              style={{ width: `${stats.blackPct}%` }}
-                            />
-                            <div
-                              className="h-full bg-white transition-all duration-500"
-                              style={{ width: `${stats.whitePct}%` }}
-                            />
-                          </div>
-                        </div>
-                        <div className="mt-0.5 flex items-center justify-between px-0.5 text-[7px] font-medium text-muted-foreground/60 tabular-nums uppercase">
-                          <span>V: {stats.red}</span>
-                          <span>P: {stats.black}</span>
-                        </div>
-                      </button>
+                      <div key={`col-stats-${ci}`} className="flex w-full gap-[4px]">
+                        {statsPair.map((stats, si) => (
+                          <button
+                            key={`col-stats-${ci}-${si}`}
+                            onClick={() => {
+                              const key = `col-${ci}-${si}`;
+                              if (highlightKey === key) {
+                                setHighlightKey(null);
+                                setHighlightN(new Set());
+                                return;
+                              }
+                              setHighlightKey(key);
+                              const next = new Set<number>();
+                              gridRows.forEach(row => {
+                                const cells = row.cells[ci];
+                                if (cells[si]) next.add(cells[si].n);
+                              });
+                              setHighlightN(next);
+                            }}
+                            className={`flex flex-1 flex-col gap-0.5 overflow-hidden rounded-[4px] p-1 shadow-inner text-left transition-all duration-300 ${highlightKey === `col-${ci}-${si}` ? "bg-primary/25 shadow-[0_0_15px_rgba(255,31,61,0.2)]" : "bg-white/[0.03] hover:bg-white/[0.08]"}`}
+                          >
+                            <div className="flex items-center justify-between px-0.5 text-[7px] font-bold tabular-nums">
+                              <span className="text-white/40">{stats.whitePct.toFixed(0)}%</span>
+                            </div>
+                            <div className="relative h-1 w-full overflow-hidden rounded-full bg-white/5">
+                              <div className="flex h-full w-full">
+                                <div
+                                  className="h-full bg-[#DE2143] transition-all duration-500"
+                                  style={{ width: `${stats.redPct}%` }}
+                                />
+                                <div
+                                  className="h-full bg-slate-800 transition-all duration-500"
+                                  style={{ width: `${stats.blackPct}%` }}
+                                />
+                                <div
+                                  className="h-full bg-white transition-all duration-500"
+                                  style={{ width: `${stats.whitePct}%` }}
+                                />
+                              </div>
+                            </div>
+                            <div className="mt-0.5 flex items-center justify-between px-0.5 text-[6px] font-medium text-muted-foreground/60 tabular-nums uppercase">
+                              <span>V:{stats.red}</span>
+                              <span>P:{stats.black}</span>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
                     );
                   })}
                 </div>
@@ -1232,28 +1278,25 @@ function Index() {
                   </div>
                 ) : viewMode === "colunas" ? (
                   <div className="history-scroll w-full overflow-x-hidden p-1 sm:p-2 lg:p-3">
-                    <div className="flex flex-col gap-0 overflow-x-auto scrollbar-none">
+                    <div className={`flex flex-col gap-0 overflow-x-auto scrollbar-none ${contarLinhas ? "pl-8" : ""}`}>
                       {/* Cabeçalho 0-9 interno para Colunas Fixas */}
                       <div className="grid grid-cols-10 gap-[8px] mb-1 sticky top-0 z-10 bg-background/40 backdrop-blur-sm min-w-[1200px] w-full">
                         {Array.from({ length: 10 }).map((_, ci) => (
                           <button
                             key={`header-inner-${ci}`}
-                            className={`flex h-[23px] w-full items-center justify-center rounded-[6px] border border-white/5 text-[14px] font-medium tabular-nums transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-primary/40 text-white shadow-[0_0_10px_rgba(255,31,61,0.3)]" : "bg-white/[0.03] text-white hover:bg-white/10"}`}
+                            className={`flex h-[23px] w-full items-center justify-center rounded-[6px] border border-white/5 text-[14px] font-medium tabular-nums transition-all duration-300 ${highlightKey && highlightKey.startsWith(`col-${ci}`) ? "bg-primary/40 text-white shadow-[0_0_10px_rgba(255,31,61,0.3)]" : "bg-white/[0.03] text-white hover:bg-white/10"}`}
                             onClick={() => {
-                              const key = `col-${ci}`;
+                              const key = `col-${ci}-0`;
                               if (highlightKey === key) {
                                 setHighlightKey(null);
                                 setHighlightN(new Set());
                                 return;
                               }
                               setHighlightKey(key);
-                              // Selecionar todos os números de ambas as pedras desta coluna (posição 0 e 1)
                               const next = new Set<number>();
                               gridRows.forEach(row => {
                                 const cells = row.cells[ci];
-                                // Pega os números das duas primeiras pedras da célula (pedra esquerda e pedra direita)
                                 if (cells[0]) next.add(cells[0].n);
-                                if (cells[1]) next.add(cells[1].n);
                               });
                               setHighlightN(next);
                             }}
@@ -1263,9 +1306,19 @@ function Index() {
                         ))}
                       </div>
 
-                      {gridRows.map((row) => (
+                      {gridRows.map((row, rIdx) => (
                         <div key={row.key} className="flex flex-col gap-0 border-b border-white/[0.02]">
                           <div className="grid grid-cols-10 gap-[8px] relative min-w-[1200px] w-full">
+                            {/* Estatística Lateral Esquerda (Linhas) */}
+                            {contarLinhas && (
+                              <div className="absolute -left-[32px] top-1/2 -translate-y-1/2 flex flex-col gap-1">
+                                {rowStats[rIdx].map((s, si) => (
+                                  <div key={`row-stat-${rIdx}-${si}`} className="flex h-[18px] w-[28px] items-center justify-center rounded-sm bg-white/[0.05] text-[7px] font-bold text-white/60">
+                                    {s.whitePct.toFixed(0)}%
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                             {row.cells.map((cell, ci) => {
                             const [hh, mmPrefix] = row.label.split(":");
                             const hm = `${hh}:${mmPrefix[0]}${ci}`;
@@ -1299,7 +1352,7 @@ function Index() {
                                 style={{ width: "100%", height: "66px", direction: "ltr" }}
                               >
                                 <div 
-                                  className={`relative flex flex-col items-center pt-2 rounded-lg transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-primary/10" : ""}`}
+                                  className={`relative flex flex-col items-center pt-2 rounded-lg transition-all duration-300 ${highlightKey && highlightKey.startsWith(`col-${ci}`) ? "bg-primary/10" : ""}`}
                                 >
                                   {badge && (
                                     <span className={`absolute top-0 z-10 inline-flex h-3 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-3.5 sm:px-1.5 sm:text-[8px] ${badgeCls}`}>
@@ -1320,35 +1373,30 @@ function Index() {
                                       if (spin) {
                                         return (
                                           <div key={(spin as Spin).id} className="flex flex-col items-center">
-                                            <TipMinerCard
-                                              spin={spin as Spin}
-                                              highlightN={highlightN}
-                                              isActive={
-                                                highlightKey 
-                                                  ? highlightKey === `col-${ci}`
-                                                  : (highlightN.size > 0 ? highlightN.has((spin as Spin).n) : true)
-                                              }
-                                              numbered={numerado}
-                                              showSeconds={exibirSegundos}
-                                              timeHighlight={destaqueHorario}
-                                              showTime={false}
-                                              onClick={() => {
-                                                const n = (spin as Spin).n;
-                                                // Se clicar em uma pedra e já houver uma coluna selecionada,
-                                                // limpa a coluna e foca apenas na pedra.
-                                                if (highlightKey) {
-                                                  setHighlightKey(null);
-                                                  setHighlightN(new Set([n]));
-                                                  return;
+                                              <TipMinerCard
+                                                spin={spin as Spin}
+                                                highlightN={highlightN}
+                                                isActive={
+                                                  highlightKey 
+                                                    ? highlightKey === `col-${ci}-${i}`
+                                                    : (highlightN.size > 0 ? highlightN.has((spin as Spin).n) : true)
                                                 }
-                                                setHighlightN((h) => {
-                                                  const next = new Set(h);
-                                                  if (next.has(n)) next.delete(n);
-                                                  else next.add(n);
-                                                  return next;
-                                                });
-                                              }}
-                                            />
+                                                numbered={numerado}
+                                                showSeconds={exibirSegundos}
+                                                timeHighlight={destaqueHorario}
+                                                showTime={false}
+                                                onClick={() => {
+                                                  const n = (spin as Spin).n;
+                                                  const key = `col-${ci}-${i}`;
+                                                  if (highlightKey === key) {
+                                                    setHighlightKey(null);
+                                                    setHighlightN(new Set());
+                                                    return;
+                                                  }
+                                                  setHighlightKey(key);
+                                                  setHighlightN(new Set([n]));
+                                                }}
+                                              />
                                             <span className={`mt-[5px] text-[11px] tabular-nums leading-none font-medium h-[11px] flex items-center ${destaqueHorario ? "text-primary font-bold" : "text-[#8ebcf0]"}`}>
                                               {exibirSegundos ? spTimeWithSeconds(spin as Spin) : (spin as Spin).time}
                                             </span>
@@ -1357,7 +1405,7 @@ function Index() {
                                       }
                                       
                                       if (pending && i === 0) {
-                                         const isSlotActive = highlightKey ? (highlightKey === `col-${ci}`) : (highlightN.size === 0);
+                                         const isSlotActive = highlightKey ? (highlightKey.startsWith(`col-${ci}`)) : (highlightN.size === 0);
                                          return (
                                           <div key={`p-${ci}-${i}`} className="flex flex-col items-center" style={{ opacity: isSlotActive ? 1 : 0.25 }}>
                                             <div className="relative flex h-[48px] w-[48px] items-center justify-center overflow-hidden rounded-[6px] border-[2.5px] border-emerald-400 bg-white shadow-sm">
@@ -1376,7 +1424,7 @@ function Index() {
                                       }
 
                                       const p = slotPredictions[slotKey];
-                                      const isSlotActive = highlightKey ? (highlightKey === `col-${ci}`) : (highlightN.size === 0);
+                                      const isSlotActive = highlightKey ? (highlightKey.startsWith(`col-${ci}`)) : (highlightN.size === 0);
                                       return (
                                         <div key={`e-${ci}-${i}`} className="flex flex-col items-center" style={{ opacity: isSlotActive ? 1 : 0.25 }}>
                                           <button
