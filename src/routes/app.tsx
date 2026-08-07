@@ -1173,56 +1173,55 @@ function Index() {
               <div className="mb-3 w-full border-b border-white/5 pb-3 overflow-x-auto scrollbar-none">
                 <div className="grid grid-cols-10 gap-[8px] min-w-[1200px] w-full">
                   {Array.from({ length: 10 }).map((_, ci) => {
-                    const stats = colStats[ci];
+                    const statsPair = colStats[ci];
                     return (
-                      <button
-                        key={`col-stats-${ci}`}
-                        onClick={() => {
-                          const key = `col-${ci}`;
-                          if (highlightKey === key) {
-                            setHighlightKey(null);
-                            setHighlightN(new Set());
-                            return;
-                          }
-                          setHighlightKey(key);
-                          // Selecionar todos os números de ambas as pedras desta coluna (posição 0 e 1)
-                          const next = new Set<number>();
-                          gridRows.forEach(row => {
-                            const cells = row.cells[ci];
-                            // Pega os números das duas primeiras pedras da célula (pedra esquerda e pedra direita)
-                            if (cells[0]) next.add(cells[0].n);
-                            if (cells[1]) next.add(cells[1].n);
-                          });
-                          setHighlightN(next);
-                        }}
-                        className={`flex w-full flex-col gap-0.5 overflow-hidden rounded-[4px] p-1 shadow-inner text-left transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-primary/25 shadow-[0_0_15px_rgba(255,31,61,0.2)]" : "bg-white/[0.03] hover:bg-white/[0.08]"}`}
-                        style={{ width: "100%" }}
-                      >
-                        <div className="flex items-center justify-between px-0.5 text-[8px] font-bold tabular-nums">
-                          <span className="text-white">B: {stats.white}</span>
-                          <span className="text-white/40">{stats.whitePct.toFixed(0)}%</span>
-                        </div>
-                        <div className="relative h-1 w-full overflow-hidden rounded-full bg-white/5">
-                          <div className="flex h-full w-full">
-                            <div
-                              className="h-full bg-[#DE2143] transition-all duration-500"
-                              style={{ width: `${stats.redPct}%` }}
-                            />
-                            <div
-                              className="h-full bg-slate-800 transition-all duration-500"
-                              style={{ width: `${stats.blackPct}%` }}
-                            />
-                            <div
-                              className="h-full bg-white transition-all duration-500"
-                              style={{ width: `${stats.whitePct}%` }}
-                            />
-                          </div>
-                        </div>
-                        <div className="mt-0.5 flex items-center justify-between px-0.5 text-[7px] font-medium text-muted-foreground/60 tabular-nums uppercase">
-                          <span>V: {stats.red}</span>
-                          <span>P: {stats.black}</span>
-                        </div>
-                      </button>
+                      <div key={`col-stats-${ci}`} className="flex w-full gap-[4px]">
+                        {statsPair.map((stats, si) => (
+                          <button
+                            key={`col-stats-${ci}-${si}`}
+                            onClick={() => {
+                              const key = `col-${ci}-${si}`;
+                              if (highlightKey === key) {
+                                setHighlightKey(null);
+                                setHighlightN(new Set());
+                                return;
+                              }
+                              setHighlightKey(key);
+                              const next = new Set<number>();
+                              gridRows.forEach(row => {
+                                const cells = row.cells[ci];
+                                if (cells[si]) next.add(cells[si].n);
+                              });
+                              setHighlightN(next);
+                            }}
+                            className={`flex flex-1 flex-col gap-0.5 overflow-hidden rounded-[4px] p-1 shadow-inner text-left transition-all duration-300 ${highlightKey === `col-${ci}-${si}` ? "bg-primary/25 shadow-[0_0_15px_rgba(255,31,61,0.2)]" : "bg-white/[0.03] hover:bg-white/[0.08]"}`}
+                          >
+                            <div className="flex items-center justify-between px-0.5 text-[7px] font-bold tabular-nums">
+                              <span className="text-white/40">{stats.whitePct.toFixed(0)}%</span>
+                            </div>
+                            <div className="relative h-1 w-full overflow-hidden rounded-full bg-white/5">
+                              <div className="flex h-full w-full">
+                                <div
+                                  className="h-full bg-[#DE2143] transition-all duration-500"
+                                  style={{ width: `${stats.redPct}%` }}
+                                />
+                                <div
+                                  className="h-full bg-slate-800 transition-all duration-500"
+                                  style={{ width: `${stats.blackPct}%` }}
+                                />
+                                <div
+                                  className="h-full bg-white transition-all duration-500"
+                                  style={{ width: `${stats.whitePct}%` }}
+                                />
+                              </div>
+                            </div>
+                            <div className="mt-0.5 flex items-center justify-between px-0.5 text-[6px] font-medium text-muted-foreground/60 tabular-nums uppercase">
+                              <span>V:{stats.red}</span>
+                              <span>P:{stats.black}</span>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
                     );
                   })}
                 </div>
