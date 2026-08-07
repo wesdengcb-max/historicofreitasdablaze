@@ -862,7 +862,7 @@ function Index() {
       ) : section === "estrategias" ? (
         <Suspense fallback={<SectionFallback />}><EstrategiasSection /></Suspense>
       ) : section !== "dashboard" ? (
-        <main className="mx-auto flex w-full max-w-[1366px] flex-col gap-5 px-3 py-10 sm:gap-6 sm:px-8 sm:py-16">
+        <main className="flex w-full flex-col gap-5 px-4 py-10 sm:gap-6 sm:px-6 sm:py-16">
           <Card delay={0.05}>
             <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
               <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
@@ -877,7 +877,7 @@ function Index() {
           </Card>
         </main>
       ) : (
-      <main className="mx-auto flex w-full max-w-[1366px] flex-col gap-3 px-1.5 py-3 sm:gap-5 sm:px-4 sm:py-6 lg:gap-6 lg:px-8 lg:py-10 bg-[#090909]">
+      <main className="flex w-full flex-col gap-3 px-4 py-3 sm:gap-5 sm:px-6 sm:py-6 lg:gap-6 lg:px-6 lg:py-10 bg-[#090909]">
 
         <section className="space-y-3 sm:space-y-5 lg:space-y-6">
           <Card delay={0.05}>
@@ -990,7 +990,7 @@ function Index() {
             </div>
           </Card>
 
-          <div className="mx-auto w-full max-w-[1366px] mb-8">
+          <div className="w-full mb-8">
              <StrategyTabs spins={visibleSpins} />
           </div>
 
@@ -1127,7 +1127,7 @@ function Index() {
             {/* Cabeçalho das estatísticas por coluna */}
             {viewMode === "colunas" && contarColunas && (
               <div className="mb-3 w-full border-b border-white/5 pb-3 overflow-x-auto scrollbar-none">
-                <div className="grid grid-cols-10 gap-[8px] min-w-[1200px]" style={{ maxWidth: "1366px", width: "100%", marginLeft: "auto", marginRight: "auto" }}>
+                <div className="grid grid-cols-10 gap-[8px] min-w-[1200px]" style={{ width: "100%" }}>
                   {Array.from({ length: 10 }).map((_, ci) => {
                     const stats = colStats[ci];
                     return (
@@ -1234,7 +1234,7 @@ function Index() {
                   <div className="history-scroll glass-card glass-card-glow w-full overflow-x-hidden p-1 sm:p-2 lg:p-3">
                     <div className="flex flex-col gap-0 overflow-x-auto scrollbar-none">
                       {/* Cabeçalho 0-9 interno para Colunas Fixas */}
-                      <div className="grid grid-cols-10 gap-[8px] mb-1 sticky top-0 z-10 bg-background/40 backdrop-blur-sm min-w-[1200px]" style={{ maxWidth: "1366px", width: "100%", marginLeft: "auto", marginRight: "auto" }}>
+                      <div className="grid grid-cols-10 gap-[8px] mb-1 sticky top-0 z-10 bg-background/40 backdrop-blur-sm min-w-[1200px]" style={{ width: "100%" }}>
                         {Array.from({ length: 10 }).map((_, ci) => (
                           <button
                             key={`header-inner-${ci}`}
@@ -1265,7 +1265,7 @@ function Index() {
 
                       {gridRows.map((row) => (
                         <div key={row.key} className="flex flex-col gap-0 border-b border-white/[0.02]">
-                          <div className="grid grid-cols-10 gap-[8px] relative min-w-[1200px]" style={{ maxWidth: "1366px", width: "100%", marginLeft: "auto", marginRight: "auto" }}>
+                          <div className="grid grid-cols-10 gap-[8px] relative min-w-[1200px]" style={{ width: "100%" }}>
                             {row.cells.map((cell, ci) => {
                             const [hh, mmPrefix] = row.label.split(":");
                             const hm = `${hh}:${mmPrefix[0]}${ci}`;
