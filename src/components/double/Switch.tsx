@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { motion } from "framer-motion";
 
 type Props = {
@@ -7,7 +8,7 @@ type Props = {
   id?: string;
 };
 
-export function Switch({ checked, onChange, label, id }: Props) {
+export const Switch = memo(function Switch({ checked, onChange, label, id }: Props) {
   return (
     <label htmlFor={id} className="inline-flex cursor-pointer items-center gap-2.5 select-none">
       <button
