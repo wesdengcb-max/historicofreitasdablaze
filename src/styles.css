@@ -227,13 +227,27 @@
 }
 
 @utility premium-btn {
-  background: linear-gradient(180deg, #DE2143 0%, #FF1F3D 100%);
-  box-shadow: 0 10px 35px rgba(255, 30, 60, 0.35);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: var(--radius-md);
+  padding: 8px 16px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 
-  &:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 15px 45px rgba(255, 30, 60, 0.45);
+  &:hover:not(:disabled) {
+    background: color-mix(in oklab, var(--primary) 90%, white);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 }
 
