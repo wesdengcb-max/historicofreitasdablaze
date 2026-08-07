@@ -58,7 +58,7 @@ const EstrategiasSection = lazy(() => import("@/components/sections/EstrategiasS
 
 function SectionFallback() {
   return (
-    <div className="mx-auto flex w-full max-w-[1366px] items-center justify-center px-3 py-24 sm:px-8">
+    <div className="flex w-full items-center justify-center px-4 py-24 sm:px-6">
       <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
     </div>
   );
@@ -800,10 +800,10 @@ function Index() {
 
   return (
     <div
-      className="history-metrics min-h-dvh [--cols:10]"
+      className="history-metrics min-h-dvh w-full [--cols:10]"
     >
       <header className="sticky top-0 z-30 border-b border-white/5 bg-background/70 backdrop-blur-xl">
-        <div className="mx-auto grid h-12 max-w-[1366px] grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-2 sm:h-14 sm:gap-4 sm:px-6 lg:h-16 lg:px-8">
+        <div className="flex h-12 w-full items-center gap-2 px-4 sm:h-14 sm:gap-4 sm:px-6 lg:h-16 lg:px-6">
           <div className="flex min-w-0 items-center gap-3">
             <div
               className="grid h-7 w-7 shrink-0 place-items-center overflow-hidden rounded-xl bg-white ring-1 ring-white/40 sm:h-9 sm:w-9"
@@ -862,7 +862,7 @@ function Index() {
       ) : section === "estrategias" ? (
         <Suspense fallback={<SectionFallback />}><EstrategiasSection /></Suspense>
       ) : section !== "dashboard" ? (
-        <main className="mx-auto flex w-full max-w-[1366px] flex-col gap-5 px-3 py-10 sm:gap-6 sm:px-8 sm:py-16">
+        <main className="flex w-full flex-col gap-5 px-4 py-10 sm:gap-6 sm:px-6 sm:py-16">
           <Card delay={0.05}>
             <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
               <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
@@ -877,7 +877,7 @@ function Index() {
           </Card>
         </main>
       ) : (
-      <main className="mx-auto flex w-full max-w-[1366px] flex-col gap-3 px-1.5 py-3 sm:gap-5 sm:px-4 sm:py-6 lg:gap-6 lg:px-8 lg:py-10 bg-[#090909]">
+      <main className="flex w-full flex-col gap-3 px-4 py-3 sm:gap-5 sm:px-6 sm:py-6 lg:gap-6 lg:px-6 lg:py-10 bg-[#090909]">
 
         <section className="space-y-3 sm:space-y-5 lg:space-y-6">
           <Card delay={0.05}>
@@ -990,7 +990,7 @@ function Index() {
             </div>
           </Card>
 
-          <div className="mx-auto w-full max-w-[1366px] mb-8">
+          <div className="w-full mb-8">
              <StrategyTabs spins={visibleSpins} />
           </div>
 
@@ -1054,56 +1054,56 @@ function Index() {
             )}
 
             {/* Painel de controles alinhado */}
-            <div className="mb-3 rounded-2xl border border-white/5 bg-white/[0.02] p-2 sm:mb-4 sm:p-4">
-              <div className="grid grid-cols-2 gap-x-3 gap-y-2 text-[11px] sm:gap-x-8 sm:gap-y-3.5 lg:grid-cols-5">
-                <div className="flex min-w-0 items-center">
+            <div className="mb-3 rounded-2xl border border-white/5 bg-white/[0.02] p-2 sm:mb-4 sm:p-3">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-3 text-[11px] sm:gap-x-6">
+                <div className="flex shrink-0 items-center">
                   <Switch checked={realtime} onChange={setRealtime} label="Tempo real" />
                 </div>
 
-                <div className="flex min-w-0 items-center">
+                <div className="flex shrink-0 items-center">
                   <Switch
                     checked={viewMode === "colunas"}
                     onChange={(v) => setViewMode(v ? "colunas" : "lista")}
                     label="Colunas fixas"
                   />
                 </div>
-                <div className="flex min-w-0 items-center">
+                <div className="flex shrink-0 items-center">
                   <Switch checked={contarColunas} onChange={setContarColunas} label="Contar colunas" />
                 </div>
-                <div className="flex min-w-0 items-center">
+                <div className="flex shrink-0 items-center">
                   <Switch checked={inverse} onChange={setInverse} label="Sentido inverso" />
                 </div>
-                <div className="flex min-w-0 items-center">
+                <div className="flex shrink-0 items-center">
                   <Switch checked={numerado} onChange={setNumerado} label="Numerado" />
                 </div>
-                <div className="flex min-w-0 items-center">
+                <div className="flex shrink-0 items-center">
                   <Switch checked={exibirSegundos} onChange={setExibirSegundos} label="Exibir segundos" />
                 </div>
-                <div className="flex min-w-0 items-center">
+                <div className="flex shrink-0 items-center">
                   <Switch checked={whiteAlert} onChange={toggleWhiteAlert} label="Alerta de branco" />
                 </div>
-                <div className="flex min-w-0 items-center">
+                <div className="flex shrink-0 items-center">
                   <Switch checked={destaqueHorario} onChange={setDestaqueHorario} label="Destaque horário" />
                 </div>
-                <div className="flex min-w-0 items-center">
-                  <div className={`flex items-center gap-2.5 rounded-full border px-3 py-1.5 transition-all ${isVip ? "border-amber-400/30 bg-amber-400/5 text-amber-400" : "border-white/5 bg-white/5 text-muted-foreground opacity-60"}`}>
+                <div className="flex shrink-0 items-center">
+                  <div className={`flex items-center gap-2 rounded-full border px-2.5 py-1 transition-all ${isVip ? "border-amber-400/30 bg-amber-400/5 text-amber-400" : "border-white/5 bg-white/5 text-muted-foreground opacity-60"}`}>
                     <Crown className="h-3.5 w-3.5" />
-                    <span className="text-[11px] font-bold uppercase tracking-wider font-outfit">
+                    <span className="text-[10px] font-bold uppercase tracking-wider font-outfit">
                       {isVip ? "VIP Ativo" : "Básico"}
                     </span>
                   </div>
                 </div>
 
-                <div className="flex min-w-0 items-center">
+                <div className="flex shrink-0 items-center">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button
                         type="button"
-                        className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-white/[0.09] hover:text-foreground"
+                        className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] font-medium text-muted-foreground transition-colors hover:bg-white/[0.09] hover:text-foreground"
                         title="Slots futuros"
                       >
                         <Clock className="h-3.5 w-3.5" />
-                        <span>Slots futuros: {futureSlots === 0 ? "Off" : `+${futureSlots} min`}</span>
+                        <span>Slots: {futureSlots === 0 ? "Off" : `+${futureSlots}`}</span>
                         <ChevronDown className="h-3 w-3 opacity-70" />
                       </button>
                     </DropdownMenuTrigger>
@@ -1127,7 +1127,7 @@ function Index() {
             {/* Cabeçalho das estatísticas por coluna */}
             {viewMode === "colunas" && contarColunas && (
               <div className="mb-3 w-full border-b border-white/5 pb-3 overflow-x-auto scrollbar-none">
-                <div className="grid grid-cols-10 gap-[8px] min-w-[1200px]" style={{ maxWidth: "1366px", width: "100%", marginLeft: "auto", marginRight: "auto" }}>
+                <div className="grid grid-cols-10 gap-[8px] min-w-[1200px] w-full">
                   {Array.from({ length: 10 }).map((_, ci) => {
                     const stats = colStats[ci];
                     return (
@@ -1234,7 +1234,7 @@ function Index() {
                   <div className="history-scroll glass-card glass-card-glow w-full overflow-x-hidden p-1 sm:p-2 lg:p-3">
                     <div className="flex flex-col gap-0 overflow-x-auto scrollbar-none">
                       {/* Cabeçalho 0-9 interno para Colunas Fixas */}
-                      <div className="grid grid-cols-10 gap-[8px] mb-1 sticky top-0 z-10 bg-background/40 backdrop-blur-sm min-w-[1200px]" style={{ maxWidth: "1366px", width: "100%", marginLeft: "auto", marginRight: "auto" }}>
+                      <div className="grid grid-cols-10 gap-[8px] mb-1 sticky top-0 z-10 bg-background/40 backdrop-blur-sm min-w-[1200px] w-full">
                         {Array.from({ length: 10 }).map((_, ci) => (
                           <button
                             key={`header-inner-${ci}`}
@@ -1265,7 +1265,7 @@ function Index() {
 
                       {gridRows.map((row) => (
                         <div key={row.key} className="flex flex-col gap-0 border-b border-white/[0.02]">
-                          <div className="grid grid-cols-10 gap-[8px] relative min-w-[1200px]" style={{ maxWidth: "1366px", width: "100%", marginLeft: "auto", marginRight: "auto" }}>
+                          <div className="grid grid-cols-10 gap-[8px] relative min-w-[1200px] w-full">
                             {row.cells.map((cell, ci) => {
                             const [hh, mmPrefix] = row.label.split(":");
                             const hm = `${hh}:${mmPrefix[0]}${ci}`;

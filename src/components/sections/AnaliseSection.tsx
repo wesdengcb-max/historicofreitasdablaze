@@ -428,7 +428,7 @@ export default function AnaliseSection() {
   const eligible = isMinuteEligible; // Removida trava de 10 ciclos
 
   return (
-    <main className="mx-auto flex w-full max-w-[1366px] flex-col gap-5 px-3 py-8 sm:gap-6 sm:px-8 sm:py-10">
+    <main className="flex w-full flex-col gap-5 px-4 py-8 sm:gap-6 sm:px-6 sm:py-10">
       <Card className="glass-card p-6">
         <div className="mb-2 text-[10px] font-black uppercase tracking-[0.4em] text-[#FF1F3D] font-outfit">
           Catalogador de latência

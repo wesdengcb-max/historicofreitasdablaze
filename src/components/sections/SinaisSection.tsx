@@ -344,12 +344,12 @@ export default function SinaisSection() {
 
 
   return (
-    <div className="min-h-screen bg-[#090909] p-4 sm:p-6 space-y-8">
+    <div className="min-h-screen bg-[#090909] px-4 py-6 sm:px-6 sm:py-8 space-y-8 w-full">
       {/* Gerador de sinais preditivos */}
       <PredictiveSignals />
 
       {/* Top header */}
-      <div className="flex flex-wrap items-start justify-between gap-4">
+      <div className="flex w-full flex-wrap items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-3 mb-2">
             <span className="text-[10px] tracking-[0.5em] text-[#FF1F3D] font-black font-outfit uppercase">
