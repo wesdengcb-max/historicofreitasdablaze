@@ -932,14 +932,14 @@ function Index() {
                         key={it.key}
                         className={`rounded-xl border p-2 transition-colors sm:p-2.5 ${
                           isLeader
-                            ? "border-emerald-400/70 shadow-[0_0_0_1px_rgba(16,185,129,0.35),0_8px_24px_-12px_rgba(16,185,129,0.45)]"
+                            ? "border-primary/70 bg-primary/10 shadow-[0_0_15px_rgba(59,130,246,0.2)]"
                             : "border-white/5 bg-white/[0.02]"
                         }`}
                       >
                         <div className="flex min-w-0 items-center gap-2">
                           <ResultCircle color={it.color} n={it.color === "white" ? undefined : 0} size="sm" animate={false} />
                           <div className="min-w-0 flex-1">
-                            <div className={`text-[13px] font-semibold tabular-nums ${isLeader ? "text-emerald-400" : "text-foreground"}`}>
+                            <div className={`text-[13px] font-semibold tabular-nums ${isLeader ? "text-primary" : "text-foreground"}`}>
                               {it.pct.toFixed(1)}%
                             </div>
                             <div className="truncate text-[10px] tabular-nums text-muted-foreground">
