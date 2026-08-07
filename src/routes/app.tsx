@@ -1281,22 +1281,19 @@ function Index() {
                         {Array.from({ length: 10 }).map((_, ci) => (
                           <button
                             key={`header-inner-${ci}`}
-                            className={`flex h-[23px] w-full items-center justify-center rounded-[6px] border border-white/5 text-[14px] font-medium tabular-nums transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-primary/40 text-white shadow-[0_0_10px_rgba(255,31,61,0.3)]" : "bg-white/[0.03] text-white hover:bg-white/10"}`}
+                            className={`flex h-[23px] w-full items-center justify-center rounded-[6px] border border-white/5 text-[14px] font-medium tabular-nums transition-all duration-300 ${highlightKey && highlightKey.startsWith(`col-${ci}`) ? "bg-primary/40 text-white shadow-[0_0_10px_rgba(255,31,61,0.3)]" : "bg-white/[0.03] text-white hover:bg-white/10"}`}
                             onClick={() => {
-                              const key = `col-${ci}`;
+                              const key = `col-${ci}-0`;
                               if (highlightKey === key) {
                                 setHighlightKey(null);
                                 setHighlightN(new Set());
                                 return;
                               }
                               setHighlightKey(key);
-                              // Selecionar todos os números de ambas as pedras desta coluna (posição 0 e 1)
                               const next = new Set<number>();
                               gridRows.forEach(row => {
                                 const cells = row.cells[ci];
-                                // Pega os números das duas primeiras pedras da célula (pedra esquerda e pedra direita)
                                 if (cells[0]) next.add(cells[0].n);
-                                if (cells[1]) next.add(cells[1].n);
                               });
                               setHighlightN(next);
                             }}
@@ -1306,9 +1303,19 @@ function Index() {
                         ))}
                       </div>
 
-                      {gridRows.map((row) => (
+                      {gridRows.map((row, rIdx) => (
                         <div key={row.key} className="flex flex-col gap-0 border-b border-white/[0.02]">
                           <div className="grid grid-cols-10 gap-[8px] relative min-w-[1200px] w-full">
+                            {/* Estatística Lateral Esquerda (Linhas) */}
+                            {contarLinhas && (
+                              <div className="absolute -left-[32px] top-1/2 -translate-y-1/2 flex flex-col gap-1">
+                                {rowStats[rIdx].map((s, si) => (
+                                  <div key={`row-stat-${rIdx}-${si}`} className="flex h-[18px] w-[28px] items-center justify-center rounded-sm bg-white/[0.05] text-[7px] font-bold text-white/60">
+                                    {s.whitePct.toFixed(0)}%
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                             {row.cells.map((cell, ci) => {
                             const [hh, mmPrefix] = row.label.split(":");
                             const hm = `${hh}:${mmPrefix[0]}${ci}`;
@@ -1342,7 +1349,7 @@ function Index() {
                                 style={{ width: "100%", height: "66px", direction: "ltr" }}
                               >
                                 <div 
-                                  className={`relative flex flex-col items-center pt-2 rounded-lg transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-primary/10" : ""}`}
+                                  className={`relative flex flex-col items-center pt-2 rounded-lg transition-all duration-300 ${highlightKey && highlightKey.startsWith(`col-${ci}`) ? "bg-primary/10" : ""}`}
                                 >
                                   {badge && (
                                     <span className={`absolute top-0 z-10 inline-flex h-3 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-3.5 sm:px-1.5 sm:text-[8px] ${badgeCls}`}>
