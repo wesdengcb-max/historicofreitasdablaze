@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { motion } from "framer-motion";
 import type { Color } from "./types";
 import brancoAsset from "@/assets/branco-vip.png.asset.json";
@@ -21,7 +22,7 @@ type Props = {
   className?: string;
 };
 
-export function ResultCircle({ color, n, size = "md", animate = true, delay = 0, glow = false, className }: Props) {
+export const ResultCircle = memo(function ResultCircle({ color, n, size = "md", animate = true, delay = 0, glow = false, className }: Props) {
   const base = "relative grid place-items-center overflow-hidden rounded-full font-semibold tabular-nums tile-shadow ring-1 transition-transform duration-200 hover:scale-[1.08]";
 
   const colorClasses =
