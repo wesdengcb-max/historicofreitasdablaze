@@ -58,7 +58,7 @@ const EstrategiasSection = lazy(() => import("@/components/sections/EstrategiasS
 
 function SectionFallback() {
   return (
-    <div className="mx-auto flex w-full max-w-[1366px] items-center justify-center px-3 py-24 sm:px-8">
+    <div className="flex w-full items-center justify-center px-4 py-24 sm:px-6">
       <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
     </div>
   );
