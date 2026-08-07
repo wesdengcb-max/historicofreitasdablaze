@@ -204,7 +204,7 @@ function AnalysisPanel({
       <div className="p-6">
         <div className="mb-6 flex items-baseline justify-between gap-3">
           <div>
-            <div className="text-[10px] font-black uppercase tracking-[0.4em] text-[#FF1F3D] mb-1 font-outfit">
+            <div className="text-[10px] font-black uppercase tracking-[0.4em] text-primary mb-1 font-outfit">
               {eyebrow}
             </div>
             <h3 className="text-xl font-black text-white font-outfit uppercase tracking-tight">{title}</h3>
@@ -430,7 +430,7 @@ export default function AnaliseSection() {
   return (
     <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-5 px-4 py-8 sm:gap-6 sm:px-6 sm:py-10">
       <Card className="glass-card p-6">
-        <div className="mb-2 text-[10px] font-black uppercase tracking-[0.4em] text-[#FF1F3D] font-outfit">
+        <div className="mb-2 text-[10px] font-black uppercase tracking-[0.4em] text-primary font-outfit">
           Catalogador de latência
         </div>
         <h2 className="text-2xl font-black text-white sm:text-3xl font-outfit uppercase tracking-tighter">
@@ -452,7 +452,7 @@ export default function AnaliseSection() {
                 onClick={() => setSelected(n)}
                 className={`flex flex-col items-center justify-center rounded-xl border px-2 py-3 text-center transition-all duration-300 font-outfit ${
                   isSel
-                    ? "border-[#FF1F3D]/60 bg-[#FF1F3D]/20 text-white shadow-[0_0_20px_rgba(255,31,61,0.2)] scale-105"
+                    ? "border-primary/60 bg-primary/20 text-white shadow-[0_0_20px_rgba(59,130,246,0.2)] scale-105"
                     : ok
                       ? "border-white/10 bg-white/[0.03] text-white hover:bg-white/[0.08] hover:border-white/20"
                       : "border-white/5 bg-white/[0.01] text-[#9CA3AF] opacity-50"
