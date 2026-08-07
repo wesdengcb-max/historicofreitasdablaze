@@ -94,7 +94,7 @@ function LandingPage() {
 
 
       {/* Content */}
-      <main className="relative z-10 mx-auto flex min-h-[100svh] max-w-4xl flex-col items-center justify-center gap-4 px-4 py-8 text-center sm:gap-6 sm:px-6">
+      <main className="relative z-10 flex min-h-[100svh] w-full flex-col items-center justify-center gap-4 px-4 py-8 text-center sm:gap-6 sm:px-6">
         <p className="text-[10px] font-black uppercase tracking-[0.5em] text-[#FF1F3D] animate-[fadeIn_0.6s_ease-out_both] sm:text-[12px] font-outfit">
           Freitas White
         </p>
