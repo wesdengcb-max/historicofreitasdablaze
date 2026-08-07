@@ -235,7 +235,7 @@ export default function EstrategiasSection() {
   );
 
   return (
-    <main className="flex w-full flex-col gap-5 px-4 py-6 sm:gap-6 sm:px-6 sm:py-10">
+    <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-5 px-4 py-6 sm:gap-6 sm:px-6 sm:py-10">
       <Card
         delay={0}
         icon={<Target className="h-4 w-4" />}
