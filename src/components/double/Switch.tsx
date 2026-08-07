@@ -34,4 +34,4 @@ export const Switch = memo(function Switch({ checked, onChange, label, id }: Pro
       {label && <span className="text-xs font-medium text-foreground/85">{label}</span>}
     </label>
   );
-}
+});
