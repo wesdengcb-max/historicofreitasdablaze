@@ -745,36 +745,80 @@ function Index() {
   const historyGridTemplate = `repeat(10, var(--colW, 120px))`;
 
   // Contagens auxiliares dos toggles "Contar colunas" / "Contar linhas".
-  const colCounts = useMemo(() => {
-    const acc = Array.from({ length: 10 }, () => 0);
-    for (const row of gridRows) {
-      row.cells.forEach((cell, i) => {
-        acc[i] += cell.length;
-      });
-    }
-    return acc;
-  }, [gridRows]);
-
-  /** Percentual de vermelho / preto / branco por coluna (00–09). */
   const colStats = useMemo(() => {
-    const acc = Array.from({ length: 10 }, () => ({ red: 0, black: 0, white: 0, total: 0 }));
+    // Agora cada coluna tem duas posições independentes
+    const acc = Array.from({ length: 10 }, () => [
+      { red: 0, black: 0, white: 0, total: 0 }, // Posição 0 (pedra esquerda)
+      { red: 0, black: 0, white: 0, total: 0 }, // Posição 1 (pedra direita)
+    ]);
+
     for (const row of gridRows) {
-      row.cells.forEach((cell, i) => {
-        for (const spin of cell) {
-          if (spin.color === "red") acc[i].red += 1;
-          else if (spin.color === "black") acc[i].black += 1;
-          else if (spin.color === "white") acc[i].white += 1;
-          else continue;
-          acc[i].total += 1;
+      row.cells.forEach((cell, ci) => {
+        // Incrementa estatísticas para a primeira pedra (posição 0)
+        const spin0 = cell[0];
+        if (spin0) {
+          const p = acc[ci][0];
+          if (spin0.color === "red") p.red += 1;
+          else if (spin0.color === "black") p.black += 1;
+          else if (spin0.color === "white") p.white += 1;
+          p.total += 1;
+        }
+
+        // Incrementa estatísticas para a segunda pedra (posição 1)
+        const spin1 = cell[1];
+        if (spin1) {
+          const p = acc[ci][1];
+          if (spin1.color === "red") p.red += 1;
+          else if (spin1.color === "black") p.black += 1;
+          else if (spin1.color === "white") p.white += 1;
+          p.total += 1;
         }
       });
     }
-    return acc.map((c) => ({
-      ...c,
-      redPct: c.total ? (c.red / c.total) * 100 : 0,
-      blackPct: c.total ? (c.black / c.total) * 100 : 0,
-      whitePct: c.total ? (c.white / c.total) * 100 : 0,
-    }));
+
+    return acc.map((positions) => 
+      positions.map((p) => ({
+        ...p,
+        redPct: p.total ? (p.red / p.total) * 100 : 0,
+        blackPct: p.total ? (p.black / p.total) * 100 : 0,
+        whitePct: p.total ? (p.white / p.total) * 100 : 0,
+      }))
+    );
+  }, [gridRows]);
+
+  const rowStats = useMemo(() => {
+    // Estatísticas para a lateral esquerda (por linha)
+    return gridRows.map((row) => {
+      const stats = [
+        { red: 0, black: 0, white: 0, total: 0 }, // Posição 0
+        { red: 0, black: 0, white: 0, total: 0 }, // Posição 1
+      ];
+
+      row.cells.forEach((cell) => {
+        const spin0 = cell[0];
+        if (spin0) {
+          if (spin0.color === "red") stats[0].red += 1;
+          else if (spin0.color === "black") stats[0].black += 1;
+          else if (spin0.color === "white") stats[0].white += 1;
+          stats[0].total += 1;
+        }
+
+        const spin1 = cell[1];
+        if (spin1) {
+          if (spin1.color === "red") stats[1].red += 1;
+          else if (spin1.color === "black") stats[1].black += 1;
+          else if (spin1.color === "white") stats[1].white += 1;
+          stats[1].total += 1;
+        }
+      });
+
+      return stats.map(s => ({
+        ...s,
+        redPct: s.total ? (s.red / s.total) * 100 : 0,
+        blackPct: s.total ? (s.black / s.total) * 100 : 0,
+        whitePct: s.total ? (s.white / s.total) * 100 : 0,
+      }));
+    });
   }, [gridRows]);
 
   const signalsByHM = useMemo(() => {
