@@ -213,6 +213,89 @@ function computeRange(
   };
 }
 
+const ColumnBlock = memo(function ColumnBlock({
+  col,
+  spins,
+  highlightN,
+  highlightKey,
+  inverse,
+  numerado,
+  destaqueHorario,
+  exibirSegundos,
+  contarColunas,
+  futureSlots,
+  slotPredictions,
+  cycleSlotPrediction,
+}: any) {
+  const isActive = highlightKey === String(col);
+  const filtered = spins.filter((s: any) => s.time.endsWith(String(col)));
+  const rows = chunk(filtered, 2);
+
+  return (
+    <div
+      className={`flex min-w-[120px] flex-col gap-y-4 rounded-lg border border-transparent p-1 transition-colors duration-300 ${
+        isActive ? "bg-primary/10" : ""
+      }`}
+    >
+      {rows.map((pair: any[], rIdx: number) => (
+        <div key={rIdx} className="flex gap-x-2">
+          <BlazeResultCardWrapper
+            item={pair[0]}
+            isActive={isActive}
+            highlightKey={highlightKey}
+            highlightN={highlightN}
+            numerado={numerado}
+            destaqueHorario={destaqueHorario}
+            exibirSegundos={exibirSegundos}
+          />
+          <BlazeResultCardWrapper
+            item={pair[1]}
+            isActive={isActive}
+            highlightKey={highlightKey}
+            highlightN={highlightN}
+            numerado={numerado}
+            destaqueHorario={destaqueHorario}
+            exibirSegundos={exibirSegundos}
+          />
+        </div>
+      ))}
+    </div>
+  );
+});
+
+const BlazeResultCardWrapper = memo(function BlazeResultCardWrapper({
+  item,
+  isActive,
+  highlightKey,
+  highlightN,
+  numerado,
+  destaqueHorario,
+  exibirSegundos,
+}: any) {
+  if (!item) return <div className="h-[68px] w-[48px]" />;
+  return (
+    <div className="flex flex-col items-center">
+      <BlazeResultCard
+        n={item.n}
+        color={item.color}
+        time={exibirSegundos ? spTimeWithSeconds(item) : item.time}
+        numbered={numerado}
+        timeHighlight={destaqueHorario}
+        dimmed={
+          (highlightKey !== null && !isActive) ||
+          (highlightN.size > 0 && !highlightN.has(item.n))
+        }
+      />
+    </div>
+  );
+});
+
+function chunk<T>(arr: T[], size: number): T[][] {
+  const res: T[][] = [];
+  for (let i = 0; i < arr.length; i += size) res.push(arr.slice(i, i + size));
+  return res;
+}
+
 function Index() {
   const section = useSection();
   const [inverse, setInverse] = useState(false);
