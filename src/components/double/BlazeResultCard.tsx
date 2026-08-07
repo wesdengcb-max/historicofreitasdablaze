@@ -8,9 +8,9 @@ export const BLAZE_GAP_X = 8;
 export const BLAZE_GAP_Y = 14;
 
 const PALETTE: Record<Color, { bg: string; border: string; ring: string; fg: string }> = {
-  red: { bg: "linear-gradient(180deg, #DE2143 0%, #FF1F3D 100%)", border: "rgba(255, 255, 255, 0.1)", ring: "#ffffff", fg: "#ffffff" },
-  black: { bg: "linear-gradient(180deg, #2A2A2A 0%, #1A1A1A 100%)", border: "rgba(255, 255, 255, 0.05)", ring: "#ffffff", fg: "#ffffff" },
-  white: { bg: "#ffffff", border: "#ffffff", ring: "#000000", fg: "#16171d" },
+  red: { bg: "var(--red)", border: "rgba(255, 255, 255, 0.1)", ring: "#ffffff", fg: "#ffffff" },
+  black: { bg: "var(--black-tile)", border: "rgba(255, 255, 255, 0.05)", ring: "#ffffff", fg: "#ffffff" },
+  white: { bg: "var(--white-tile)", border: "var(--white-tile)", ring: "#000000", fg: "#16171d" },
 };
 
 type Props = {
@@ -86,7 +86,7 @@ export const BlazeResultCard = memo(function BlazeResultCard({
       {time && (
         <span
           className={`mt-[5px] text-center leading-none tabular-nums ${
-            timeHighlight ? "font-bold text-primary" : "text-[#8ebcf0]"
+            timeHighlight ? "font-bold text-primary" : "text-muted-foreground"
           }`}
           style={{ fontSize: "var(--blaze-time, 11px)" }}
         >

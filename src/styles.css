@@ -2,16 +2,17 @@
 @source "../src";
 @import "tw-animate-css";
 @import "@fontsource-variable/inter";
+@import "@fontsource-variable/outfit";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --font-sans: "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-outfit: "Outfit", var(--font-sans);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --font-outfit: "Outfit Variable", "Outfit", var(--font-sans);
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -42,87 +43,76 @@
 }
 
 :root {
-  --radius: 16px;
+  --radius: 8px;
 
-  /* Premium Dark Theme */
-  --background: #090909;
-  --foreground: #FFFFFF;
+  /* TipMiner Inspired Dark Theme */
+  --background: #0f111a;
+  --foreground: #ffffff;
 
-  --surface: #111111;
-  --surface-2: #0C0C0C;
-  --surface-3: #101114;
+  --surface: #161825;
+  --surface-2: #1c1f2e;
+  --surface-3: #23273a;
 
-  --card: #111111;
-  --card-foreground: #FFFFFF;
-  --popover: #111111;
-  --popover-foreground: #FFFFFF;
+  --card: #161825;
+  --card-foreground: #ffffff;
+  --popover: #1c1f2e;
+  --popover-foreground: #ffffff;
 
-  --primary: #FF1F3D;
-  --primary-foreground: #FFFFFF;
+  /* Color of highlight - TipMiner Blue */
+  --primary: #3b82f6; 
+  --primary-foreground: #ffffff;
 
-  --secondary: #0C0C0C;
-  --secondary-foreground: #9CA3AF;
+  --secondary: #1c1f2e;
+  --secondary-foreground: #94a3b8;
 
-  --muted: #111111;
-  --muted-foreground: #9CA3AF;
+  --muted: #1c1f2e;
+  --muted-foreground: #64748b;
 
-  --accent: #FF2648;
-  --accent-foreground: #FFFFFF;
+  --accent: #3b82f6;
+  --accent-foreground: #ffffff;
 
-  --destructive: #FF1F3D;
-  --destructive-foreground: #FFFFFF;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
 
-  --border: rgba(255, 255, 255, 0.05);
+  --border: rgba(255, 255, 255, 0.08);
   --input: rgba(255, 255, 255, 0.05);
-  --ring: #FF1F3D;
+  --ring: #3b82f6;
 
-  /* Roulette tile palette - slightly adjusted for premium feel */
-  --red: #FF1F3D;
-  --red-foreground: #FFFFFF;
-  --black-tile: #1A1A1A;
-  --white-tile: #FFFFFF;
-  --positive: #00FF88;
+  /* Roulette tiles */
+  --red: #ef4444;
+  --red-foreground: #ffffff;
+  --black-tile: #1a1c24;
+  --white-tile: #ffffff;
+  --positive: #22c55e;
 
-  /* Premium Decorations */
-  --gradient-primary: linear-gradient(180deg, #DE2143 0%, #FF1F3D 100%);
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4);
-  --shadow-elegant: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 25px rgba(255, 30, 60, 0.18);
-  --shadow-btn: 0 10px 35px rgba(255, 30, 60, 0.35);
+  /* Decorations */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-elegant: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.15);
 }
 
 .light {
   color-scheme: light;
   --background: #f8fafc;
   --foreground: #0f172a;
-
-  --surface:   #ffffff;
+  --surface: #ffffff;
   --surface-2: #f1f5f9;
   --surface-3: #e2e8f0;
-
   --card: #ffffff;
   --card-foreground: #0f172a;
-  --popover: #ffffff;
-  --popover-foreground: #0f172a;
-
-  --primary: #FF1F3D; /* Keep primary red */
-  --primary-foreground: #FFFFFF;
-
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
   --secondary: #f1f5f9;
   --secondary-foreground: #0f172a;
-
   --muted: #f1f5f9;
   --muted-foreground: #64748b;
-
-  --accent: #f1f5f9;
-  --accent-foreground: #0f172a;
-
-  --border: rgba(0, 0, 0, 0.08);
-  --input: rgba(0, 0, 0, 0.1);
-  --ring: #FF1F3D;
-
-  --black-tile: #1A1A1A; /* Maintain tile colors */
-  --white-tile: #FFFFFF;
+  --accent: #3b82f6;
+  --accent-foreground: #ffffff;
+  --border: rgba(0, 0, 0, 0.1);
+  --input: rgba(0, 0, 0, 0.05);
+  --ring: #3b82f6;
+  --black-tile: #1a1c24;
+  --white-tile: #ffffff;
 }
 
 .light body {
@@ -134,7 +124,7 @@
   background: rgba(255, 255, 255, 0.95) !important;
   border: 1px solid rgba(0, 0, 0, 0.08) !important;
   color: #0f172a !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
 }
 
 .light header {
@@ -200,38 +190,23 @@
   }
   body {
     font-feature-settings: "ss01", "cv11";
-    background-color: #090909;
+    background-color: var(--background);
     background-image: 
-      radial-gradient(circle at 50% -20%, rgba(255, 31, 61, 0.15) 0%, transparent 50%),
-      radial-gradient(circle at 0% 0%, rgba(255, 31, 61, 0.05) 0%, transparent 30%),
-      radial-gradient(circle at 100% 100%, rgba(255, 31, 61, 0.05) 0%, transparent 30%);
+      radial-gradient(circle at 50% -20%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 0% 0%, rgba(59, 130, 246, 0.03) 0%, transparent 30%);
     background-attachment: fixed;
     min-height: 100vh;
     position: relative;
-  }
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-    opacity: 0.02;
-    pointer-events: none;
-    z-index: 0;
   }
 
   ::selection { background: color-mix(in oklab, var(--primary) 40%, transparent); color: var(--foreground); }
 }
 
 @utility glass-card {
-  background: rgba(17, 17, 17, 0.85);
-  border: 1px solid rgba(222, 33, 67, 0.2);
-  box-shadow: 
-    0 0 0 1px rgba(222, 33, 67, 0.1),
-    0 0 20px rgba(222, 33, 67, 0.15),
-    inset 0 0 12px rgba(222, 33, 67, 0.05);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-elegant);
+  border-radius: var(--radius-lg);
   position: relative;
   overflow: hidden;
 }
@@ -252,35 +227,31 @@
 }
 
 @utility premium-btn {
-  background: linear-gradient(180deg, #DE2143 0%, #FF1F3D 100%);
-  box-shadow: 0 10px 35px rgba(255, 30, 60, 0.35);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: var(--radius-md);
+  padding: 8px 16px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 
-  &:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 15px 45px rgba(255, 30, 60, 0.45);
+  &:hover:not(:disabled) {
+    background: color-mix(in oklab, var(--primary) 90%, white);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 }
 
-@utility logo-glow {
-  position: relative;
-  &::before {
-    content: "";
-    position: absolute;
-    inset: -4px;
-    border-radius: 9999px;
-    padding: 2px;
-    background: linear-gradient(135deg, #FF1F3D, #DE2143, #c9a84c, #FF1F3D);
-    background-size: 300% 300%;
-    animation: gradientMove 3s ease infinite, logoPulse 2s ease-in-out infinite;
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-    box-shadow: 0 0 15px rgba(255, 31, 61, 0.4);
-  }
-}
+/* Removido logo-glow antigo */
 
 @keyframes gradientMove {
   0% { background-position: 0% 50%; }
@@ -307,14 +278,21 @@
 
 
 @utility premium-input {
-  background: #111111;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  transition: all 0.3s ease;
+  background: var(--input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--foreground);
+  transition: all 0.2s ease;
 
   &:focus {
-    border-color: rgba(255, 40, 70, 0.35);
-    box-shadow: 0 0 15px rgba(255, 30, 60, 0.15);
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px color-mix(in oklab, var(--primary) 20%, transparent);
+  }
+
+  &::placeholder {
+    color: var(--muted-foreground);
+    opacity: 0.5;
   }
 }
 

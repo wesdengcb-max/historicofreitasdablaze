@@ -58,7 +58,7 @@ export function TopNav() {
   };
 
   return (
-    <nav className="relative z-50 border-b border-white/[0.05] bg-[#101114]/80 backdrop-blur-2xl">
+    <nav className="relative z-50 border-b border-white/[0.05] bg-surface/80 backdrop-blur-2xl">
       <div className="mx-auto flex max-w-[1440px] items-center justify-between px-4 py-2 sm:px-6">
         <div className="flex flex-1 gap-1 overflow-x-auto scrollbar-none">
           {ITEMS.map((item) => {
@@ -72,7 +72,7 @@ export function TopNav() {
                 onClick={() => handleSectionClick(item)}
                 className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-bold transition sm:text-xs font-outfit ${
                   isActive
-                    ? "bg-[#FF1F3D]/10 border border-[#FF1F3D]/30 text-white shadow-[0_0_15px_rgba(255,31,61,0.1)]"
+                    ? "bg-primary/10 border border-primary/30 text-white shadow-[0_0_15px_rgba(59,130,246,0.1)]"
                     : "border border-transparent text-[#9CA3AF] hover:bg-white/[0.03] hover:text-white"
                 } ${isLocked ? "opacity-60" : ""}`}
               >
@@ -110,9 +110,9 @@ export function TopNav() {
                 <Crown className="h-4 w-4" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 border-white/10 bg-[#101114]">
+            <DropdownMenuContent align="end" className="w-56 border-white/10 bg-surface">
               <div className="px-2 py-2">
-                <p className="font-outfit text-xs font-black uppercase tracking-widest text-[#FF1F3D]">
+                <p className="font-outfit text-xs font-black uppercase tracking-widest text-primary">
                   Membro VIP
                 </p>
                 <p className="mt-1 text-[11px] text-muted-foreground">
@@ -131,7 +131,7 @@ export function TopNav() {
                       : "Recursos premium foram bloqueados.",
                   });
                 }}
-                className="mt-1 flex cursor-pointer items-center gap-2 font-bold text-white focus:bg-[#FF1F3D]/20 focus:text-white"
+                className="mt-1 flex cursor-pointer items-center gap-2 font-bold text-white focus:bg-primary/20 focus:text-white"
               >
                 <Crown className={`h-4 w-4 ${isVip ? "text-amber-400" : ""}`} />
                 <span>{isVip ? "Desativar VIP (Demo)" : "Ativar VIP (Demo)"}</span>

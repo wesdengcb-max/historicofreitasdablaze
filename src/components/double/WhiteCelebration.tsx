@@ -130,7 +130,7 @@ export function WhiteCelebration({ spin, onClose }: Props) {
           aria-live="assertive"
           onClick={onClose}
         >
-          <div className="absolute inset-0 bg-[oklch(0.12_0.01_260/0.72)] backdrop-blur-[3px]" />
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-[3px]" />
           <Fireworks running />
 
           <motion.div
@@ -155,7 +155,7 @@ export function WhiteCelebration({ spin, onClose }: Props) {
                 alt="Branco"
                 animate={{ y: [0, -12, 0], scale: [1, 1.04, 1] }}
                 transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
-                className="relative h-40 w-40 rounded-full object-cover ring-4 ring-white/70 sm:h-56 sm:w-56"
+                className="relative h-40 w-40 rounded-full object-cover ring-4 ring-primary/70 sm:h-56 sm:w-56"
                 style={{ boxShadow: "0 0 90px oklch(1 0 0 / 0.55), 0 30px 80px -20px oklch(0 0 0 / 0.8)" }}
                 draggable={false}
               />
@@ -220,7 +220,7 @@ export function WhiteAlertToggleFx({ state, onDone }: { state: "on" | "off" | nu
               border: "1px solid rgba(255,255,255,0.15)"
             }}
           >
-            <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-white ring-2 ring-white/50">
+            <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-white ring-2 ring-primary/50">
               <img src={brancoVip.url} alt="" className="h-full w-full object-cover" />
               {state === "on" && (
                 <span className="absolute inset-0 animate-ping rounded-full bg-white/60" />

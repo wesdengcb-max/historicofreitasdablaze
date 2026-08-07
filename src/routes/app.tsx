@@ -802,12 +802,12 @@ function Index() {
     <div
       className="history-metrics min-h-dvh w-full [--cols:10]"
     >
-      <header className="sticky top-0 z-30 border-b border-white/5 bg-background/70 backdrop-blur-xl">
+      <header className="sticky top-0 z-30 border-b border-white/5 bg-background/80 backdrop-blur-xl">
         <div className="mx-auto flex h-12 max-w-[1440px] items-center gap-2 px-4 sm:h-14 sm:gap-4 sm:px-6 lg:h-16 lg:px-6">
           <div className="flex min-w-0 items-center gap-3">
             <div
-              className="grid h-7 w-7 shrink-0 place-items-center overflow-hidden rounded-xl bg-white ring-1 ring-white/40 sm:h-9 sm:w-9"
-              style={{ boxShadow: "var(--shadow-glow)" }}
+              className="grid h-7 w-7 shrink-0 place-items-center overflow-hidden rounded-xl bg-white border border-white/40 sm:h-9 sm:w-9"
+              
             >
               <img src={freitasLogo.url} alt="Freitas Blaze" className="h-full w-full object-cover" />
             </div>
@@ -877,7 +877,7 @@ function Index() {
           </Card>
         </main>
       ) : (
-      <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-3 px-4 py-3 sm:gap-5 sm:px-6 sm:py-6 lg:gap-6 lg:px-6 lg:py-10 bg-[#090909]">
+      <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-3 px-4 py-3 sm:gap-5 sm:px-6 sm:py-6 lg:gap-6 lg:px-6 lg:py-10 bg-background">
 
         <section className="space-y-3 sm:space-y-5 lg:space-y-6">
           <Card delay={0.05}>
@@ -932,14 +932,14 @@ function Index() {
                         key={it.key}
                         className={`rounded-xl border p-2 transition-colors sm:p-2.5 ${
                           isLeader
-                            ? "border-emerald-400/70 shadow-[0_0_0_1px_rgba(16,185,129,0.35),0_8px_24px_-12px_rgba(16,185,129,0.45)]"
+                            ? "border-primary/70 bg-primary/10 shadow-[0_0_15px_rgba(59,130,246,0.2)]"
                             : "border-white/5 bg-white/[0.02]"
                         }`}
                       >
                         <div className="flex min-w-0 items-center gap-2">
                           <ResultCircle color={it.color} n={it.color === "white" ? undefined : 0} size="sm" animate={false} />
                           <div className="min-w-0 flex-1">
-                            <div className={`text-[13px] font-semibold tabular-nums ${isLeader ? "text-emerald-400" : "text-foreground"}`}>
+                            <div className={`text-[13px] font-semibold tabular-nums ${isLeader ? "text-primary" : "text-foreground"}`}>
                               {it.pct.toFixed(1)}%
                             </div>
                             <div className="truncate text-[10px] tabular-nums text-muted-foreground">
@@ -953,7 +953,7 @@ function Index() {
                             style={{
                               width: `${Math.min(100, it.pct)}%`,
                               background: isLeader
-                                ? "linear-gradient(90deg, #DE2143, #FF1F3D)"
+                                ? "linear-gradient(90deg, #3b82f6, #60a5fa)"
                                 : it.tint,
                             }}
                           />
@@ -969,11 +969,11 @@ function Index() {
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] text-muted-foreground">
                 <span className="inline-flex items-center gap-2">
                   <Flame className="h-3.5 w-3.5" />
-                  Último branco há <b className="text-[#FF1F3D] font-black">{lastWhiteAgo}</b> rodadas
+                  Último branco há <b className="text-primary font-black">{lastWhiteAgo}</b> rodadas
                 </span>
                 <span className="inline-flex items-center gap-2">
                   <Activity className="h-3.5 w-3.5" />
-                  Brancos seguidos <b className="text-[#FF1F3D] font-black">{countConsecutive(visibleSpins, "white")}</b>
+                  Brancos seguidos <b className="text-primary font-black">{countConsecutive(visibleSpins, "white")}</b>
                 </span>
               </div>
               <div className="flex flex-wrap items-center gap-1.5 sm:justify-end">
@@ -982,7 +982,7 @@ function Index() {
                 </span>
                 {freq.map((f) => (
                   <div key={f.n} className="flex items-center gap-1">
-                    <ResultCircle color={colorOf(f.n)} n={f.n} size="sm" animate={false} className="shadow-[0_0_10px_rgba(255,31,61,0.2)]" />
+                    <ResultCircle color={colorOf(f.n)} n={f.n} size="sm" animate={false} className="shadow-[0_0_10px_rgba(59,130,246,0.1)]" />
                     <span className="text-[10px] tabular-nums text-muted-foreground">{f.count}</span>
                   </div>
                 ))}
