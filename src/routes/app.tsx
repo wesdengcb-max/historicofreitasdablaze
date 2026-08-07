@@ -803,7 +803,7 @@ function Index() {
       className="history-metrics min-h-dvh [--cols:10]"
     >
       <header className="sticky top-0 z-30 border-b border-white/5 bg-background/70 backdrop-blur-xl">
-        <div className="mx-auto grid h-12 max-w-[1366px] grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-2 sm:h-14 sm:gap-4 sm:px-6 lg:h-16 lg:px-8">
+        <div className="flex h-12 w-full items-center gap-2 px-4 sm:h-14 sm:gap-4 sm:px-6 lg:h-16 lg:px-6">
           <div className="flex min-w-0 items-center gap-3">
             <div
               className="grid h-7 w-7 shrink-0 place-items-center overflow-hidden rounded-xl bg-white ring-1 ring-white/40 sm:h-9 sm:w-9"
