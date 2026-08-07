@@ -42,15 +42,12 @@ import { LeftStatsDrawer } from "@/components/double/LeftStatsDrawer";
 
 
 import { colorOf, fmtTime, type Spin } from "@/components/double/types";
-import brancoVip from "@/assets/branco-vip.png.asset.json";
-import brancoTile from "@/assets/branco-tile.png.asset.json";
 import {
   BlazeResultCard,
   BLAZE_CARD_W,
   BLAZE_GAP_X,
   BLAZE_GAP_Y,
 } from "@/components/double/BlazeResultCard";
-import freitasLogo from "@/assets/freitas-logo.jpg.asset.json";
 
 import { getSignals, subscribeSignals, type StoredSignal } from "@/lib/signalsStore";
 import { TopNav } from "@/components/TopNav";
@@ -120,28 +117,6 @@ function rowToSpin(r: Row): Spin {
     time: fmtTime(r.created_at),
     createdAt: r.created_at,
   };
-}
-
-function dedupeById<T extends { id: number | string }>(items: T[]): T[] {
-  return dedupeByIdImpl(items);
-}
-
-const spSecondsFormatter = new Intl.DateTimeFormat("pt-BR", {
-  timeZone: "America/Sao_Paulo",
-  hour: "2-digit",
-  minute: "2-digit",
-  second: "2-digit",
-  hour12: false,
-});
-
-// Exibe HH:MM:SS no fuso de Brasília; cai para o horário já formatado se não houver timestamp.
-function spTimeWithSeconds(spin: Spin): string {
-  const raw = (spin.createdAt ?? "").trim();
-  if (!raw) return spin.time;
-  const hasTz = /Z$|[+-]\d{2}:?\d{2}$/.test(raw);
-  const d = new Date(hasTz ? raw : `${raw.replace(" ", "T")}Z`);
-  if (Number.isNaN(d.getTime())) return spin.time;
-  return spSecondsFormatter.format(d);
 }
 
 function dedupeByIdImpl<T extends { id: number | string }>(items: T[]): T[] {
