@@ -296,14 +296,21 @@
 
 
 @utility premium-input {
-  background: #111111;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  transition: all 0.3s ease;
+  background: var(--input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--foreground);
+  transition: all 0.2s ease;
 
   &:focus {
-    border-color: rgba(255, 40, 70, 0.35);
-    box-shadow: 0 0 15px rgba(255, 30, 60, 0.15);
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px color-mix(in oklab, var(--primary) 20%, transparent);
+  }
+
+  &::placeholder {
+    color: var(--muted-foreground);
+    opacity: 0.5;
   }
 }
 
