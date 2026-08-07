@@ -120,7 +120,13 @@ function rowToSpin(r: Row): Spin {
 }
 
 function dedupeById<T extends { id: number | string }>(items: T[]): T[] {
-  return dedupeByIdImpl(items);
+  const byId = new Map<string, T>();
+  for (const item of items) {
+    const key = String(item.id);
+    if (!key || key === "undefined" || key === "null") continue;
+    if (!byId.has(key)) byId.set(key, item);
+  }
+  return Array.from(byId.values());
 }
 
 const spSecondsFormatter = new Intl.DateTimeFormat("pt-BR", {
