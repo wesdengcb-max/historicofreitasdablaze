@@ -806,8 +806,8 @@ function Index() {
         <div className="mx-auto flex h-12 max-w-[1440px] items-center gap-2 px-4 sm:h-14 sm:gap-4 sm:px-6 lg:h-16 lg:px-6">
           <div className="flex min-w-0 items-center gap-3">
             <div
-              className="grid h-7 w-7 shrink-0 place-items-center overflow-hidden rounded-xl bg-white ring-1 ring-white/40 sm:h-9 sm:w-9"
-              style={{ boxShadow: "var(--shadow-glow)" }}
+              className="grid h-7 w-7 shrink-0 place-items-center overflow-hidden rounded-xl bg-white border border-white/40 sm:h-9 sm:w-9"
+              
             >
               <img src={freitasLogo.url} alt="Freitas Blaze" className="h-full w-full object-cover" />
             </div>
