@@ -333,7 +333,7 @@ function Index() {
       let q = supabase
         .from("blaze_results")
         .select("id, roll, color, created_at")
-        .order("created_at", { ascending: false })
+        .order("id", { ascending: false })
         .range(from, to);
       if (range.start) q = q.gte("created_at", range.start);
       if (range.end) q = q.lte("created_at", range.end);
