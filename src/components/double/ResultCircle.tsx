@@ -79,4 +79,4 @@ export const ResultCircle = memo(function ResultCircle({ color, n, size = "md", 
       {content}
     </motion.div>
   );
-}
+});
