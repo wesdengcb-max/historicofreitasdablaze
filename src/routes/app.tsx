@@ -42,15 +42,12 @@ import { LeftStatsDrawer } from "@/components/double/LeftStatsDrawer";
 
 
 import { colorOf, fmtTime, type Spin } from "@/components/double/types";
-import brancoVip from "@/assets/branco-vip.png.asset.json";
-import brancoTile from "@/assets/branco-tile.png.asset.json";
 import {
   BlazeResultCard,
   BLAZE_CARD_W,
   BLAZE_GAP_X,
   BLAZE_GAP_Y,
 } from "@/components/double/BlazeResultCard";
-import freitasLogo from "@/assets/freitas-logo.jpg.asset.json";
 
 import { getSignals, subscribeSignals, type StoredSignal } from "@/lib/signalsStore";
 import { TopNav } from "@/components/TopNav";
@@ -123,7 +120,13 @@ function rowToSpin(r: Row): Spin {
 }
 
 function dedupeById<T extends { id: number | string }>(items: T[]): T[] {
-  return dedupeByIdImpl(items);
+  const byId = new Map<string, T>();
+  for (const item of items) {
+    const key = String(item.id);
+    if (!key || key === "undefined" || key === "null") continue;
+    if (!byId.has(key)) byId.set(key, item);
+  }
+  return Array.from(byId.values());
 }
 
 const spSecondsFormatter = new Intl.DateTimeFormat("pt-BR", {
@@ -134,7 +137,6 @@ const spSecondsFormatter = new Intl.DateTimeFormat("pt-BR", {
   hour12: false,
 });
 
-// Exibe HH:MM:SS no fuso de Brasília; cai para o horário já formatado se não houver timestamp.
 function spTimeWithSeconds(spin: Spin): string {
   const raw = (spin.createdAt ?? "").trim();
   if (!raw) return spin.time;
@@ -144,15 +146,9 @@ function spTimeWithSeconds(spin: Spin): string {
   return spSecondsFormatter.format(d);
 }
 
-function dedupeByIdImpl<T extends { id: number | string }>(items: T[]): T[] {
-  const byId = new Map<string, T>();
-  for (const item of items) {
-    const key = String(item.id);
-    if (!key || key === "undefined" || key === "null") continue;
-    if (!byId.has(key)) byId.set(key, item);
-  }
-  return Array.from(byId.values());
-}
+import brancoTile from "@/assets/branco-tile.png.asset.json";
+import freitasLogo from "@/assets/freitas-logo.jpg.asset.json";
+
 
 // Retorna YYYY-MM-DD para uma data no fuso America/Sao_Paulo.
 function spYmd(d: Date = new Date()): string {
@@ -215,6 +211,89 @@ function computeRange(
     end: spToUtcIso(e, tEnd),
     includesNow: new Date(spToUtcIso(e, tEnd)).getTime() >= Date.now(),
   };
+}
+
+const ColumnBlock = memo(function ColumnBlock({
+  col,
+  spins,
+  highlightN,
+  highlightKey,
+  inverse,
+  numerado,
+  destaqueHorario,
+  exibirSegundos,
+  contarColunas,
+  futureSlots,
+  slotPredictions,
+  cycleSlotPrediction,
+}: any) {
+  const isActive = highlightKey === String(col);
+  const filtered = spins.filter((s: any) => s.time.endsWith(String(col)));
+  const rows = chunk(filtered, 2);
+
+  return (
+    <div
+      className={`flex min-w-[120px] flex-col gap-y-4 rounded-lg border border-transparent p-1 transition-colors duration-300 ${
+        isActive ? "bg-primary/10" : ""
+      }`}
+    >
+      {rows.map((pair: any[], rIdx: number) => (
+        <div key={rIdx} className="flex gap-x-2">
+          <BlazeResultCardWrapper
+            item={pair[0]}
+            isActive={isActive}
+            highlightKey={highlightKey}
+            highlightN={highlightN}
+            numerado={numerado}
+            destaqueHorario={destaqueHorario}
+            exibirSegundos={exibirSegundos}
+          />
+          <BlazeResultCardWrapper
+            item={pair[1]}
+            isActive={isActive}
+            highlightKey={highlightKey}
+            highlightN={highlightN}
+            numerado={numerado}
+            destaqueHorario={destaqueHorario}
+            exibirSegundos={exibirSegundos}
+          />
+        </div>
+      ))}
+    </div>
+  );
+});
+
+const BlazeResultCardWrapper = memo(function BlazeResultCardWrapper({
+  item,
+  isActive,
+  highlightKey,
+  highlightN,
+  numerado,
+  destaqueHorario,
+  exibirSegundos,
+}: any) {
+  if (!item) return <div className="h-[68px] w-[48px]" />;
+  return (
+    <div className="flex flex-col items-center">
+      <BlazeResultCard
+        n={item.n}
+        color={item.color}
+        time={exibirSegundos ? spTimeWithSeconds(item) : item.time}
+        numbered={numerado}
+        timeHighlight={destaqueHorario}
+        dimmed={
+          (highlightKey !== null && !isActive) ||
+          (highlightN.size > 0 && !highlightN.has(item.n))
+        }
+      />
+    </div>
+  );
+});
+
+function chunk<T>(arr: T[], size: number): T[][] {
+  const res: T[][] = [];
+  for (let i = 0; i < arr.length; i += size) res.push(arr.slice(i, i + size));
+  return res;
 }
 
 function Index() {
@@ -337,7 +416,7 @@ function Index() {
       let q = supabase
         .from("blaze_results")
         .select("id, roll, color, created_at")
-        .order("created_at", { ascending: false })
+        .order("id", { ascending: false })
         .range(from, to);
       if (range.start) q = q.gte("created_at", range.start);
       if (range.end) q = q.lte("created_at", range.end);

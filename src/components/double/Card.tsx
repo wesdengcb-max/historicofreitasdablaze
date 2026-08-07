@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { motion } from "framer-motion";
 import type { ReactNode } from "react";
 
@@ -11,7 +12,7 @@ type Props = {
   className?: string;
 };
 
-export function Card({ title, subtitle, icon, action, children, delay = 0, className = "" }: Props) {
+export const Card = memo(function Card({ title, subtitle, icon, action, children, delay = 0, className = "" }: Props) {
   return (
     <motion.section
       initial={{ opacity: 0, y: 12 }}
@@ -38,4 +39,4 @@ export function Card({ title, subtitle, icon, action, children, delay = 0, class
       {children}
     </motion.section>
   );
-}
+});

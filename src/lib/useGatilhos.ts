@@ -39,7 +39,7 @@ export function useGatilhos(analise: string, pedra: number) {
     try {
       const { data, error: err } = await supabase
         .from("gatilhos_analise")
-        .select("id, analise, pedra, minuto, fuso_horario, trigger_at, detalhe, gaps")
+        .select("analise, pedra, minuto, trigger_at, detalhe, gaps")
         .eq("analise", analise)
         .eq("pedra", pedra)
         .order("trigger_at", { ascending: false })
@@ -47,18 +47,16 @@ export function useGatilhos(analise: string, pedra: number) {
         
       if (err) {
         if (err.message.includes("schema cache")) {
-          setError("Sincronizando banco de dados... Por favor, aguarde alguns instantes.");
+          setError("Sincronizando banco de dados...");
         } else {
           setError(err.message);
         }
-        console.error("[useGatilhos] Supabase error:", err);
       } else {
         setError(null);
         setRows(((data ?? []) as GatilhoRow[]).slice().reverse());
       }
     } catch (e) {
-      setError("Erro ao conectar com o servidor.");
-      console.error("[useGatilhos] Load error:", e);
+      setError("Erro de conexão.");
     } finally {
       setLoading(false);
     }

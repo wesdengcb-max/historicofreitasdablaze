@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { motion } from "framer-motion";
 
 type Props = {
@@ -5,7 +6,7 @@ type Props = {
   color?: "red" | "black" | "primary";
 };
 
-export function ProgressBar({ value, color = "primary" }: Props) {
+export const ProgressBar = memo(function ProgressBar({ value, color = "primary" }: Props) {
   const bg =
     color === "red"
       ? "var(--gradient-red)"
@@ -23,4 +24,4 @@ export function ProgressBar({ value, color = "primary" }: Props) {
       />
     </div>
   );
-}
+});
