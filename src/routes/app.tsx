@@ -1060,50 +1060,50 @@ function Index() {
                   <Switch checked={realtime} onChange={setRealtime} label="Tempo real" />
                 </div>
 
-                <div className="flex min-w-0 items-center">
+                <div className="flex shrink-0 items-center">
                   <Switch
                     checked={viewMode === "colunas"}
                     onChange={(v) => setViewMode(v ? "colunas" : "lista")}
                     label="Colunas fixas"
                   />
                 </div>
-                <div className="flex min-w-0 items-center">
+                <div className="flex shrink-0 items-center">
                   <Switch checked={contarColunas} onChange={setContarColunas} label="Contar colunas" />
                 </div>
-                <div className="flex min-w-0 items-center">
+                <div className="flex shrink-0 items-center">
                   <Switch checked={inverse} onChange={setInverse} label="Sentido inverso" />
                 </div>
-                <div className="flex min-w-0 items-center">
+                <div className="flex shrink-0 items-center">
                   <Switch checked={numerado} onChange={setNumerado} label="Numerado" />
                 </div>
-                <div className="flex min-w-0 items-center">
+                <div className="flex shrink-0 items-center">
                   <Switch checked={exibirSegundos} onChange={setExibirSegundos} label="Exibir segundos" />
                 </div>
-                <div className="flex min-w-0 items-center">
+                <div className="flex shrink-0 items-center">
                   <Switch checked={whiteAlert} onChange={toggleWhiteAlert} label="Alerta de branco" />
                 </div>
-                <div className="flex min-w-0 items-center">
+                <div className="flex shrink-0 items-center">
                   <Switch checked={destaqueHorario} onChange={setDestaqueHorario} label="Destaque horário" />
                 </div>
-                <div className="flex min-w-0 items-center">
-                  <div className={`flex items-center gap-2.5 rounded-full border px-3 py-1.5 transition-all ${isVip ? "border-amber-400/30 bg-amber-400/5 text-amber-400" : "border-white/5 bg-white/5 text-muted-foreground opacity-60"}`}>
+                <div className="flex shrink-0 items-center">
+                  <div className={`flex items-center gap-2 rounded-full border px-2.5 py-1 transition-all ${isVip ? "border-amber-400/30 bg-amber-400/5 text-amber-400" : "border-white/5 bg-white/5 text-muted-foreground opacity-60"}`}>
                     <Crown className="h-3.5 w-3.5" />
-                    <span className="text-[11px] font-bold uppercase tracking-wider font-outfit">
+                    <span className="text-[10px] font-bold uppercase tracking-wider font-outfit">
                       {isVip ? "VIP Ativo" : "Básico"}
                     </span>
                   </div>
                 </div>
 
-                <div className="flex min-w-0 items-center">
+                <div className="flex shrink-0 items-center">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button
                         type="button"
-                        className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-white/[0.09] hover:text-foreground"
+                        className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] font-medium text-muted-foreground transition-colors hover:bg-white/[0.09] hover:text-foreground"
                         title="Slots futuros"
                       >
                         <Clock className="h-3.5 w-3.5" />
-                        <span>Slots futuros: {futureSlots === 0 ? "Off" : `+${futureSlots} min`}</span>
+                        <span>Slots: {futureSlots === 0 ? "Off" : `+${futureSlots}`}</span>
                         <ChevronDown className="h-3 w-3 opacity-70" />
                       </button>
                     </DropdownMenuTrigger>
