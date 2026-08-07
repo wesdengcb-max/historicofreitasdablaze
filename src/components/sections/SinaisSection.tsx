@@ -344,7 +344,7 @@ export default function SinaisSection() {
 
 
   return (
-    <div className="min-h-screen bg-[#090909] p-4 sm:p-6 space-y-8">
+    <div className="min-h-screen bg-[#090909] px-4 py-6 sm:px-6 sm:py-8 space-y-8">
       {/* Gerador de sinais preditivos */}
       <PredictiveSignals />
 
