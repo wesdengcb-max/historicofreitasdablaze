@@ -19,7 +19,7 @@ export const Switch = memo(function Switch({ checked, onChange, label, id }: Pro
         onClick={() => onChange(!checked)}
         className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border transition-colors duration-300 ${
           checked
-            ? "border-[#DE2143]/40 bg-[#DE2143]/85"
+            ? "border-primary/40 bg-primary"
             : "border-white/10 bg-white/5"
         }`}
       >

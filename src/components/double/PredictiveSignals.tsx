@@ -273,11 +273,11 @@ export function PredictiveSignals() {
     <Card className="glass-card !p-0 overflow-hidden">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.05] bg-white/[0.02] px-6 py-5">
         <div className="flex items-center gap-4">
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-[#FF1F3D]/10 text-[#FF1F3D] shadow-[0_0_15px_rgba(255,31,61,0.1)]">
+          <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary shadow-[0_0_15px_rgba(59,130,246,0.1)]">
             <Sparkles className="h-5 w-5" />
           </div>
           <div>
-            <div className="text-[10px] font-black uppercase tracking-[0.4em] text-[#FF1F3D] font-outfit">
+            <div className="text-[10px] font-black uppercase tracking-[0.4em] text-primary font-outfit">
               Gerador preditivo
             </div>
             <h2 className="text-xl font-black text-white font-outfit uppercase tracking-tight">Próximo branco</h2>
@@ -366,7 +366,7 @@ export function PredictiveSignals() {
                         )}
                       </div>
                       <div className="mt-1 text-[11px] tabular-nums font-bold flex items-center gap-1.5">
-                        <span className={medal ? "text-inherit" : "text-[#FF1F3D]"}>
+                        <span className={medal ? "text-inherit" : "text-primary"}>
                           {s.pct.toFixed(1)}%
                         </span>
                         <span className="opacity-50 text-[10px]">· janela {s.label}</span>
@@ -405,7 +405,7 @@ export function PredictiveSignals() {
                       className={`rounded-2xl border px-5 py-4 backdrop-blur-sm transition-all duration-300 ${
                         medal 
                           ? medal.classes 
-                          : "border-[#FF1F3D]/20 bg-[#FF1F3D]/5 shadow-[0_0_25px_rgba(255,31,61,0.1)]"
+                          : "border-primary/20 bg-primary/5 shadow-[0_0_25px_rgba(59,130,246,0.1)]"
                       }`}
                     >
                       <div className="flex items-center justify-between gap-2">
@@ -415,7 +415,7 @@ export function PredictiveSignals() {
                             {medal.label}
                           </span>
                         ) : (
-                          <span className="rounded-full border border-[#FF1F3D]/30 bg-[#FF1F3D]/20 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest text-white">
+                          <span className="rounded-full border border-primary/30 bg-primary/20 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest text-white">
                             Alta assertividade
                           </span>
                         )}
@@ -431,13 +431,13 @@ export function PredictiveSignals() {
                         )}
                       </div>
                       <div className="mt-1 text-[11px] tabular-nums font-black">
-                        <span className={medal ? "text-inherit" : "text-[#FF1F3D]"}>
+                        <span className={medal ? "text-inherit" : "text-primary"}>
                           {s.pct.toFixed(1)}%
                         </span>
                       </div>
                       <div className="mt-2 text-[10px] leading-relaxed text-muted-foreground opacity-80">
                         Confluência Top 5:{" "}
-                        <span className={`font-bold ${medal ? "text-inherit" : "text-[#FF1F3D]"}`}>{s.confluence}</span>
+                        <span className={`font-bold ${medal ? "text-inherit" : "text-primary"}`}>{s.confluence}</span>
                       </div>
                       <div className="mt-1 flex flex-wrap gap-1">
                         {s.sources.map((p) => (
@@ -446,7 +446,7 @@ export function PredictiveSignals() {
                             className={
                               p.top5
                                 ? `rounded-full border px-2 py-0.5 text-[9px] font-black tabular-nums ${
-                                    medal ? "border-current/30 bg-current/10 text-inherit" : "border-[#FF1F3D]/30 bg-[#FF1F3D]/20 text-white"
+                                    medal ? "border-current/30 bg-current/10 text-inherit" : "border-primary/30 bg-primary/20 text-white"
                                   }`
                                 : "rounded-full border border-white/10 bg-white/[0.03] px-2 py-0.5 text-[9px] font-bold tabular-nums text-[#9CA3AF]"
                             }

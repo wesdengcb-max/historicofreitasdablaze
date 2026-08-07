@@ -34,7 +34,7 @@ export function StrategyTabs({ spins }: { spins: Spin[] }) {
               disabled={t.soon}
               className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl px-4 py-2.5 text-[11px] font-black uppercase tracking-widest transition sm:text-[11px] font-outfit ${
                 active
-                  ? "bg-[#FF1F3D] text-white shadow-[0_5px_15px_rgba(255,31,61,0.3)]"
+                  ? "bg-primary text-white shadow-[0_5px_15px_rgba(59,130,246,0.3)]"
                   : t.soon
                   ? "cursor-not-allowed text-[#9CA3AF]/30"
                   : "text-[#9CA3AF] hover:bg-white/[0.04] hover:text-white"
