@@ -1370,35 +1370,30 @@ function Index() {
                                       if (spin) {
                                         return (
                                           <div key={(spin as Spin).id} className="flex flex-col items-center">
-                                            <TipMinerCard
-                                              spin={spin as Spin}
-                                              highlightN={highlightN}
-                                              isActive={
-                                                highlightKey 
-                                                  ? highlightKey === `col-${ci}`
-                                                  : (highlightN.size > 0 ? highlightN.has((spin as Spin).n) : true)
-                                              }
-                                              numbered={numerado}
-                                              showSeconds={exibirSegundos}
-                                              timeHighlight={destaqueHorario}
-                                              showTime={false}
-                                              onClick={() => {
-                                                const n = (spin as Spin).n;
-                                                // Se clicar em uma pedra e já houver uma coluna selecionada,
-                                                // limpa a coluna e foca apenas na pedra.
-                                                if (highlightKey) {
-                                                  setHighlightKey(null);
-                                                  setHighlightN(new Set([n]));
-                                                  return;
+                                              <TipMinerCard
+                                                spin={spin as Spin}
+                                                highlightN={highlightN}
+                                                isActive={
+                                                  highlightKey 
+                                                    ? highlightKey === `col-${ci}-${i}`
+                                                    : (highlightN.size > 0 ? highlightN.has((spin as Spin).n) : true)
                                                 }
-                                                setHighlightN((h) => {
-                                                  const next = new Set(h);
-                                                  if (next.has(n)) next.delete(n);
-                                                  else next.add(n);
-                                                  return next;
-                                                });
-                                              }}
-                                            />
+                                                numbered={numerado}
+                                                showSeconds={exibirSegundos}
+                                                timeHighlight={destaqueHorario}
+                                                showTime={false}
+                                                onClick={() => {
+                                                  const n = (spin as Spin).n;
+                                                  const key = `col-${ci}-${i}`;
+                                                  if (highlightKey === key) {
+                                                    setHighlightKey(null);
+                                                    setHighlightN(new Set());
+                                                    return;
+                                                  }
+                                                  setHighlightKey(key);
+                                                  setHighlightN(new Set([n]));
+                                                }}
+                                              />
                                             <span className={`mt-[5px] text-[11px] tabular-nums leading-none font-medium h-[11px] flex items-center ${destaqueHorario ? "text-primary font-bold" : "text-[#8ebcf0]"}`}>
                                               {exibirSegundos ? spTimeWithSeconds(spin as Spin) : (spin as Spin).time}
                                             </span>
