@@ -95,7 +95,7 @@ function LandingPage() {
 
       {/* Content */}
       <main className="relative z-10 flex min-h-[100svh] w-full flex-col items-center justify-center gap-4 px-4 py-8 text-center sm:gap-6 sm:px-6">
-        <p className="text-[10px] font-black uppercase tracking-[0.5em] text-[#FF1F3D] animate-[fadeIn_0.6s_ease-out_both] sm:text-[12px] font-outfit">
+        <p className="text-[10px] font-black uppercase tracking-[0.5em] text-primary animate-[fadeIn_0.6s_ease-out_both] sm:text-[12px] font-outfit">
           Freitas White
         </p>
 
@@ -114,11 +114,11 @@ function LandingPage() {
           className="text-[clamp(3rem,10vw,7rem)] font-black leading-none tracking-tight animate-[fadeUp_0.8s_ease-out_0.35s_both] font-outfit uppercase"
           style={{
             background:
-              "linear-gradient(180deg, #FFFFFF 0%, #FF1F3D 100%)",
+              "linear-gradient(180deg, #FFFFFF 0%, #3b82f6 100%)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             filter:
-              "drop-shadow(0 0 30px rgba(229,57,53,0.55)) drop-shadow(0 0 80px rgba(229,57,53,0.35))",
+              "drop-shadow(0 0 30px rgba(59,130,246,0.35)) drop-shadow(0 0 80px rgba(59,130,246,0.15))",
           }}
         >
           LIBERADO
@@ -139,9 +139,9 @@ function LandingPage() {
             className="group relative inline-flex items-center gap-3 rounded-full px-8 py-3 text-sm font-semibold text-black transition-transform hover:scale-[1.03] active:scale-[0.98] sm:px-9 sm:py-3.5 sm:text-base"
             style={{
               background:
-                "linear-gradient(180deg, #ffb0b0 0%, #ff4d4d 100%)",
+                "linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%)",
               boxShadow:
-                "0 0 40px rgba(229,57,53,0.55), 0 0 90px rgba(229,57,53,0.35), inset 0 1px 0 rgba(255,255,255,0.55)",
+                "0 0 40px rgba(59,130,246,0.35), 0 0 90px rgba(59,130,246,0.15), inset 0 1px 0 rgba(255,255,255,0.35)",
             }}
           >
             <span>Entrar no sistema</span>
@@ -160,9 +160,9 @@ function LandingPage() {
             className="absolute inset-y-0 -left-full w-full animate-[slideOver_0.62s_cubic-bezier(0.7,0,0.2,1)_forwards]"
             style={{
               background:
-                "linear-gradient(90deg, transparent 0%, rgba(229,57,53,0.85) 45%, #000 100%)",
+                "linear-gradient(90deg, transparent 0%, rgba(59,130,246,0.45) 45%, #000 100%)",
               boxShadow:
-                "0 0 80px 20px rgba(229,57,53,0.45), 0 0 160px 40px rgba(0,0,0,0.6)",
+                "0 0 80px 20px rgba(59,130,246,0.25), 0 0 160px 40px rgba(0,0,0,0.6)",
             }}
           />
         </div>
