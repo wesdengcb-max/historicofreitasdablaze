@@ -190,38 +190,23 @@
   }
   body {
     font-feature-settings: "ss01", "cv11";
-    background-color: #090909;
+    background-color: var(--background);
     background-image: 
-      radial-gradient(circle at 50% -20%, rgba(255, 31, 61, 0.15) 0%, transparent 50%),
-      radial-gradient(circle at 0% 0%, rgba(255, 31, 61, 0.05) 0%, transparent 30%),
-      radial-gradient(circle at 100% 100%, rgba(255, 31, 61, 0.05) 0%, transparent 30%);
+      radial-gradient(circle at 50% -20%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 0% 0%, rgba(59, 130, 246, 0.03) 0%, transparent 30%);
     background-attachment: fixed;
     min-height: 100vh;
     position: relative;
-  }
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-    opacity: 0.02;
-    pointer-events: none;
-    z-index: 0;
   }
 
   ::selection { background: color-mix(in oklab, var(--primary) 40%, transparent); color: var(--foreground); }
 }
 
 @utility glass-card {
-  background: rgba(17, 17, 17, 0.85);
-  border: 1px solid rgba(222, 33, 67, 0.2);
-  box-shadow: 
-    0 0 0 1px rgba(222, 33, 67, 0.1),
-    0 0 20px rgba(222, 33, 67, 0.15),
-    inset 0 0 12px rgba(222, 33, 67, 0.05);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-elegant);
+  border-radius: var(--radius-lg);
   position: relative;
   overflow: hidden;
 }
