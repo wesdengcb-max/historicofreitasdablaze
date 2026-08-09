@@ -883,7 +883,9 @@ function Index() {
                   {last && (
                     <div className="flex items-center gap-2">
                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Último</span>
-                       <ResultCircle color={last.color} n={last.n} size="md" glow />
+                       <div key={last.id} className="animate-in fade-in zoom-in-95 duration-200">
+                         <ResultCircle color={last.color} n={last.n} size="md" glow />
+                       </div>
                     </div>
                   )}
                 </div>
@@ -916,33 +918,7 @@ function Index() {
             </Card>
           </section>
 
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-white/5 pt-3">
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] text-muted-foreground">
-                <span className="inline-flex items-center gap-2">
-                  <Flame className="h-3.5 w-3.5 text-red-500" />
-                  Último branco há <b className="text-foreground">{lastWhiteAgo}</b> rodadas
-                </span>
-              </div>
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                  Frequência
-                </span>
-                {freq.map((f) => (
-                  <div key={f.n} className="flex items-center gap-1">
-                    <ResultCircle color={colorOf(f.n)} n={f.n} size="xs" animate={false} />
-                    <span className="text-[10px] tabular-nums text-muted-foreground">{f.count}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Card>
-
-          <Card title="Estratégias Ativas" className="lg:col-span-1">
-             <StrategyTabs spins={visibleSpins} />
-          </Card>
-        </section>
-
-        <section className="space-y-3 sm:space-y-5 lg:space-y-6">
+          <section className="space-y-3 sm:space-y-5 lg:space-y-6">
 
 
 
