@@ -52,6 +52,8 @@ import { getSignals, subscribeSignals, type StoredSignal } from "@/lib/signalsSt
 import { Sidebar } from "@/components/Sidebar";
 import { AppHeader } from "@/components/AppHeader";
 import { useSection } from "@/lib/sectionStore";
+import { useSidebarStore } from "@/lib/sidebarStore";
+import { cn } from "@/lib/utils";
 const SinaisPage = lazy(() => import("@/components/sections/SinaisSection"));
 const AnaliseSection = lazy(() => import("@/components/sections/AnaliseSection"));
 const EstrategiasSection = lazy(() => import("@/components/sections/EstrategiasSection"));
@@ -301,6 +303,7 @@ function Index() {
   const section = useSection();
   const [inverse, setInverse] = useState(false);
   const [viewMode, setViewMode] = useState<"colunas" | "lista">("colunas");
+  const { isCollapsed } = useSidebarStore();
   const isVip = useVipStatus();
 
   // Removido o switch automático para lista em mobile para manter layout de PC em todos os dispositivos
@@ -800,14 +803,17 @@ function Index() {
 
 
   return (
-    <div className="flex h-screen w-full bg-[#080808] text-white">
-      {/* Sidebar lateral fixa */}
-      <div className="hidden lg:block">
+    <div className="flex h-screen w-full bg-[#080808] text-white overflow-hidden">
+      {/* Sidebar lateral fixa com transição suave */}
+      <div className={cn(
+        "hidden lg:block shrink-0 transition-all duration-300 ease-in-out",
+        isCollapsed ? "w-[80px]" : "w-[260px]"
+      )}>
         <Sidebar />
       </div>
 
-      {/* Área principal scrollable */}
-      <div className="flex flex-1 flex-col overflow-hidden">
+      {/* Área principal scrollable - flex-1 garante que ocupa o resto do espaço */}
+      <div className="flex flex-1 flex-col min-w-0 overflow-hidden">
         <AppHeader />
         
         <div className="flex-1 overflow-y-auto scrollbar-none">
