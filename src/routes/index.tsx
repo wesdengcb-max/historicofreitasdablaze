@@ -97,7 +97,7 @@ function LandingPage() {
               "drop-shadow(0 0 30px rgba(59,130,246,0.35)) drop-shadow(0 0 80px rgba(59,130,246,0.15))",
           }}
         >
-          LIBERADO
+          PODE ME AJUDAR?
         </h1>
 
         <p className="max-w-md text-sm text-white/70 sm:text-base animate-[fadeUp_0.6s_ease-out_0.55s_both]">
