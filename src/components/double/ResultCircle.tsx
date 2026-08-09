@@ -6,11 +6,11 @@ import brancoAsset from "@/assets/branco-vip.png.asset.json";
 type Size = "xs" | "sm" | "md" | "lg" | "fluid";
 
 const sizes: Record<Size, string> = {
-  xs: "h-5 w-5 text-[9px]",
-  sm: "h-7 w-7 text-[11px]",
-  md: "h-9 w-9 sm:h-10 sm:w-10 text-xs sm:text-sm",
-  lg: "h-14 w-14 text-lg",
-  fluid: "w-full aspect-square text-[clamp(10px,2.4vw,14px)]",
+  xs: "h-5 w-5 text-[9px] rounded-sm",
+  sm: "h-7 w-7 text-[11px] rounded-md",
+  md: "h-9 w-9 sm:h-10 sm:w-10 text-xs sm:text-sm rounded-lg",
+  lg: "h-14 w-14 text-lg rounded-xl",
+  fluid: "w-full aspect-square text-[clamp(10px,2.4vw,14px)] rounded-md",
 };
 
 
@@ -25,7 +25,7 @@ type Props = {
 };
 
 export const ResultCircle = memo(function ResultCircle({ color, n, size = "md", animate = true, delay = 0, glow = false, className }: Props) {
-  const base = "relative grid place-items-center overflow-hidden rounded-full font-semibold tabular-nums tile-shadow ring-1 transition-transform duration-200 hover:scale-[1.08]";
+  const base = "relative grid place-items-center overflow-hidden font-semibold tabular-nums tile-shadow ring-1 transition-transform duration-200 hover:scale-[1.08]";
 
   const colorClasses =
     color === "red"
