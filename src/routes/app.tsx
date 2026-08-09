@@ -863,7 +863,7 @@ function Index() {
           <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
             <Card className="lg:col-span-2">
               <div className="flex flex-col gap-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between border-b border-white/5 pb-4">
                   <div className="flex flex-col">
                     <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Status da Rodada</span>
                     <div className="mt-1 flex items-center gap-3">
@@ -876,13 +876,13 @@ function Index() {
                           Próximo giro em <span className="text-white">{String(countdown).padStart(2, "0")}s</span>
                         </span>
                       </div>
-                      <span className="text-[10px] font-medium text-muted-foreground/60">{total} rodadas</span>
+                      <span className="text-[10px] font-medium text-red-500">{total} rodadas</span>
                     </div>
                   </div>
                   
                   {last && (
-                    <div className="flex items-center gap-2">
-                       <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Último</span>
+                    <div className="flex flex-col items-end gap-1">
+                       <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Último giro</span>
                        <div key={last.id} className="animate-in fade-in zoom-in-95 duration-200">
                          <ResultCircle color={last.color} n={last.n} size="md" glow />
                        </div>

@@ -1,28 +1,35 @@
 import { memo } from "react";
 import { ResultCircle } from "./ResultCircle";
-import { colorOf, type Spin } from "./types";
 import { cn } from "@/lib/utils";
 import blazeLogo from "@/assets/freitas-logo.jpg.asset.json";
+import { RefreshCcw } from "lucide-react";
 
-interface StatsRowProps {
-  label: string;
-  value?: string | number;
-  valueColor?: string;
-  children?: React.ReactNode;
+interface StatsCardProps {
+  title: string;
+  titleSuffix?: React.ReactNode;
+  children: React.ReactNode;
+  footer?: React.ReactNode;
   className?: string;
 }
 
-const StatsRow = ({ label, value, valueColor, children, className }: StatsRowProps) => (
-  <div className={cn("flex flex-col gap-2 rounded-xl bg-[#0c0c0c] border border-white/5 p-4", className)}>
-    <div className="flex items-center justify-between">
-      <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{label}</span>
-      {value !== undefined && (
-        <span className={cn("text-[11px] font-bold tabular-nums", valueColor || "text-yellow-500")}>
-          {typeof value === "number" && label.includes("Pessoas") ? `→ ${value}` : value}
-        </span>
-      )}
+const StatsCard = ({ title, titleSuffix, children, footer, className }: StatsCardProps) => (
+  <div className={cn("flex flex-col rounded-lg bg-[#0c0c0c] border border-white/5 overflow-hidden", className)}>
+    <div className="flex flex-col items-center pt-3 px-4">
+      <div className="flex items-center gap-1.5">
+        <span className="text-[13px] font-medium text-[#eaeaea]">{title}</span>
+        {titleSuffix}
+      </div>
+      <div className="mt-2.5 w-full border-t border-white/5" />
     </div>
-    {children}
+    <div className="flex-1 px-4 py-3">
+      {children}
+    </div>
+    {footer && (
+      <div className="px-4 pb-3">
+        <div className="mb-2.5 border-t border-white/5" />
+        {footer}
+      </div>
+    )}
   </div>
 );
 
@@ -44,100 +51,125 @@ export const LiveStats = memo(function LiveStats({
   whitePct: number;
 }) {
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-      {/* Plataforma Atual */}
-      <StatsRow label="Plataforma Atual" className="flex flex-col items-center justify-center text-center">
-        <div className="flex flex-col items-center gap-4 py-2">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* 1. Plataforma Atual */}
+      <StatsCard title="Plataforma Atual">
+        <div className="flex flex-col items-center justify-center gap-4 py-2">
           <div className="flex items-center gap-2">
-             <img src={blazeLogo.url} alt="Blaze" className="h-8 w-8 rounded-lg object-cover" />
-             <span className="text-xl font-black italic tracking-tighter text-white">blaze</span>
+            <div className="relative h-10 w-10 overflow-hidden rounded-lg bg-black p-1">
+               <img src={blazeLogo.url} alt="Blaze" className="h-full w-full object-contain" />
+            </div>
+            <span className="text-2xl font-black italic tracking-tighter text-white">blaze</span>
           </div>
-          <div className="flex gap-2">
-            <button className="rounded border border-red-500/50 bg-red-500/10 px-3 py-1 text-[10px] font-bold text-red-500 hover:bg-red-500/20">
+          <div className="flex gap-2.5">
+            <button className="h-6 rounded border border-red-600 bg-black px-3 text-[10px] font-bold text-white transition-colors hover:bg-red-600/10">
               Blaze.com
             </button>
-            <button className="rounded border border-red-500/50 bg-red-500/10 px-3 py-1 text-[10px] font-bold text-red-500 hover:bg-red-500/20">
+            <button className="h-6 rounded border border-red-600 bg-black px-3 text-[10px] font-bold text-white transition-colors hover:bg-red-600/10">
               Double
             </button>
           </div>
         </div>
-      </StatsRow>
+      </StatsCard>
 
-      {/* Pessoas Entrando */}
-      <StatsRow label="Pessoas Entrando" value={Math.floor(700 + Math.random() * 200)}>
-        <div className="grid grid-cols-3 gap-2 py-1">
+      {/* 2. Pessoas Entrando */}
+      <StatsCard 
+        title="Pessoas Entrando" 
+        titleSuffix={<span className="text-[13px] font-bold text-[#FBBF24]">→ 791</span>}
+        footer={
+          <div className="flex items-center justify-between px-1">
+            <span className="text-[10px] font-medium text-[#999999]">Entradas Abertas...</span>
+            <div className="flex items-center justify-center h-4 w-4 rounded-md bg-emerald-500/20">
+              <RefreshCcw className="h-3 w-3 text-[#10b981]" />
+            </div>
+          </div>
+        }
+      >
+        <div className="flex justify-between px-2 pt-1">
           {[
-            { color: "red", count: reds, val: "R$ 2.036,35" },
-            { color: "white", count: whites, val: "R$ 4.432,03" },
-            { color: "black", count: blacks, val: "R$ 1.112,80" }
+            { color: "red", count: 142, val: "R$ 2.036,35" },
+            { color: "white", count: 538, val: "R$ 4.432,03" },
+            { color: "black", count: 111, val: "R$ 1.112,80" }
           ].map((item, i) => (
-            <div key={i} className="flex flex-col items-center gap-1">
-              <span className="text-[10px] font-bold text-white bg-black/40 px-1.5 rounded">{item.count}</span>
-              <ResultCircle color={item.color as any} n={item.color === "white" ? undefined : 0} size="sm" animate={false} />
-              <span className="text-[8px] font-medium text-muted-foreground">{item.val}</span>
+            <div key={i} className="flex flex-col items-center gap-1.5">
+              <span className="text-[10px] font-bold text-white bg-[#1A1A1A] px-2 py-0.5 rounded min-w-[32px] text-center">{item.count}</span>
+              <div className="h-8 w-8 rounded-lg overflow-hidden border border-white/10">
+                <ResultCircle color={item.color as any} size="fluid" animate={false} />
+              </div>
+              <span className="text-[9px] font-medium text-[#888888] tabular-nums">{item.val}</span>
             </div>
           ))}
         </div>
-        <div className="mt-2 flex items-center justify-between border-t border-white/5 pt-2">
-          <span className="text-[9px] text-muted-foreground italic">Entradas Abertas...</span>
-          <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-        </div>
-      </StatsRow>
+      </StatsCard>
 
-      {/* Proporção de Cores */}
-      <StatsRow label="Proporção de Cores" value={`(${total} Rodadas)`} valueColor="text-red-500">
-        <div className="grid grid-cols-3 gap-2 py-1">
+      {/* 3. Proporção de Cores */}
+      <StatsCard 
+        title="Proporção de Cores" 
+        titleSuffix={<span className="text-[11px] font-medium text-[#ef4444]">({total} Rodadas)</span>}
+        footer={
+          <div className="text-center px-1">
+            <span className="text-[10px] font-medium text-[#999999]">
+              <span className="text-white">Quantidade</span> e <span className="text-white">Porcentagem</span> das cores na tela.
+            </span>
+          </div>
+        }
+      >
+        <div className="flex justify-between px-2 pt-1">
           {[
             { color: "red", count: reds, pct: redPct },
             { color: "white", count: whites, pct: whitePct },
             { color: "black", count: blacks, pct: blackPct }
           ].map((item, i) => (
-            <div key={i} className="flex flex-col items-center gap-1">
-              <span className="text-[10px] font-bold text-white bg-black/40 px-1.5 rounded">{item.count} X</span>
-              <ResultCircle color={item.color as any} n={item.color === "white" ? undefined : 0} size="sm" animate={false} />
+            <div key={i} className="flex flex-col items-center gap-1.5">
+              <span className="text-[10px] font-bold text-white bg-[#1A1A1A] px-2 py-0.5 rounded min-w-[32px] text-center">{item.count} X</span>
+              <div className="h-8 w-8 rounded-lg overflow-hidden border border-white/10">
+                <ResultCircle color={item.color as any} size="fluid" animate={false} />
+              </div>
               <span className="text-[9px] font-bold text-white">{item.pct.toFixed(2)}%</span>
             </div>
           ))}
         </div>
-        <div className="mt-2 border-t border-white/5 pt-2 text-center">
-          <span className="text-[9px] font-medium text-muted-foreground">
-            <span className="text-white">Quantidade</span> e <span className="text-white">Porcentagem</span> das cores na tela.
-          </span>
-        </div>
-      </StatsRow>
+      </StatsCard>
 
-      {/* Puxadas */}
-      <StatsRow label="Puxadas">
-        <div className="flex flex-col gap-3 py-1">
+      {/* 4. Puxadas */}
+      <StatsCard 
+        title="Puxadas"
+        footer={
+          <div className="text-center px-1">
+            <span className="text-[10px] font-medium text-[#999999]">
+              <span className="text-white">Quantidade</span> de os puxadas.
+            </span>
+          </div>
+        }
+      >
+        <div className="flex flex-col items-center gap-2 pt-1">
           <div className="flex flex-col items-center">
-            <span className="text-[9px] font-bold text-red-500 mb-1">7 Casts</span>
+            <span className="text-[10px] font-bold text-[#ef4444] mb-1.5">7 Casts</span>
             <div className="flex gap-4">
-              <div className="flex flex-col items-center">
-                <ResultCircle color="red" n={0} size="xs" animate={false} />
-                <span className="text-[8px] mt-1">3 X</span>
+              <div className="flex flex-col items-center gap-1">
+                <ResultCircle color="red" size="xs" animate={false} />
+                <span className="text-[9px] font-bold text-white">3 X</span>
               </div>
-              <div className="flex flex-col items-center">
-                <ResultCircle color="black" n={0} size="xs" animate={false} />
-                <span className="text-[8px] mt-1">3 X</span>
+              <div className="flex flex-col items-center gap-1">
+                <ResultCircle color="black" size="xs" animate={false} />
+                <span className="text-[9px] font-bold text-white">3 X</span>
               </div>
             </div>
           </div>
+          
+          <div className="w-full border-t border-white/5 my-1" />
+
           <div className="flex flex-col items-center">
-            <span className="text-[9px] font-bold text-red-500 mb-1">8 Casais atuais</span>
-            <div className="flex gap-2">
+            <span className="text-[10px] font-bold text-[#ef4444] mb-1.5">8 Casais atuais</span>
+            <div className="flex gap-1.5">
               <ResultCircle color="white" size="xs" animate={false} />
-              <ResultCircle color="red" n={0} size="xs" animate={false} />
-              <ResultCircle color="red" n={0} size="xs" animate={false} />
-              <ResultCircle color="black" n={0} size="xs" animate={false} />
+              <ResultCircle color="red" size="xs" animate={false} />
+              <ResultCircle color="red" size="xs" animate={false} />
+              <ResultCircle color="black" size="xs" animate={false} />
             </div>
           </div>
         </div>
-        <div className="mt-1 border-t border-white/5 pt-2 text-center">
-          <span className="text-[9px] font-medium text-muted-foreground">
-            <span className="text-white">Quantidade</span> de os puxadas.
-          </span>
-        </div>
-      </StatsRow>
+      </StatsCard>
     </div>
   );
 });
