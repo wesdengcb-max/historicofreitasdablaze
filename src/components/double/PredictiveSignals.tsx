@@ -210,7 +210,7 @@ export function PredictiveSignals() {
 
     for (const item of active) {
       const hist = engine[item.analysis].filter(c => c.value === item.value);
-      // FILTRO DE MASSA CRÍTICA (Mínimo de 9 gatilhos)
+      // FILTRO DE MASSA CRÍTICA (Mínimo de 5 gatilhos)
       if (hist.length < MIN_GATILHOS) continue;
 
       const list = computeTop(hist, CANDIDATE_DEPTH);
@@ -219,7 +219,7 @@ export function PredictiveSignals() {
         if (at <= now.getTime()) return;
         const arr = byMinute.get(at) ?? [];
         arr.push({
-          analysis: item.analysis,
+          analysis: item.analysis as 1 | 2 | 3 | 4 | 5,
           value: item.value,
           pct: g.pct,
           top5: idx < TOP5_DEPTH,
@@ -251,7 +251,7 @@ export function PredictiveSignals() {
         .map((p) => `A${p.analysis}·${p.value}`)
         .join(", ");
       
-      const isHighTendency = projs.some(p => checkHighTendency(engine[p.analysis], p.value));
+      const isHighTendency = projs.some(p => checkHighTendency(engine[p.analysis as 1 | 2 | 3 | 4 | 5], p.value));
 
       m2.push({
         key: `m2-${at}`,
