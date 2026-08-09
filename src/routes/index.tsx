@@ -1,10 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowRight, BarChart3, Crown } from "lucide-react";
+import { ArrowRight, Crown } from "lucide-react";
 import { useMemo, useState } from "react";
 import kingImg from "@/assets/freitas-white-hero.png.asset.json";
-import logoFreitas from "@/assets/logo-freitas.png.asset.json";
 import { useVipStatus } from "@/lib/auth/vipStore";
-
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -26,7 +24,6 @@ function LandingPage() {
   const isVip = useVipStatus();
   const navigate = useNavigate();
 
-
   const goWithTransition = (to: "/app" | "/sinais" | "/estrategias") => {
     if (exitTo) return;
     setExitTo(to);
@@ -34,25 +31,6 @@ function LandingPage() {
       navigate({ to });
     }, 620);
   };
-
-  const particles = useMemo(
-    () =>
-      Array.from({ length: 18 }).map((_, i) => ({
-        id: i,
-        left: Math.random() * 100,
-        top: Math.random() * 100,
-        size: Math.random() * 2 + 1,
-        delay: Math.random() * 6,
-        duration: 5 + Math.random() * 6,
-        color:
-          i % 5 === 0
-            ? "bg-[#e53935]"
-            : i % 3 === 0
-              ? "bg-[#c9a84c]"
-              : "bg-white/60",
-      })),
-    [],
-  );
 
   return (
     <div className="relative min-h-[100svh] w-full overflow-hidden bg-black text-white">
@@ -92,7 +70,6 @@ function LandingPage() {
         )}
       </div>
 
-
       {/* Content */}
       <main className="relative z-10 flex min-h-[100svh] w-full flex-col items-center justify-center gap-4 px-4 py-8 text-center sm:gap-6 sm:px-6">
         <p className="text-[10px] font-black uppercase tracking-[0.5em] text-primary animate-[fadeIn_0.6s_ease-out_both] sm:text-[12px] font-outfit">
@@ -109,7 +86,6 @@ function LandingPage() {
           </span>
         </div>
 
-
         <h1
           className="text-[clamp(3rem,10vw,7rem)] font-black leading-none tracking-tight animate-[fadeUp_0.8s_ease-out_0.35s_both] font-outfit uppercase"
           style={{
@@ -121,7 +97,7 @@ function LandingPage() {
               "drop-shadow(0 0 30px rgba(59,130,246,0.35)) drop-shadow(0 0 80px rgba(59,130,246,0.15))",
           }}
         >
-          LIBERADO
+          PODE ME AJUDAR?
         </h1>
 
         <p className="max-w-md text-sm text-white/70 sm:text-base animate-[fadeUp_0.6s_ease-out_0.55s_both]">
