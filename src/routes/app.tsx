@@ -899,47 +899,127 @@ function Index() {
               ))}
             </div>
 
-            <div className="mt-6 space-y-3 sm:space-y-5 lg:space-y-6">
+            <div className="mt-6">
               <div
                 className={
                   fullscreen
-                    ? "fixed inset-0 z-50 flex flex-col bg-background/95 p-4 backdrop-blur-md sm:p-6"
-                    : "overflow-hidden rounded-2xl border border-white/5 bg-black/15"
+                    ? "fixed inset-0 z-50 flex flex-col bg-[#080808] p-4 backdrop-blur-md sm:p-6"
+                    : "overflow-hidden rounded-xl border border-white/5 bg-white/[0.02]"
                 }
               >
                 {fullscreen && (
-                  <div className="mb-3 flex items-center justify-between gap-3">
+                  <div className="mb-4 flex items-center justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                        Histórico — tela cheia
+                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-red-600">
+                        Histórico — Tela Cheia
                       </p>
-                      <h2 className="truncate text-lg font-semibold">{total} rodadas · horário de Brasília</h2>
+                      <h2 className="truncate text-lg font-black text-white">{total} rodadas · Brasília</h2>
                     </div>
                     <button
                       type="button"
                       onClick={() => setFullscreen(false)}
-                      className="grid h-10 w-10 place-items-center rounded-xl border border-white/10 bg-white/5 text-muted-foreground transition-colors hover:bg-white/[0.09] hover:text-foreground"
-                      aria-label="Fechar tela cheia"
+                      className="grid h-10 w-10 place-items-center rounded-lg border border-white/10 bg-white/5 text-muted-foreground transition-colors hover:bg-white/[0.09] hover:text-foreground"
                     >
                       <X className="h-4 w-4" />
                     </button>
                   </div>
                 )}
                 
+                <div className="flex items-center justify-between px-4 py-3 border-b border-white/5 bg-white/[0.01]">
+                   <div className="flex items-center gap-2">
+                      <Activity className="h-3.5 w-3.5 text-red-600" />
+                      <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-white">Rodadas Recentes</h3>
+                      <span className="rounded bg-red-600/10 px-1.5 py-0.5 text-[9px] font-black text-red-500 border border-red-600/20">{total}</span>
+                   </div>
+                   <div className="flex items-center gap-2">
+                     <button 
+                       onClick={() => setViewMode(viewMode === "colunas" ? "lista" : "colunas")}
+                       className="p-1.5 rounded-md hover:bg-white/5 text-muted-foreground transition-colors"
+                       title="Mudar visualização"
+                     >
+                       {viewMode === "colunas" ? <BarChart3 className="h-3.5 w-3.5" /> : <Layers className="h-3.5 w-3.5" />}
+                     </button>
+                     <button 
+                       onClick={() => setFullscreen(true)}
+                       className="p-1.5 rounded-md hover:bg-white/5 text-muted-foreground transition-colors"
+                       title="Tela cheia"
+                     >
+                       <Maximize2 className="h-3.5 w-3.5" />
+                     </button>
+                   </div>
+                </div>
+
                 <div
                   className={
                     fullscreen
-                      ? "min-h-0 flex-1 overflow-auto rounded-2xl border border-white/5 bg-black/20"
-                      : ""
+                      ? "min-h-0 flex-1 overflow-auto bg-black/20 p-4"
+                      : "max-h-[600px] overflow-auto p-4 scrollbar-thin scrollbar-thumb-white/10"
                   }
                   style={{ direction: inverse && viewMode === "colunas" ? "rtl" : "ltr" }}
                 >
-                  {/* Histórico e Controles do Histórico viriam aqui */}
+                   {viewMode === "colunas" ? (
+                      <div className="flex flex-col gap-4">
+                        <div className="grid grid-cols-10 gap-2 mb-2">
+                          {Array.from({ length: 10 }).map((_, i) => (
+                            <div key={i} className="flex flex-col items-center gap-1">
+                              <div className="w-full py-1.5 rounded bg-white/[0.03] border border-white/5 text-center text-[10px] font-black text-white/40">
+                                {i}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="grid grid-cols-10 gap-2">
+                          {Array.from({ length: 10 }).map((_, colIndex) => (
+                            <div key={colIndex} className="flex flex-col gap-3">
+                              {gridRows.map((row) => (
+                                <div key={row.key} className="flex flex-col gap-2">
+                                  {row.cells[colIndex].map((spin) => (
+                                    <BlazeResultCard
+                                      key={spin.id}
+                                      n={spin.n}
+                                      color={spin.color}
+                                      time={exibirSegundos ? spTimeWithSeconds(spin) : spin.time}
+                                      numbered={numerado}
+                                      timeHighlight={destaqueHorario}
+                                    />
+                                  ))}
+                                </div>
+                              ))}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                   ) : (
+                     <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3">
+                        {visibleSpins.map((spin) => (
+                          <BlazeResultCard
+                            key={spin.id}
+                            n={spin.n}
+                            color={spin.color}
+                            time={exibirSegundos ? spTimeWithSeconds(spin) : spin.time}
+                            numbered={numerado}
+                            timeHighlight={destaqueHorario}
+                          />
+                        ))}
+                     </div>
+                   )}
+                   
+                   {hasMore && (
+                     <div className="mt-8 flex justify-center">
+                       <button
+                         onClick={loadMore}
+                         disabled={loadingMore}
+                         className="rounded-lg border border-white/10 bg-white/5 px-6 py-2 text-[11px] font-black uppercase tracking-widest text-white hover:bg-white/10 transition-colors disabled:opacity-50"
+                       >
+                         {loadingMore ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Carregar mais"}
+                       </button>
+                     </div>
+                   )}
                 </div>
               </div>
             </div>
           </Card>
-        </section>
+
           <div className="flex flex-col gap-4">
             <Card className="relative overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-[1px] bg-red-600/30" />
@@ -954,6 +1034,7 @@ function Index() {
           </div>
         </section>
       </main>
+
     )}
   </div>
 </div>
