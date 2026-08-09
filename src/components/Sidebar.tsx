@@ -77,7 +77,7 @@ export const Sidebar = memo(function Sidebar() {
   return (
     <aside className={cn(
       "fixed inset-y-0 left-0 z-50 flex flex-col border-r border-white/5 bg-[#0A0A0A] transition-all duration-300 ease-in-out",
-      isCollapsed ? "w-[80px]" : "w-[260px]"
+      isCollapsed ? "w-[80px] -translate-x-full lg:translate-x-0" : "w-[260px] translate-x-0"
     )}>
       {/* Collapse Toggle */}
       <button 
