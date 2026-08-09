@@ -39,6 +39,7 @@ import { Switch } from "@/components/double/Switch";
 import { WhiteCelebration, WhiteAlertToggleFx } from "@/components/double/WhiteCelebration";
 import { StrategyTabs } from "@/components/double/StrategyTabs";
 import { LeftStatsDrawer } from "@/components/double/LeftStatsDrawer";
+import { LiveStats } from "@/components/double/LiveStats";
 
 import { colorOf, fmtTime, type Spin } from "@/components/double/types";
 import {
@@ -831,138 +832,93 @@ function Index() {
             <Suspense fallback={<SectionFallback />}><AnaliseSection /></Suspense>
           ) : section === "estrategias" ? (
             <Suspense fallback={<SectionFallback />}><EstrategiasSection /></Suspense>
+          ) : section !== "dashboard" ? (
+            <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-5 px-4 py-10 sm:gap-6 sm:px-6 sm:py-16">
+              <Card delay={0.05}>
+                <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                    Seção
+                  </div>
+                  <h2 className="text-2xl font-semibold text-foreground capitalize">{section}</h2>
+                  <p className="max-w-md text-sm text-muted-foreground">
+                    Conteúdo desta seção em construção. Em breve você verá aqui os dados
+                    específicos de <span className="capitalize text-foreground">{section}</span>.
+                  </p>
+                </div>
+              </Card>
+            </main>
+          ) : (
+            <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8 lg:py-8">
+          {/* Novas métricas estilo Blaze Dashboard */}
+          <LiveStats 
+            total={total}
+            reds={reds}
+            blacks={blacks}
+            whites={whites}
+            redPct={redPct}
+            blackPct={blackPct}
+            whitePct={whitePct}
+          />
 
-      ) : section !== "dashboard" ? (
-        <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-5 px-4 py-10 sm:gap-6 sm:px-6 sm:py-16">
-          <Card delay={0.05}>
-            <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                Seção
-              </div>
-              <h2 className="text-2xl font-semibold text-foreground capitalize">{section}</h2>
-              <p className="max-w-md text-sm text-muted-foreground">
-                Conteúdo desta seção em construção. Em breve você verá aqui os dados
-                específicos de <span className="capitalize text-foreground">{section}</span>.
-              </p>
-            </div>
-          </Card>
-        </main>
-      ) : (
-        <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-3 px-4 py-3 sm:gap-5 sm:px-6 sm:py-6 lg:gap-6 lg:px-6 lg:py-10">
-          <section className="grid grid-cols-1 gap-3 sm:gap-5 lg:grid-cols-3 lg:gap-6">
+          <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
             <Card className="lg:col-span-2">
-
-            {/* Cabeçalho compacto: status + contagem + último número */}
-            <div className="mb-3 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-              <div className="min-w-0">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                  Status da rodada
-                </p>
-                <div className="mt-0.5 flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
-                  <h1 className="truncate text-lg font-semibold tracking-tight text-foreground sm:text-xl">
-                    {countdown > 3 ? "Apostas abertas" : "Rodando…"}
-                  </h1>
-                  <span className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                    <span className="relative inline-flex h-1.5 w-1.5">
-                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-positive/70" />
-                      <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-positive" />
-                    </span>
-                    Próximo giro em{" "}
-                    <b className="tabular-nums text-foreground">{String(countdown).padStart(2, "0")}s</b>
-                  </span>
-                  <span className="text-[11px] tabular-nums text-muted-foreground">{total} rodadas</span>
-                </div>
-              </div>
-              <div className="flex shrink-0 items-center gap-2">
-                <p className="hidden text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground sm:block">
-                  Último
-                </p>
-                {last ? (
-                  <div key={last.id} className="animate-in fade-in zoom-in-95 duration-200">
-                    <ResultCircle color={last.color} n={last.n} size="md" glow />
-                  </div>
-                ) : (
-                  <div className="h-9 w-9 rounded-full border border-dashed border-white/10" />
-                )}
-              </div>
-            </div>
-
-            {(() => {
-              const items = [
-                { key: "red" as const, color: "red" as const, count: reds, pct: redPct, tint: "#DE2143" },
-                { key: "white" as const, color: "white" as const, count: whites, pct: whitePct, tint: "#ffffff" },
-                { key: "black" as const, color: "black" as const, count: blacks, pct: blackPct, tint: "#16171d" },
-              ];
-              const leader = items.reduce((a, b) => (b.count > a.count ? b : a), items[0]);
-              return (
-                <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                  {items.map((it) => {
-                    const isLeader = it.key === leader.key && it.count > 0;
-                    return (
-                      <div
-                        key={it.key}
-                        className={`rounded-xl border p-2 transition-colors sm:p-2.5 ${
-                          isLeader
-                            ? "border-primary/70 bg-primary/10 shadow-[0_0_15px_rgba(59,130,246,0.2)]"
-                            : "border-white/5 bg-white/[0.02]"
-                        }`}
-                      >
-                        <div className="flex min-w-0 items-center gap-2">
-                          <ResultCircle color={it.color} n={it.color === "white" ? undefined : 0} size="sm" animate={false} />
-                          <div className="min-w-0 flex-1">
-                            <div className={`text-[13px] font-semibold tabular-nums ${isLeader ? "text-primary" : "text-foreground"}`}>
-                              {it.pct.toFixed(1)}%
-                            </div>
-                            <div className="truncate text-[10px] tabular-nums text-muted-foreground">
-                              {it.count} apostas
-                            </div>
-                          </div>
-                        </div>
-                        <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-white/[0.06]">
-                          <div
-                            className="h-full rounded-full transition-[width] duration-500"
-                            style={{
-                              width: `${Math.min(100, it.pct)}%`,
-                              background: isLeader
-                                ? "linear-gradient(90deg, #3b82f6, #60a5fa)"
-                                : it.tint,
-                            }}
-                          />
-                        </div>
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Status da Rodada</span>
+                    <div className="mt-1 flex items-center gap-3">
+                      <h2 className="text-xl font-black text-white">
+                        {countdown > 3 ? "Apostas abertas..." : "Rodando..."}
+                      </h2>
+                      <div className="flex items-center gap-1.5 rounded-full bg-white/5 px-2 py-0.5">
+                        <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+                        <span className="text-[10px] font-bold text-muted-foreground">
+                          Próximo giro em <span className="text-white">{String(countdown).padStart(2, "0")}s</span>
+                        </span>
                       </div>
-                    );
-                  })}
-                </div>
-              );
-            })()}
-
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-white/5 pt-3">
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] text-muted-foreground">
-                <span className="inline-flex items-center gap-2">
-                  <Flame className="h-3.5 w-3.5 text-red-500" />
-                  Último branco há <b className="text-foreground">{lastWhiteAgo}</b> rodadas
-                </span>
-              </div>
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                  Frequência
-                </span>
-                {freq.map((f) => (
-                  <div key={f.n} className="flex items-center gap-1">
-                    <ResultCircle color={colorOf(f.n)} n={f.n} size="xs" animate={false} />
-                    <span className="text-[10px] tabular-nums text-muted-foreground">{f.count}</span>
+                      <span className="text-[10px] font-medium text-muted-foreground/60">{total} rodadas</span>
+                    </div>
                   </div>
-                ))}
+                  
+                  {last && (
+                    <div className="flex items-center gap-2">
+                       <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Último</span>
+                       <div key={last.id} className="animate-in fade-in zoom-in-95 duration-200">
+                         <ResultCircle color={last.color} n={last.n} size="md" glow />
+                       </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2">
+                    <Flame className="h-3 w-3 text-red-500" />
+                    <span className="text-[10px] font-bold text-muted-foreground">
+                      Último branco há <span className="text-white">{lastWhiteAgo}</span> rodadas
+                    </span>
+                  </div>
+                  
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mr-1">Frequência</span>
+                    <div className="flex flex-wrap gap-2">
+                      {freq.map((f) => (
+                        <div key={f.n} className="flex items-center gap-1 bg-white/[0.03] rounded-full px-1.5 py-0.5 border border-white/5">
+                          <ResultCircle color={colorOf(f.n)} n={f.n} size="xs" animate={false} />
+                          <span className="text-[9px] font-bold tabular-nums text-white">{f.count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-          </Card>
+            </Card>
 
-          <Card title="Estratégias Ativas" className="lg:col-span-1">
-             <StrategyTabs spins={visibleSpins} />
-          </Card>
-        </section>
+            <Card title="Estratégias Ativas" className="lg:col-span-1">
+               <StrategyTabs spins={visibleSpins} />
+            </Card>
+          </section>
 
-        <section className="space-y-3 sm:space-y-5 lg:space-y-6">
+          <section className="space-y-3 sm:space-y-5 lg:space-y-6">
 
 
 
@@ -1479,10 +1435,10 @@ function Index() {
             </div>
           </Card>
         </section>
-          </main>
-        )}
-        </div>
-      </div>
+      </main>
+    )}
+  </div>
+</div>
 
 
 
