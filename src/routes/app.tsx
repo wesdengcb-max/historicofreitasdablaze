@@ -39,6 +39,7 @@ import { Switch } from "@/components/double/Switch";
 import { WhiteCelebration, WhiteAlertToggleFx } from "@/components/double/WhiteCelebration";
 import { StrategyTabs } from "@/components/double/StrategyTabs";
 import { LeftStatsDrawer } from "@/components/double/LeftStatsDrawer";
+import { LiveStats } from "@/components/double/LiveStats";
 
 import { colorOf, fmtTime, type Spin } from "@/components/double/types";
 import {
