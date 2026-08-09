@@ -66,7 +66,3 @@ export function StrategyTabs({ spins }: { spins: Spin[] }) {
   );
 }
 
-
-    </div>
-  );
-}

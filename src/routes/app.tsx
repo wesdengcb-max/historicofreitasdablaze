@@ -951,6 +951,7 @@ function Index() {
         <section className="space-y-3 sm:space-y-5 lg:space-y-6">
 
 
+
           <Card
             title="Giros anteriores"
             subtitle={`${total} rodadas · horário de Brasília`}
