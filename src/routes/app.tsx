@@ -26,6 +26,8 @@ import {
   BarChart3,
   Crown,
   Send,
+  Layers,
+  ShieldCheck,
 } from "lucide-react";
 
 import { useVipStatus } from "@/lib/auth/vipStore";
@@ -47,6 +49,8 @@ import {
   BLAZE_GAP_X,
   BLAZE_GAP_Y,
 } from "@/components/double/BlazeResultCard";
+import { PredictiveSignals } from "@/components/double/PredictiveSignals";
+
 
 import { getSignals, subscribeSignals, type StoredSignal } from "@/lib/signalsStore";
 import { Sidebar } from "@/components/Sidebar";
