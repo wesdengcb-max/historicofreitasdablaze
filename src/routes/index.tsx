@@ -90,11 +90,11 @@ function LandingPage() {
           className="text-[clamp(3rem,10vw,7rem)] font-black leading-none tracking-tight animate-[fadeUp_0.8s_ease-out_0.35s_both] font-outfit uppercase"
           style={{
             background:
-              "linear-gradient(180deg, #FFFFFF 0%, #3b82f6 100%)",
+              "linear-gradient(180deg, #FFFFFF 0%, #ef4444 100%)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             filter:
-              "drop-shadow(0 0 30px rgba(59,130,246,0.35)) drop-shadow(0 0 80px rgba(59,130,246,0.15))",
+              "drop-shadow(0 0 30px rgba(239, 68, 68, 0.35)) drop-shadow(0 0 80px rgba(239, 68, 68, 0.15))",
           }}
         >
           PODE ME AJUDAR?
