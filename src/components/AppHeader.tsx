@@ -1,7 +1,8 @@
 import { memo } from "react";
-import { ChevronLeft, Menu, Clock, Crown } from "lucide-react";
+import { ChevronLeft, Menu, Clock, Crown, Dice5 } from "lucide-react";
 import { useVipStatus, setVipStatus } from "@/lib/auth/vipStore";
 import { toast } from "sonner";
+
 
 export const AppHeader = memo(function AppHeader() {
   const isVip = useVipStatus();
