@@ -7,6 +7,7 @@ import {
   buildA2,
   buildA3,
   buildA4,
+  buildA5,
   computeTop,
   cyclesOf,
   fmtClock,
@@ -25,7 +26,7 @@ type Mode1Signal = {
   pct: number; 
   label: string; 
   analysisCount: number; 
-  sources: Array<{ analysis: number; value: number }>;
+  sources: Array<{ analysis: 1 | 2 | 3 | 4 | 5; value: number }>;
   isHighTendency: boolean;
 };
 type Mode2Signal = {
@@ -33,7 +34,7 @@ type Mode2Signal = {
   title: string;
   times: Date[];
   pct: number;
-  sources: Array<{ analysis: 1 | 2 | 3 | 4; value: number; pct: number; top5: boolean }>;
+  sources: Array<{ analysis: 1 | 2 | 3 | 4 | 5; value: number; pct: number; top5: boolean }>;
   confluence: string;
   analysisCount: number;
   isHighTendency: boolean;
@@ -41,7 +42,7 @@ type Mode2Signal = {
 
 const MIN_ASSERTIVIDADE_TOP1 = 65;
 const MIN_ASSERTIVIDADE_CONFLUENCIA = 55;
-const MIN_GATILHOS = 9;
+const MIN_GATILHOS = 5;
 
 function addMinutes(d: Date, m: number) {
   const out = new Date(d.getTime() + m * 60_000);
@@ -117,16 +118,17 @@ export function PredictiveSignals() {
     const a2 = buildA2(rows);
     const a3 = buildA3(rows);
     const a4 = buildA4(rows);
-    return { 1: a1, 2: a2, 3: a3, 4: a4 } as Record<1 | 2 | 3 | 4, Cycle[]>;
+    const a5 = buildA5(rows);
+    return { 1: a1, 2: a2, 3: a3, 4: a4, 5: a5 } as Record<1 | 2 | 3 | 4 | 5, Cycle[]>;
   }, [rows]);
 
   /** Ciclos em aberto (status < MAX_ZEROS) por análise + valor. */
   const active = useMemo(() => {
-    const out: Array<{ analysis: 1 | 2 | 3 | 4; value: number; open: Cycle }> = [];
-    ([1, 2, 3, 4] as const).forEach((a) => {
+    const out: Array<{ analysis: 1 | 2 | 3 | 4 | 5; value: number; open: Cycle }> = [];
+    ([1, 2, 3, 4, 5] as const).forEach((a) => {
       const latest = latestByValue(engine[a]);
       latest.forEach((cycle, value) => {
-        const limit = a === 4 ? MAX_ZEROS_A4 : MAX_ZEROS;
+        const limit = (a === 4 || a === 5) ? MAX_ZEROS_A4 : MAX_ZEROS;
         if (cycle.gaps.length < limit) out.push({ analysis: a, value, open: cycle });
       });
     });
@@ -147,7 +149,7 @@ export function PredictiveSignals() {
     >();
     for (const item of active) {
       const hist = engine[item.analysis].filter(c => c.value === item.value);
-      // FILTRO DE MASSA CRÍTICA (Mínimo de 9 gatilhos)
+      // FILTRO DE MASSA CRÍTICA (Mínimo de 5 gatilhos)
       if (hist.length < MIN_GATILHOS) continue;
 
       const top1 = computeTop(hist, 1)[0];
@@ -169,13 +171,13 @@ export function PredictiveSignals() {
           analyses: new Set([item.analysis]),
           pct: top1.pct, 
           label: top1.label,
-          sources: [{ analysis: item.analysis, value: item.value }],
+          sources: [{ analysis: item.analysis as 1 | 2 | 3 | 4 | 5, value: item.value }],
           isHighTendency: isTendency
         });
       } else {
         if (!cur.values.includes(item.value)) cur.values.push(item.value);
         cur.analyses.add(item.analysis);
-        cur.sources.push({ analysis: item.analysis, value: item.value });
+        cur.sources.push({ analysis: item.analysis as 1 | 2 | 3 | 4 | 5, value: item.value });
         if (isTendency) cur.isHighTendency = true;
         if (top1.pct > cur.pct) {
           cur.pct = top1.pct;
@@ -194,7 +196,7 @@ export function PredictiveSignals() {
           pct: info.pct,
           label: info.label,
           analysisCount: info.analyses.size,
-          sources: info.sources,
+          sources: info.sources as Array<{ analysis: 1 | 2 | 3 | 4 | 5; value: number }>,
           isHighTendency: info.isHighTendency
         };
       });
@@ -203,12 +205,12 @@ export function PredictiveSignals() {
     const usedTimes = new Set<number>(m1.map((s) => s.at.getTime()));
 
     // ---- Modo 2: Estratégia de Coincidência ----
-    type Proj = { analysis: 1 | 2 | 3 | 4; value: number; pct: number; top5: boolean };
+    type Proj = { analysis: 1 | 2 | 3 | 4 | 5; value: number; pct: number; top5: boolean };
     const byMinute = new Map<number, Proj[]>();
 
     for (const item of active) {
       const hist = engine[item.analysis].filter(c => c.value === item.value);
-      // FILTRO DE MASSA CRÍTICA (Mínimo de 9 gatilhos)
+      // FILTRO DE MASSA CRÍTICA (Mínimo de 5 gatilhos)
       if (hist.length < MIN_GATILHOS) continue;
 
       const list = computeTop(hist, CANDIDATE_DEPTH);
@@ -217,7 +219,7 @@ export function PredictiveSignals() {
         if (at <= now.getTime()) return;
         const arr = byMinute.get(at) ?? [];
         arr.push({
-          analysis: item.analysis,
+          analysis: item.analysis as 1 | 2 | 3 | 4 | 5,
           value: item.value,
           pct: g.pct,
           top5: idx < TOP5_DEPTH,
@@ -249,7 +251,7 @@ export function PredictiveSignals() {
         .map((p) => `A${p.analysis}·${p.value}`)
         .join(", ");
       
-      const isHighTendency = projs.some(p => checkHighTendency(engine[p.analysis], p.value));
+      const isHighTendency = projs.some(p => checkHighTendency(engine[p.analysis as 1 | 2 | 3 | 4 | 5], p.value));
 
       m2.push({
         key: `m2-${at}`,
