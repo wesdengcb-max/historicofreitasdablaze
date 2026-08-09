@@ -834,7 +834,8 @@ function Index() {
           </Card>
         </main>
       ) : (
-      <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-3 px-4 py-3 sm:gap-5 sm:px-6 sm:py-6 lg:gap-6 lg:px-6 lg:py-10 bg-background">
+        <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-3 px-4 py-3 sm:gap-5 sm:px-6 sm:py-6 lg:gap-6 lg:px-6 lg:py-10 bg-background">
+
 
         <section className="space-y-3 sm:space-y-5 lg:space-y-6">
           <Card delay={0.05}>
