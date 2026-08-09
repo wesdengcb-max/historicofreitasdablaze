@@ -11,12 +11,16 @@ import {
   ShieldCheck, 
   Dice5,
   Lock,
-  Crown
+  Crown,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import { setSection, useSection, type SectionId } from "@/lib/sectionStore";
 import { useVipStatus } from "@/lib/auth/vipStore";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import { useSidebarStore } from "@/lib/sidebarStore";
+import { cn } from "@/lib/utils";
 
 type MenuItem = {
   id: SectionId | "notificador" | "validador" | "simulador";
@@ -50,6 +54,7 @@ export const Sidebar = memo(function Sidebar() {
 
   const active = useSection();
   const isVip = useVipStatus();
+  const { isCollapsed, toggle } = useSidebarStore();
 
   const handleItemClick = (item: MenuItem) => {
     if (item.soon) return;
