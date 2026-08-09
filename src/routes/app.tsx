@@ -818,7 +818,6 @@ function Index() {
           ) : section === "estrategias" ? (
             <Suspense fallback={<SectionFallback />}><EstrategiasSection /></Suspense>
 
-        <Suspense fallback={<SectionFallback />}><EstrategiasSection /></Suspense>
       ) : section !== "dashboard" ? (
         <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-5 px-4 py-10 sm:gap-6 sm:px-6 sm:py-16">
           <Card delay={0.05}>
