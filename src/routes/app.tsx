@@ -1034,11 +1034,10 @@ function Index() {
           </div>
         </section>
       </main>
-
     )}
   </div>
 </div>
-</div>
+
 
 <WhiteCelebration 
   spin={whiteFlash} 
