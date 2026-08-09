@@ -28,11 +28,11 @@ type Cycle = {
 
 const NUMBERS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 const ALL_NUMBERS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
-const MIN_CYCLES = 10;
+const MIN_CYCLES = 5;
 const TOP_N = 5;
 const MAX_ZEROS = 14;           
-const MAX_DETAIL_ROWS = 10;     
-const MAX_PATTERN_CYCLES = 14;
+const MAX_DETAIL_ROWS = 5;     
+const MAX_PATTERN_CYCLES = 5;
 const BRAZIL_TIME_ZONE = "America/Sao_Paulo";
 
 function diffMinutes(a: Date, b: Date) {
@@ -387,7 +387,7 @@ export default function AnaliseSection() {
             if (s[n]) {
               s[n].total++;
               const gaps = r.gaps ?? [];
-              const maxNeeded = r.analise === 'analise4' ? 20 : 14;
+              const maxNeeded = (r.analise === 'analise4' || r.analise === 'analise5') ? 20 : 14;
               if (gaps.length > 0) {
                 if (gaps.length >= maxNeeded) {
                   s[n].fullyCompleted++;

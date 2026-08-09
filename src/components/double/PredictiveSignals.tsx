@@ -7,6 +7,7 @@ import {
   buildA2,
   buildA3,
   buildA4,
+  buildA5,
   computeTop,
   cyclesOf,
   fmtClock,
@@ -33,7 +34,7 @@ type Mode2Signal = {
   title: string;
   times: Date[];
   pct: number;
-  sources: Array<{ analysis: 1 | 2 | 3 | 4; value: number; pct: number; top5: boolean }>;
+  sources: Array<{ analysis: 1 | 2 | 3 | 4 | 5; value: number; pct: number; top5: boolean }>;
   confluence: string;
   analysisCount: number;
   isHighTendency: boolean;
@@ -41,7 +42,7 @@ type Mode2Signal = {
 
 const MIN_ASSERTIVIDADE_TOP1 = 65;
 const MIN_ASSERTIVIDADE_CONFLUENCIA = 55;
-const MIN_GATILHOS = 9;
+const MIN_GATILHOS = 5;
 
 function addMinutes(d: Date, m: number) {
   const out = new Date(d.getTime() + m * 60_000);
@@ -203,7 +204,7 @@ export function PredictiveSignals() {
     const usedTimes = new Set<number>(m1.map((s) => s.at.getTime()));
 
     // ---- Modo 2: Estratégia de Coincidência ----
-    type Proj = { analysis: 1 | 2 | 3 | 4; value: number; pct: number; top5: boolean };
+    type Proj = { analysis: 1 | 2 | 3 | 4 | 5; value: number; pct: number; top5: boolean };
     const byMinute = new Map<number, Proj[]>();
 
     for (const item of active) {

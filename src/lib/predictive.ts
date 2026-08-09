@@ -3,14 +3,15 @@ export type Row = { id: number; roll: string; color: string; created_at: string 
 
 export type Cycle = {
   value: number;
-  analysis: 1 | 2 | 3 | 4;
+  analysis: 1 | 2 | 3 | 4 | 5;
   triggerAt: Date;
   gaps: number[];
 };
 
 export const MAX_ZEROS = 14;
 export const MAX_ZEROS_A4 = 20;
-export const MAX_CYCLES = 14;
+export const MAX_ZEROS_A5 = 20;
+export const MAX_CYCLES = 5;
 
 function diffMinutes(a: Date, b: Date) {
   return Math.max(0, Math.round((b.getTime() - a.getTime()) / 60000));
@@ -18,7 +19,7 @@ function diffMinutes(a: Date, b: Date) {
 
 function collectGaps(rows: Row[], i: number, dt: Date, analysis: number = 1): number[] {
   const gaps: number[] = [];
-  const limit = analysis === 4 ? MAX_ZEROS_A4 : MAX_ZEROS;
+  const limit = (analysis === 4 || analysis === 5) ? MAX_ZEROS_A4 : MAX_ZEROS;
   for (let k = 1; i + k < rows.length && gaps.length < limit; k++) {
     if (Number(rows[i + k].roll) !== 0) continue;
     const zdt = parseUtcDate(rows[i + k].created_at);
@@ -93,6 +94,38 @@ export function buildA4(rows: Row[]): Cycle[] {
     if (!Number.isFinite(n) || n < 0 || n > 14) return;
 
     out.push({ value: n, analysis: 4, triggerAt: dt, gaps: collectGaps(rows, i, dt, 4) });
+  });
+  return out;
+}
+
+/** Análise 5 — Segunda Pedra da Dezena (virada do minuto 00, 10, 20, 30, 40, 50). */
+export function buildA5(rows: Row[]): Cycle[] {
+  const out: Cycle[] = [];
+  const processedKeys = new Set<string>();
+
+  // Dicionário para contar pedras no mesmo minuto
+  const minuteCounts = new Map<string, number>();
+
+  rows.forEach((r, i) => {
+    const dt = parseUtcDate(r.created_at);
+    if (Number.isNaN(dt.getTime())) return;
+    
+    const minutes = dt.getMinutes();
+    if (minutes % 10 !== 0) return;
+
+    const key = `${dt.getFullYear()}-${dt.getMonth()}-${dt.getDate()}-${dt.getHours()}-${minutes}`;
+    const count = (minuteCounts.get(key) || 0) + 1;
+    minuteCounts.set(key, count);
+
+    // Gatilho apenas na SEGUNDA pedra enviada no minuto
+    if (count !== 2) return;
+    if (processedKeys.has(key)) return;
+    processedKeys.add(key);
+
+    const n = Number(r.roll);
+    if (!Number.isFinite(n) || n < 0 || n > 14) return;
+
+    out.push({ value: n, analysis: 5, triggerAt: dt, gaps: collectGaps(rows, i, dt, 5) });
   });
   return out;
 }

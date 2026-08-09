@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-export const MAX_GATILHOS = 10;
+export const MAX_GATILHOS = 5;
 export const BRAZIL_TZ = "America/Sao_Paulo";
 
 export type GatilhoRow = {
