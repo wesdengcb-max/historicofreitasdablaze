@@ -538,54 +538,9 @@ export default function AnaliseSection() {
         now={now}
         maxZeros={20}
       />
-        err={err}
-        emptyLabel={`Ainda sem repetições consecutivas da pedra ${selected} no histórico.`}
-        eligible={stat.total >= MIN_CYCLES}
-        eligibleHint={`precisa ${MIN_CYCLES}+ ocorrências`}
-        showFullBadge={false}
-        analiseKey="analise2"
-        pedra={selected}
-        now={now}
-      />
-
-      <AnalysisPanel
-        eyebrow={`Análise 3 · repetição + minuto casado (${selected})`}
-        title="Tempo até o 0 após repetição com unidade do minuto igual"
-        subtitle={
-          (typeof selected === 'number' && selected <= 9)
-            ? `Gatilho: pedra ${selected} repete e ao menos uma sai em minuto terminado em ${selected}. Últimas ${MAX_PATTERN_CYCLES} ocorrências.`
-            : "Análise aplicável apenas para pedras de 0 a 9."
-        }
-        loading={loading}
-        err={err}
-        emptyLabel={
-          (typeof selected === 'number' && selected <= 9)
-            ? `Ainda sem repetições da pedra ${selected} em minuto casado.`
-            : "Análise aplicável apenas para pedras de 0 a 9."
-        }
-        eligible={(typeof selected === 'number' && selected <= 9) && stat.total >= MIN_CYCLES}
-        eligibleHint={`precisa ${MIN_CYCLES}+ ocorrências`}
-        showFullBadge={false}
-        analiseKey="analise3"
-        pedra={selected}
-        now={now}
-      />
-
-      <AnalysisPanel
-        eyebrow={`Análise 4 · Primeira Pedra da Dezena`}
-        title="Primeira Pedra na Virada do Minuto"
-        subtitle={`Gatilho: minutos 00, 10, 20, 30, 40, 50. Analisa até 20 tempos de Branco.`}
-        loading={loading}
-        err={err}
-        emptyLabel={`Ainda sem registros da Análise 4 no histórico.`}
-        eligible={stat.total >= MIN_CYCLES}
-        eligibleHint={`precisa ${MIN_CYCLES}+ ocorrências`}
-        showFullBadge={true}
-        analiseKey="analise4"
-        pedra={selected}
-        now={now}
-        maxZeros={20}
-      />
+    </main>
+  );
+}
     </main>
   );
 }
