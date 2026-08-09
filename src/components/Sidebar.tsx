@@ -82,10 +82,10 @@ export const Sidebar = memo(function Sidebar() {
       {/* Collapse Toggle */}
       <button 
         onClick={toggle}
-        className="absolute -right-3.5 top-10 flex h-7 w-7 items-center justify-center rounded-full border border-white/20 bg-[#1A1A1A] text-white transition hover:bg-red-500 shadow-xl z-[60] group ring-2 ring-black/50"
+        className="absolute -right-3.5 top-10 flex h-7 w-7 items-center justify-center rounded-full border border-white/20 bg-[#1A1A1A] text-white transition hover:bg-red-500 shadow-2xl z-[60] group ring-2 ring-black/80"
       >
         <div className="flex items-center justify-center transition-transform group-active:scale-90">
-          {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          {isCollapsed ? <ChevronRight className="h-4 w-4 stroke-[3px]" /> : <ChevronLeft className="h-4 w-4 stroke-[3px]" />}
         </div>
       </button>
 
@@ -167,7 +167,7 @@ export const Sidebar = memo(function Sidebar() {
             <h4 className="text-xs font-bold text-white uppercase tracking-widest">Seja VIP</h4>
             <p className="mt-2 text-[10px] text-muted-foreground leading-relaxed">Tenha acesso total a todas as ferramentas e recursos exclusivos.</p>
             <a 
-              href="https://t.me/freitasdablaze" 
+              href="https://t.me/freitaswhite" 
               target="_blank" 
               rel="noopener noreferrer"
               className="mt-4 flex w-full items-center justify-center rounded-xl bg-red-500 py-2.5 text-[11px] font-black uppercase tracking-widest text-white transition hover:bg-red-600 active:scale-95 shadow-[0_4px_15px_rgba(239,68,68,0.3)]"
@@ -180,7 +180,7 @@ export const Sidebar = memo(function Sidebar() {
       {isCollapsed && (
         <div className="p-4 flex justify-center">
           <a 
-            href="https://t.me/freitasdablaze" 
+            href="https://t.me/freitaswhite" 
             target="_blank" 
             rel="noopener noreferrer"
             className="rounded-xl bg-red-500 p-2 text-white shadow-lg transition hover:bg-red-600 active:scale-95"
