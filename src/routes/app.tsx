@@ -834,11 +834,10 @@ function Index() {
           </Card>
         </main>
       ) : (
-        <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-3 px-4 py-3 sm:gap-5 sm:px-6 sm:py-6 lg:gap-6 lg:px-6 lg:py-10 bg-background">
+        <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-3 px-4 py-3 sm:gap-5 sm:px-6 sm:py-6 lg:gap-6 lg:px-6 lg:py-10">
+          <section className="grid grid-cols-1 gap-3 sm:gap-5 lg:grid-cols-3 lg:gap-6">
+            <Card className="lg:col-span-2">
 
-
-        <section className="space-y-3 sm:space-y-5 lg:space-y-6">
-          <Card delay={0.05}>
             {/* Cabeçalho compacto: status + contagem + último número */}
             <div className="mb-3 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
               <div className="min-w-0">
