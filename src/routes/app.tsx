@@ -303,7 +303,7 @@ function Index() {
   const section = useSection();
   const [inverse, setInverse] = useState(false);
   const [viewMode, setViewMode] = useState<"colunas" | "lista">("colunas");
-  const { isCollapsed } = useSidebarStore();
+  const { isCollapsed, toggle } = useSidebarStore();
   const isVip = useVipStatus();
 
   // Removido o switch automático para lista em mobile para manter layout de PC em todos os dispositivos
