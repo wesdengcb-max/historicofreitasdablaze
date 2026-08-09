@@ -858,6 +858,7 @@ function Index() {
             redPct={redPct}
             blackPct={blackPct}
             whitePct={whitePct}
+            countdown={countdown}
           />
 
           <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
@@ -867,13 +868,13 @@ function Index() {
                   <div className="flex flex-col">
                     <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Status da Rodada</span>
                     <div className="mt-1 flex items-center gap-3">
-                      <h2 className="text-xl font-black text-white">
-                        {countdown > 3 ? "Apostas abertas..." : "Rodando..."}
-                      </h2>
                       <div className="flex items-center gap-1.5 rounded-full bg-white/5 px-2 py-0.5">
-                        <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+                        <div className={cn(
+                          "h-1.5 w-1.5 rounded-full animate-pulse",
+                          countdown > 3 ? "bg-emerald-500" : "bg-red-500"
+                        )} />
                         <span className="text-[10px] font-bold text-muted-foreground">
-                          Próximo giro em <span className="text-white">{String(countdown).padStart(2, "0")}s</span>
+                          {countdown > 3 ? "Próximo giro em" : "Giro em andamento"} <span className="text-white">{countdown > 3 ? `${String(countdown).padStart(2, "0")}s` : ""}</span>
                         </span>
                       </div>
                       <span className="text-[10px] font-medium text-red-500">{total} rodadas</span>
