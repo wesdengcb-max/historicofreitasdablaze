@@ -986,6 +986,10 @@ function Index() {
                                       time={exibirSegundos ? spTimeWithSeconds(spin) : spin.time}
                                       numbered={numerado}
                                       timeHighlight={destaqueHorario}
+                                      dimmed={
+                                        (highlightKey !== null && highlightKey !== String(colIndex)) ||
+                                        (highlightN.size > 0 && !highlightN.has(spin.n))
+                                      }
                                     />
                                   ))}
                                 </div>
@@ -994,6 +998,7 @@ function Index() {
                           ))}
                         </div>
                       </div>
+
                    ) : (
                      <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3">
                         {visibleSpins.map((spin) => (
