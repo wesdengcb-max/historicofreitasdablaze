@@ -82,9 +82,9 @@ export const Sidebar = memo(function Sidebar() {
       {/* Collapse Toggle */}
       <button 
         onClick={toggle}
-        className="absolute -right-3.5 top-10 flex h-7 w-7 items-center justify-center rounded-full border border-white/10 bg-[#0A0A0A] text-muted-foreground transition hover:text-white shadow-lg z-50 group"
+        className="absolute -right-3.5 top-10 flex h-7 w-7 items-center justify-center rounded-full border border-white/20 bg-[#1A1A1A] text-white transition hover:bg-red-500 shadow-xl z-[60] group ring-2 ring-black/50"
       >
-        <div className="h-full w-full rounded-full border border-white/5 flex items-center justify-center group-hover:border-red-500/50 transition-colors">
+        <div className="flex items-center justify-center transition-transform group-active:scale-90">
           {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
         </div>
       </button>
@@ -166,17 +166,27 @@ export const Sidebar = memo(function Sidebar() {
             </div>
             <h4 className="text-xs font-bold text-white uppercase tracking-widest">Seja VIP</h4>
             <p className="mt-2 text-[10px] text-muted-foreground leading-relaxed">Tenha acesso total a todas as ferramentas e recursos exclusivos.</p>
-            <button className="mt-4 w-full rounded-xl bg-red-500 py-2.5 text-[11px] font-black uppercase tracking-widest text-white transition hover:bg-red-600 active:scale-95 shadow-[0_4px_15px_rgba(239,68,68,0.3)]">
+            <a 
+              href="https://t.me/freitasdablaze" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="mt-4 flex w-full items-center justify-center rounded-xl bg-red-500 py-2.5 text-[11px] font-black uppercase tracking-widest text-white transition hover:bg-red-600 active:scale-95 shadow-[0_4px_15px_rgba(239,68,68,0.3)]"
+            >
               Quero ser VIP
-            </button>
+            </a>
           </div>
         </div>
       )}
       {isCollapsed && (
         <div className="p-4 flex justify-center">
-          <button className="rounded-xl bg-red-500 p-2 text-white shadow-lg transition hover:bg-red-600 active:scale-95">
+          <a 
+            href="https://t.me/freitasdablaze" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="rounded-xl bg-red-500 p-2 text-white shadow-lg transition hover:bg-red-600 active:scale-95"
+          >
             <Crown className="h-4 w-4" />
-          </button>
+          </a>
         </div>
       )}
     </aside>
