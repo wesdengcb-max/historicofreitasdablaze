@@ -26,6 +26,8 @@ import {
   BarChart3,
   Crown,
   Send,
+  Layers,
+  ShieldCheck,
 } from "lucide-react";
 
 import { useVipStatus } from "@/lib/auth/vipStore";
@@ -47,6 +49,8 @@ import {
   BLAZE_GAP_X,
   BLAZE_GAP_Y,
 } from "@/components/double/BlazeResultCard";
+import { PredictiveSignals } from "@/components/double/PredictiveSignals";
+
 
 import { getSignals, subscribeSignals, type StoredSignal } from "@/lib/signalsStore";
 import { Sidebar } from "@/components/Sidebar";
@@ -810,15 +814,14 @@ function Index() {
       <div className="flex flex-1 flex-col overflow-hidden">
         <AppHeader />
         
-        <div className="flex-1 overflow-y-auto scrollbar-none">
+        <div className="flex-1 overflow-y-auto scrollbar-none bg-[#080808]">
           {section === "sinais" ? (
             <Suspense fallback={<SectionFallback />}><SinaisPage /></Suspense>
           ) : section === "analise" ? (
             <Suspense fallback={<SectionFallback />}><AnaliseSection /></Suspense>
           ) : section === "estrategias" ? (
             <Suspense fallback={<SectionFallback />}><EstrategiasSection /></Suspense>
-
-      ) : section !== "dashboard" ? (
+          ) : section !== "dashboard" ? (
         <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-5 px-4 py-10 sm:gap-6 sm:px-6 sm:py-16">
           <Card delay={0.05}>
             <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
@@ -834,664 +837,232 @@ function Index() {
           </Card>
         </main>
       ) : (
-        <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-3 px-4 py-3 sm:gap-5 sm:px-6 sm:py-6 lg:gap-6 lg:px-6 lg:py-10">
-          <section className="grid grid-cols-1 gap-3 sm:gap-5 lg:grid-cols-3 lg:gap-6">
-            <Card className="lg:col-span-2">
+        <main className="mx-auto flex w-full max-w-[1600px] flex-col gap-4 px-4 py-4 sm:gap-6 sm:px-6 sm:py-6 lg:gap-6 lg:px-8 lg:py-6">
+          <section className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-[1fr_300px] lg:gap-6">
+            <Card className="relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-[1px] bg-red-600/30" />
 
-            {/* Cabeçalho compacto: status + contagem + último número */}
-            <div className="mb-3 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-              <div className="min-w-0">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                  Status da rodada
-                </p>
-                <div className="mt-0.5 flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
-                  <h1 className="truncate text-lg font-semibold tracking-tight text-foreground sm:text-xl">
+
+            <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3 flex flex-col justify-center min-h-[70px] relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-[1px] bg-red-600/30" />
+                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mb-1">Status da rodada</p>
+                <div className="flex items-center gap-2">
+                  <div className={`h-2 w-2 rounded-full ${countdown > 3 ? "bg-emerald-500 animate-pulse" : "bg-red-500"}`} />
+                  <h3 className="text-sm font-black uppercase tracking-tight text-white font-outfit">
                     {countdown > 3 ? "Apostas abertas" : "Rodando…"}
-                  </h1>
-                  <span className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                    <span className="relative inline-flex h-1.5 w-1.5">
-                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-positive/70" />
-                      <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-positive" />
-                    </span>
-                    Próximo giro em{" "}
-                    <b className="tabular-nums text-foreground">{String(countdown).padStart(2, "0")}s</b>
-                  </span>
-                  <span className="text-[11px] tabular-nums text-muted-foreground">{total} rodadas</span>
+                  </h3>
                 </div>
               </div>
-              <div className="flex shrink-0 items-center gap-2">
-                <p className="hidden text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground sm:block">
-                  Último
-                </p>
-                {last ? (
-                  <div key={last.id} className="animate-in fade-in zoom-in-95 duration-200">
-                    <ResultCircle color={last.color} n={last.n} size="md" glow />
-                  </div>
-                ) : (
-                  <div className="h-9 w-9 rounded-full border border-dashed border-white/10" />
-                )}
+              
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3 flex flex-col justify-center min-h-[70px] relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-[1px] bg-red-600/30" />
+                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mb-1">Próximo Giro</p>
+                <div className="flex items-center gap-2">
+                  <Clock className="h-3.5 w-3.5 text-red-600" />
+                  <span className="text-lg font-black tabular-nums text-white font-outfit">00:{String(countdown).padStart(2, '0')}</span>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3 flex flex-col justify-center min-h-[70px] relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-[1px] bg-red-600/30" />
+                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mb-1">Último Resultado</p>
+                <div className="flex items-center gap-2">
+                  {spins[0] && <ResultCircle color={spins[0].color} n={spins[0].n} size="sm" animate={false} />}
+                  <span className="text-sm font-bold text-white/90">{spins[0] ? (spins[0].color === 'white' ? 'Branco' : spins[0].color === 'red' ? 'Vermelho' : 'Preto') : '--'}</span>
+                </div>
               </div>
             </div>
 
-            {(() => {
-              const items = [
-                { key: "red" as const, color: "red" as const, count: reds, pct: redPct, tint: "#DE2143" },
-                { key: "white" as const, color: "white" as const, count: whites, pct: whitePct, tint: "#ffffff" },
-                { key: "black" as const, color: "black" as const, count: blacks, pct: blackPct, tint: "#16171d" },
-              ];
-              const leader = items.reduce((a, b) => (b.count > a.count ? b : a), items[0]);
-              return (
-                <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                  {items.map((it) => {
-                    const isLeader = it.key === leader.key && it.count > 0;
-                    return (
-                      <div
-                        key={it.key}
-                        className={`rounded-xl border p-2 transition-colors sm:p-2.5 ${
-                          isLeader
-                            ? "border-primary/70 bg-primary/10 shadow-[0_0_15px_rgba(59,130,246,0.2)]"
-                            : "border-white/5 bg-white/[0.02]"
-                        }`}
-                      >
-                        <div className="flex min-w-0 items-center gap-2">
-                          <ResultCircle color={it.color} n={it.color === "white" ? undefined : 0} size="sm" animate={false} />
-                          <div className="min-w-0 flex-1">
-                            <div className={`text-[13px] font-semibold tabular-nums ${isLeader ? "text-primary" : "text-foreground"}`}>
-                              {it.pct.toFixed(1)}%
-                            </div>
-                            <div className="truncate text-[10px] tabular-nums text-muted-foreground">
-                              {it.count} apostas
-                            </div>
-                          </div>
-                        </div>
-                        <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-white/[0.06]">
-                          <div
-                            className="h-full rounded-full transition-[width] duration-500"
-                            style={{
-                              width: `${Math.min(100, it.pct)}%`,
-                              background: isLeader
-                                ? "linear-gradient(90deg, #3b82f6, #60a5fa)"
-                                : it.tint,
-                            }}
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })()}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+              {[
+                { label: 'Vermelho', color: 'red', count: counts.red, pct: redPct },
+                { label: 'Branco', color: 'white', count: counts.white, pct: whitePct },
+                { label: 'Preto', color: 'black', count: counts.black, pct: blackPct }
+              ].map((c) => (
 
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-white/5 pt-3">
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] text-muted-foreground">
-                <span className="inline-flex items-center gap-2">
-                  <Flame className="h-3.5 w-3.5 text-red-500" />
-                  Último branco há <b className="text-foreground">{lastWhiteAgo}</b> rodadas
-                </span>
-              </div>
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                  Frequência
-                </span>
-                {freq.map((f) => (
-                  <div key={f.n} className="flex items-center gap-1">
-                    <ResultCircle color={colorOf(f.n)} n={f.n} size="xs" animate={false} />
-                    <span className="text-[10px] tabular-nums text-muted-foreground">{f.count}</span>
+                <div key={c.color} className="rounded-xl border border-white/5 bg-white/[0.02] p-3 relative overflow-hidden">
+                  <div className="absolute top-0 left-0 right-0 h-[1px] bg-red-600/30" />
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className={`h-2 w-2 rounded-full ${c.color === 'red' ? 'bg-red-500' : c.color === 'white' ? 'bg-white' : 'bg-neutral-700'}`} />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-white/70">{c.label}</span>
+                    </div>
+                    <span className="text-[10px] font-black text-white">{c.pct.toFixed(0)}%</span>
                   </div>
-                ))}
-              </div>
-            </div>
-          </Card>
-
-          <Card title="Estratégias Ativas" className="lg:col-span-1">
-             <StrategyTabs spins={visibleSpins} />
-          </Card>
-        </section>
-
-        <section className="space-y-3 sm:space-y-5 lg:space-y-6">
-
-
-
-          <Card
-            title="Giros anteriores"
-            subtitle={`${total} rodadas · horário de Brasília`}
-            icon={<TrendingUp className="h-3.5 w-3.5" />}
-            delay={0.08}
-            action={
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => setFullscreen(true)}
-                  className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 bg-white/5 text-muted-foreground transition-colors hover:bg-white/[0.09] hover:text-foreground"
-                  aria-label="Tela cheia"
-                  title="Tela cheia"
-                >
-                  <Maximize2 className="h-4 w-4" />
-                </button>
-              </div>
-            }
-          >
-            {/* Filtros de período */}
-            <div className="mb-3 flex flex-wrap gap-1 sm:mb-4 sm:gap-1.5">
-              {([
-                ["hoje", "Hoje"],
-                ["ontem", "Ontem"],
-                ["7d", "Últimos 7 dias"],
-                ["30d", "Últimos 30 dias"],
-                ["custom", "Personalizado"],
-              ] as [FilterId, string][]).map(([id, label]) => (
-                <button
-                  key={id}
-                  type="button"
-                  onClick={() => setFilter(id)}
-                  className={`rounded-full border px-2 py-1 text-[10px] font-medium transition-colors sm:px-3 sm:py-1.5 sm:text-[11px] ${
-                    filter === id
-                      ? "border-white/20 bg-white/10 text-foreground"
-                      : "border-white/5 bg-white/[0.03] text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {label}
-                </button>
+                  <div className="flex items-end justify-between">
+                    <span className="text-lg font-black text-white tabular-nums">{c.count}</span>
+                    <span className="text-[9px] text-muted-foreground mb-1">Rodadas</span>
+                  </div>
+                  <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full transition-all duration-500 ${c.color === 'red' ? 'bg-red-500' : c.color === 'white' ? 'bg-white' : 'bg-neutral-600'}`} 
+                      style={{ width: `${c.pct}%` }} 
+                    />
+                  </div>
+                </div>
               ))}
             </div>
 
-            {filter === "custom" && (
-              <div className="mb-3 grid gap-2 rounded-xl border border-white/5 bg-white/[0.02] p-3 sm:mb-4 sm:grid-cols-[repeat(4,1fr)_auto] sm:items-end">
-                <FieldInput label="Data inicial" type="date" value={customStart} onChange={setCustomStart} />
-                <FieldInput label="Data final" type="date" value={customEnd} onChange={setCustomEnd} />
-                <FieldInput label="Hora inicial" type="time" value={timeStart} onChange={setTimeStart} placeholder="00:00" />
-                <FieldInput label="Hora final" type="time" value={timeEnd} onChange={setTimeEnd} placeholder="23:59" />
-                <button
-                  type="button"
-                  onClick={applyCustom}
-                  className="h-9 rounded-lg bg-[#DE2143] px-4 text-[12px] font-semibold text-primary-foreground transition-opacity hover:opacity-90"
-                >
-                  Pesquisar
-                </button>
-              </div>
-            )}
-
-            {/* Painel de controles alinhado */}
-            <div className="mb-3 rounded-2xl border border-white/5 bg-white/[0.02] p-2 sm:mb-4 sm:p-3">
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-3 text-[11px] sm:gap-x-6">
-                <div className="flex shrink-0 items-center">
-                  <Switch checked={realtime} onChange={setRealtime} label="Tempo real" />
-                </div>
-
-                <div className="flex shrink-0 items-center">
-                  <Switch
-                    checked={viewMode === "colunas"}
-                    onChange={(v) => setViewMode(v ? "colunas" : "lista")}
-                    label="Colunas fixas"
-                  />
-                </div>
-                <div className="flex shrink-0 items-center">
-                  <Switch checked={contarColunas} onChange={setContarColunas} label="Contar colunas" />
-                </div>
-                <div className="flex shrink-0 items-center">
-                  <Switch checked={inverse} onChange={setInverse} label="Sentido inverso" />
-                </div>
-                <div className="flex shrink-0 items-center">
-                  <Switch checked={numerado} onChange={setNumerado} label="Numerado" />
-                </div>
-                <div className="flex shrink-0 items-center">
-                  <Switch checked={exibirSegundos} onChange={setExibirSegundos} label="Exibir segundos" />
-                </div>
-                <div className="flex shrink-0 items-center">
-                  <Switch checked={whiteAlert} onChange={toggleWhiteAlert} label="Alerta de branco" />
-                </div>
-                <div className="flex shrink-0 items-center">
-                  <Switch checked={destaqueHorario} onChange={setDestaqueHorario} label="Destaque horário" />
-                </div>
-                <div className="flex shrink-0 items-center">
-                  <div className={`flex items-center gap-2 rounded-full border px-2.5 py-1 transition-all ${isVip ? "border-amber-400/30 bg-amber-400/5 text-amber-400" : "border-white/5 bg-white/5 text-muted-foreground opacity-60"}`}>
-                    <Crown className="h-3.5 w-3.5" />
-                    <span className="text-[10px] font-bold uppercase tracking-wider font-outfit">
-                      {isVip ? "VIP Ativo" : "Básico"}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex shrink-0 items-center">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button
-                        type="button"
-                        className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] font-medium text-muted-foreground transition-colors hover:bg-white/[0.09] hover:text-foreground"
-                        title="Slots futuros"
-                      >
-                        <Clock className="h-3.5 w-3.5" />
-                        <span>Slots: {futureSlots === 0 ? "Off" : `+${futureSlots}`}</span>
-                        <ChevronDown className="h-3 w-3 opacity-70" />
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="min-w-[7rem]">
-                      {([0, 10, 20, 30] as const).map((v) => (
-                        <DropdownMenuItem
-                          key={v}
-                          onSelect={() => setFutureSlots(v)}
-                          className={futureSlots === v ? "bg-white/10" : ""}
-                        >
-                          {v === 0 ? "Off" : `+${v} min`}
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </div>
-            </div>
-
-
-            {/* Cabeçalho das estatísticas por coluna */}
-            {viewMode === "colunas" && contarColunas && (
-              <div className="mb-3 w-full border-b border-white/5 pb-3 overflow-x-auto scrollbar-none">
-                <div className="grid grid-cols-10 gap-[8px] min-w-[1200px] w-full">
-                  {Array.from({ length: 10 }).map((_, ci) => {
-                    const stats = colStats[ci];
-                    return (
-                      <button
-                        key={`col-stats-${ci}`}
-                        onClick={() => {
-                          const key = `col-${ci}`;
-                          if (highlightKey === key) {
-                            setHighlightKey(null);
-                            setHighlightN(new Set());
-                            return;
-                          }
-                          setHighlightKey(key);
-                          // Selecionar todos os números de ambas as pedras desta coluna (posição 0 e 1)
-                          const next = new Set<number>();
-                          gridRows.forEach(row => {
-                            const cells = row.cells[ci];
-                            // Pega os números das duas primeiras pedras da célula (pedra esquerda e pedra direita)
-                            if (cells[0]) next.add(cells[0].n);
-                            if (cells[1]) next.add(cells[1].n);
-                          });
-                          setHighlightN(next);
-                        }}
-                        className={`flex w-full flex-col gap-0.5 overflow-hidden rounded-[4px] p-1 shadow-inner text-left transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-primary/25 shadow-[0_0_15px_rgba(255,31,61,0.2)]" : "bg-white/[0.03] hover:bg-white/[0.08]"}`}
-                        style={{ width: "100%" }}
-                      >
-                        <div className="flex items-center justify-between px-0.5 text-[8px] font-bold tabular-nums">
-                          <span className="text-white">B: {stats.white}</span>
-                          <span className="text-white/40">{stats.whitePct.toFixed(0)}%</span>
-                        </div>
-                        <div className="relative h-1 w-full overflow-hidden rounded-full bg-white/5">
-                          <div className="flex h-full w-full">
-                            <div
-                              className="h-full bg-[#DE2143] transition-all duration-500"
-                              style={{ width: `${stats.redPct}%` }}
-                            />
-                            <div
-                              className="h-full bg-slate-800 transition-all duration-500"
-                              style={{ width: `${stats.blackPct}%` }}
-                            />
-                            <div
-                              className="h-full bg-white transition-all duration-500"
-                              style={{ width: `${stats.whitePct}%` }}
-                            />
-                          </div>
-                        </div>
-                        <div className="mt-0.5 flex items-center justify-between px-0.5 text-[7px] font-medium text-muted-foreground/60 tabular-nums uppercase">
-                          <span>V: {stats.red}</span>
-                          <span>P: {stats.black}</span>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            <div
-              className={
-                fullscreen
-                  ? "fixed inset-0 z-50 flex flex-col bg-background/95 p-4 backdrop-blur-md sm:p-6"
-                  : "overflow-hidden rounded-2xl border border-white/5 bg-black/15"
-              }
-            >
-              {fullscreen && (
-                <div className="mb-3 flex items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                      Histórico — tela cheia
-                    </p>
-                    <h2 className="truncate text-lg font-semibold">{total} rodadas · horário de Brasília</h2>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setFullscreen(false)}
-                    className="grid h-10 w-10 place-items-center rounded-xl border border-white/10 bg-white/5 text-muted-foreground transition-colors hover:bg-white/[0.09] hover:text-foreground"
-                    aria-label="Fechar tela cheia"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              )}
+            <div className="mt-6">
               <div
                 className={
                   fullscreen
-                    ? "min-h-0 flex-1 overflow-auto rounded-2xl border border-white/5 bg-black/20"
-                    : ""
+                    ? "fixed inset-0 z-50 flex flex-col bg-[#080808] p-4 backdrop-blur-md sm:p-6"
+                    : "overflow-hidden rounded-xl border border-white/5 bg-white/[0.02]"
                 }
-                style={{ direction: inverse && viewMode === "colunas" ? "rtl" : "ltr" }}
               >
-
-
-                {loading ? (
-                  <div className="flex items-center justify-center py-16 text-sm text-muted-foreground">
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Carregando histórico…
+                {fullscreen && (
+                  <div className="mb-4 flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-red-600">
+                        Histórico — Tela Cheia
+                      </p>
+                      <h2 className="truncate text-lg font-black text-white">{total} rodadas · Brasília</h2>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setFullscreen(false)}
+                      className="grid h-10 w-10 place-items-center rounded-lg border border-white/10 bg-white/5 text-muted-foreground transition-colors hover:bg-white/[0.09] hover:text-foreground"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
                   </div>
-                ) : visibleSpins.length === 0 ? (
-                  <div className="py-16 text-center text-sm text-muted-foreground">
-                    {status === "error"
-                      ? `Erro ao buscar histórico: ${errorMsg}`
-                      : "Nenhum resultado no período selecionado."}
-                  </div>
-                ) : viewMode === "colunas" ? (
-                  <div className="history-scroll w-full overflow-x-hidden p-1 sm:p-2 lg:p-3">
-                    <div className="flex flex-col gap-0 overflow-x-auto scrollbar-none">
-                      {/* Cabeçalho 0-9 interno para Colunas Fixas */}
-                      <div className="grid grid-cols-10 gap-[8px] mb-1 sticky top-0 z-10 bg-background/40 backdrop-blur-sm min-w-[1200px] w-full">
-                        {Array.from({ length: 10 }).map((_, ci) => (
-                          <button
-                            key={`header-inner-${ci}`}
-                            className={`flex h-[23px] w-full items-center justify-center rounded-[6px] border border-white/5 text-[14px] font-medium tabular-nums transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-primary/40 text-white shadow-[0_0_10px_rgba(255,31,61,0.3)]" : "bg-white/[0.03] text-white hover:bg-white/10"}`}
-                            onClick={() => {
-                              const key = `col-${ci}`;
-                              if (highlightKey === key) {
-                                setHighlightKey(null);
-                                setHighlightN(new Set());
-                                return;
-                              }
-                              setHighlightKey(key);
-                              // Selecionar todos os números de ambas as pedras desta coluna (posição 0 e 1)
-                              const next = new Set<number>();
-                              gridRows.forEach(row => {
-                                const cells = row.cells[ci];
-                                // Pega os números das duas primeiras pedras da célula (pedra esquerda e pedra direita)
-                                if (cells[0]) next.add(cells[0].n);
-                                if (cells[1]) next.add(cells[1].n);
-                              });
-                              setHighlightN(next);
-                            }}
-                          >
-                            {ci}
-                          </button>
-                        ))}
+                )}
+                
+                <div className="flex items-center justify-between px-4 py-3 border-b border-white/5 bg-white/[0.01]">
+                   <div className="flex items-center gap-2">
+                      <Activity className="h-3.5 w-3.5 text-red-600" />
+                      <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-white">Rodadas Recentes</h3>
+                      <span className="rounded bg-red-600/10 px-1.5 py-0.5 text-[9px] font-black text-red-500 border border-red-600/20">{total}</span>
+                   </div>
+                   <div className="flex items-center gap-2">
+                     <button 
+                       onClick={() => setViewMode(viewMode === "colunas" ? "lista" : "colunas")}
+                       className="p-1.5 rounded-md hover:bg-white/5 text-muted-foreground transition-colors"
+                       title="Mudar visualização"
+                     >
+                       {viewMode === "colunas" ? <BarChart3 className="h-3.5 w-3.5" /> : <Layers className="h-3.5 w-3.5" />}
+                     </button>
+                     <button 
+                       onClick={() => setFullscreen(true)}
+                       className="p-1.5 rounded-md hover:bg-white/5 text-muted-foreground transition-colors"
+                       title="Tela cheia"
+                     >
+                       <Maximize2 className="h-3.5 w-3.5" />
+                     </button>
+                   </div>
+                </div>
+
+                <div
+                  className={
+                    fullscreen
+                      ? "min-h-0 flex-1 overflow-auto bg-black/20 p-4"
+                      : "max-h-[600px] overflow-auto p-4 scrollbar-thin scrollbar-thumb-white/10"
+                  }
+                  style={{ direction: inverse && viewMode === "colunas" ? "rtl" : "ltr" }}
+                >
+                   {viewMode === "colunas" ? (
+                      <div className="flex flex-col gap-4">
+                        <div className="grid grid-cols-10 gap-2 mb-2">
+                          {Array.from({ length: 10 }).map((_, i) => (
+                            <div key={i} className="flex flex-col items-center gap-1">
+                              <div className="w-full py-1.5 rounded bg-white/[0.03] border border-white/5 text-center text-[10px] font-black text-white/40">
+                                {i}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="grid grid-cols-10 gap-2">
+                          {Array.from({ length: 10 }).map((_, colIndex) => (
+                            <div key={colIndex} className="flex flex-col gap-3">
+                              {gridRows.map((row) => (
+                                <div key={row.key} className="flex flex-col gap-2">
+                                  {row.cells[colIndex].map((spin) => (
+                                    <BlazeResultCard
+                                      key={spin.id}
+                                      n={spin.n}
+                                      color={spin.color}
+                                      time={exibirSegundos ? spTimeWithSeconds(spin) : spin.time}
+                                      numbered={numerado}
+                                      timeHighlight={destaqueHorario}
+                                      dimmed={
+                                        (highlightKey !== null && highlightKey !== String(colIndex)) ||
+                                        (highlightN.size > 0 && !highlightN.has(spin.n))
+                                      }
+                                    />
+                                  ))}
+                                </div>
+                              ))}
+                            </div>
+                          ))}
+                        </div>
                       </div>
 
-                      {gridRows.map((row) => (
-                        <div key={row.key} className="flex flex-col gap-0 border-b border-white/[0.02]">
-                          <div className="grid grid-cols-10 gap-[8px] relative min-w-[1200px] w-full">
-                            {row.cells.map((cell, ci) => {
-                            const [hh, mmPrefix] = row.label.split(":");
-                            const hm = `${hh}:${mmPrefix[0]}${ci}`;
-                            const cellSignals = signalsByHM.get(hm) ?? [];
-                            const green = cellSignals.find((s) => s.outcome === "green");
-                            const pending = cellSignals.find((s) => s.outcome === "pending");
-                            const red = cellSignals.find((s) => s.outcome === "red");
-                            let badge: null | { label: string; tone: "exato" | "margem" | "pending" | "loss" } = null;
-                            if (green) {
-                              const diff = green.matchedIso
-                                ? Math.abs(new Date(green.matchedIso).getTime() - new Date(green.targetIso).getTime())
-                                : 0;
-                              badge = diff <= 15_000
-                                ? { label: "EXATO", tone: "exato" }
-                                : { label: "MARGEM", tone: "margem" };
-                            } else if (pending) {
-                              badge = { label: "SINAL", tone: "pending" };
-                            } else if (red) {
-                              badge = { label: "LOSS", tone: "loss" };
-                            }
-                            const badgeCls =
-                              badge?.tone === "exato" || badge?.tone === "pending"
-                                ? "bg-emerald-500 text-black border border-emerald-300 shadow-[0_2px_8px_rgba(16,185,129,0.35)]"
-                                : badge?.tone === "margem"
-                                  ? "bg-amber-400 text-black border border-amber-200 shadow-[0_2px_8px_rgba(245,158,11,0.35)]"
-                                  : "bg-red-500 text-white border border-red-300 shadow-[0_2px_8px_rgba(239,68,68,0.35)]";
-                            return (
-                              <div
-                                key={ci}
-                                className="flex flex-col items-center justify-center p-0.5 sm:p-1"
-                                style={{ width: "100%", height: "66px", direction: "ltr" }}
-                              >
-                                <div 
-                                  className={`relative flex flex-col items-center pt-2 rounded-lg transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-primary/10" : ""}`}
-                                >
-                                  {badge && (
-                                    <span className={`absolute top-0 z-10 inline-flex h-3 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-3.5 sm:px-1.5 sm:text-[8px] ${badgeCls}`}>
-                                      {badge.label}
-                                    </span>
-                                  )}
-                                  <div className="relative flex h-[56px] items-start gap-[8px]">
-                                    {(cell.length >= 2
-                                      ? [cell[0], cell[1]]
-                                      : cell.length === 1
-                                        ? [cell[0], undefined]
-                                        : [undefined, undefined]
-                                    ).map((spin, i) => {
+                   ) : (
+                     <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3">
+                        {visibleSpins.map((spin) => (
+                          <BlazeResultCard
+                            key={spin.id}
+                            n={spin.n}
+                            color={spin.color}
+                            time={exibirSegundos ? spTimeWithSeconds(spin) : spin.time}
+                            numbered={numerado}
+                            timeHighlight={destaqueHorario}
+                            dimmed={highlightN.size > 0 && !highlightN.has(spin.n)}
+                          />
+                        ))}
+                     </div>
 
-                                      const slotKey = `${hm}-${i}`;
-                                      const isLocked = !isVip && !spin && !(pending && i === 0);
-
-                                      if (spin) {
-                                        return (
-                                          <div key={(spin as Spin).id} className="flex flex-col items-center">
-                                            <TipMinerCard
-                                              spin={spin as Spin}
-                                              highlightN={highlightN}
-                                              isActive={
-                                                highlightKey 
-                                                  ? highlightKey === `col-${ci}`
-                                                  : (highlightN.size > 0 ? highlightN.has((spin as Spin).n) : true)
-                                              }
-                                              numbered={numerado}
-                                              showSeconds={exibirSegundos}
-                                              timeHighlight={destaqueHorario}
-                                              showTime={false}
-                                              onClick={() => {
-                                                const n = (spin as Spin).n;
-                                                // Se clicar em uma pedra e já houver uma coluna selecionada,
-                                                // limpa a coluna e foca apenas na pedra.
-                                                if (highlightKey) {
-                                                  setHighlightKey(null);
-                                                  setHighlightN(new Set([n]));
-                                                  return;
-                                                }
-                                                setHighlightN((h) => {
-                                                  const next = new Set(h);
-                                                  if (next.has(n)) next.delete(n);
-                                                  else next.add(n);
-                                                  return next;
-                                                });
-                                              }}
-                                            />
-                                            <span className={`mt-[5px] text-[11px] tabular-nums leading-none font-medium h-[11px] flex items-center ${destaqueHorario ? "text-primary font-bold" : "text-[#8ebcf0]"}`}>
-                                              {exibirSegundos ? spTimeWithSeconds(spin as Spin) : (spin as Spin).time}
-                                            </span>
-                                          </div>
-                                        );
-                                      }
-                                      
-                                      if (pending && i === 0) {
-                                         const isSlotActive = highlightKey ? (highlightKey === `col-${ci}`) : (highlightN.size === 0);
-                                         return (
-                                          <div key={`p-${ci}-${i}`} className="flex flex-col items-center" style={{ opacity: isSlotActive ? 1 : 0.25 }}>
-                                            <div className="relative flex h-[48px] w-[48px] items-center justify-center overflow-hidden rounded-[6px] border-[2.5px] border-emerald-400 bg-white shadow-sm">
-                                              <img
-                                                src={brancoTile.url}
-                                                alt="Sinal"
-                                                className="h-full w-full object-cover"
-                                                draggable={false}
-                                              />
-                                            </div>
-                                            <span className="mt-[5px] text-[11px] tabular-nums font-medium h-[11px] flex items-center text-[#8ebcf0]">
-                                              {hm}
-                                            </span>
-                                          </div>
-                                        );
-                                      }
-
-                                      const p = slotPredictions[slotKey];
-                                      const isSlotActive = highlightKey ? (highlightKey === `col-${ci}`) : (highlightN.size === 0);
-                                      return (
-                                        <div key={`e-${ci}-${i}`} className="flex flex-col items-center" style={{ opacity: isSlotActive ? 1 : 0.25 }}>
-                                          <button
-                                            type="button"
-                                            onClick={() => {
-                                              if (isLocked) {
-                                                toast.error("Recurso VIP", {
-                                                  description: "A criação de alertas manuais é exclusiva para membros VIP.",
-                                                });
-                                                return;
-                                              }
-                                              cycleSlotPrediction(slotKey);
-                                            }}
-                                            className={`relative flex h-[48px] w-[48px] items-center justify-center rounded-[6px] border border-dashed transition-colors hover:border-white/20 ${
-                                              isLocked
-                                                ? "border-white/5 bg-white/5 opacity-50 cursor-not-allowed"
-                                                : p === "white"
-                                                  ? "border-emerald-400/50 bg-emerald-400/5"
-                                                  : p === "red"
-                                                    ? "border-red-500/50 bg-red-500/5"
-                                                    : p === "black"
-                                                      ? "border-slate-500/50 bg-slate-500/5"
-                                                      : "border-[#3b5270] bg-[#233248]"
-                                            }`}
-                                          >
-                                            {isLocked ? (
-                                              <Lock className="h-4 w-4 text-muted-foreground/40" />
-                                            ) : (
-                                              <div
-                                                className={`h-[32px] w-[32px] rounded-full border-2 transition-all ${
-                                                  p === "white"
-                                                    ? "bg-white border-white/20"
-                                                    : p === "red"
-                                                      ? "bg-red-500 border-red-400/20"
-                                                      : p === "black"
-                                                        ? "bg-slate-800 border-slate-700/20"
-                                                        : "bg-transparent border-white"
-                                                }`}
-                                              />
-                                            )}
-                                          </button>
-                                          <span className="mt-[5px] h-[11px] text-[11px] font-medium tabular-nums text-[#8ebcf0]">
-                                            {hm}
-                                          </span>
-                                        </div>
-
-                                      );
-                                    })}
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                            })}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  (() => {
-                    return (
-                       <div
-                         className="history-scroll grid p-1 sm:p-3 lg:p-4"
-                         style={{
-                           gridTemplateColumns:
-                             `repeat(auto-fill, minmax(52px, 1fr))`,
-                           columnGap: "8px",
-                           rowGap: "16px",
-                           direction: inverse ? "rtl" : "ltr",
-                         }}
+                   )}
+                   
+                   {hasMore && (
+                     <div className="mt-8 flex justify-center">
+                       <button
+                         onClick={loadMore}
+                         disabled={loadingMore}
+                         className="rounded-lg border border-white/10 bg-white/5 px-6 py-2 text-[11px] font-black uppercase tracking-widest text-white hover:bg-white/10 transition-colors disabled:opacity-50"
                        >
-                         {visibleSpins.map((spin, i) => {
-                           const hasSel = highlightN.size > 0;
-                           const hit = highlightN.has(spin.n);
-                           return (
-                             <div key={spin.id} style={{ direction: "ltr" }}>
-                               <BlazeResultCard
-                                 n={spin.n}
-                                 color={spin.color}
-                                 time={exibirSegundos ? spTimeWithSeconds(spin) : spin.time}
-                                 numbered={numerado}
-                                 timeHighlight={destaqueHorario}
-                                 selected={hit}
-                                 dimmed={hasSel && !hit}
-                                 delay={i < 20 ? i * 0.015 : 0}
-                                 onClick={() =>
-                                   setHighlightN((h) => {
-                                     const next = new Set(h);
-                                     if (next.has(spin.n)) next.delete(spin.n);
-                                     else next.add(spin.n);
-                                     return next;
-                                   })
-                                 }
-                               />
-                             </div>
-                           );
-                         })}
-                       </div>
-                    );
-                  })()
-                )}
-
-                {!loading && visibleSpins.length > 0 && (
-                  <div className="mt-5 flex justify-center pb-4">
-                    {hasMore ? (
-                      <button
-                        type="button"
-                        onClick={loadMore}
-                        disabled={loadingMore}
-                        className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-2 text-[12px] font-semibold text-foreground transition-colors hover:bg-white/[0.09] disabled:opacity-60"
-                      >
-                        {loadingMore ? (
-                          <>
-                            <Loader2 className="h-4 w-4 animate-spin" /> Carregando…
-                          </>
-                        ) : (
-                          <>+ Carregar mais {PAGE_SIZE} resultados</>
-                        )}
-                      </button>
-                    ) : (
-                      <span className="text-[11px] text-muted-foreground">
-                        Fim do histórico do período.
-                      </span>
-                    )}
-                  </div>
-                )}
+                         {loadingMore ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Carregar mais"}
+                       </button>
+                     </div>
+                   )}
+                </div>
               </div>
             </div>
           </Card>
+
+          <div className="flex flex-col gap-4">
+            <Card className="relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-[1px] bg-red-600/30" />
+              <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-white mb-4 flex items-center gap-2">
+                <ShieldCheck className="h-3.5 w-3.5 text-red-600" />
+                Estratégias Ativas
+              </h3>
+              <StrategyTabs spins={visibleSpins} />
+            </Card>
+
+            <PredictiveSignals />
+          </div>
         </section>
-          </main>
-        )}
-        </div>
-      </div>
+      </main>
+    )}
+  </div>
+</div>
 
 
+<WhiteCelebration 
+  spin={whiteFlash} 
+  onClose={() => setWhiteFlash(null)} 
+/>
+<WhiteAlertToggleFx state={alertFx} onDone={() => setAlertFx(null)} />
+</div>
 
-
-
-
-
-      <WhiteCelebration 
-        spin={whiteFlash} 
-        onClose={() => setWhiteFlash(null)} 
-      />
-      <WhiteAlertToggleFx state={alertFx} onDone={() => setAlertFx(null)} />
-
-      <LeftStatsDrawer
-        open={statsOpen}
-        onClose={() => setStatsOpen(false)}
-        spins={visibleSpins}
-      />
-    </div>
-  );
+)
 }
 
 const TipMinerCard = memo(function TipMinerCard({
+
   spin,
   delay = 0,
   showTime = true,
