@@ -923,24 +923,20 @@ function Index() {
               );
             })()}
 
-            <div className="mt-3 grid gap-2 border-t border-white/5 pt-3 sm:grid-cols-[1fr_auto] sm:items-center sm:gap-4">
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-white/5 pt-3">
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] text-muted-foreground">
                 <span className="inline-flex items-center gap-2">
-                  <Flame className="h-3.5 w-3.5" />
-                  Último branco há <b className="text-primary font-black">{lastWhiteAgo}</b> rodadas
-                </span>
-                <span className="inline-flex items-center gap-2">
-                  <Activity className="h-3.5 w-3.5" />
-                  Brancos seguidos <b className="text-primary font-black">{countConsecutive(visibleSpins, "white")}</b>
+                  <Flame className="h-3.5 w-3.5 text-red-500" />
+                  Último branco há <b className="text-foreground">{lastWhiteAgo}</b> rodadas
                 </span>
               </div>
-              <div className="flex flex-wrap items-center gap-1.5 sm:justify-end">
+              <div className="flex flex-wrap items-center gap-1.5">
                 <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                   Frequência
                 </span>
                 {freq.map((f) => (
                   <div key={f.n} className="flex items-center gap-1">
-                    <ResultCircle color={colorOf(f.n)} n={f.n} size="sm" animate={false} className="shadow-[0_0_10px_rgba(59,130,246,0.1)]" />
+                    <ResultCircle color={colorOf(f.n)} n={f.n} size="xs" animate={false} />
                     <span className="text-[10px] tabular-nums text-muted-foreground">{f.count}</span>
                   </div>
                 ))}
@@ -948,9 +944,13 @@ function Index() {
             </div>
           </Card>
 
-          <div className="w-full mb-8">
+          <Card title="Estratégias Ativas" className="lg:col-span-1">
              <StrategyTabs spins={visibleSpins} />
-          </div>
+          </Card>
+        </section>
+
+        <section className="space-y-3 sm:space-y-5 lg:space-y-6">
+
 
           <Card
             title="Giros anteriores"
