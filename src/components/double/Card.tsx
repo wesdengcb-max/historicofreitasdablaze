@@ -18,7 +18,7 @@ export const Card = memo(function Card({ title, subtitle, icon, action, children
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={`relative overflow-hidden rounded-xl border border-white/5 bg-[#0c0c0c] p-5 shadow-sm ${className}`}
+      className={`relative overflow-hidden rounded-xl border border-white/5 bg-[#0c0c0c] p-4 shadow-sm ${className}`}
     >
 
       {(title || action) && (
