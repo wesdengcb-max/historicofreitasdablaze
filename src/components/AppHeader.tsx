@@ -1,16 +1,22 @@
 import { memo } from "react";
-import { ChevronLeft, Menu, Clock, Crown } from "lucide-react";
+import { ChevronLeft, Menu, Clock, Crown, PanelLeftOpen, PanelLeftClose } from "lucide-react";
 import { useVipStatus, setVipStatus } from "@/lib/auth/vipStore";
+import { useSidebarStore } from "@/lib/sidebarStore";
 import { toast } from "sonner";
 
 export const AppHeader = memo(function AppHeader() {
   const isVip = useVipStatus();
+  const { isCollapsed, toggle } = useSidebarStore();
 
   return (
     <header className="sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b border-white/5 bg-[#0A0A0A]/80 px-6 backdrop-blur-xl">
       <div className="flex items-center gap-4">
-        <button className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.03] text-muted-foreground transition hover:bg-white/[0.06] hover:text-white">
-          <ChevronLeft className="h-5 w-5" />
+        <button 
+          onClick={toggle}
+          className="hidden lg:flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.03] text-muted-foreground transition hover:bg-white/[0.06] hover:text-white"
+          title={isCollapsed ? "Expandir Menu" : "Recolher Menu"}
+        >
+          {isCollapsed ? <PanelLeftOpen className="h-5 w-5" /> : <PanelLeftClose className="h-5 w-5" />}
         </button>
         <button className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.03] text-muted-foreground transition hover:bg-white/[0.06] hover:text-white lg:hidden">
           <Menu className="h-5 w-5" />
