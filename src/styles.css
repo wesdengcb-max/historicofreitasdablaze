@@ -43,7 +43,7 @@
 }
 
 :root {
-  --radius: 6px;
+  --radius: 8px;
 
   /* TipMiner Inspired Dark Theme */
   --background: #080808;
@@ -90,9 +90,6 @@
   --shadow-elegant: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
   --shadow-glow: 0 0 20px rgba(239, 68, 68, 0.05);
   --shadow-red-glow: 0 0 15px rgba(239, 68, 68, 0.3);
-
-  /* Layout vars */
-  --sidebar-w: 240px;
 }
 
 

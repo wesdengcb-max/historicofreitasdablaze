@@ -276,9 +276,7 @@ function BrancoIcon({ size = 32 }: { size?: number }) {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 relative overflow-hidden">
-      <div className="absolute top-0 left-0 right-0 h-[1px] bg-red-600/30" />
-
+    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
       <h3 className="mb-3 text-[13px] font-semibold text-foreground">{title}</h3>
       <div className="flex flex-col gap-2.5">{children}</div>
     </div>
@@ -320,7 +318,7 @@ export const LeftStatsDrawer = memo(function LeftStatsDrawer({ open, onClose, sp
       >
         <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
           <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-            Estatísticas da Rodada
+            Estatísticas
           </p>
           <button
             type="button"
