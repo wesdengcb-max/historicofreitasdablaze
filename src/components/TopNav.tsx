@@ -47,8 +47,8 @@ export function TopNav() {
   const isVip = useVipStatus();
 
   const handleSectionClick = (item: Item) => {
-    // Only dashboard is public, others require VIP
-    if (item.id !== "dashboard" && !isVip) {
+    // Only dashboard and videos are public, others require VIP
+    if (item.id !== "dashboard" && item.id !== "videos" && !isVip) {
       toast.error("Área Exclusiva", {
         description: "Você precisa ser Membro VIP para acessar esta aba.",
       });
@@ -64,7 +64,7 @@ export function TopNav() {
           {ITEMS.map((item) => {
             const Icon = item.icon;
             const isActive = active === item.id;
-            const isLocked = item.id !== "dashboard" && !isVip;
+            const isLocked = item.id !== "dashboard" && item.id !== "videos" && !isVip;
 
             return (
               <button
@@ -113,7 +113,7 @@ export function TopNav() {
             <DropdownMenuContent align="end" className="w-56 border-white/10 bg-surface">
               <div className="px-2 py-2">
                 <p className="font-outfit text-xs font-black uppercase tracking-widest text-primary">
-                  Membro VIP
+                  Membro VIP | Freitas White
                 </p>
                 <p className="mt-1 text-[11px] text-muted-foreground">
                   {isVip
