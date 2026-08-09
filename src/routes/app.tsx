@@ -303,7 +303,7 @@ function Index() {
   const section = useSection();
   const [inverse, setInverse] = useState(false);
   const [viewMode, setViewMode] = useState<"colunas" | "lista">("colunas");
-  const { isCollapsed } = useSidebarStore();
+  const { isCollapsed, toggle } = useSidebarStore();
   const isVip = useVipStatus();
 
   // Removido o switch automático para lista em mobile para manter layout de PC em todos os dispositivos
@@ -803,14 +803,22 @@ function Index() {
 
 
   return (
-    <div className="flex h-screen w-full bg-[#080808] text-white overflow-hidden">
-      {/* Sidebar lateral fixa com transição suave */}
+    <div className="relative flex h-screen w-full bg-[#080808] text-white overflow-hidden">
+      {/* Sidebar lateral fixa com transição suave - Mobile overlay support */}
       <div className={cn(
-        "hidden lg:block shrink-0 transition-all duration-300 ease-in-out",
-        isCollapsed ? "w-[80px]" : "w-[260px]"
+        "fixed inset-y-0 left-0 z-50 transition-all duration-300 ease-in-out lg:relative lg:z-0 lg:block lg:shrink-0",
+        isCollapsed ? "w-0 lg:w-[80px]" : "w-[260px]"
       )}>
         <Sidebar />
       </div>
+
+      {/* Background overlay for mobile when menu is open */}
+      {!isCollapsed && (
+        <div 
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
+          onClick={toggle}
+        />
+      )}
 
       {/* Área principal scrollable - flex-1 garante que ocupa o resto do espaço */}
       <div className="flex flex-1 flex-col min-w-0 overflow-hidden">
