@@ -1009,9 +1009,11 @@ function Index() {
                             time={exibirSegundos ? spTimeWithSeconds(spin) : spin.time}
                             numbered={numerado}
                             timeHighlight={destaqueHorario}
+                            dimmed={highlightN.size > 0 && !highlightN.has(spin.n)}
                           />
                         ))}
                      </div>
+
                    )}
                    
                    {hasMore && (
