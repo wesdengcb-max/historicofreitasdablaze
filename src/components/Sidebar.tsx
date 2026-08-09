@@ -44,7 +44,10 @@ const FERRAMENTAS: MenuItem[] = [
   { id: "simulador", title: "Simulador", icon: Dice5, isTool: true, soon: true },
 ];
 
+import logoFreitas from "@/assets/logo-freitas.png.asset.json";
+
 export const Sidebar = memo(function Sidebar() {
+
   const active = useSection();
   const isVip = useVipStatus();
 
@@ -72,7 +75,7 @@ export const Sidebar = memo(function Sidebar() {
       <div className="flex flex-col items-center px-6 py-8">
         <div className="relative mb-4 h-20 w-20 overflow-hidden rounded-full border-2 border-red-500/20 p-1">
           <div className="h-full w-full rounded-full bg-gradient-to-b from-red-500 to-red-900 flex items-center justify-center overflow-hidden">
-             <img src="/freitas-avatar.png" alt="Freitas" className="h-full w-full object-cover" />
+             <img src={logoFreitas.url} alt="Freitas" className="h-full w-full object-cover" />
           </div>
           <div className="absolute bottom-0 right-0 rounded-full bg-red-500 p-1 shadow-lg">
              <Crown className="h-3 w-3 text-white" />

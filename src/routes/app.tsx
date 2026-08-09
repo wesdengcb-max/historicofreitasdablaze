@@ -800,64 +800,21 @@ function Index() {
 
 
   return (
-    <div
-      className="history-metrics min-h-dvh w-full [--cols:10]"
-    >
-      <header className="sticky top-0 z-30 border-b border-white/5 bg-background/80 backdrop-blur-xl">
-        <div className="mx-auto flex h-12 max-w-[1440px] items-center gap-2 px-4 sm:h-14 sm:gap-4 sm:px-6 lg:h-16 lg:px-6">
-          <div className="flex min-w-0 items-center gap-3">
-            <div
-              className="grid h-7 w-7 shrink-0 place-items-center overflow-hidden rounded-xl bg-white border border-white/40 sm:h-9 sm:w-9"
-              
-            >
-              <img src={freitasLogo.url} alt="Freitas Blaze" className="h-full w-full object-cover" />
-            </div>
-            <div className="min-w-0 leading-tight">
-              <p className="truncate text-[12px] font-semibold tracking-tight sm:text-sm">Freitas da Blaze</p>
-              <p className="truncate text-[9px] font-medium uppercase tracking-[0.14em] text-muted-foreground sm:text-[10px] sm:tracking-[0.18em]">
-                Análise do Histórico da Blaze
-              </p>
-            </div>
-          </div>
+    <div className="flex h-screen w-full bg-[#080808] text-white">
+      {/* Sidebar lateral fixa */}
+      <div className="hidden lg:block">
+        <Sidebar />
+      </div>
 
-          <div className="flex shrink-0 items-center gap-1 sm:gap-3">
-            <StatusPill status={status} message={errorMsg} />
-             <ThemeToggle />
-            <button
-              type="button"
-              onClick={() => toggleWhiteAlert(!whiteAlert)}
-              className="grid h-8 w-8 place-items-center rounded-xl border border-white/5 bg-white/5 text-muted-foreground transition-colors duration-200 hover:bg-white/[0.08] hover:text-foreground sm:h-10 sm:w-10 lg:h-11 lg:w-11"
-              aria-label="Notificar branco"
-              title={whiteAlert ? "Alerta de branco: ligado" : "Alerta de branco: desligado"}
-            >
-              <Bell className={`h-4 w-4 ${whiteAlert ? "text-foreground" : ""}`} />
-            </button>
-            <button
-              type="button"
-              onClick={() => setStatsOpen((v) => !v)}
-              className="grid h-8 w-8 place-items-center rounded-xl border border-white/5 bg-white/5 text-muted-foreground transition-colors duration-200 hover:bg-white/[0.08] hover:text-foreground sm:h-10 sm:w-10 lg:h-11 lg:w-11"
-              aria-label="Abrir estatísticas"
-            >
-              <BarChart3 className="h-4 w-4" />
-            </button>
-            <a
-              href="https://t.me/freitaswhite"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Abrir Telegram"
-              className="grid h-8 w-8 place-items-center rounded-xl text-white transition-transform duration-200 hover:scale-105 sm:h-10 sm:w-10 lg:h-11 lg:w-11"
-              style={{ background: "linear-gradient(135deg, #29b6f6, #0288d1)" }}
-            >
-              <Send className="h-4 w-4 -translate-x-[1px] translate-y-[1px] fill-white" />
-            </a>
-          </div>
-        </div>
-      </header>
+      {/* Área principal scrollable */}
+      <div className="flex flex-1 flex-col overflow-hidden">
+        <AppHeader />
+        
+        <div className="flex-1 overflow-y-auto scrollbar-none">
+          {section === "sinais" ? (
+            <Suspense fallback={<SectionFallback />}><SinaisPage /></Suspense>
+          ) : section === "analise" ? (
 
-      <TopNav />
-
-      {section === "sinais" ? (
-        <Suspense fallback={<SectionFallback />}><SinaisPage /></Suspense>
       ) : section === "analise" ? (
         <Suspense fallback={<SectionFallback />}><AnaliseSection /></Suspense>
       ) : section === "estrategias" ? (
