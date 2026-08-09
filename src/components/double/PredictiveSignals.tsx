@@ -26,7 +26,7 @@ type Mode1Signal = {
   pct: number; 
   label: string; 
   analysisCount: number; 
-  sources: Array<{ analysis: number; value: number }>;
+  sources: Array<{ analysis: 1 | 2 | 3 | 4 | 5; value: number }>;
   isHighTendency: boolean;
 };
 type Mode2Signal = {
@@ -149,7 +149,7 @@ export function PredictiveSignals() {
     >();
     for (const item of active) {
       const hist = engine[item.analysis].filter(c => c.value === item.value);
-      // FILTRO DE MASSA CRÍTICA (Mínimo de 9 gatilhos)
+      // FILTRO DE MASSA CRÍTICA (Mínimo de 5 gatilhos)
       if (hist.length < MIN_GATILHOS) continue;
 
       const top1 = computeTop(hist, 1)[0];
@@ -171,13 +171,13 @@ export function PredictiveSignals() {
           analyses: new Set([item.analysis]),
           pct: top1.pct, 
           label: top1.label,
-          sources: [{ analysis: item.analysis, value: item.value }],
+          sources: [{ analysis: item.analysis as 1 | 2 | 3 | 4 | 5, value: item.value }],
           isHighTendency: isTendency
         });
       } else {
         if (!cur.values.includes(item.value)) cur.values.push(item.value);
         cur.analyses.add(item.analysis);
-        cur.sources.push({ analysis: item.analysis, value: item.value });
+        cur.sources.push({ analysis: item.analysis as 1 | 2 | 3 | 4 | 5, value: item.value });
         if (isTendency) cur.isHighTendency = true;
         if (top1.pct > cur.pct) {
           cur.pct = top1.pct;
@@ -196,7 +196,7 @@ export function PredictiveSignals() {
           pct: info.pct,
           label: info.label,
           analysisCount: info.analyses.size,
-          sources: info.sources,
+          sources: info.sources as Array<{ analysis: 1 | 2 | 3 | 4 | 5; value: number }>,
           isHighTendency: info.isHighTendency
         };
       });
