@@ -1,0 +1,51 @@
+import { memo } from "react";
+import { ChevronLeft, Menu, Clock, Crown } from "lucide-react";
+import { useVipStatus, setVipStatus } from "@/lib/auth/vipStore";
+import { toast } from "sonner";
+
+export const AppHeader = memo(function AppHeader() {
+  const isVip = useVipStatus();
+
+  return (
+    <header className="sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b border-white/5 bg-[#0A0A0A]/80 px-6 backdrop-blur-xl">
+      <div className="flex items-center gap-4">
+        <button className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.03] text-muted-foreground transition hover:bg-white/[0.06] hover:text-white">
+          <ChevronLeft className="h-5 w-5" />
+        </button>
+        <button className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.03] text-muted-foreground transition hover:bg-white/[0.06] hover:text-white lg:hidden">
+          <Menu className="h-5 w-5" />
+        </button>
+        
+        <div className="h-6 w-px bg-white/5 mx-2" />
+        
+        <div className="flex items-center gap-3">
+          <div className="h-2 w-2 animate-pulse rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+          <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white font-outfit">Análise em tempo real</span>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-5">
+        <div className="hidden items-center gap-2 rounded-xl bg-white/[0.03] px-4 py-2 sm:flex">
+          <Clock className="h-3.5 w-3.5 text-red-500" />
+          <span className="text-[12px] font-bold tabular-nums text-white">16:39:49</span>
+        </div>
+
+        <button 
+          onClick={() => {
+            const next = !isVip;
+            setVipStatus(next);
+            toast.success(next ? "Modo VIP Ativado" : "Modo VIP Desativado");
+          }}
+          className={`flex items-center gap-2 rounded-xl px-4 py-2 text-[11px] font-black uppercase tracking-widest transition active:scale-95 ${
+            isVip 
+              ? "bg-red-500 text-white shadow-[0_4px_15px_rgba(239,68,68,0.3)]"
+              : "border border-white/10 bg-white/5 text-muted-foreground hover:bg-white/10"
+          }`}
+        >
+          <Crown className="h-3.5 w-3.5" />
+          <span>VIP</span>
+        </button>
+      </div>
+    </header>
+  );
+});

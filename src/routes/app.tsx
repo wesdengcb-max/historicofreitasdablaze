@@ -40,7 +40,6 @@ import { WhiteCelebration, WhiteAlertToggleFx } from "@/components/double/WhiteC
 import { StrategyTabs } from "@/components/double/StrategyTabs";
 import { LeftStatsDrawer } from "@/components/double/LeftStatsDrawer";
 
-
 import { colorOf, fmtTime, type Spin } from "@/components/double/types";
 import {
   BlazeResultCard,
@@ -50,7 +49,8 @@ import {
 } from "@/components/double/BlazeResultCard";
 
 import { getSignals, subscribeSignals, type StoredSignal } from "@/lib/signalsStore";
-import { TopNav } from "@/components/TopNav";
+import { Sidebar } from "@/components/Sidebar";
+import { AppHeader } from "@/components/AppHeader";
 import { useSection } from "@/lib/sectionStore";
 const SinaisPage = lazy(() => import("@/components/sections/SinaisSection"));
 const AnaliseSection = lazy(() => import("@/components/sections/AnaliseSection"));
@@ -58,11 +58,12 @@ const EstrategiasSection = lazy(() => import("@/components/sections/EstrategiasS
 
 function SectionFallback() {
   return (
-    <div className="flex w-full items-center justify-center px-4 py-24 sm:px-6">
-      <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+    <div className="flex h-[400px] w-full items-center justify-center">
+      <Loader2 className="h-6 w-6 animate-spin text-red-500" />
     </div>
   );
 }
+
 
 
 
@@ -799,68 +800,24 @@ function Index() {
 
 
   return (
-    <div
-      className="history-metrics min-h-dvh w-full [--cols:10]"
-    >
-      <header className="sticky top-0 z-30 border-b border-white/5 bg-background/80 backdrop-blur-xl">
-        <div className="mx-auto flex h-12 max-w-[1440px] items-center gap-2 px-4 sm:h-14 sm:gap-4 sm:px-6 lg:h-16 lg:px-6">
-          <div className="flex min-w-0 items-center gap-3">
-            <div
-              className="grid h-7 w-7 shrink-0 place-items-center overflow-hidden rounded-xl bg-white border border-white/40 sm:h-9 sm:w-9"
-              
-            >
-              <img src={freitasLogo.url} alt="Freitas Blaze" className="h-full w-full object-cover" />
-            </div>
-            <div className="min-w-0 leading-tight">
-              <p className="truncate text-[12px] font-semibold tracking-tight sm:text-sm">Freitas da Blaze</p>
-              <p className="truncate text-[9px] font-medium uppercase tracking-[0.14em] text-muted-foreground sm:text-[10px] sm:tracking-[0.18em]">
-                Análise do Histórico da Blaze
-              </p>
-            </div>
-          </div>
+    <div className="flex h-screen w-full bg-[#080808] text-white">
+      {/* Sidebar lateral fixa */}
+      <div className="hidden lg:block">
+        <Sidebar />
+      </div>
 
-          <div className="flex shrink-0 items-center gap-1 sm:gap-3">
-            <StatusPill status={status} message={errorMsg} />
-             <ThemeToggle />
-            <button
-              type="button"
-              onClick={() => toggleWhiteAlert(!whiteAlert)}
-              className="grid h-8 w-8 place-items-center rounded-xl border border-white/5 bg-white/5 text-muted-foreground transition-colors duration-200 hover:bg-white/[0.08] hover:text-foreground sm:h-10 sm:w-10 lg:h-11 lg:w-11"
-              aria-label="Notificar branco"
-              title={whiteAlert ? "Alerta de branco: ligado" : "Alerta de branco: desligado"}
-            >
-              <Bell className={`h-4 w-4 ${whiteAlert ? "text-foreground" : ""}`} />
-            </button>
-            <button
-              type="button"
-              onClick={() => setStatsOpen((v) => !v)}
-              className="grid h-8 w-8 place-items-center rounded-xl border border-white/5 bg-white/5 text-muted-foreground transition-colors duration-200 hover:bg-white/[0.08] hover:text-foreground sm:h-10 sm:w-10 lg:h-11 lg:w-11"
-              aria-label="Abrir estatísticas"
-            >
-              <BarChart3 className="h-4 w-4" />
-            </button>
-            <a
-              href="https://t.me/freitaswhite"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Abrir Telegram"
-              className="grid h-8 w-8 place-items-center rounded-xl text-white transition-transform duration-200 hover:scale-105 sm:h-10 sm:w-10 lg:h-11 lg:w-11"
-              style={{ background: "linear-gradient(135deg, #29b6f6, #0288d1)" }}
-            >
-              <Send className="h-4 w-4 -translate-x-[1px] translate-y-[1px] fill-white" />
-            </a>
-          </div>
-        </div>
-      </header>
+      {/* Área principal scrollable */}
+      <div className="flex flex-1 flex-col overflow-hidden">
+        <AppHeader />
+        
+        <div className="flex-1 overflow-y-auto scrollbar-none">
+          {section === "sinais" ? (
+            <Suspense fallback={<SectionFallback />}><SinaisPage /></Suspense>
+          ) : section === "analise" ? (
+            <Suspense fallback={<SectionFallback />}><AnaliseSection /></Suspense>
+          ) : section === "estrategias" ? (
+            <Suspense fallback={<SectionFallback />}><EstrategiasSection /></Suspense>
 
-      <TopNav />
-
-      {section === "sinais" ? (
-        <Suspense fallback={<SectionFallback />}><SinaisPage /></Suspense>
-      ) : section === "analise" ? (
-        <Suspense fallback={<SectionFallback />}><AnaliseSection /></Suspense>
-      ) : section === "estrategias" ? (
-        <Suspense fallback={<SectionFallback />}><EstrategiasSection /></Suspense>
       ) : section !== "dashboard" ? (
         <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-5 px-4 py-10 sm:gap-6 sm:px-6 sm:py-16">
           <Card delay={0.05}>
@@ -877,10 +834,10 @@ function Index() {
           </Card>
         </main>
       ) : (
-      <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-3 px-4 py-3 sm:gap-5 sm:px-6 sm:py-6 lg:gap-6 lg:px-6 lg:py-10 bg-background">
+        <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-3 px-4 py-3 sm:gap-5 sm:px-6 sm:py-6 lg:gap-6 lg:px-6 lg:py-10">
+          <section className="grid grid-cols-1 gap-3 sm:gap-5 lg:grid-cols-3 lg:gap-6">
+            <Card className="lg:col-span-2">
 
-        <section className="space-y-3 sm:space-y-5 lg:space-y-6">
-          <Card delay={0.05}>
             {/* Cabeçalho compacto: status + contagem + último número */}
             <div className="mb-3 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
               <div className="min-w-0">
@@ -965,24 +922,20 @@ function Index() {
               );
             })()}
 
-            <div className="mt-3 grid gap-2 border-t border-white/5 pt-3 sm:grid-cols-[1fr_auto] sm:items-center sm:gap-4">
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-white/5 pt-3">
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] text-muted-foreground">
                 <span className="inline-flex items-center gap-2">
-                  <Flame className="h-3.5 w-3.5" />
-                  Último branco há <b className="text-primary font-black">{lastWhiteAgo}</b> rodadas
-                </span>
-                <span className="inline-flex items-center gap-2">
-                  <Activity className="h-3.5 w-3.5" />
-                  Brancos seguidos <b className="text-primary font-black">{countConsecutive(visibleSpins, "white")}</b>
+                  <Flame className="h-3.5 w-3.5 text-red-500" />
+                  Último branco há <b className="text-foreground">{lastWhiteAgo}</b> rodadas
                 </span>
               </div>
-              <div className="flex flex-wrap items-center gap-1.5 sm:justify-end">
+              <div className="flex flex-wrap items-center gap-1.5">
                 <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                   Frequência
                 </span>
                 {freq.map((f) => (
                   <div key={f.n} className="flex items-center gap-1">
-                    <ResultCircle color={colorOf(f.n)} n={f.n} size="sm" animate={false} className="shadow-[0_0_10px_rgba(59,130,246,0.1)]" />
+                    <ResultCircle color={colorOf(f.n)} n={f.n} size="xs" animate={false} />
                     <span className="text-[10px] tabular-nums text-muted-foreground">{f.count}</span>
                   </div>
                 ))}
@@ -990,9 +943,14 @@ function Index() {
             </div>
           </Card>
 
-          <div className="w-full mb-8">
+          <Card title="Estratégias Ativas" className="lg:col-span-1">
              <StrategyTabs spins={visibleSpins} />
-          </div>
+          </Card>
+        </section>
+
+        <section className="space-y-3 sm:space-y-5 lg:space-y-6">
+
+
 
           <Card
             title="Giros anteriores"
@@ -1507,8 +1465,14 @@ function Index() {
             </div>
           </Card>
         </section>
-      </main>
-      )}
+          </main>
+        )}
+        </div>
+      </div>
+
+
+
+
 
 
 
