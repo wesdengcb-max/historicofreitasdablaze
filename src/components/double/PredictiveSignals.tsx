@@ -118,16 +118,17 @@ export function PredictiveSignals() {
     const a2 = buildA2(rows);
     const a3 = buildA3(rows);
     const a4 = buildA4(rows);
-    return { 1: a1, 2: a2, 3: a3, 4: a4 } as Record<1 | 2 | 3 | 4, Cycle[]>;
+    const a5 = buildA5(rows);
+    return { 1: a1, 2: a2, 3: a3, 4: a4, 5: a5 } as Record<1 | 2 | 3 | 4 | 5, Cycle[]>;
   }, [rows]);
 
   /** Ciclos em aberto (status < MAX_ZEROS) por análise + valor. */
   const active = useMemo(() => {
-    const out: Array<{ analysis: 1 | 2 | 3 | 4; value: number; open: Cycle }> = [];
-    ([1, 2, 3, 4] as const).forEach((a) => {
+    const out: Array<{ analysis: 1 | 2 | 3 | 4 | 5; value: number; open: Cycle }> = [];
+    ([1, 2, 3, 4, 5] as const).forEach((a) => {
       const latest = latestByValue(engine[a]);
       latest.forEach((cycle, value) => {
-        const limit = a === 4 ? MAX_ZEROS_A4 : MAX_ZEROS;
+        const limit = (a === 4 || a === 5) ? MAX_ZEROS_A4 : MAX_ZEROS;
         if (cycle.gaps.length < limit) out.push({ analysis: a, value, open: cycle });
       });
     });

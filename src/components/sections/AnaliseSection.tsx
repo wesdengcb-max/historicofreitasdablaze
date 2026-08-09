@@ -472,32 +472,72 @@ export default function AnaliseSection() {
       </Card>
 
       <AnalysisPanel
-        eyebrow={`Análise 1 · dígito ${selected}`}
-        title={`Minutos até o 0 (gatilho por unidade do minuto)`}
-        subtitle={
-          isMinuteEligible
-            ? `Gatilho: número ${selected} caiu em minuto terminado em ${selected}. Vizinhos ±1 min agrupados.`
-            : "Gatilho de minuto aplicável apenas para pedras de 0 a 9."
-        }
+        key={`${selected}-a1`}
+        eyebrow="Análise 1 · Pedra = Minuto"
+        title={`PEDRA ${selected}`}
+        subtitle="Gatilho: a pedra sai num minuto com o mesmo final (ex: 1 no min 51). Analisa até 14 tempos de Branco."
         loading={loading}
         err={err}
-        emptyLabel={
-          isMinuteEligible
-            ? `Ainda sem zeros registrados após gatilhos do número ${selected}.`
-            : "Gatilho de minuto aplicável apenas para pedras de 0 a 9."
-        }
+        emptyLabel={`Nenhum gatilho registrado para a pedra ${selected} recentemente.`}
         eligible={eligible}
-        eligibleHint={`precisa ${MIN_CYCLES}+ ciclos completos`}
         analiseKey="analise1"
         pedra={selected}
         now={now}
       />
-
       <AnalysisPanel
-        eyebrow={`Análise 2 · repetição da pedra ${selected}`}
-        title="Tempo até o 0 após pedra repetida consecutiva"
-        subtitle={`Gatilho: pedra ${selected} sai duas vezes seguidas. Últimas ${MAX_PATTERN_CYCLES} ocorrências.`}
+        key={`${selected}-a2`}
+        eyebrow="Análise 2 · Repetição Simples"
+        title={`PEDRA ${selected}`}
+        subtitle="Gatilho: a pedra sai duas vezes seguidas na roleta. Analisa até 14 tempos de Branco."
         loading={loading}
+        err={err}
+        emptyLabel="Nenhum gatilho de repetição dupla registrado recentemente."
+        eligible={eligible}
+        analiseKey="analise2"
+        pedra={selected}
+        now={now}
+      />
+      <AnalysisPanel
+        key={`${selected}-a3`}
+        eyebrow="Análise 3 · Repetição Casada"
+        title={`PEDRA ${selected}`}
+        subtitle="Gatilho: repetição da pedra coincidindo com o minuto. Analisa até 14 tempos de Branco."
+        loading={loading}
+        err={err}
+        emptyLabel="Nenhum gatilho de repetição casada registrado recentemente."
+        eligible={eligible}
+        analiseKey="analise3"
+        pedra={selected}
+        now={now}
+      />
+      <AnalysisPanel
+        key={`${selected}-a4`}
+        eyebrow="Análise 4 · Primeira Pedra da Dezena"
+        title={`PEDRA ${selected}`}
+        subtitle="Primeira pedra registrada na virada do minuto (00, 10, 20, 30, 40, 50). Analisa até 20 tempos de Branco."
+        loading={loading}
+        err={err}
+        emptyLabel="Nenhum gatilho de virada de minuto registrado recentemente."
+        eligible={eligible}
+        analiseKey="analise4"
+        pedra={selected}
+        now={now}
+        maxZeros={20}
+      />
+      <AnalysisPanel
+        key={`${selected}-a5`}
+        eyebrow="ANÁLISE 5 · SEGUNDA PEDRA DA DEZENA"
+        title={`PEDRA ${selected}`}
+        subtitle="Segunda pedra registrada na virada do minuto (00, 10, 20, 30, 40, 50). Analisa até 20 tempos de Branco."
+        loading={loading}
+        err={err}
+        emptyLabel="Nenhum gatilho de segunda pedra da dezena registrado recentemente."
+        eligible={eligible}
+        analiseKey="analise5"
+        pedra={selected}
+        now={now}
+        maxZeros={20}
+      />
         err={err}
         emptyLabel={`Ainda sem repetições consecutivas da pedra ${selected} no histórico.`}
         eligible={stat.total >= MIN_CYCLES}
