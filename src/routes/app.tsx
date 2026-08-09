@@ -965,6 +965,7 @@ function Index() {
 />
 <WhiteAlertToggleFx state={alertFx} onDone={() => setAlertFx(null)} />
 </div>
+
 )
 }
 
