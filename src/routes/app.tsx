@@ -40,7 +40,6 @@ import { WhiteCelebration, WhiteAlertToggleFx } from "@/components/double/WhiteC
 import { StrategyTabs } from "@/components/double/StrategyTabs";
 import { LeftStatsDrawer } from "@/components/double/LeftStatsDrawer";
 
-
 import { colorOf, fmtTime, type Spin } from "@/components/double/types";
 import {
   BlazeResultCard,
@@ -50,7 +49,8 @@ import {
 } from "@/components/double/BlazeResultCard";
 
 import { getSignals, subscribeSignals, type StoredSignal } from "@/lib/signalsStore";
-import { TopNav } from "@/components/TopNav";
+import { Sidebar } from "@/components/Sidebar";
+import { AppHeader } from "@/components/AppHeader";
 import { useSection } from "@/lib/sectionStore";
 const SinaisPage = lazy(() => import("@/components/sections/SinaisSection"));
 const AnaliseSection = lazy(() => import("@/components/sections/AnaliseSection"));
@@ -58,11 +58,12 @@ const EstrategiasSection = lazy(() => import("@/components/sections/EstrategiasS
 
 function SectionFallback() {
   return (
-    <div className="flex w-full items-center justify-center px-4 py-24 sm:px-6">
-      <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+    <div className="flex h-[400px] w-full items-center justify-center">
+      <Loader2 className="h-6 w-6 animate-spin text-red-500" />
     </div>
   );
 }
+
 
 
 

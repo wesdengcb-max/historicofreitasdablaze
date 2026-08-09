@@ -46,49 +46,50 @@
   --radius: 8px;
 
   /* TipMiner Inspired Dark Theme */
-  --background: #0f111a;
+  --background: #080808;
   --foreground: #ffffff;
 
-  --surface: #161825;
-  --surface-2: #1c1f2e;
-  --surface-3: #23273a;
+  --surface: #0f0f0f;
+  --surface-2: #141414;
+  --surface-3: #1a1a1a;
 
-  --card: #161825;
+  --card: #0c0c0c;
   --card-foreground: #ffffff;
-  --popover: #1c1f2e;
+  --popover: #0f0f0f;
   --popover-foreground: #ffffff;
 
-  /* Color of highlight - Red Blaze Style */
+  /* Color of highlight - Red Blaze Premium Style */
   --primary: #ef4444; 
   --primary-foreground: #ffffff;
 
-  --secondary: #1c1f2e;
+  --secondary: #141414;
   --secondary-foreground: #94a3b8;
 
-  --muted: #1c1f2e;
-  --muted-foreground: #64748b;
+  --muted: #141414;
+  --muted-foreground: #6b7280;
 
-  --accent: #3b82f6;
+  --accent: #ef4444;
   --accent-foreground: #ffffff;
 
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
 
-  --border: rgba(255, 255, 255, 0.08);
-  --input: rgba(255, 255, 255, 0.05);
+  --border: rgba(255, 255, 255, 0.05);
+  --input: rgba(255, 255, 255, 0.03);
   --ring: #ef4444;
 
   /* Roulette tiles */
   --red: #ef4444;
   --red-foreground: #ffffff;
-  --black-tile: #1a1c24;
+  --black-tile: #141414;
   --white-tile: #ffffff;
-  --positive: #22c55e;
+  --positive: #10b981;
 
   /* Decorations */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
-  --shadow-elegant: 0 4px 12px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 20px rgba(239, 68, 68, 0.15);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.8);
+  --shadow-elegant: 0 10px 30px -5px rgba(0, 0, 0, 0.9);
+  --shadow-glow: 0 0 30px rgba(239, 68, 68, 0.1);
+  --shadow-red-glow: 0 0 20px rgba(239, 68, 68, 0.4);
 }
 
 .light {
