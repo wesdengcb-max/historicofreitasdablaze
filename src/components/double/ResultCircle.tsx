@@ -3,14 +3,16 @@ import { motion } from "framer-motion";
 import type { Color } from "./types";
 import brancoAsset from "@/assets/branco-vip.png.asset.json";
 
-type Size = "sm" | "md" | "lg" | "fluid";
+type Size = "xs" | "sm" | "md" | "lg" | "fluid";
 
 const sizes: Record<Size, string> = {
+  xs: "h-5 w-5 text-[9px]",
   sm: "h-7 w-7 text-[11px]",
   md: "h-9 w-9 sm:h-10 sm:w-10 text-xs sm:text-sm",
   lg: "h-14 w-14 text-lg",
   fluid: "w-full aspect-square text-[clamp(10px,2.4vw,14px)]",
 };
+
 
 type Props = {
   color: Color;
