@@ -82,9 +82,11 @@ export const Sidebar = memo(function Sidebar() {
       {/* Collapse Toggle */}
       <button 
         onClick={toggle}
-        className="absolute -right-3 top-10 flex h-6 w-6 items-center justify-center rounded-full border border-white/10 bg-[#0A0A0A] text-muted-foreground transition hover:text-white"
+        className="absolute -right-3.5 top-10 flex h-7 w-7 items-center justify-center rounded-full border border-white/10 bg-[#0A0A0A] text-muted-foreground transition hover:text-white shadow-lg z-50 group"
       >
-        {isCollapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
+        <div className="h-full w-full rounded-full border border-white/5 flex items-center justify-center group-hover:border-red-500/50 transition-colors">
+          {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+        </div>
       </button>
 
       {/* Profile / Logo Section */}
