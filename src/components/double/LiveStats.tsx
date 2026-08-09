@@ -40,7 +40,8 @@ export const LiveStats = memo(function LiveStats({
   whites,
   redPct,
   blackPct,
-  whitePct 
+  whitePct,
+  countdown
 }: { 
   total: number;
   reds: number;
@@ -49,6 +50,7 @@ export const LiveStats = memo(function LiveStats({
   redPct: number;
   blackPct: number;
   whitePct: number;
+  countdown: number;
 }) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -75,12 +77,20 @@ export const LiveStats = memo(function LiveStats({
       {/* 2. Pessoas Entrando */}
       <StatsCard 
         title="Pessoas Entrando" 
-        titleSuffix={<span className="text-[13px] font-bold text-[#FBBF24]">→ 791</span>}
+        titleSuffix={<span className="text-[13px] font-bold text-[#FBBF24]">→ {countdown > 3 ? Math.floor(700 + Math.random() * 200) : "---"}</span>}
         footer={
           <div className="flex items-center justify-between px-1">
-            <span className="text-[10px] font-medium text-[#999999]">Entradas Abertas...</span>
-            <div className="flex items-center justify-center h-4 w-4 rounded-md bg-emerald-500/20">
-              <RefreshCcw className="h-3 w-3 text-[#10b981]" />
+            <span className="text-[10px] font-medium text-[#999999]">
+              {countdown > 3 ? "Entradas Abertas..." : "Girando..."}
+            </span>
+            <div className={cn(
+              "flex items-center justify-center h-4 w-4 rounded-md transition-colors",
+              countdown > 3 ? "bg-emerald-500/20" : "bg-red-500/20"
+            )}>
+              <RefreshCcw className={cn(
+                "h-3 w-3",
+                countdown > 3 ? "text-[#10b981] animate-spin" : "text-red-500"
+              )} />
             </div>
           </div>
         }
