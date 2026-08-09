@@ -876,10 +876,11 @@ function Index() {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
               {[
-                { label: 'Vermelho', color: 'red', count: stats.red, pct: stats.redPct },
-                { label: 'Branco', color: 'white', count: stats.white, pct: stats.whitePct },
-                { label: 'Preto', color: 'black', count: stats.black, pct: stats.blackPct }
+                { label: 'Vermelho', color: 'red', count: counts.red, pct: redPct },
+                { label: 'Branco', color: 'white', count: counts.white, pct: whitePct },
+                { label: 'Preto', color: 'black', count: counts.black, pct: blackPct }
               ].map((c) => (
+
                 <div key={c.color} className="rounded-xl border border-white/5 bg-white/[0.02] p-3 relative overflow-hidden">
                   <div className="absolute top-0 left-0 right-0 h-[1px] bg-red-600/30" />
                   <div className="flex items-center justify-between mb-2">
