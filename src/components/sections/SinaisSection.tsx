@@ -283,6 +283,7 @@ export default function SinaisSection() {
       const raw = getPredictiveSignals();
       const now = Date.now();
       const WHITE_MARGIN_MS = 60_000;
+      const MARGIN_MS = 2 * 60_000; // Window for margin green (1-2 minutes)
       const REMOVE_DELAY_MS = 3 * 60_000;
 
       const validated = raw.map(s => {
@@ -292,16 +293,29 @@ export default function SinaisSection() {
 
         if (s.outcome && s.outcome !== "pending") return s;
 
-        const matched = resultsForValidation.find(r => {
+        const matchedExact = resultsForValidation.find(r => {
           if (r.color !== "white") return false;
           const rt = new Date(r.createdAt).getTime();
-          return rt >= targetTime - WHITE_MARGIN_MS && rt <= targetTime + WHITE_MARGIN_MS;
+          // Exact is within 1 minute of projected time (before or after)
+          return rt >= targetTime - 60_000 && rt <= targetTime + 60_000;
         });
 
-        if (matched) {
-          return { ...s, outcome: "green" as const, resultTime: fmtTime(matched.createdAt) };
+        if (matchedExact) {
+          return { ...s, outcome: "green" as const, resultTime: fmtTime(matchedExact.createdAt), label: "EXATO" };
         }
-        if (now > windowEnd) {
+
+        const matchedMargin = resultsForValidation.find(r => {
+          if (r.color !== "white") return false;
+          const rt = new Date(r.createdAt).getTime();
+          // Margin is within 2 minutes of projected time (before or after) but NOT exact
+          return rt >= targetTime - MARGIN_MS && rt <= targetTime + MARGIN_MS;
+        });
+
+        if (matchedMargin) {
+          return { ...s, outcome: "green" as const, resultTime: fmtTime(matchedMargin.createdAt), label: "MARGEM" };
+        }
+
+        if (now > windowEnd + 60_000) {
           return { ...s, outcome: "red" as const };
         }
         return s;
@@ -487,7 +501,7 @@ export default function SinaisSection() {
                             : "bg-red-500/10 text-red-400 border-red-500/20"
                         }`}
                       >
-                        {s.outcome === "green" ? "WIN" : "LOSS"}
+                        {s.outcome === "green" ? `WIN ${s.label === "MARGEM" ? "MARGEM" : "EXATO"}` : "LOSS"}
                         {s.resultTime ? ` · ${s.resultTime}` : ""}
                       </div>
                     )}
