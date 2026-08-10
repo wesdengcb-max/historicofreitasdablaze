@@ -236,7 +236,7 @@ function LandingPage() {
           <FeatureCard 
             icon={<History size={28} />} 
             title="Histórico Completo" 
-            description="Consulte as rodadas históricas de forma organizada, rápida e fácil."
+            description="Acesse todas as rodadas da Blaze com filtros avançados."
           />
           <FeatureCard 
             icon={<BarChart3 size={28} />} 
