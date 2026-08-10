@@ -87,6 +87,7 @@ export function PredictiveSignals() {
   const [mode2, setMode2] = useState<Mode2Signal[] | null>(null);
   const [hasClicked, setHasClicked] = useState(false);
   const [showBranco, setShowBranco] = useState(false);
+  const [showProximaLista, setShowProximaLista] = useState(false);
   const [generatedAt, setGeneratedAt] = useState<Date | null>(null);
 
   useEffect(() => {
