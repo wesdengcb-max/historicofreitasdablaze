@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getProximaListaSignals, setProximaListaSignals, type ProximaListaSignal } from "@/lib/signalsStore";
 import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
+import { validateSignal } from "@/lib/signalValidation";
 
 export function ListSignalMonitor() {
   const [signals, setSignals] = useState<ProximaListaSignal[]>([]);
@@ -22,7 +23,7 @@ export function ListSignalMonitor() {
       const currentSignals = getProximaListaSignals();
       if (currentSignals.length === 0) return;
 
-      const pendingSignals = currentSignals.filter(s => s.outcome === "pending" || !s.outcome);
+      const pendingSignals = currentSignals.filter(s => s.outcome === "pending" || !s.outcome || s.outcome === "waiting");
       if (pendingSignals.length === 0) return;
 
       // Get latest results to verify signals
@@ -36,126 +37,24 @@ export function ListSignalMonitor() {
 
       let changed = false;
       const updatedSignals = currentSignals.map(signal => {
-        if (signal.outcome && signal.outcome !== "pending") return signal;
+        if (signal.outcome === "green" || signal.outcome === "red") return signal;
 
-        // Current time in SP for expiry checks
-        const spTimeStr = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
-        const now = new Date(spTimeStr).getTime();
+        const result = validateSignal(signal, latestResults);
         
-        // Signal time is already in SP (from generateProximaLista)
-        const signalDate = new Date(signal.entryDate);
-        const signalStartTime = signalDate.getTime();
-        
-        // Strategy: Signal Minute (0-59s) + Gale 1 Minute (60-119s)
-        const signalEndTime = signalStartTime + 60_000;
-        const gale1EndTime = signalStartTime + 120_000;
-        const expiryTime = gale1EndTime + 30_000; // 30s buffer to ensure DB has recorded Gale 1 rolls
-
-        if (now < signalStartTime) return signal; // Future signal
-
-        const targetColor = signal.symbols.startsWith("🔴") ? 1 : (signal.symbols.startsWith("⚫️") ? 2 : 0);
-        const targetColorName = targetColor === 1 ? "VERMELHO" : (targetColor === 2 ? "PRETO" : "BRANCO");
-        
-        // IMPORTANT: The validation must only respect results that happened AFTER the signal generation timestamp
-        const signalGenerationTime = signal.generatedAt;
-        
-        // Find results strictly within the Signal + Gale 1 window AND AFTER the signal was generated
-        const allRelevantResults = latestResults.filter(r => {
-          const resDate = new Date(r.created_at);
-          const resTimeInSP = new Date(resDate.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" })).getTime();
-          
-          // Must be within the window [signalStartTime, gale1EndTime)
-          const inWindow = resTimeInSP >= signalStartTime && resTimeInSP < gale1EndTime;
-          // AND Must be strictly AFTER the moment the signal was generated
-          const afterGeneration = resTimeInSP > signalGenerationTime;
-          
-          return inWindow && afterGeneration;
-        });
-
-        const resultsBeforeSignal = latestResults.filter(r => {
-          const resDate = new Date(r.created_at);
-          const resTimeInSP = new Date(resDate.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" })).getTime();
-          return resTimeInSP >= signalStartTime && resTimeInSP <= signalGenerationTime;
-        });
-
-        console.log(`\n[SINAL]
-horário exibido: ${signal.time}
-timestamp exato do sinal: ${signalGenerationTime} (${new Date(signalGenerationTime || 0).toISOString()})
-cor esperada: ${targetColorName} (${targetColor})`);
-
-        console.log(`[RESULTADOS ANTERIORES AO SINAL]`);
-        if (resultsBeforeSignal.length === 0) {
-          console.log("(Nenhum resultado anterior encontrado na janela)");
-        }
-        resultsBeforeSignal.forEach(r => {
-          console.log(`ID: ${r.id} | created_at: ${r.created_at} | roll: ${r.roll} | color: ${r.color} -> IGNORADO (Anterior ao sinal)`);
-        });
-
-        console.log(`[RESULTADOS POSTERIORES AO SINAL]`);
-        if (allRelevantResults.length === 0) {
-          console.log("(Nenhum resultado posterior encontrado na janela até agora)");
-        }
-        allRelevantResults.forEach(r => {
-          console.log(`ID: ${r.id} | created_at: ${r.created_at} | roll: ${r.roll} | color: ${r.color} -> USADO NA VALIDAÇÃO`);
-        });
-
-        // Split into Sinal and Gale 1 for specific logging if needed
-        const signalResults = allRelevantResults.filter(r => {
-          const resDate = new Date(r.created_at);
-          const resTimeInSP = new Date(resDate.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" })).getTime();
-          return resTimeInSP < signalEndTime;
-        });
-
-        const gale1Results = allRelevantResults.filter(r => {
-          const resDate = new Date(r.created_at);
-          const resTimeInSP = new Date(resDate.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" })).getTime();
-          return resTimeInSP >= signalEndTime;
-        });
-
-        // 1. Check if ANY result is GREEN (Target color or White protection)
-        const greenResult = allRelevantResults.find(r => {
-          const resColor = Number(r.color);
-          const resRoll = Number(r.roll);
-          const isWhite = resColor === 0 || resRoll === 0;
-          return resColor === targetColor || isWhite;
-        });
-
-        if (greenResult) {
-          console.log(`[RESULTADO DA VALIDAÇÃO]
-status: GREEN
-motivo: Sucesso encontrado no resultado ID ${greenResult.id} (Cor: ${greenResult.color}, Roll: ${greenResult.roll})`);
+        if (result.status === "green") {
           changed = true;
           return { ...signal, outcome: "green" as const };
-        }
-
-        // 2. Determine if it's RED
-        // A signal is RED only if the Gale 1 window has fully passed AND we have confirmed results that weren't the target.
-        const galeHasFinished = now > expiryTime;
-        
-        if (galeHasFinished) {
-          if (allRelevantResults.length > 0) {
-            console.log(`[RESULTADO DA VALIDAÇÃO]
-status: RED
-motivo: Janela G1 finalizada. ${allRelevantResults.length} resultado(s) analisado(s) e nenhum correspondeu à cor esperada.`);
-          } else {
-            console.log(`[RESULTADO DA VALIDAÇÃO]
-status: RED
-motivo: Prazo máximo expirado sem nenhum registro de resultado posterior ao sinal no banco.`);
-          }
+        } else if (result.status === "red") {
           changed = true;
           return { ...signal, outcome: "red" as const };
+        } else if (result.status === "wait") {
+          if (signal.outcome !== "waiting") {
+             changed = true;
+             return { ...signal, outcome: "waiting" as const };
+          }
+          return signal;
         }
 
-        // 3. Otherwise WAIT
-        console.log(`[RESULTADO DA VALIDAÇÃO]
-status: WAIT
-motivo: Aguardando processamento da janela (Sinal/Gale 1). Resultados atuais não conferem.`);
-        return signal;
-
-        // 3. Otherwise WAIT
-        console.log(`[RESULTADO DA VALIDAÇÃO]
-status: WAIT
-motivo: Aguardando processamento da janela (Sinal/Gale 1). Resultados atuais não conferem.`);
         return signal;
       });
 
@@ -163,7 +62,7 @@ motivo: Aguardando processamento da janela (Sinal/Gale 1). Resultados atuais nã
         setProximaListaSignals(updatedSignals);
         setSignals(updatedSignals);
       }
-    }, 10000); // Check every 10s
+    }, 5000); // Check every 5s for faster feedback
 
     return () => {
       window.removeEventListener("storage", handleStorage);
@@ -173,3 +72,4 @@ motivo: Aguardando processamento da janela (Sinal/Gale 1). Resultados atuais nã
 
   return null; // Background component
 }
+
