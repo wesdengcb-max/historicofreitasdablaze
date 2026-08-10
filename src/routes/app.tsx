@@ -1318,11 +1318,21 @@ function Index() {
                             {row.cells.map((cell, ci) => {
                             const [hh, mmPrefix] = row.label.split(":");
                             const hm = `${hh}:${mmPrefix[0]}${ci}`;
-                            const cellSignals = signalsByHM.get(hm) ?? [];
+                             const cellSignals = signalsByHM.get(hm) ?? [];
+                             
+                             // Filtrar sinais que estão num raio de 3 minutos (casas)
+                             const now = new Date();
+                             const nearbySignals = cellSignals.filter(s => {
+                               const target = new Date(s.targetIso);
+                               const diffMs = target.getTime() - now.getTime();
+                               const diffMin = diffMs / 60_000;
+                               // Mostrar se o sinal é no passado (até sumir) ou até 3 minutos no futuro
+                               return diffMin <= 3;
+                             });
 
-                            const green = robotOn ? cellSignals.find((s) => s.outcome === "green") : undefined;
-                            const pending = robotOn ? cellSignals.find((s) => s.outcome === "pending") : undefined;
-                            const red = robotOn ? cellSignals.find((s) => s.outcome === "red") : undefined;
+                             const green = robotOn ? nearbySignals.find((s) => s.outcome === "green") : undefined;
+                             const pending = robotOn ? nearbySignals.find((s) => s.outcome === "pending") : undefined;
+                             const red = robotOn ? nearbySignals.find((s) => s.outcome === "red") : undefined;
                             let badge: null | { label: string; tone: "exato" | "margem" | "pending" | "loss" } = null;
                             if (green) {
                               const diff = green.matchedIso
