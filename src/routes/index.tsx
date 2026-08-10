@@ -27,17 +27,20 @@ function LandingPage() {
       
       {/* BACKGROUND ELEMENTS */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        {/* Subtle Grid */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:60px_60px] opacity-20" />
+        {/* Dark Radial Gradient */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(0,0,0,0)_0%,#030303_70%)]" />
         
-        {/* Glow Effects */}
-        <div className="absolute top-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full bg-red-600/5 blur-[120px] animate-pulse" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-red-600/5 blur-[120px]" />
-        
-        {/* Geometric Lines */}
-        <svg className="absolute inset-0 w-full h-full opacity-[0.03]" viewBox="0 0 100 100" preserveAspectRatio="none">
-          <path d="M0 0 L100 100 M100 0 L0 100" stroke="red" strokeWidth="0.1" />
-        </svg>
+        {/* Floating Suits like Reference */}
+        <div className="absolute top-[10%] left-[10%] w-[300px] h-[300px] opacity-[0.03] rotate-[15deg]">
+          <svg viewBox="0 0 24 24" fill="currentColor" className="text-blue-500">
+             <path d="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z" />
+          </svg>
+        </div>
+        <div className="absolute bottom-[20%] right-[10%] w-[400px] h-[400px] opacity-[0.02] rotate-[-10deg]">
+          <svg viewBox="0 0 24 24" fill="currentColor" className="text-blue-400">
+            <path d="M12,2C12,2 4,9 4,14C4,18.42 7.58,22 12,22C16.42,22 20,18.42 20,14C20,9 12,2 12,2Z" />
+          </svg>
+        </div>
       </div>
 
       {/* HEADER / NAVBAR */}
@@ -106,77 +109,46 @@ function LandingPage() {
       </header>
 
       {/* HERO SECTION */}
-      <section className="relative pt-32 lg:pt-48 pb-20 px-6 z-10">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          
-          {/* Left Content */}
-          <div className="flex flex-col animate-fade-in-up">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="w-8 h-[2px] bg-red-600" />
-              <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.3em] text-[#E50914]">
-                HISTÓRICO COMPLETO DA BLAZE
-              </span>
-            </div>
-
-            <h1 className="text-5xl md:text-7xl lg:text-[5.5rem] font-black leading-[0.9] tracking-tighter uppercase mb-8">
-              O histórico que separa <br />
-              amadores de <span className="text-[#E50914] drop-shadow-[0_0_20px_rgba(229,9,20,0.5)]">vencedores.</span>
-            </h1>
-
-            <p className="text-lg md:text-xl text-gray-400 mb-10 max-w-xl leading-relaxed font-medium">
-              Acesse cada rodada, analise padrões e tome decisões <br className="hidden md:block" /> com base em dados reais da Blaze.
-            </p>
-
-            <div className="flex flex-col sm:flex-row items-center gap-4 mb-12">
-              <Link to="/app" className="w-full sm:w-auto">
-                <Button className="w-full sm:w-auto h-16 px-10 bg-[#E50914] hover:bg-[#ff1a1a] text-white font-black uppercase tracking-widest text-sm rounded-xl flex items-center gap-3 group shadow-[0_15px_30px_rgba(229,9,20,0.4)] transition-all hover:translate-y-[-4px]">
-                  Ver Histórico
-                  <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
-              
-              <Link to="/app" className="w-full sm:w-auto">
-                <Button variant="outline" className="w-full sm:w-auto h-16 px-10 bg-transparent border-white/10 hover:border-red-500/50 hover:bg-red-500/5 text-white font-black uppercase tracking-widest text-sm rounded-xl transition-all">
-                  Ver Estatísticas
-                </Button>
-              </Link>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-8 opacity-90">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 size={18} className="text-[#E50914]" />
-                <span className="text-[10px] font-bold uppercase tracking-widest">Dados 100% Reais</span>
+      <section className="relative pt-32 lg:pt-48 pb-20 px-6 z-10 flex flex-col items-center text-center">
+        <div className="max-w-4xl mx-auto flex flex-col items-center animate-fade-in">
+          {/* Logo Centralized like Reference */}
+          <div className="flex flex-col items-center mb-10 group">
+            <div className="flex items-center gap-4">
+              <div className="w-20 h-20 relative">
+                <div className="absolute inset-0 bg-red-600 blur-[20px] opacity-20 group-hover:opacity-40 transition-opacity" />
+                <img 
+                  src={logoTextWhite.url} 
+                  alt="Blaze Logo" 
+                  className="w-full h-full object-contain relative z-10 drop-shadow-[0_0_15px_rgba(229,9,20,0.6)]"
+                />
               </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 size={18} className="text-[#E50914]" />
-                <span className="text-[10px] font-bold uppercase tracking-widest">Atualizado em Tempo Real</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 size={18} className="text-[#E50914]" />
-                <span className="text-[10px] font-bold uppercase tracking-widest">Confiável e Seguro</span>
+              <div className="flex flex-col items-start">
+                <span className="text-[10px] font-black tracking-[0.3em] text-gray-400 uppercase leading-none mb-1">
+                  HISTÓRICOS
+                </span>
+                <span className="text-6xl font-black tracking-tighter uppercase leading-none">
+                  Blaze
+                </span>
               </div>
             </div>
           </div>
 
-          {/* Right Visual (Personagem) */}
-          <div className="relative animate-fade-in group">
-            {/* Background Glow */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-[#E50914]/10 rounded-full blur-[100px] pointer-events-none" />
-            
-            {/* Frame/Integration */}
-            <div className="relative z-10 transition-transform duration-700 group-hover:scale-[1.02]">
-              <div className="absolute -inset-2 bg-gradient-to-br from-[#E50914]/30 to-transparent rounded-3xl blur opacity-30 group-hover:opacity-60 transition-opacity" />
-              <img 
-                src={heroAsset.url} 
-                alt="Freitas White" 
-                className="relative w-full h-auto drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)] mask-edge"
-              />
-              
-              {/* Particles/Geometric detail */}
-              <div className="absolute top-10 right-10 w-20 h-20 border-t-2 border-r-2 border-[#E50914]/40 rounded-tr-3xl" />
-              <div className="absolute bottom-10 left-10 w-20 h-20 border-b-2 border-l-2 border-[#E50914]/40 rounded-bl-3xl" />
-            </div>
-          </div>
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-8">
+            Bem-vindo, Jogador!
+          </h1>
+
+          <p className="text-lg md:text-xl text-gray-400 mb-12 max-w-3xl leading-relaxed font-medium">
+            Com a nossa plataforma de resultados, o mercado de apostas pode ser mais lucrativo. Tendo acesso à milhares de resultados catalogados e que podem ser manipulados através de filtros. Em conjunto com bons estudos, você pode ser mais assertivo.
+          </p>
+
+          <Link to="/app">
+            <Button className="h-14 px-10 bg-[#E50914] hover:bg-[#ff1a1a] text-white font-black uppercase tracking-widest text-xs rounded-md flex items-center gap-3 group shadow-[0_10px_20px_rgba(229,9,20,0.3)] transition-all hover:scale-105 active:scale-95">
+              <div className="w-4 h-4 flex items-center justify-center">
+                <ArrowRight size={16} fill="currentColor" />
+              </div>
+              CONHECENDO AS FERRAMENTAS
+            </Button>
+          </Link>
         </div>
       </section>
 
