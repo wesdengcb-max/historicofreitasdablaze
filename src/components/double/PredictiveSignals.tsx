@@ -304,17 +304,16 @@ export function PredictiveSignals() {
     setPredictiveSignals(syncSignals);
   }, [active, engine]);
 
-  // Sync projections with global store for SinaisSection even before clicking button
+  // Sync projections with global store for SinaisSection automatically
   useEffect(() => {
     if (rows.length > 0 && !loading) {
-      // Re-run the generation logic internally but only update the store
-      // We'll refactor generate to separate calculations from state updates if needed, 
-      // but for now let's just trigger it once to populate the store.
-      // However, we want mode1/mode2 to only show in THIS component after click.
-      
       const now = new Date();
       now.setSeconds(0, 0);
 
+      const m1List: Mode1Signal[] = [];
+      const usedTimes = new Set<number>();
+
+      // Internal calculation for Mode 1
       const byTime = new Map<number, any>();
       for (const item of active) {
         const hist = engine[item.analysis].filter(c => c.value === item.value);
@@ -339,21 +338,59 @@ export function PredictiveSignals() {
         }
       }
 
-      const m1Store = Array.from(byTime.entries()).map(([t, info]) => ({
-        key: `m1-${t}`,
-        time: fmtClock(new Date(t)),
-        pct: info.pct,
-        label: info.label,
-        confluence: info.sources.map((src: any) => `A${src.analysis}·${src.value}`).join(", "),
-        medal: getMedalStyles(info.analyses.size)?.label,
-        entryDate: new Date(t),
-        outcome: "pending"
-      }));
+      const syncM1 = Array.from(byTime.entries()).map(([t, info]) => {
+        usedTimes.add(t);
+        return {
+          key: `m1-${t}`,
+          time: fmtClock(new Date(t)),
+          pct: info.pct,
+          label: info.label,
+          confluence: info.sources.map((src: any) => `A${src.analysis}·${src.value}`).join(", "),
+          medal: getMedalStyles(info.analyses.size)?.label,
+          entryDate: new Date(t),
+          outcome: "pending"
+        };
+      });
 
-      // Mode 2 logic for store... (simplified for brevity or just call generate with a flag)
-      // To keep it simple and DRY, I'll just make sure generate() always updates the store, 
-      // and we just control visibility of the cards here.
-      generate(); 
+      // Internal calculation for Mode 2 (Confluences)
+      const byMinute = new Map<number, any[]>();
+      for (const item of active) {
+        const hist = engine[item.analysis].filter(c => c.value === item.value);
+        if (hist.length < MIN_GATILHOS) continue;
+        const list = computeTop(hist, CANDIDATE_DEPTH);
+        list.forEach((g, idx) => {
+          const at = addMinutes(item.open.triggerAt, g.m).getTime();
+          if (at <= now.getTime()) return;
+          const arr = byMinute.get(at) ?? [];
+          arr.push({ analysis: item.analysis, value: item.value, pct: g.pct, top5: idx < TOP5_DEPTH });
+          byMinute.set(at, arr);
+        });
+      }
+
+      const syncM2: any[] = [];
+      for (const [at, projs] of byMinute) {
+        const distinctAnalyses = new Set(projs.map((p) => p.analysis));
+        if (distinctAnalyses.size < 2) continue;
+        const validators = projs.filter((p) => p.top5);
+        if (!validators.length) continue;
+        const pct = projs.reduce((s, p) => s + p.pct, 0) / projs.length;
+        if (pct < MIN_ASSERTIVIDADE_CONFLUENCIA) continue;
+        if (usedTimes.has(at)) continue;
+        usedTimes.add(at);
+
+        syncM2.push({
+          key: `m2-${at}`,
+          time: fmtClock(new Date(at)),
+          pct,
+          label: "Confluência",
+          confluence: validators.map(p => `A${p.analysis}·${p.value}`).join(", "),
+          medal: getMedalStyles(distinctAnalyses.size)?.label,
+          entryDate: new Date(at),
+          outcome: "pending"
+        });
+      }
+
+      setPredictiveSignals([...syncM1, ...syncM2].sort((a, b) => a.entryDate.getTime() - b.entryDate.getTime()));
     }
   }, [rows, loading, active, engine]);
 
