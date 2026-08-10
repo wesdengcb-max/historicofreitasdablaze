@@ -316,95 +316,107 @@ export function PredictiveSignals() {
     setPredictiveSignals(syncSignals);
   }, [active, engine]);
 
-  // Sync projections with global store for SinaisSection automatically
-  useEffect(() => {
-    if (rows.length > 0 && !loading) {
-      const now = new Date();
-      now.setSeconds(0, 0);
-
-      const m1List: Mode1Signal[] = [];
-      const usedTimes = new Set<number>();
-
-      // Internal calculation for Mode 1
-      const byTime = new Map<number, any>();
-      for (const item of active) {
-        const hist = engine[item.analysis].filter(c => c.value === item.value);
-        if (hist.length < MIN_GATILHOS) continue;
-        const top1 = computeTop(hist, 1)[0];
-        if (!top1 || top1.pct < MIN_ASSERTIVIDADE_TOP1) continue;
-        const at = addMinutes(item.open.triggerAt, top1.m);
-        if (at.getTime() <= now.getTime()) continue;
-        const t = at.getTime();
-        const cur = byTime.get(t);
-        if (!cur) {
-          byTime.set(t, { 
-            pct: top1.pct, 
-            label: top1.label,
-            sources: [{ analysis: item.analysis, value: item.value }],
-            analyses: new Set([item.analysis])
-          });
-        } else {
-          cur.analyses.add(item.analysis);
-          cur.sources.push({ analysis: item.analysis, value: item.value });
-          if (top1.pct > cur.pct) { cur.pct = top1.pct; cur.label = top1.label; }
-        }
-      }
-
-      const syncM1 = Array.from(byTime.entries()).map(([t, info]) => {
-        usedTimes.add(t);
-        return {
-          key: `m1-${t}`,
-          time: fmtClock(new Date(t)),
-          pct: info.pct,
-          label: info.label,
-          confluence: info.sources.map((src: any) => `A${src.analysis}·${src.value}`).join(", "),
-          medal: getMedalStyles(info.analyses.size)?.label,
-          entryDate: new Date(t),
-          outcome: "pending"
-        };
-      });
-
-      // Internal calculation for Mode 2 (Confluences)
-      const byMinute = new Map<number, any[]>();
-      for (const item of active) {
-        const hist = engine[item.analysis].filter(c => c.value === item.value);
-        if (hist.length < MIN_GATILHOS) continue;
-        const list = computeTop(hist, CANDIDATE_DEPTH);
-        list.forEach((g, idx) => {
-          const at = addMinutes(item.open.triggerAt, g.m).getTime();
-          if (at <= now.getTime()) return;
-          const arr = byMinute.get(at) ?? [];
-          arr.push({ analysis: item.analysis, value: item.value, pct: g.pct, top5: idx < TOP5_DEPTH });
-          byMinute.set(at, arr);
-        });
-      }
-
-      const syncM2: any[] = [];
-      for (const [at, projs] of byMinute) {
-        const distinctAnalyses = new Set(projs.map((p) => p.analysis));
-        if (distinctAnalyses.size < 2) continue;
-        const validators = projs.filter((p) => p.top5);
-        if (!validators.length) continue;
-        const pct = projs.reduce((s, p) => s + p.pct, 0) / projs.length;
-        if (pct < MIN_ASSERTIVIDADE_CONFLUENCIA) continue;
-        if (usedTimes.has(at)) continue;
-        usedTimes.add(at);
-
-        syncM2.push({
-          key: `m2-${at}`,
-          time: fmtClock(new Date(at)),
-          pct,
-          label: "Confluência",
-          confluence: validators.map(p => `A${p.analysis}·${p.value}`).join(", "),
-          medal: getMedalStyles(distinctAnalyses.size)?.label,
-          entryDate: new Date(at),
-          outcome: "pending"
-        });
-      }
-
-      setPredictiveSignals([...syncM1, ...syncM2].sort((a, b) => a.entryDate.getTime() - b.entryDate.getTime()));
+  const generate = useCallback(() => {
+    if (showBranco) {
+      setShowBranco(false);
+      setHasClicked(false);
+      setMode1(null);
+      setMode2(null);
+      setPredictiveSignals([]);
+      return;
     }
-  }, [rows, loading, active, engine]);
+
+    if (rows.length === 0 || loading) return;
+
+    setShowBranco(true);
+    setHasClicked(true);
+    const now = new Date();
+    now.setSeconds(0, 0);
+
+    const m1List: Mode1Signal[] = [];
+    const usedTimes = new Set<number>();
+
+    // Internal calculation for Mode 1
+    const byTime = new Map<number, any>();
+    for (const item of active) {
+      const hist = engine[item.analysis].filter(c => c.value === item.value);
+      if (hist.length < MIN_GATILHOS) continue;
+      const top1 = computeTop(hist, 1)[0];
+      if (!top1 || top1.pct < MIN_ASSERTIVIDADE_TOP1) continue;
+      const at = addMinutes(item.open.triggerAt, top1.m);
+      if (at.getTime() <= now.getTime()) continue;
+      const t = at.getTime();
+      const cur = byTime.get(t);
+      if (!cur) {
+        byTime.set(t, { 
+          pct: top1.pct, 
+          label: top1.label,
+          sources: [{ analysis: item.analysis, value: item.value }],
+          analyses: new Set([item.analysis])
+        });
+      } else {
+        cur.analyses.add(item.analysis);
+        cur.sources.push({ analysis: item.analysis, value: item.value });
+        if (top1.pct > cur.pct) { cur.pct = top1.pct; cur.label = top1.label; }
+      }
+    }
+
+    const syncM1 = Array.from(byTime.entries()).map(([t, info]) => {
+      usedTimes.add(t);
+      return {
+        key: `m1-${t}`,
+        time: fmtClock(new Date(t)),
+        pct: info.pct,
+        label: info.label,
+        confluence: info.sources.map((src: any) => `A${src.analysis}·${src.value}`).join(", "),
+        medal: getMedalStyles(info.analyses.size)?.label,
+        entryDate: new Date(t),
+        outcome: "pending"
+      };
+    });
+
+    // Internal calculation for Mode 2 (Confluences)
+    const byMinute = new Map<number, any[]>();
+    for (const item of active) {
+      const hist = engine[item.analysis].filter(c => c.value === item.value);
+      if (hist.length < MIN_GATILHOS) continue;
+      const list = computeTop(hist, CANDIDATE_DEPTH);
+      list.forEach((g, idx) => {
+        const at = addMinutes(item.open.triggerAt, g.m).getTime();
+        if (at <= now.getTime()) return;
+        const arr = byMinute.get(at) ?? [];
+        arr.push({ analysis: item.analysis, value: item.value, pct: g.pct, top5: idx < TOP5_DEPTH });
+        byMinute.set(at, arr);
+      });
+    }
+
+    const syncM2: any[] = [];
+    for (const [at, projs] of byMinute) {
+      const distinctAnalyses = new Set(projs.map((p) => p.analysis));
+      if (distinctAnalyses.size < 2) continue;
+      const validators = projs.filter((p) => p.top5);
+      if (!validators.length) continue;
+      const pct = projs.reduce((s, p) => s + p.pct, 0) / projs.length;
+      if (pct < MIN_ASSERTIVIDADE_CONFLUENCIA) continue;
+      if (usedTimes.has(at)) continue;
+      usedTimes.add(at);
+
+      syncM2.push({
+        key: `m2-${at}`,
+        time: fmtClock(new Date(at)),
+        pct,
+        label: "Confluência",
+        confluence: validators.map(p => `A${p.analysis}·${p.value}`).join(", "),
+        medal: getMedalStyles(distinctAnalyses.size)?.label,
+        entryDate: new Date(at),
+        outcome: "pending"
+      });
+    }
+
+    const allSignals = [...syncM1, ...syncM2].sort((a, b) => a.entryDate.getTime() - b.entryDate.getTime());
+    setMode1(syncM1);
+    setPredictiveSignals(allSignals);
+  }, [rows, loading, active, engine, showBranco]);
 
 
   const generateProximaLista = useCallback(() => {
