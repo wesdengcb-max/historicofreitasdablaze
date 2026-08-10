@@ -38,10 +38,13 @@ export function ListSignalMonitor() {
       const updatedSignals = currentSignals.map(signal => {
         if (signal.outcome && signal.outcome !== "pending") return signal;
 
+        // Use a stable SP-based comparison for the outcome monitoring
+        const spTimeStr = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
+        const now = new Date(spTimeStr).getTime();
+        
         const signalDate = new Date(signal.entryDate);
         const signalTime = signalDate.getTime();
         
-        const now = new Date().getTime();
         // Give it 2 minutes + 30s buffer to account for the result being recorded
         const twoMinutesAfter = signalTime + 120_000;
         const expiryTime = twoMinutesAfter + 30_000;
@@ -53,17 +56,21 @@ export function ListSignalMonitor() {
         // Find results in the window [signalTime, signalTime + 2min]
         // We include a 30s lead buffer in case of minor timestamp drifts in the DB
         const matches = latestResults.filter(r => {
-          const resTime = new Date(r.created_at).getTime();
-          return resTime >= (signalTime - 30_000) && resTime < twoMinutesAfter;
+          const resDate = new Date(r.created_at);
+          // Convert result timestamp to SP time before comparing to the SP-based signalTime
+          const resTimeInSP = new Date(resDate.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" })).getTime();
+          return resTimeInSP >= (signalTime - 60_000) && resTimeInSP < (twoMinutesAfter + 60_000);
         });
 
         if (matches.length > 0) {
           const isGreen = matches.some(r => {
             const resColor = Number(r.color);
+            // GREEN if it hits the target color OR white (protection)
             return resColor === targetColor || resColor === 0;
           });
           
           if (isGreen) {
+            console.log(`[ListSignalMonitor] Signal ${signal.time} (${signal.symbols}) is GREEN`, matches);
             changed = true;
             return { ...signal, outcome: "green" as const };
           }
@@ -71,6 +78,7 @@ export function ListSignalMonitor() {
 
         // Only mark as RED if the time window (G1) has fully passed + buffer
         if (now > expiryTime) {
+          console.log(`[ListSignalMonitor] Signal ${signal.time} (${signal.symbols}) is RED - No matches in window`, matches);
           changed = true;
           return { ...signal, outcome: "red" as const };
         }
