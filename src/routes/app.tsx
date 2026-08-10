@@ -968,7 +968,7 @@ function Index() {
                   <h3 className="text-[13px] font-bold text-white uppercase tracking-tight">Casas do Branco</h3>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <BarChart3 className="h-3 w-3 text-red-500" />
-                    <span className="text-[11px] text-muted-foreground">{total} resultados, desde o último branco.</span>
+                    <span className="text-[11px] text-muted-foreground">{lastWhiteAgo} resultados, desde o último branco.</span>
                   </div>
                 </div>
               </div>
