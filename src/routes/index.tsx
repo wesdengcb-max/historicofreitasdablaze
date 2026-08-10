@@ -328,19 +328,13 @@ function FeatureCard({ icon, title, description }: { icon: React.ReactNode, titl
       <div className="absolute top-0 right-0 w-32 h-32 bg-red-600/5 blur-[40px] opacity-0 group-hover:opacity-100 transition-opacity" />
       
       <div className="relative z-10">
-        <div className="w-16 h-16 bg-red-600/10 rounded-2xl flex items-center justify-center mb-8 text-[#E50914] border border-red-600/10 group-hover:scale-110 group-hover:bg-red-600 group-hover:text-white transition-all duration-500 group-hover:shadow-[0_0_30px_rgba(229,9,20,0.5)]">
+        <div className="w-16 h-16 bg-red-600/10 rounded-2xl flex items-center justify-center mb-8 text-[#E50914] border border-red-600/10 transition-all duration-500 group-hover:bg-[#E50914] group-hover:text-white group-hover:shadow-[0_0_30px_rgba(229,9,20,0.5)]">
           {icon}
         </div>
         <h3 className="text-xl font-black uppercase tracking-tighter mb-4">{title}</h3>
         <p className="text-gray-500 text-sm leading-relaxed font-medium">
           {description}
         </p>
-      </div>
-      
-      {/* Corner detail */}
-      <div className="absolute bottom-0 right-0 w-8 h-8 opacity-0 group-hover:opacity-100 transition-opacity">
-         <div className="absolute bottom-4 right-4 w-4 h-[2px] bg-red-600" />
-         <div className="absolute bottom-4 right-4 h-4 w-[2px] bg-red-600" />
       </div>
     </div>
   );
