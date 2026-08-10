@@ -1,5 +1,125 @@
 import { create } from 'zustand';
 
+export type StoredSignal = {
+  id: string;
+  color: "red" | "black" | "white";
+  entry: number;
+  targetIso: string; // ISO UTC do horário do sinal
+  outcome: "pending" | "green" | "red";
+  matchedIso?: string; // ISO UTC do resultado que bateu (se green)
+};
+
+const KEY = "freitas.signals.v1";
+const ROBOT_KEY = "freitas.robot.enabled";
+const PREDICTIVE_KEY = "freitas.predictive.signals";
+const EVENT = "freitas:signals";
+const ROBOT_EVENT = "freitas:robot";
+const PREDICTIVE_EVENT = "freitas:predictive";
+
+export function getSignals(): StoredSignal[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function setSignals(next: StoredSignal[]) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(KEY, JSON.stringify(next));
+  } catch {
+    // ignore
+  }
+  window.dispatchEvent(new Event(EVENT));
+}
+
+export function subscribeSignals(listener: () => void): () => void {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener(EVENT, listener);
+  window.addEventListener("storage", (e) => {
+    if (e.key === KEY) listener();
+  });
+  return () => {
+    window.removeEventListener(EVENT, listener);
+  };
+}
+
+export function getRobotEnabled(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(ROBOT_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+export function setRobotEnabled(enabled: boolean) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(ROBOT_KEY, enabled ? "true" : "false");
+  } catch {
+    // ignore
+  }
+  window.dispatchEvent(new Event(ROBOT_EVENT));
+}
+
+export function subscribeRobot(listener: () => void): () => void {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener(ROBOT_EVENT, listener);
+  window.addEventListener("storage", (e) => {
+    if (e.key === ROBOT_KEY) listener();
+  });
+  return () => {
+    window.removeEventListener(ROBOT_EVENT, listener);
+  };
+}
+
+export interface PredictiveSignal {
+  key: string;
+  time: string;
+  pct: number;
+  label: string;
+  confluence: string;
+  medal?: string;
+  outcome?: "pending" | "green" | "red";
+  resultTime?: string;
+  entryDate?: Date;
+}
+
+export function setPredictiveSignals(signals: PredictiveSignal[]) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(PREDICTIVE_KEY, JSON.stringify(signals));
+  } catch {
+    // ignore
+  }
+  window.dispatchEvent(new Event(PREDICTIVE_EVENT));
+}
+
+export function getPredictiveSignals(): PredictiveSignal[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(PREDICTIVE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function subscribePredictive(listener: () => void): () => void {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener(PREDICTIVE_EVENT, listener);
+  window.addEventListener("storage", (e) => {
+    if (e.key === PREDICTIVE_KEY) listener();
+  });
+  return () => {
+    window.removeEventListener(PREDICTIVE_EVENT, listener);
+  };
+}
+
 export type ProximaListaSignal = {
   key: string;
   time: string;
@@ -17,7 +137,7 @@ export type ProximaListaSignal = {
 const PROXIMA_LISTA_KEY = "freitas.proxima.lista";
 const PROXIMA_LISTA_EVENT = "freitas:proxima_lista";
 
-export const setProximaListaSignals = (signals: ProximaListaSignal[]) => {
+export function setProximaListaSignals(signals: ProximaListaSignal[]) {
   if (typeof window === "undefined") return;
   try {
     window.localStorage.setItem(PROXIMA_LISTA_KEY, JSON.stringify(signals));
@@ -25,9 +145,9 @@ export const setProximaListaSignals = (signals: ProximaListaSignal[]) => {
     // ignore
   }
   window.dispatchEvent(new Event(PROXIMA_LISTA_EVENT));
-};
+}
 
-export const getProximaListaSignals = (): ProximaListaSignal[] => {
+export function getProximaListaSignals(): ProximaListaSignal[] {
   if (typeof window === "undefined") return [];
   try {
     const raw = window.localStorage.getItem(PROXIMA_LISTA_KEY);
@@ -35,9 +155,9 @@ export const getProximaListaSignals = (): ProximaListaSignal[] => {
   } catch {
     return [];
   }
-};
+}
 
-export const subscribeProximaLista = (listener: () => void): () => void => {
+export function subscribeProximaLista(listener: () => void): () => void {
   if (typeof window === "undefined") return () => {};
   window.addEventListener(PROXIMA_LISTA_EVENT, listener);
   window.addEventListener("storage", (e) => {
@@ -46,50 +166,4 @@ export const subscribeProximaLista = (listener: () => void): () => void => {
   return () => {
     window.removeEventListener(PROXIMA_LISTA_EVENT, listener);
   };
-};
-
-export interface PredictiveSignal {
-  key: string;
-  time: string;
-  pct: number;
-  label: string;
-  confluence: string;
-  medal?: string;
-  outcome?: "pending" | "green" | "red";
-  resultTime?: string;
-  entryDate?: Date;
 }
-
-const PREDICTIVE_KEY = "freitas.predictive.signals";
-const PREDICTIVE_EVENT = "freitas:predictive";
-
-export const setPredictiveSignals = (signals: PredictiveSignal[]) => {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(PREDICTIVE_KEY, JSON.stringify(signals));
-  } catch {
-    // ignore
-  }
-  window.dispatchEvent(new Event(PREDICTIVE_EVENT));
-};
-
-export const getPredictiveSignals = (): PredictiveSignal[] => {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = window.localStorage.getItem(PREDICTIVE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-};
-
-export const subscribePredictive = (listener: () => void): () => void => {
-  if (typeof window === "undefined") return () => {};
-  window.addEventListener(PREDICTIVE_EVENT, listener);
-  window.addEventListener("storage", (e) => {
-    if (e.key === PREDICTIVE_KEY) listener();
-  });
-  return () => {
-    window.removeEventListener(PREDICTIVE_EVENT, listener);
-  };
-};
