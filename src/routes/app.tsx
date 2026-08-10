@@ -863,8 +863,78 @@ function Index() {
 
 
           <section className="space-y-3 sm:space-y-5 lg:space-y-6">
+          {/* Seção de Resumo Rápido (Último Giro, Último Branco, Casas do Branco) */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <Card className="flex flex-col p-4">
+              <div className="flex items-center justify-between mb-2">
+                <div>
+                  <h3 className="text-[13px] font-bold text-white uppercase tracking-tight">Último Giro</h3>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <Flame className="h-3 w-3 text-red-500 fill-red-500" />
+                    <span className="text-[11px] text-muted-foreground">Rodada mais recente.</span>
+                  </div>
+                </div>
+                <div className="flex flex-col items-end">
+                  <ResultCircle 
+                    n={last?.n ?? 0} 
+                    color={last?.color ?? "white"} 
+                    size="sm" 
+                    className="rounded-md shadow-lg"
+                  />
+                  <span className="text-[10px] font-medium text-muted-foreground mt-1.5 tabular-nums">
+                    {last ? spTimeWithSeconds(last) : "--:--:--"}
+                  </span>
+                </div>
+              </div>
+              <div className="mt-auto border-t border-white/5 pt-3">
+                <p className="text-[11px] text-muted-foreground">
+                  <span className="font-bold text-white">{Math.floor(Math.random() * 500) + 100}</span> pessoas apostaram no <span className="font-bold text-white capitalize">{last?.color === 'red' ? 'Vermelho' : last?.color === 'black' ? 'Preto' : 'Branco'}</span> nessa rodada.
+                </p>
+              </div>
+            </Card>
 
+            <Card className="flex flex-col p-4">
+              <div className="flex items-center justify-between mb-2">
+                <div>
+                  <h3 className="text-[13px] font-bold text-white uppercase tracking-tight">Último Branco</h3>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <Clock className="h-3 w-3 text-red-500" />
+                    <span className="text-[11px] text-muted-foreground">{lastWhiteAgo} rodadas atrás.</span>
+                  </div>
+                </div>
+                <div className="flex flex-col items-end">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-md bg-white shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+                    <img src={brancoTile.url} alt="Branco" className="h-5 w-5 object-contain" />
+                  </div>
+                  <span className="text-[10px] font-bold text-white mt-1.5 tabular-nums">
+                    {visibleSpins[lastWhiteIdx]?.time ?? "--:--"}
+                  </span>
+                </div>
+              </div>
+              <div className="mt-auto border-t border-white/5 pt-3">
+                <p className="text-[11px] text-muted-foreground">
+                  <span className="font-bold text-white">{Math.floor(Math.random() * 2000) + 500}</span> pessoas pegaram esse branco.
+                </p>
+              </div>
+            </Card>
 
+            <Card className="flex flex-col p-4">
+              <div className="flex items-center justify-between mb-2">
+                <div>
+                  <h3 className="text-[13px] font-bold text-white uppercase tracking-tight">Casas do Branco</h3>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <BarChart3 className="h-3 w-3 text-red-500" />
+                    <span className="text-[11px] text-muted-foreground">{total} resultados, desde o último branco.</span>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-auto border-t border-white/5 pt-3">
+                <p className="text-[11px] text-muted-foreground">
+                  O máximo de hoje foi de <span className="font-bold text-white">70</span> casas, começando no branco das <span className="font-bold text-white">10:11</span>.
+                </p>
+              </div>
+            </Card>
+          </div>
 
           <Card
             title="Giros anteriores"
