@@ -923,6 +923,8 @@ function Index() {
             countdown={countdown}
           />
 
+          <SinaisSectionList />
+
 
           <section className="space-y-3 sm:space-y-5 lg:space-y-6">
           {/* Seção de Resumo Rápido (Último Giro, Último Branco, Casas do Branco) */}
