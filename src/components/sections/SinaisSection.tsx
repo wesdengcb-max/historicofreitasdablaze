@@ -131,6 +131,7 @@ function buildSignals(results: Result[]): Signal[] {
 export default function SinaisSection() {
   const [results, setResults] = useState<Result[]>([]);
   const [tick, setTick] = useState(0);
+  const [resultsForValidation, setResultsForValidation] = useState<Result[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [disabled, setDisabled] = useState<Set<string>>(new Set());
   const [robotOn, setRobotOn] = useState(getRobotEnabled());
@@ -166,7 +167,9 @@ export default function SinaisSection() {
         .limit(1000);
       if (error || !alive) return;
       const rows = (data ?? []) as Array<{ id: number; color: string; roll: string; created_at: string }>;
-      setResults(rows.map(rowToResult));
+      const mapped = rows.map(rowToResult);
+      setResults(mapped);
+      setResultsForValidation(mapped);
     };
     void load();
 
@@ -178,6 +181,7 @@ export default function SinaisSection() {
         (payload) => {
           const r = payload.new as { id: number; color: string; roll: string; created_at: string };
           const next = rowToResult(r);
+          setResultsForValidation(prev => [next, ...prev].slice(0, 1000));
           setResults((prev) =>
             prev.some((item) => item.id === next.id)
               ? prev
@@ -275,11 +279,49 @@ export default function SinaisSection() {
   );
 
   useEffect(() => {
-    const sub = subscribePredictive(() => {
-      setPredictiveList(getPredictiveSignals());
-    });
-    return sub;
-  }, []);
+    const update = () => {
+      const raw = getPredictiveSignals();
+      const now = Date.now();
+      const WHITE_MARGIN_MS = 60_000;
+      const REMOVE_DELAY_MS = 3 * 60_000;
+
+      const validated = raw.map(s => {
+        if (!s.entryDate) return s;
+        const targetTime = new Date(s.entryDate).getTime();
+        const windowEnd = targetTime + WHITE_MARGIN_MS;
+
+        if (s.outcome && s.outcome !== "pending") return s;
+
+        const matched = resultsForValidation.find(r => {
+          if (r.color !== "white") return false;
+          const rt = new Date(r.createdAt).getTime();
+          return rt >= targetTime - WHITE_MARGIN_MS && rt <= targetTime + WHITE_MARGIN_MS;
+        });
+
+        if (matched) {
+          return { ...s, outcome: "green" as const, resultTime: fmtTime(matched.createdAt) };
+        }
+        if (now > windowEnd) {
+          return { ...s, outcome: "red" as const };
+        }
+        return s;
+      }).filter(s => {
+        if (!s.entryDate || !s.outcome || s.outcome === "pending") return true;
+        const targetTime = new Date(s.entryDate).getTime();
+        return now < targetTime + WHITE_MARGIN_MS + REMOVE_DELAY_MS;
+      });
+
+      setPredictiveList(validated);
+    };
+
+    update();
+    const sub = subscribePredictive(update);
+    const interval = setInterval(update, 5000);
+    return () => {
+      sub();
+      clearInterval(interval);
+    };
+  }, [resultsForValidation]);
 
   useEffect(() => {
     const sub = subscribeRobot(() => {
@@ -433,9 +475,22 @@ export default function SinaisSection() {
                     </div>
                   </td>
                   <td className="px-3 py-4">
-                    <div className="inline-flex items-center gap-2 rounded-md bg-white/[0.05] border border-white/10 px-3 py-1 text-[10px] font-black tracking-widest text-muted-foreground uppercase font-mono">
-                      Monitorando
-                    </div>
+                    {!s.outcome || s.outcome === "pending" ? (
+                      <div className="inline-flex items-center gap-2 rounded-md bg-white/[0.05] border border-white/10 px-3 py-1 text-[10px] font-black tracking-widest text-muted-foreground uppercase font-mono">
+                        Monitorando
+                      </div>
+                    ) : (
+                      <div
+                        className={`inline-flex items-center rounded-md px-3 py-1 font-mono text-[10px] font-black tracking-widest border ${
+                          s.outcome === "green"
+                            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                            : "bg-red-500/10 text-red-400 border-red-500/20"
+                        }`}
+                      >
+                        {s.outcome === "green" ? "WIN" : "LOSS"}
+                        {s.resultTime ? ` · ${s.resultTime}` : ""}
+                      </div>
+                    )}
                   </td>
                   <td className="px-3 py-4"></td>
                 </tr>

@@ -29,6 +29,8 @@ type Mode1Signal = {
   analysisCount: number; 
   sources: Array<{ analysis: 1 | 2 | 3 | 4 | 5; value: number }>;
   isHighTendency: boolean;
+  outcome?: "pending" | "green" | "red";
+  resultTime?: string;
 };
 type Mode2Signal = {
   key: string;
@@ -39,6 +41,8 @@ type Mode2Signal = {
   confluence: string;
   analysisCount: number;
   isHighTendency: boolean;
+  outcome?: "pending" | "green" | "red";
+  resultTime?: string;
 };
 
 const MIN_ASSERTIVIDADE_TOP1 = 65;
@@ -272,14 +276,16 @@ export function PredictiveSignals() {
     setMode2(m2);
 
     // Sync with global store for SinaisSection
-    const syncSignals = [
+    const syncSignals: any[] = [
       ...m1.map(s => ({
         key: s.key,
         time: fmtClock(s.at),
         pct: s.pct,
         label: s.label,
         confluence: s.sources.map(src => `A${src.analysis}·${src.value}`).join(", "),
-        medal: getMedalStyles(s.analysisCount)?.label
+        medal: getMedalStyles(s.analysisCount)?.label,
+        entryDate: s.at,
+        outcome: "pending"
       })),
       ...m2.map(s => ({
         key: s.key,
@@ -287,9 +293,11 @@ export function PredictiveSignals() {
         pct: s.pct,
         label: "Confluência",
         confluence: s.confluence,
-        medal: getMedalStyles(s.analysisCount)?.label
+        medal: getMedalStyles(s.analysisCount)?.label,
+        entryDate: s.times[0],
+        outcome: "pending"
       }))
-    ].sort((a, b) => a.time.localeCompare(b.time));
+    ].sort((a, b) => a.entryDate.getTime() - b.entryDate.getTime());
 
     setPredictiveSignals(syncSignals);
   }, [active, engine]);
