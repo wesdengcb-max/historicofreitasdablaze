@@ -397,23 +397,32 @@ export function PredictiveSignals() {
   const generateProximaLista = useCallback(() => {
     if (rows.length === 0) return;
 
+    // Horário atual no fuso de São Paulo
     const nowInSP = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
+    const currentYear = nowInSP.getFullYear();
+    const currentMonth = nowInSP.getMonth();
+    const currentDate = nowInSP.getDate();
     const currentHour = nowInSP.getHours();
-    const previousHour = (currentHour - 1 + 24) % 24;
 
-    // Filter results from the previous hour
+    // Determinar a hora anterior (ex: se agora é 02:xx, analisar 01:00-01:59)
+    // Se agora for 00:xx, a hora anterior é 23:xx do dia anterior.
+    const startTimeInSP = new Date(currentYear, currentMonth, currentDate, currentHour - 1, 0, 0);
+    const endTimeInSP = new Date(currentYear, currentMonth, currentDate, currentHour - 1, 59, 59, 999);
+
+    // Filtrar resultados da Blaze que caíram na hora anterior (no fuso SP)
     const previousHourRows = rows.filter(r => {
       const d = new Date(r.created_at);
       const dInSP = new Date(d.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
-      return dInSP.getHours() === previousHour;
+      return dInSP >= startTimeInSP && dInSP <= endTimeInSP;
     });
 
-    // Group by minute and find the first row (earliest created_at) for each minute
+    // Agrupar por minuto e pegar EXCLUSIVAMENTE a primeira pedra de cada minuto (created_at mais antigo)
     const firstByMinute = new Map<number, Row>();
     previousHourRows.forEach(r => {
       const d = new Date(r.created_at);
       const dInSP = new Date(d.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
       const min = dInSP.getMinutes();
+      
       const existing = firstByMinute.get(min);
       if (!existing || new Date(r.created_at).getTime() < new Date(existing.created_at).getTime()) {
         firstByMinute.set(min, r);
@@ -421,31 +430,41 @@ export function PredictiveSignals() {
     });
 
     const listSignals: ProximaListaSignal[] = [];
-    firstByMinute.forEach((row, min) => {
-      const roll = Number(row.roll);
+    
+    // Iterar pelos minutos 0-59 para garantir ordem e consistência
+    for (let min = 0; min <= 59; min++) {
+      const firstRow = firstByMinute.get(min);
+      if (!firstRow) continue;
+
+      const roll = Number(firstRow.roll);
       let symbols = "";
+      
+      // Regra 1: Pedra 6 ou 7 -> 🔴⚪️ (mesmo minuto + 1 hora)
       if (roll === 6 || roll === 7) {
         symbols = "🔴⚪️";
-      } else if (roll === 8 || roll === 9) {
+      } 
+      // Regra 2: Pedra 8 ou 9 -> ⚫️ (mesmo minuto + 1 hora)
+      else if (roll === 8 || roll === 9) {
         symbols = "⚫️";
       }
 
       if (symbols) {
-        const signalHour = currentHour;
-        const entryDate = new Date();
-        entryDate.setHours(signalHour, min, 0, 0);
+        // O horário do sinal é EXATAMENTE a mesma hora atual (que é hora_anterior + 1)
+        const displayTime = `${currentHour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`;
+        
+        // Criar data de entrada para ordenação e validação (no dia atual)
+        const entryDate = new Date(currentYear, currentMonth, currentDate, currentHour, min, 0);
 
         listSignals.push({
-          key: `pl-${signalHour}-${min}`,
-          time: `${signalHour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`,
+          key: `pl-${currentHour}-${min}`,
+          time: displayTime,
           symbols,
           entryDate,
           outcome: "pending"
         });
       }
-    });
+    }
 
-    listSignals.sort((a, b) => a.entryDate.getTime() - b.entryDate.getTime());
     setProximaListaSignals(listSignals);
   }, [rows]);
 
