@@ -635,14 +635,10 @@ function Index() {
   const lastWhiteAgo = lastWhiteIdx >= 0 ? lastWhiteIdx : visibleSpins.length;
   
   const lastWhiteMinutesAgo = useMemo(() => {
-    if (lastWhiteIdx < 0 || !visibleSpins[lastWhiteIdx]?.createdAt) return null;
-    const lastWhiteDate = new Date(visibleSpins[lastWhiteIdx].createdAt!);
-    const now = new Date();
-    
-    // Calcula a diferença absoluta em milissegundos
-    const diffMs = Math.abs(now.getTime() - lastWhiteDate.getTime());
-    return Math.floor(diffMs / 60000);
-  }, [visibleSpins, lastWhiteIdx]);
+    if (lastWhiteIdx < 0) return null;
+    // O usuário deseja que o tempo seja baseado no número de rodadas (2 rodadas = 1 minuto)
+    return Math.floor(lastWhiteIdx / 2);
+  }, [lastWhiteIdx]);
 
   const freq = useMemo(
     () => Array.from({ length: 15 }, (_, n) => ({ n, count: counts.byNumber[n] ?? 0 })),
