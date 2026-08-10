@@ -864,33 +864,6 @@ function Index() {
           <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
             <Card className="lg:col-span-2">
               <div className="flex flex-col gap-4">
-                <div className="flex items-center justify-between border-b border-white/5 pb-4">
-                  <div className="flex flex-col">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Status da Rodada</span>
-                    <div className="mt-1 flex items-center gap-3">
-                      <div className="flex items-center gap-1.5 rounded-full bg-white/5 px-2 py-0.5">
-                        <div className={cn(
-                          "h-1.5 w-1.5 rounded-full animate-pulse",
-                          countdown > 3 ? "bg-emerald-500" : "bg-red-500"
-                        )} />
-                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
-                          {countdown > 3 ? "Próximo giro em" : "Giro em andamento"} <span className="text-white ml-1">{countdown > 3 ? `${String(countdown).padStart(2, "0")}s` : ""}</span>
-                        </span>
-                      </div>
-                      <span className="text-[10px] font-bold text-[#ef4444] uppercase tracking-tight">{total} rodadas</span>
-                    </div>
-                  </div>
-                  
-                  {last && (
-                    <div className="flex flex-col items-end gap-1">
-                       <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Último giro</span>
-                       <div key={last.id} className="animate-in fade-in zoom-in-95 duration-200">
-                         <ResultCircle color={last.color} n={last.n} size="md" glow />
-                       </div>
-                    </div>
-                  )}
-                </div>
-
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center gap-2">
                     <Flame className="h-3.5 w-3.5 text-red-500" />
