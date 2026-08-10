@@ -339,6 +339,7 @@ function Index() {
     setAlertFx(next ? "on" : "off");
   }, []);
   const [realtime, setRealtime] = useState(true);
+  const [robotOn, setRobotOn] = useState(false);
   const [numerado, setNumerado] = useState(false);
   const [destaqueHorario, setDestaqueHorario] = useState(false);
   const [exibirSegundos, setExibirSegundos] = useState(false);
