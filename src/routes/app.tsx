@@ -307,9 +307,13 @@ function Index() {
   const { isCollapsed, toggle } = useSidebarStore();
   const isVip = useVipStatus();
 
-  // Removido o switch automático para lista em mobile para manter layout de PC em todos os dispositivos
+  // Sempre que inicia no celular ou tablet, o histórico deve estar com coluna fixa desabilitada e sentido inverso habilitado
   useEffect(() => {
-    // setViewMode("colunas"); // Força o modo colunas por padrão
+    const isMobile = window.innerWidth < 1024;
+    if (isMobile) {
+      setViewMode("lista");
+      setInverse(true);
+    }
   }, []);
 
   // Protect current section if VIP is lost
