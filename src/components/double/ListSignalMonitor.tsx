@@ -30,7 +30,7 @@ export function ListSignalMonitor() {
         .from("blaze_results")
         .select("roll, color, created_at")
         .order("created_at", { ascending: false })
-        .limit(200);
+        .limit(500);
 
       if (!latestResults || latestResults.length === 0) return;
 
