@@ -2,6 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { Button } from "@/components/ui/button"
 import { ArrowRight, MessageSquare, ShieldCheck, Zap, Globe, Crown } from "lucide-react"
 import logoFreitas from "@/assets/logo-freitas.png.asset.json";
+import heroImg from "@/assets/freitas-white-hero.png.asset.json";
 
 export const Route = createFileRoute('/')({
   component: LandingPage,
@@ -36,45 +37,71 @@ function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <header className="relative overflow-hidden pt-40 pb-24 lg:pt-56 lg:pb-40">
+      <header className="relative overflow-hidden pt-32 pb-24 lg:pt-48 lg:pb-32">
         <div className="absolute top-0 left-1/2 -z-10 h-[800px] w-[1200px] -translate-x-1/2 bg-red-600/10 blur-[140px] rounded-full opacity-50" />
         
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="relative z-10 text-center">
-            <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-red-500/20 bg-red-500/5 px-5 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-red-500 animate-pulse">
-              <Crown className="h-3 w-3" />
-              <span>Tecnologia Preditiva 2.0</span>
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="relative z-10 text-left">
+              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-red-500/20 bg-red-500/5 px-5 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-red-500 animate-pulse">
+                <Crown className="h-3 w-3" />
+                <span>Tecnologia Preditiva 2.0</span>
+              </div>
+              
+              <h1 className="text-5xl font-black tracking-tighter sm:text-7xl lg:text-8xl font-outfit uppercase leading-[0.9] text-white mb-6">
+                DOMINE A <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-b from-red-500 to-red-800">BLAZE</span> COM <br />
+                INTELIGÊNCIA
+              </h1>
+              
+              <p className="max-w-xl text-lg font-medium text-gray-400 sm:text-xl leading-relaxed mb-10">
+                O ecossistema definitivo para investidores de Double. 
+                Combine confluência técnica e inteligência artificial para dominar o mercado em tempo real.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link to="/app" className="w-full sm:w-auto">
+                  <Button size="lg" className="h-16 w-full sm:w-64 bg-red-600 text-sm font-black uppercase tracking-[0.2em] hover:bg-red-700 group rounded-2xl shadow-[0_10px_30px_rgba(239,68,68,0.4)] transition-all hover:scale-105 active:scale-95">
+                    COMEÇAR AGORA
+                    <ArrowRight className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-2" />
+                  </Button>
+                </Link>
+                <a href="https://t.me/freitaswhite" target="_blank" rel="noreferrer" className="w-full sm:w-auto">
+                  <Button variant="outline" size="lg" className="h-16 w-full sm:w-64 border-white/5 bg-white/[0.03] text-sm font-black uppercase tracking-[0.2em] hover:bg-white/[0.08] transition-all rounded-2xl backdrop-blur-sm">
+                    <MessageSquare className="mr-3 h-5 w-5 text-red-500" />
+                    GRUPO FREE
+                  </Button>
+                </a>
+              </div>
             </div>
-            
-            <h1 className="text-6xl font-black tracking-tighter sm:text-8xl lg:text-9xl font-outfit uppercase leading-[0.85] text-white">
-              A ELITE DA <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-b from-red-500 to-red-800">BLAZE</span>
-            </h1>
-            
-            <p className="mx-auto mt-10 max-w-2xl text-lg font-medium text-gray-400 sm:text-xl leading-relaxed">
-              O ecossistema definitivo para investidores de Double. <br className="hidden sm:block" />
-              Combine confluência técnica e inteligência artificial para dominar o mercado.
-            </p>
-            
-            <div className="mt-14 flex flex-col items-center justify-center gap-6 sm:flex-row">
-              <Link to="/app" className="w-full sm:w-auto">
-                <Button size="lg" className="h-16 w-full sm:w-64 bg-red-600 text-sm font-black uppercase tracking-[0.2em] hover:bg-red-700 group rounded-2xl shadow-[0_10px_30px_rgba(239,68,68,0.4)] transition-all hover:scale-105 active:scale-95">
-                  COMEÇAR AGORA
-                  <ArrowRight className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-2" />
-                </Button>
-              </Link>
-              <a href="https://t.me/freitaswhite" target="_blank" rel="noreferrer" className="w-full sm:w-auto">
-                <Button variant="outline" size="lg" className="h-16 w-full sm:w-64 border-white/5 bg-white/[0.03] text-sm font-black uppercase tracking-[0.2em] hover:bg-white/[0.08] transition-all rounded-2xl backdrop-blur-sm">
-                  <MessageSquare className="mr-3 h-5 w-5 text-red-500" />
-                  GRUPO FREE
-                </Button>
-              </a>
+
+            <div className="relative lg:block">
+              <div className="relative z-10 overflow-hidden rounded-[40px] border border-white/10 bg-gradient-to-b from-white/5 to-transparent p-2 shadow-2xl backdrop-blur-sm">
+                 <img 
+                   src={heroImg.url} 
+                   alt="Plataforma Freitas White" 
+                   className="w-full h-auto rounded-[32px] object-cover shadow-2xl transition-transform duration-700 hover:scale-105"
+                 />
+                 <div className="absolute inset-0 bg-gradient-to-t from-[#080808] via-transparent to-transparent opacity-60" />
+              </div>
+              
+              {/* Floating stats card deco */}
+              <div className="absolute -bottom-6 -left-6 z-20 hidden sm:block">
+                <div className="rounded-2xl border border-white/10 bg-[#0c0c0c]/90 p-6 shadow-2xl backdrop-blur-xl animate-bounce-slow">
+                  <div className="flex items-center gap-4">
+                    <div className="h-12 w-12 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                      <Zap className="h-6 w-6 text-emerald-500" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Assertividade</p>
+                      <p className="text-2xl font-black text-white font-outfit">94.8%</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-
-        {/* Decorative elements */}
-        <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
       </header>
 
       {/* Features */}
