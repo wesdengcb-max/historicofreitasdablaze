@@ -48,7 +48,7 @@ const FERRAMENTAS: MenuItem[] = [
   { id: "simulador", title: "Simulador", icon: Dice5, isTool: true, soon: true },
 ];
 
-import logoFreitas from "@/assets/logo-freitas.png.asset.json";
+import fwLogoAsset from "@/assets/fw-logo-new.png.asset.json";
 
 export const Sidebar = memo(function Sidebar() {
 
@@ -88,7 +88,7 @@ export const Sidebar = memo(function Sidebar() {
           isCollapsed ? "h-12 w-12" : "h-20 w-20"
         )}>
           <div className="h-full w-full rounded-full bg-gradient-to-b from-red-500 to-red-900 flex items-center justify-center overflow-hidden">
-             <img src={logoFreitas.url} alt="Freitas" className="h-full w-full object-cover" />
+             <img src={fwLogoAsset.url} alt="Freitas" className="h-full w-full object-cover" />
           </div>
           {!isCollapsed && (
             <div className="absolute bottom-0 right-0 rounded-full bg-red-500 p-1 shadow-lg">
