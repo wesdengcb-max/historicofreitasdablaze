@@ -37,6 +37,7 @@ export const BlazeResultCard = memo(function BlazeResultCard({
   dimmed = false,
   selected = false,
   delay = 0,
+  signal,
   onClick,
 }: Props) {
   const c = PALETTE[color];
