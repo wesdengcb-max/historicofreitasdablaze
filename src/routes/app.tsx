@@ -1354,6 +1354,7 @@ function Index() {
                                             <TipMinerCard
                                               spin={spin as Spin}
                                               highlightN={highlightN}
+                                              signal={robotOn ? signalsByHM.get(`${hm}-${i}`)?.[0] : undefined}
                                               isActive={
                                                 highlightKey 
                                                   ? highlightKey === `col-${ci}`
