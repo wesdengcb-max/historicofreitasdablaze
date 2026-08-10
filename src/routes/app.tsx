@@ -861,32 +861,6 @@ function Index() {
             countdown={countdown}
           />
 
-          <section>
-            <Card>
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-3">
-                  <div className="flex items-center gap-2">
-                    <Flame className="h-3.5 w-3.5 text-red-500" />
-                    <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-tight">
-                      Último branco há <span className="text-white">{lastWhiteAgo}</span> rodadas
-                    </span>
-                  </div>
-                  
-                  <div className="flex flex-col gap-2">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Frequência</span>
-                    <div className="flex flex-wrap gap-x-2 gap-y-2">
-                      {freq.map((f) => (
-                        <div key={f.n} className="flex items-center gap-1.5 bg-white/[0.03] rounded-md px-2 py-1 border border-white/5">
-                          <ResultCircle color={colorOf(f.n)} n={f.n} size="xs" animate={false} />
-                          <span className="text-[10px] font-black tabular-nums text-white">{f.count}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </section>
 
           <section className="space-y-3 sm:space-y-5 lg:space-y-6">
 
