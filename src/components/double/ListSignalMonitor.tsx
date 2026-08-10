@@ -38,10 +38,13 @@ export function ListSignalMonitor() {
       const updatedSignals = currentSignals.map(signal => {
         if (signal.outcome && signal.outcome !== "pending") return signal;
 
+        // Use a stable SP-based comparison for the outcome monitoring
+        const spTimeStr = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
+        const now = new Date(spTimeStr).getTime();
+        
         const signalDate = new Date(signal.entryDate);
         const signalTime = signalDate.getTime();
         
-        const now = new Date().getTime();
         // Give it 2 minutes + 30s buffer to account for the result being recorded
         const twoMinutesAfter = signalTime + 120_000;
         const expiryTime = twoMinutesAfter + 30_000;
@@ -53,8 +56,9 @@ export function ListSignalMonitor() {
         // Find results in the window [signalTime, signalTime + 2min]
         // We include a 30s lead buffer in case of minor timestamp drifts in the DB
         const matches = latestResults.filter(r => {
-          const resTime = new Date(r.created_at).getTime();
-          return resTime >= (signalTime - 30_000) && resTime < twoMinutesAfter;
+          const resDate = new Date(r.created_at);
+          const resTimeInSP = new Date(resDate.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" })).getTime();
+          return resTimeInSP >= (signalTime - 30_000) && resTimeInSP < twoMinutesAfter;
         });
 
         if (matches.length > 0) {
