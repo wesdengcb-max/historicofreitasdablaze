@@ -56,12 +56,9 @@ export const LiveStats = memo(function LiveStats({
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {/* 1. Plataforma Atual */}
       <StatsCard title="Plataforma Atual">
-        <div className="flex flex-col items-center justify-center gap-4 py-2">
-          <div className="flex items-center gap-2">
-            <div className="relative h-10 w-10 overflow-hidden rounded-lg bg-black p-1">
-               <img src={blazeLogo.url} alt="Blaze" className="h-full w-full object-contain" />
-            </div>
-            <span className="text-2xl font-black italic tracking-tighter text-white">blaze</span>
+        <div className="flex flex-col items-center justify-center gap-4 py-3">
+          <div className="flex items-center justify-center w-full">
+             <img src={blazeLogo.url} alt="Blaze" className="h-16 w-auto object-contain" />
           </div>
           <div className="flex gap-2.5">
             <a 
