@@ -50,7 +50,7 @@ import {
   BLAZE_GAP_Y,
 } from "@/components/double/BlazeResultCard";
 
-import { getSignals, subscribeSignals, type StoredSignal, getRobotEnabled, subscribeRobot, getPredictiveSignals, subscribePredictive } from "@/lib/signalsStore";
+import { getSignals, subscribeSignals, type StoredSignal, getRobotEnabled, subscribeRobot } from "@/lib/signalsStore";
 import { Sidebar } from "@/components/Sidebar";
 import { AppHeader } from "@/components/AppHeader";
 import { useSection } from "@/lib/sectionStore";
@@ -715,7 +715,6 @@ function Index() {
   );
 
   const storedSignals = useSyncExternalStore(subscribeSignals, getSignals, getSignals);
-  const predictiveSignals = useSyncExternalStore(subscribePredictive, getPredictiveSignals, getPredictiveSignals);
 
   type GridRow = { key: string; label: string; order: number; cells: Spin[][] };
 
@@ -859,6 +858,7 @@ function Index() {
   }, [gridRows]);
 
   const signalsByHM = useMemo(() => {
+
     const fmt = new Intl.DateTimeFormat("en-GB", {
       timeZone: "America/Sao_Paulo",
       hour: "2-digit",
@@ -874,26 +874,8 @@ function Index() {
       arr.push(s);
       map.set(key, arr);
     }
-    
-    for (const ps of predictiveSignals) {
-      if (!ps.entryDate) continue;
-      const d = new Date(ps.entryDate);
-      if (Number.isNaN(d.getTime())) continue;
-      const key = fmt.format(d); // "HH:MM"
-      const arr = map.get(key) ?? [];
-      const s: StoredSignal = {
-        id: ps.key,
-        color: "white",
-        entry: 1,
-        targetIso: new Date(ps.entryDate).toISOString(),
-        outcome: ps.outcome || "pending",
-        matchedIso: ps.resultTime ? new Date().toISOString() : undefined 
-      };
-      arr.push(s);
-      map.set(key, arr);
-    }
     return map;
-  }, [storedSignals, predictiveSignals]);
+  }, [storedSignals]);
 
 
   return (
@@ -1318,21 +1300,10 @@ function Index() {
                             {row.cells.map((cell, ci) => {
                             const [hh, mmPrefix] = row.label.split(":");
                             const hm = `${hh}:${mmPrefix[0]}${ci}`;
-                             const cellSignals = signalsByHM.get(hm) ?? [];
-                             
-                             // Filtrar sinais que estão num raio de 3 minutos (casas)
-                             const now = new Date();
-                             const nearbySignals = cellSignals.filter(s => {
-                               const target = new Date(s.targetIso);
-                               const diffMs = target.getTime() - now.getTime();
-                               const diffMin = diffMs / 60_000;
-                               // Mostrar se o sinal é no passado (até sumir) ou até 3 minutos no futuro
-                               return diffMin <= 3;
-                             });
-
-                             const green = robotOn ? nearbySignals.find((s) => s.outcome === "green") : undefined;
-                             const pending = robotOn ? nearbySignals.find((s) => s.outcome === "pending") : undefined;
-                             const red = robotOn ? nearbySignals.find((s) => s.outcome === "red") : undefined;
+                            const cellSignals = signalsByHM.get(hm) ?? [];
+                            const green = robotOn ? cellSignals.find((s) => s.outcome === "green") : undefined;
+                            const pending = robotOn ? cellSignals.find((s) => s.outcome === "pending") : undefined;
+                            const red = robotOn ? cellSignals.find((s) => s.outcome === "red") : undefined;
                             let badge: null | { label: string; tone: "exato" | "margem" | "pending" | "loss" } = null;
                             if (green) {
                               const diff = green.matchedIso
@@ -1421,7 +1392,7 @@ function Index() {
                                          const isSlotActive = highlightKey ? (highlightKey === `col-${ci}`) : (highlightN.size === 0);
                                          return (
                                           <div key={`p-${ci}-${i}`} className="flex flex-col items-center" style={{ opacity: isSlotActive ? 1 : 0.25 }}>
-                                            <div className="relative flex h-[48px] w-[48px] items-center justify-center overflow-hidden rounded-[6px] border-[2.5px] border-emerald-400 bg-white shadow-sm shadow-emerald-500/20">
+                                            <div className="relative flex h-[48px] w-[48px] items-center justify-center overflow-hidden rounded-[6px] border-[2.5px] border-emerald-400 bg-white shadow-sm">
                                               <img
                                                 src={brancoTile.url}
                                                 alt="Sinal"
@@ -1429,7 +1400,7 @@ function Index() {
                                                 draggable={false}
                                               />
                                             </div>
-                                            <span className="mt-[5px] text-[11px] tabular-nums font-bold h-[11px] flex items-center text-emerald-400">
+                                            <span className="mt-[5px] text-[11px] tabular-nums font-medium h-[11px] flex items-center text-[#8ebcf0]">
                                               {hm}
                                             </span>
                                           </div>
