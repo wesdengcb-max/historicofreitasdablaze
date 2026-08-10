@@ -27,17 +27,20 @@ function LandingPage() {
       
       {/* BACKGROUND ELEMENTS */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        {/* Subtle Grid */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:60px_60px] opacity-20" />
+        {/* Dark Radial Gradient */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(0,0,0,0)_0%,#030303_70%)]" />
         
-        {/* Glow Effects */}
-        <div className="absolute top-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full bg-red-600/5 blur-[120px] animate-pulse" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-red-600/5 blur-[120px]" />
-        
-        {/* Geometric Lines */}
-        <svg className="absolute inset-0 w-full h-full opacity-[0.03]" viewBox="0 0 100 100" preserveAspectRatio="none">
-          <path d="M0 0 L100 100 M100 0 L0 100" stroke="red" strokeWidth="0.1" />
-        </svg>
+        {/* Floating Suits like Reference */}
+        <div className="absolute top-[10%] left-[10%] w-[300px] h-[300px] opacity-[0.03] rotate-[15deg]">
+          <svg viewBox="0 0 24 24" fill="currentColor" className="text-blue-500">
+             <path d="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z" />
+          </svg>
+        </div>
+        <div className="absolute bottom-[20%] right-[10%] w-[400px] h-[400px] opacity-[0.02] rotate-[-10deg]">
+          <svg viewBox="0 0 24 24" fill="currentColor" className="text-blue-400">
+            <path d="M12,2C12,2 4,9 4,14C4,18.42 7.58,22 12,22C16.42,22 20,18.42 20,14C20,9 12,2 12,2Z" />
+          </svg>
+        </div>
       </div>
 
       {/* HEADER / NAVBAR */}
