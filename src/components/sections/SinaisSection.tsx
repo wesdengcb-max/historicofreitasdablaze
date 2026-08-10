@@ -477,7 +477,7 @@ export default function SinaisSection() {
                   </td>
                   <td className="px-3 py-4">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-black text-white/90">{s.symbols}</span>
+                      <span className="text-sm font-black text-white/90">{s.symbols.includes('⚪️') ? s.symbols : `${s.symbols}⚪️`}</span>
                     </div>
                   </td>
                   <td className="px-3 py-4">

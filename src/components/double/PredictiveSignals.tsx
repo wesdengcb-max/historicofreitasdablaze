@@ -86,6 +86,8 @@ export function PredictiveSignals() {
   const [mode1, setMode1] = useState<Mode1Signal[] | null>(null);
   const [mode2, setMode2] = useState<Mode2Signal[] | null>(null);
   const [hasClicked, setHasClicked] = useState(false);
+  const [showBranco, setShowBranco] = useState(false);
+  const [showProximaLista, setShowProximaLista] = useState(false);
   const [generatedAt, setGeneratedAt] = useState<Date | null>(null);
 
   useEffect(() => {
@@ -144,6 +146,16 @@ export function PredictiveSignals() {
   const hasOpportunity = active.length > 0;
 
   const generate = useCallback(() => {
+    if (showBranco) {
+      setShowBranco(false);
+      setHasClicked(false);
+      setMode1(null);
+      setMode2(null);
+      setPredictiveSignals([]);
+      return;
+    }
+
+    setShowBranco(true);
     setHasClicked(true);
     const now = new Date();
     now.setSeconds(0, 0);
@@ -394,9 +406,17 @@ export function PredictiveSignals() {
     }
   }, [rows, loading, active, engine]);
 
+
   const generateProximaLista = useCallback(() => {
     if (rows.length === 0) return;
 
+    if (showProximaLista) {
+      setShowProximaLista(false);
+      setProximaListaSignals([]);
+      return;
+    }
+
+    setShowProximaLista(true);
     // Horário atual no fuso de São Paulo
     const nowInSP = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
     const currentYear = nowInSP.getFullYear();
@@ -405,7 +425,6 @@ export function PredictiveSignals() {
     const currentHour = nowInSP.getHours();
 
     // Determinar a hora anterior (ex: se agora é 02:xx, analisar 01:00-01:59)
-    // Se agora for 00:xx, a hora anterior é 23:xx do dia anterior.
     const startTimeInSP = new Date(currentYear, currentMonth, currentDate, currentHour - 1, 0, 0);
     const endTimeInSP = new Date(currentYear, currentMonth, currentDate, currentHour - 1, 59, 59, 999);
 
@@ -443,16 +462,13 @@ export function PredictiveSignals() {
       if (roll === 6 || roll === 7) {
         symbols = "🔴⚪️";
       } 
-      // Regra 2: Pedra 8 ou 9 -> ⚫️ (mesmo minuto + 1 hora)
+      // Regra 2: Pedra 8 ou 9 -> ⚫️⚪️ (mesmo minuto + 1 hora)
       else if (roll === 8 || roll === 9) {
-        symbols = "⚫️";
+        symbols = "⚫️⚪️";
       }
 
       if (symbols) {
-        // O horário do sinal é EXATAMENTE a mesma hora atual (que é hora_anterior + 1)
         const displayTime = `${currentHour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`;
-        
-        // Criar data de entrada para ordenação e validação (no dia atual)
         const entryDate = new Date(currentYear, currentMonth, currentDate, currentHour, min, 0);
 
         listSignals.push({
@@ -466,7 +482,7 @@ export function PredictiveSignals() {
     }
 
     setProximaListaSignals(listSignals);
-  }, [rows]);
+  }, [rows, showProximaLista]);
 
   return (
     <div className="space-y-6">
@@ -489,7 +505,7 @@ export function PredictiveSignals() {
             onClick={generate}
             className={
               hasOpportunity && !loading
-                ? "relative overflow-hidden rounded-xl bg-gradient-to-br from-primary via-primary/90 to-blue-600 px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] text-white shadow-[0_8px_20px_-6px_rgba(59,130,246,0.5)] transition-all hover:scale-[1.02] hover:shadow-[0_12px_25px_-6px_rgba(59,130,246,0.6)] active:scale-[0.98] font-outfit border border-white/10 group"
+                ? `relative overflow-hidden rounded-xl bg-gradient-to-br ${showBranco ? 'from-zinc-700 via-zinc-800 to-zinc-900 shadow-zinc-500/20' : 'from-primary via-primary/90 to-blue-600 shadow-[0_8px_20px_-6px_rgba(59,130,246,0.5)]'} px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] text-white transition-all hover:scale-[1.02] active:scale-[0.98] font-outfit border border-white/10 group`
                 : "rounded-xl border border-white/5 bg-white/[0.03] px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] text-[#9CA3AF] opacity-50 font-outfit"
             }
           >
@@ -502,7 +518,7 @@ export function PredictiveSignals() {
               ) : hasOpportunity ? (
                 <>
                   <Sparkles className="h-3.5 w-3.5" />
-                  <span>Próximo branco</span>
+                  <span>{showBranco ? "BOTÃO" : "BOTÃO"}</span>
                 </>
               ) : (
                 "Aguardando gatilho"
@@ -689,7 +705,7 @@ export function PredictiveSignals() {
           onClick={generateProximaLista}
           className={
             !loading
-              ? "relative overflow-hidden rounded-xl bg-gradient-to-br from-red-600 via-red-500 to-red-700 px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] text-white shadow-[0_8px_20px_-6px_rgba(239,68,68,0.5)] transition-all hover:scale-[1.02] hover:shadow-[0_12px_25px_-6px_rgba(239,68,68,0.6)] active:scale-[0.98] font-outfit border border-white/10 group"
+              ? `relative overflow-hidden rounded-xl bg-gradient-to-br ${showProximaLista ? 'from-zinc-700 via-zinc-800 to-zinc-900 shadow-zinc-500/20' : 'from-red-600 via-red-500 to-red-700 shadow-red-500/50'} px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] text-white transition-all hover:scale-[1.02] active:scale-[0.98] font-outfit border border-white/10 group`
               : "rounded-xl border border-white/5 bg-white/[0.03] px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] text-[#9CA3AF] opacity-50 font-outfit"
           }
         >
@@ -702,7 +718,7 @@ export function PredictiveSignals() {
             ) : (
               <>
                 <List className="h-3.5 w-3.5" />
-                <span>Gerar Lista de Cor</span>
+                <span>{showProximaLista ? "BOTÃO" : "BOTÃO"}</span>
               </>
             )}
           </div>
@@ -745,7 +761,7 @@ function ProximaListaDisplay() {
         {list.map((s) => (
           <div key={s.key} className="flex items-center justify-center gap-2 bg-white/[0.03] rounded-lg py-2 px-3 border border-white/[0.05]">
             <span className="text-sm font-black tabular-nums text-white font-outfit">{s.time}</span>
-            <span className="text-lg">{s.symbols}</span>
+            <span className="text-lg">{s.symbols.includes('⚪️') ? s.symbols : `${s.symbols}⚪️`}</span>
           </div>
         ))}
       </div>
