@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { ResultCircle } from "./ResultCircle";
 import { cn } from "@/lib/utils";
-import blazeLogo from "@/assets/blaze-logo.png.asset.json";
+import fwLogoAsset from "@/assets/fw-logo-new.png.asset.json";
 import { RefreshCcw } from "lucide-react";
 
 interface StatsCardProps {
