@@ -138,3 +138,45 @@ export function subscribePredictive(listener: () => void): () => void {
     window.removeEventListener(PREDICTIVE_EVENT, listener);
   };
 }
+
+export type ProximaListaSignal = {
+  key: string;
+  time: string;
+  symbols: string;
+  outcome?: "pending" | "green" | "red";
+  entryDate: Date;
+};
+
+const PROXIMA_LISTA_KEY = "freitas.proxima.lista";
+const PROXIMA_LISTA_EVENT = "freitas:proxima_lista";
+
+export function setProximaListaSignals(signals: ProximaListaSignal[]) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(PROXIMA_LISTA_KEY, JSON.stringify(signals));
+  } catch {
+    // ignore
+  }
+  window.dispatchEvent(new Event(PROXIMA_LISTA_EVENT));
+}
+
+export function getProximaListaSignals(): ProximaListaSignal[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(PROXIMA_LISTA_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function subscribeProximaLista(listener: () => void): () => void {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener(PROXIMA_LISTA_EVENT, listener);
+  window.addEventListener("storage", (e) => {
+    if (e.key === PROXIMA_LISTA_KEY) listener();
+  });
+  return () => {
+    window.removeEventListener(PROXIMA_LISTA_EVENT, listener);
+  };
+}
