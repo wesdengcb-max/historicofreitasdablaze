@@ -1301,9 +1301,20 @@ function Index() {
                             const [hh, mmPrefix] = row.label.split(":");
                             const hm = `${hh}:${mmPrefix[0]}${ci}`;
                             const cellSignals = signalsByHM.get(hm) ?? [];
-                            const green = robotOn ? cellSignals.find((s) => s.outcome === "green") : undefined;
-                            const pending = robotOn ? cellSignals.find((s) => s.outcome === "pending") : undefined;
-                            const red = robotOn ? cellSignals.find((s) => s.outcome === "red") : undefined;
+                            
+                            // Filtrar sinais que estão num raio de 3 minutos (casas)
+                            const now = new Date();
+                            const nearbySignals = cellSignals.filter(s => {
+                              const target = new Date(s.targetIso);
+                              const diffMs = target.getTime() - now.getTime();
+                              const diffMin = diffMs / 60_000;
+                              // Mostrar se o sinal é no passado (até sumir) ou até 3 minutos no futuro
+                              return diffMin <= 3;
+                            });
+
+                            const green = robotOn ? nearbySignals.find((s) => s.outcome === "green") : undefined;
+                            const pending = robotOn ? nearbySignals.find((s) => s.outcome === "pending") : undefined;
+                            const red = robotOn ? nearbySignals.find((s) => s.outcome === "red") : undefined;
                             let badge: null | { label: string; tone: "exato" | "margem" | "pending" | "loss" } = null;
                             if (green) {
                               const diff = green.matchedIso
@@ -1392,7 +1403,7 @@ function Index() {
                                          const isSlotActive = highlightKey ? (highlightKey === `col-${ci}`) : (highlightN.size === 0);
                                          return (
                                           <div key={`p-${ci}-${i}`} className="flex flex-col items-center" style={{ opacity: isSlotActive ? 1 : 0.25 }}>
-                                            <div className="relative flex h-[48px] w-[48px] items-center justify-center overflow-hidden rounded-[6px] border-[2.5px] border-emerald-400 bg-white shadow-sm">
+                                            <div className="relative flex h-[48px] w-[48px] items-center justify-center overflow-hidden rounded-[6px] border-[2.5px] border-emerald-400 bg-white shadow-sm shadow-emerald-500/20">
                                               <img
                                                 src={brancoTile.url}
                                                 alt="Sinal"
@@ -1400,7 +1411,7 @@ function Index() {
                                                 draggable={false}
                                               />
                                             </div>
-                                            <span className="mt-[5px] text-[11px] tabular-nums font-medium h-[11px] flex items-center text-[#8ebcf0]">
+                                            <span className="mt-[5px] text-[11px] tabular-nums font-bold h-[11px] flex items-center text-emerald-400">
                                               {hm}
                                             </span>
                                           </div>
