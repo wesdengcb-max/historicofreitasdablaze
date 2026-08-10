@@ -761,7 +761,7 @@ function ProximaListaDisplay() {
         {list.map((s) => (
           <div key={s.key} className="flex items-center justify-center gap-2 bg-white/[0.03] rounded-lg py-2 px-3 border border-white/[0.05]">
             <span className="text-sm font-black tabular-nums text-white font-outfit">{s.time}</span>
-            <span className="text-lg">{s.symbols}</span>
+            <span className="text-lg">{s.symbols.includes('⚪️') ? s.symbols : `${s.symbols}⚪️`}</span>
           </div>
         ))}
       </div>
