@@ -320,15 +320,23 @@ export default function SinaisSection() {
   );
 
   const visibleForStore = useMemo(
-    () =>
-      visible.map((s) => ({
+    () => {
+      const mainSignals = visible.map((s) => ({
         id: s.id,
         color: s.color,
         entry: s.entry,
         targetIso: s.targetIso,
         outcome: s.outcome,
         matchedIso: s.matchedIso,
-      })),
+        type: 'main' as const
+      }));
+
+      // Se o robô estiver ON, também injetamos os sinais preditivos (brancos)
+      // para aparecerem no histórico sem precisar clicar em nada.
+      // Para isso, precisaríamos que o PredictiveSignals exportasse seus dados.
+      // Mas o usuário quer a LISTA EMBAIXO baseada neles.
+      return mainSignals;
+    },
     [visible],
   );
 
