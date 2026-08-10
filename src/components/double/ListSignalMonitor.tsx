@@ -56,37 +56,64 @@ export function ListSignalMonitor() {
         const targetColor = signal.symbols.startsWith("🔴") ? 1 : (signal.symbols.startsWith("⚫️") ? 2 : 0);
         const targetColorName = targetColor === 1 ? "VERMELHO" : (targetColor === 2 ? "PRETO" : "BRANCO");
         
-        // Find ALL results strictly within the Signal + Gale 1 window
-        const signalResults = latestResults.filter(r => {
+        // IMPORTANT: The validation must only respect results that happened AFTER the signal generation timestamp
+        const signalGenerationTime = signal.generatedAt;
+        
+        // Find results strictly within the Signal + Gale 1 window AND AFTER the signal was generated
+        const allRelevantResults = latestResults.filter(r => {
           const resDate = new Date(r.created_at);
           const resTimeInSP = new Date(resDate.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" })).getTime();
-          return resTimeInSP >= signalStartTime && resTimeInSP < signalEndTime;
+          
+          // Must be within the window [signalStartTime, gale1EndTime)
+          const inWindow = resTimeInSP >= signalStartTime && resTimeInSP < gale1EndTime;
+          // AND Must be strictly AFTER the moment the signal was generated
+          const afterGeneration = resTimeInSP > signalGenerationTime;
+          
+          return inWindow && afterGeneration;
         });
 
-        const gale1Results = latestResults.filter(r => {
+        const resultsBeforeSignal = latestResults.filter(r => {
           const resDate = new Date(r.created_at);
           const resTimeInSP = new Date(resDate.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" })).getTime();
-          return resTimeInSP >= signalEndTime && resTimeInSP < gale1EndTime;
+          return resTimeInSP >= signalStartTime && resTimeInSP <= signalGenerationTime;
         });
-
-        const allResults = [...signalResults, ...gale1Results];
 
         console.log(`\n[SINAL]
-horário exato do sinal: ${signal.time}
-cor esperada: ${targetColorName} (${targetColor})
-timestamp início janela: ${new Date(signalStartTime).toISOString()}
-timestamp fim janela (G1): ${new Date(gale1EndTime).toISOString()}`);
+horário exibido: ${signal.time}
+timestamp exato do sinal: ${signalGenerationTime} (${new Date(signalGenerationTime).toISOString()})
+cor esperada: ${targetColorName} (${targetColor})`);
 
-        console.log(`[RESULTADOS ENCONTRADOS]`);
-        if (allResults.length === 0) {
-          console.log("(Nenhum resultado encontrado até agora)");
+        console.log(`[RESULTADOS ANTERIORES AO SINAL]`);
+        if (resultsBeforeSignal.length === 0) {
+          console.log("(Nenhum resultado anterior encontrado na janela)");
         }
-        allResults.forEach(r => {
-          console.log(`ID: ${r.id} | created_at: ${r.created_at} | roll: ${r.roll} | color: ${r.color}`);
+        resultsBeforeSignal.forEach(r => {
+          console.log(`ID: ${r.id} | created_at: ${r.created_at} | roll: ${r.roll} | color: ${r.color} -> IGNORADO (Anterior ao sinal)`);
+        });
+
+        console.log(`[RESULTADOS POSTERIORES AO SINAL]`);
+        if (allRelevantResults.length === 0) {
+          console.log("(Nenhum resultado posterior encontrado na janela até agora)");
+        }
+        allRelevantResults.forEach(r => {
+          console.log(`ID: ${r.id} | created_at: ${r.created_at} | roll: ${r.roll} | color: ${r.color} -> USADO NA VALIDAÇÃO`);
+        });
+
+        // Split into Sinal and Gale 1 for specific logging if needed
+        const signalResults = allRelevantResults.filter(r => {
+          const resDate = new Date(r.created_at);
+          const resTimeInSP = new Date(resDate.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" })).getTime();
+          return resTimeInSP < signalEndTime;
+        });
+
+        const gale1Results = allRelevantResults.filter(r => {
+          const resDate = new Date(r.created_at);
+          const resTimeInSP = new Date(resDate.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" })).getTime();
+          return resTimeInSP >= signalEndTime;
         });
 
         // 1. Check if ANY result is GREEN (Target color or White protection)
-        const greenResult = allResults.find(r => {
+        const greenResult = allRelevantResults.find(r => {
           const resColor = Number(r.color);
           const resRoll = Number(r.roll);
           const isWhite = resColor === 0 || resRoll === 0;
@@ -106,18 +133,24 @@ motivo: Sucesso encontrado no resultado ID ${greenResult.id} (Cor: ${greenResult
         const galeHasFinished = now > expiryTime;
         
         if (galeHasFinished) {
-          if (allResults.length > 0) {
+          if (allRelevantResults.length > 0) {
             console.log(`[RESULTADO DA VALIDAÇÃO]
 status: RED
-motivo: Janela G1 finalizada. ${allResults.length} resultado(s) analisado(s) e nenhum correspondeu à cor esperada.`);
+motivo: Janela G1 finalizada. ${allRelevantResults.length} resultado(s) analisado(s) e nenhum correspondeu à cor esperada.`);
           } else {
             console.log(`[RESULTADO DA VALIDAÇÃO]
 status: RED
-motivo: Prazo máximo expirado sem nenhum registro de resultado no banco.`);
+motivo: Prazo máximo expirado sem nenhum registro de resultado posterior ao sinal no banco.`);
           }
           changed = true;
           return { ...signal, outcome: "red" as const };
         }
+
+        // 3. Otherwise WAIT
+        console.log(`[RESULTADO DA VALIDAÇÃO]
+status: WAIT
+motivo: Aguardando processamento da janela (Sinal/Gale 1). Resultados atuais não conferem.`);
+        return signal;
 
         // 3. Otherwise WAIT
         console.log(`[RESULTADO DA VALIDAÇÃO]
