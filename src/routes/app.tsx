@@ -974,7 +974,7 @@ function Index() {
               </div>
               <div className="mt-auto border-t border-white/5 pt-3">
                 <p className="text-[11px] text-muted-foreground">
-                  O máximo de hoje foi de <span className="font-bold text-white">70</span> casas, começando no branco das <span className="font-bold text-white">10:11</span>.
+                  O máximo de hoje foi de <span className="font-bold text-white">{maxTodayCasas.max}</span> casas, começando no branco das <span className="font-bold text-white">{maxTodayCasas.time}</span>.
                 </p>
               </div>
             </Card>
