@@ -251,7 +251,7 @@ function LandingPage() {
           <FeatureCard 
             icon={<Shield size={28} />} 
             title="Dados Confiáveis" 
-            description="Informações organizadas e atualizadas para facilitar sua análise."
+            description="Informações 100% reais, seguras e atualizadas em tempo real."
           />
         </div>
       </section>
