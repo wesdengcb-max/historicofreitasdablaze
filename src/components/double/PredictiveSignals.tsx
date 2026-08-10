@@ -685,10 +685,23 @@ function ProximaListaDisplay() {
               <span className="text-sm font-black tabular-nums text-white font-outfit">{s.time}</span>
               <span className="text-lg">{s.symbols.includes('⚪️') ? s.symbols : `${s.symbols}⚪️`}</span>
             </div>
-            {s.outcome === 'green' && <CheckCircle2 size={14} className="text-green-500" />}
-            {s.outcome === 'red' && <XCircle size={14} className="text-red-500" />}
+            {s.outcome === 'green' && (
+              <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-green-500/20 border border-green-500/30 animate-in fade-in zoom-in duration-300">
+                <CheckCircle2 size={12} className="text-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
+                <span className="text-[9px] font-black text-green-500 uppercase tracking-wider font-outfit">GREEN</span>
+              </div>
+            )}
+            {s.outcome === 'red' && (
+              <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-red-500/20 border border-red-500/30 animate-in fade-in zoom-in duration-300">
+                <XCircle size={12} className="text-red-500" />
+                <span className="text-[9px] font-black text-red-500 uppercase tracking-wider font-outfit">RED</span>
+              </div>
+            )}
             {(!s.outcome || s.outcome === 'pending') && (
-              <Clock size={12} className="text-muted-foreground animate-pulse" />
+              <div className="flex items-center gap-1 opacity-40">
+                <Clock size={10} className="text-muted-foreground animate-pulse" />
+                <span className="text-[8px] font-bold text-muted-foreground uppercase font-outfit">WAIT</span>
+              </div>
             )}
           </div>
         ))}

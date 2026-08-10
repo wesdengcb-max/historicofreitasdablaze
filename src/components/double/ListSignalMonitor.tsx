@@ -59,7 +59,7 @@ export function ListSignalMonitor() {
           const resDate = new Date(r.created_at);
           // Convert result timestamp to SP time before comparing to the SP-based signalTime
           const resTimeInSP = new Date(resDate.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" })).getTime();
-          return resTimeInSP >= (signalTime - 60_000) && resTimeInSP < (twoMinutesAfter + 60_000);
+          return resTimeInSP >= (signalTime - 120_000) && resTimeInSP < (twoMinutesAfter + 60_000);
         });
 
         if (matches.length > 0) {
