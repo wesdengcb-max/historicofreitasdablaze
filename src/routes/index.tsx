@@ -86,11 +86,11 @@ function LandingPage() {
 
         {/* WELCOME TEXT */}
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mb-8 text-white animate-fade-in-up">
-          analise na aba sinais
+          vc esqueceu de me responder se ta pegando perfeito
         </h1>
 
         <p className="text-base md:text-lg text-[#d1d5db] mb-12 max-w-[700px] leading-relaxed font-medium animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-          Se ainda ta pegando o alta tendencia pq tem q manter funcionamento perfeito ocmo estava antas pegando tudo entende? Dps q fiz a mudança não mudou algo não na estrategia ou algo do tipo? Pq tem q mandar pegando perfeito pow
+          analise na aba sinais se ainda ta pegando o alta tendencia pq tem q manter funcionamento perfeito ocmo estava antas pegando tudo entende? Dps q fiz a mudança não mudou algo não na estrategia ou algo do tipo? Pq tem q mandar pegando perfeito pow
         </p>
 
         {/* CTA BUTTON */}
