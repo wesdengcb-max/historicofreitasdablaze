@@ -23,134 +23,84 @@ function LandingPage() {
   }, []);
 
   return (
-    <div className="relative min-h-screen bg-[#030303] text-white font-sans overflow-x-hidden selection:bg-red-500/30">
+    <div className="relative min-h-screen bg-[#020407] text-white font-sans flex flex-col items-center justify-center overflow-hidden selection:bg-red-500/30">
       
       {/* BACKGROUND ELEMENTS */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
         {/* Dark Radial Gradient */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(0,0,0,0)_0%,#030303_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,#0c1527_0%,#020407_70%)]" />
+        
+        {/* Central Cyan Glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-cyan-500/5 blur-[120px] rounded-full" />
         
         {/* Floating Suits like Reference */}
-        <div className="absolute top-[10%] left-[10%] w-[300px] h-[300px] opacity-[0.03] rotate-[15deg]">
-          <svg viewBox="0 0 24 24" fill="currentColor" className="text-blue-500">
-             <path d="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z" />
+        <div className="absolute top-[15%] left-[15%] w-[120px] h-[120px] opacity-[0.08] rotate-[15deg] animate-pulse">
+          <svg viewBox="0 0 24 24" fill="currentColor" className="text-cyan-400">
+            <path d="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z" />
           </svg>
         </div>
-        <div className="absolute bottom-[20%] right-[10%] w-[400px] h-[400px] opacity-[0.02] rotate-[-10deg]">
-          <svg viewBox="0 0 24 24" fill="currentColor" className="text-blue-400">
+        <div className="absolute top-[20%] right-[20%] w-[140px] h-[140px] opacity-[0.05] rotate-[-20deg]">
+          <svg viewBox="0 0 24 24" fill="currentColor" className="text-cyan-300">
             <path d="M12,2C12,2 4,9 4,14C4,18.42 7.58,22 12,22C16.42,22 20,18.42 20,14C20,9 12,2 12,2Z" />
+          </svg>
+        </div>
+        <div className="absolute bottom-[20%] left-[20%] w-[100px] h-[100px] opacity-[0.06] rotate-[10deg]">
+          <svg viewBox="0 0 24 24" fill="currentColor" className="text-cyan-500">
+            <path d="M12,2C9,2 7,4 7,7C7,8.6 7.6,10 8.6,11C6.7,11.3 5,13.2 5,15.5C5,18 7,20 9.5,20C10.5,20 11.5,19.6 12,19C12.5,19.6 13.5,20 14.5,20C17,20 19,18 19,15.5C19,13.2 17.3,11.3 15.4,11C16.4,10 17,8.6 17,7C17,4 15,2 12,2Z" />
+          </svg>
+        </div>
+        <div className="absolute bottom-[15%] right-[25%] w-[130px] h-[130px] opacity-[0.04] rotate-[-5deg]">
+          <svg viewBox="0 0 24 24" fill="currentColor" className="text-cyan-400">
+            <path d="M12,2L3.5,12L12,22L20.5,12L12,2Z" />
           </svg>
         </div>
       </div>
 
-      {/* HEADER / NAVBAR */}
-      <header 
-        className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 border-b ${
-          isScrolled ? "bg-black/80 backdrop-blur-xl border-white/10 py-4" : "bg-transparent border-transparent py-6"
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-12 h-12 rounded-full p-0.5 bg-gradient-to-br from-[#E50914] to-[#7f0000] shadow-[0_0_20px_rgba(229,9,20,0.4)] transition-transform duration-500 group-hover:rotate-[360deg] group-hover:scale-110">
-              <div className="w-full h-full rounded-full bg-black overflow-hidden flex items-center justify-center border border-white/10 relative">
-                <div className="absolute -top-2 left-1/2 -translate-x-1/2 text-[#E50914] z-10">
-                  <Crown size={14} fill="currentColor" />
-                </div>
-                <img 
-                  src={logoTextWhite.url} 
-                  alt="FreitasWhite Logo" 
-                  className="w-[85%] h-auto object-contain"
-                />
-              </div>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xl font-black tracking-tighter uppercase leading-none">
-                Freitas<span className="relative">W<span className="text-[#E50914]">hite</span></span>
-              </span>
-              <span className="text-[8px] font-bold text-gray-500 uppercase tracking-[0.3em] mt-1">Ecosystem Pro</span>
-            </div>
-          </Link>
-
-          {/* Navigation Links (Desktop) */}
-          <nav className="hidden lg:flex items-center gap-8">
-            {['Início', 'Histórico', 'Estatísticas', 'Probabilidades', 'Planos', 'Suporte'].map((item) => (
-              <Link 
-                key={item} 
-                to={item === 'Início' ? '/' : '/app'} 
-                className="text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-colors relative group"
-              >
-                {item}
-                <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-red-600 transition-all duration-300 group-hover:w-full" />
-              </Link>
-            ))}
-          </nav>
-
-          {/* Actions */}
-          <div className="flex items-center gap-4">
-            <button 
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="p-2 text-gray-400 hover:text-white transition-colors"
-            >
-              {theme === 'dark' ? <Moon size={18} /> : <Sun size={18} />}
-            </button>
-            
-            <Link to="/auth" className="hidden sm:block text-xs font-bold uppercase tracking-widest text-white hover:text-red-500 transition-colors px-4">
-              Entrar
-            </Link>
-            
-            <Link to="/auth">
-              <Button className="bg-[#E50914] hover:bg-[#ff1a1a] text-white text-xs font-bold uppercase tracking-widest px-8 rounded-full h-11 shadow-[0_0_20px_rgba(229,9,20,0.3)] border-t border-white/20 transition-all hover:scale-105 active:scale-95">
-                Cadastrar
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      {/* HERO SECTION */}
-      <section className="relative pt-32 lg:pt-48 pb-20 px-6 z-10 flex flex-col items-center text-center">
-        <div className="max-w-4xl mx-auto flex flex-col items-center animate-fade-in">
-          {/* Logo Centralized like Reference */}
-          <div className="flex flex-col items-center mb-10 group">
-            <div className="flex items-center gap-4">
-              <div className="w-20 h-20 relative">
-                <div className="absolute inset-0 bg-red-600 blur-[20px] opacity-20 group-hover:opacity-40 transition-opacity" />
-                <img 
-                  src={logoTextWhite.url} 
-                  alt="Blaze Logo" 
-                  className="w-full h-full object-contain relative z-10 drop-shadow-[0_0_15px_rgba(229,9,20,0.6)]"
-                />
-              </div>
-              <div className="flex flex-col items-start">
-                <span className="text-[10px] font-black tracking-[0.3em] text-gray-400 uppercase leading-none mb-1">
-                  HISTÓRICOS
-                </span>
-                <span className="text-6xl font-black tracking-tighter uppercase leading-none">
-                  Blaze
-                </span>
+      {/* HERO CONTENT - CENTERED VERTICALLY & HORIZONTALLY */}
+      <main className="relative z-10 w-full max-w-4xl px-6 flex flex-col items-center text-center py-20">
+        
+        {/* LOGO - CENTERED AT TOP OF HERO */}
+        <div className="flex items-center gap-4 mb-16 animate-fade-in">
+          {/* Flame Icon with Clock */}
+          <div className="w-16 h-16 relative flex items-center justify-center">
+            <div className="absolute inset-0 bg-[#ff3b5c] rounded-2xl rotate-45 opacity-20 blur-sm" />
+            <div className="relative z-10 text-[#ff3b5c]">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-14 h-14">
+                <path d="M12,2C12,2 12,7 9,10C6,13 6,17 9.5,20C10.5,21 13.5,21 14.5,20C18,17 18,13 15,10C12,7 12,2 12,2Z" />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center pt-2">
+                <Clock size={16} strokeWidth={2.5} className="text-white" />
               </div>
             </div>
           </div>
-
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-8">
-            Bem-vindo, Jogador!
-          </h1>
-
-          <p className="text-lg md:text-xl text-gray-400 mb-12 max-w-3xl leading-relaxed font-medium">
-            Com a nossa plataforma de resultados, o mercado de apostas pode ser mais lucrativo. Tendo acesso à milhares de resultados catalogados e que podem ser manipulados através de filtros. Em conjunto com bons estudos, você pode ser mais assertivo.
-          </p>
-
-          <Link to="/app">
-            <Button className="h-14 px-10 bg-[#E50914] hover:bg-[#ff1a1a] text-white font-black uppercase tracking-widest text-xs rounded-md flex items-center gap-3 group shadow-[0_10px_20px_rgba(229,9,20,0.3)] transition-all hover:scale-105 active:scale-95">
-              <div className="w-4 h-4 flex items-center justify-center">
-                <ArrowRight size={16} fill="currentColor" />
-              </div>
-              CONHECENDO AS FERRAMENTAS
-            </Button>
-          </Link>
+          
+          <div className="flex flex-col items-start">
+            <span className="text-[10px] font-bold tracking-[0.5em] text-gray-400 uppercase leading-none mb-1">
+              HISTÓRICOS
+            </span>
+            <span className="text-4xl md:text-5xl font-black tracking-tighter uppercase leading-none text-white">
+              Blaze
+            </span>
+          </div>
         </div>
-      </section>
+
+        {/* WELCOME TEXT */}
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mb-8 text-white animate-fade-in-up">
+          Bem-vindo, Jogador!
+        </h1>
+
+        <p className="text-base md:text-lg text-[#d1d5db] mb-12 max-w-[700px] leading-relaxed font-medium animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+          Com a nossa plataforma de resultados, o mercado de apostas pode ser mais lucrativo. Tendo acesso à milhares de resultados catalogados e que podem ser manipulados através de filtros. Em conjunto com bons estudos, você pode ser mais acertivo.
+        </p>
+
+        {/* CTA BUTTON */}
+        <Link to="/app" className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+          <Button className="h-14 px-10 bg-gradient-to-r from-[#ff4b5c] to-[#e63946] hover:from-[#ff5c6c] hover:to-[#f74a57] text-white font-black uppercase tracking-widest text-xs rounded-md flex items-center gap-3 shadow-[0px_4px_20px_rgba(230,57,70,0.4)] transition-all hover:scale-105 active:scale-95 border-none">
+            <span className="text-lg leading-none mt-[2px]">▷</span>
+            CONHECENDO AS FERRAMENTAS
+          </Button>
+        </Link>
+      </main>
 
       {/* MÉTRICAS SECTION */}
       <section className="relative z-20 px-6 pb-32">
