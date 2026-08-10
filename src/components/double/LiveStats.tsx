@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { ResultCircle } from "./ResultCircle";
 import { cn } from "@/lib/utils";
-import blazeLogo from "@/assets/blaze-logo.png.asset.json";
+import fwLogoAsset from "@/assets/fw-logo-new.png.asset.json";
 import { RefreshCcw } from "lucide-react";
 
 interface StatsCardProps {
@@ -58,7 +58,7 @@ export const LiveStats = memo(function LiveStats({
       <StatsCard title="Plataforma Atual">
         <div className="flex flex-col items-center justify-center gap-4 py-3">
           <div className="flex items-center justify-center w-full">
-             <img src={blazeLogo.url} alt="Blaze" className="h-16 w-auto object-contain" />
+             <img src={fwLogoAsset.url} alt="FW Logo" className="h-16 w-auto object-contain" />
           </div>
           <div className="flex justify-between w-full px-2 mt-2">
             <a 
