@@ -48,24 +48,23 @@ function LandingPage() {
         
         {/* LOGO - CENTERED AT TOP OF HERO */}
         <div className="flex items-center gap-4 mb-16 animate-fade-in">
-          {/* Flame Icon with Clock */}
-          <div className="w-16 h-16 relative flex items-center justify-center">
-            <div className="absolute inset-0 bg-[#ff3b5c] rounded-2xl rotate-45 opacity-20 blur-sm" />
-            <div className="relative z-10 text-[#ff3b5c]">
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-14 h-14">
-                <path d="M12,2C12,2 12,7 9,10C6,13 6,17 9.5,20C10.5,21 13.5,21 14.5,20C18,17 18,13 15,10C12,7 12,2 12,2Z" />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center pt-2">
-                <Clock size={16} strokeWidth={2.5} className="text-white" />
-              </div>
+          {/* Circular Icon with Logo */}
+          <div className="w-20 h-20 relative flex items-center justify-center">
+            <div className="absolute inset-0 bg-red-600 rounded-full opacity-20 blur-md animate-pulse" />
+            <div className="relative z-10 w-full h-full p-1 bg-black rounded-full border-2 border-red-600/50 overflow-hidden">
+              <img 
+                src={fwLogoAsset.url} 
+                alt="Logo" 
+                className="w-full h-full object-cover rounded-full"
+              />
             </div>
           </div>
           
           <div className="flex flex-col items-start">
-            <span className="text-[10px] font-bold tracking-[0.5em] text-gray-400 uppercase leading-none mb-1">
+            <span className="text-[12px] font-bold tracking-[0.6em] text-red-500 uppercase leading-none mb-1">
               HISTÓRICOS
             </span>
-            <span className="text-4xl md:text-5xl font-black tracking-tighter uppercase leading-none text-white">
+            <span className="text-4xl md:text-6xl font-black tracking-tighter uppercase leading-none text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
               Blaze
             </span>
           </div>
