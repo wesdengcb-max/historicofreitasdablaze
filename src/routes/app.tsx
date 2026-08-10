@@ -861,8 +861,8 @@ function Index() {
             countdown={countdown}
           />
 
-          <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-            <Card className="lg:col-span-2">
+          <section>
+            <Card>
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center gap-2">
@@ -885,10 +885,6 @@ function Index() {
                   </div>
                 </div>
               </div>
-            </Card>
-
-            <Card title="Estratégias Ativas" className="lg:col-span-1">
-               <StrategyTabs spins={visibleSpins} />
             </Card>
           </section>
 
