@@ -28,9 +28,9 @@ export function ListSignalMonitor() {
       // Get latest results to verify signals
       const { data: latestResults } = await supabase
         .from("blaze_results")
-        .select("roll, color, created_at")
+        .select("id, roll, color, created_at")
         .order("created_at", { ascending: false })
-        .limit(500);
+        .limit(1000);
 
       if (!latestResults || latestResults.length === 0) return;
 
