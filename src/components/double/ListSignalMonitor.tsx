@@ -38,47 +38,44 @@ export function ListSignalMonitor() {
       const updatedSignals = currentSignals.map(signal => {
         if (signal.outcome && signal.outcome !== "pending") return signal;
 
-        // Use a stable SP-based comparison for the outcome monitoring
         const spTimeStr = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
         const now = new Date(spTimeStr).getTime();
         
         const signalDate = new Date(signal.entryDate);
         const signalTime = signalDate.getTime();
         
-        // Give it 2 minutes + 30s buffer to account for the result being recorded
-        const twoMinutesAfter = signalTime + 120_000;
-        const expiryTime = twoMinutesAfter + 30_000;
+        // Window for validation: Target minute and next minute (Gale 1)
+        // With expanded tolerance for late result recording
+        const gale1EndTime = signalTime + 120_000;
+        const expiryTime = gale1EndTime + 60_000;
 
         if (now < signalTime) return signal; // Future signal
 
         const targetColor = signal.symbols.startsWith("🔴") ? 1 : (signal.symbols.startsWith("⚫️") ? 2 : 0);
         
         // Find results in the window [signalTime, signalTime + 2min]
-        // We include a 30s lead buffer in case of minor timestamp drifts in the DB
+        // Expanded window to capture signals that might be delayed in database recording
         const matches = latestResults.filter(r => {
           const resDate = new Date(r.created_at);
-          // Convert result timestamp to SP time before comparing to the SP-based signalTime
           const resTimeInSP = new Date(resDate.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" })).getTime();
-          return resTimeInSP >= (signalTime - 120_000) && resTimeInSP < (twoMinutesAfter + 60_000);
+          // Look from 1 min before (just in case) to Gale 1 end
+          return resTimeInSP >= (signalTime - 60_000) && resTimeInSP < (gale1EndTime + 30_000);
         });
 
-        if (matches.length > 0) {
-          const isGreen = matches.some(r => {
-            const resColor = Number(r.color);
-            // GREEN if it hits the target color OR white (protection)
-            return resColor === targetColor || resColor === 0;
-          });
-          
-          if (isGreen) {
-            console.log(`[ListSignalMonitor] Signal ${signal.time} (${signal.symbols}) is GREEN`, matches);
-            changed = true;
-            return { ...signal, outcome: "green" as const };
-          }
+        const isGreen = matches.some(r => {
+          const resColor = Number(r.color);
+          return resColor === targetColor || resColor === 0;
+        });
+
+        if (isGreen) {
+          console.log(`[ListSignalMonitor] Signal ${signal.time} is GREEN`, matches);
+          changed = true;
+          return { ...signal, outcome: "green" as const };
         }
 
         // Only mark as RED if the time window (G1) has fully passed + buffer
         if (now > expiryTime) {
-          console.log(`[ListSignalMonitor] Signal ${signal.time} (${signal.symbols}) is RED - No matches in window`, matches);
+          console.log(`[ListSignalMonitor] Signal ${signal.time} is RED`, matches);
           changed = true;
           return { ...signal, outcome: "red" as const };
         }
