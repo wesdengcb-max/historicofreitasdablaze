@@ -715,6 +715,7 @@ function Index() {
   );
 
   const storedSignals = useSyncExternalStore(subscribeSignals, getSignals, getSignals);
+  const predictiveSignals = useSyncExternalStore(subscribePredictive, getPredictiveSignals, getPredictiveSignals);
 
   type GridRow = { key: string; label: string; order: number; cells: Spin[][] };
 
