@@ -23,6 +23,7 @@ type Props = {
   dimmed?: boolean;
   selected?: boolean;
   delay?: number;
+  signal?: StoredSignal;
   onClick?: () => void;
 };
 
