@@ -322,7 +322,8 @@ export default function SinaisSection() {
       }).filter(s => {
         if (!s.entryDate || !s.outcome || s.outcome === "pending") return true;
         const targetTime = new Date(s.entryDate).getTime();
-        return now < targetTime + WHITE_MARGIN_MS + REMOVE_DELAY_MS;
+        // Remove 3 minutes after the outcome is decided (which is at most windowEnd + MARGIN_MS)
+        return now < targetTime + WHITE_MARGIN_MS + MARGIN_MS + REMOVE_DELAY_MS;
       });
 
       setPredictiveList(validated);
@@ -491,7 +492,7 @@ export default function SinaisSection() {
                   <td className="px-3 py-4">
                     {!s.outcome || s.outcome === "pending" ? (
                       <div className="inline-flex items-center gap-2 rounded-md bg-white/[0.05] border border-white/10 px-3 py-1 text-[10px] font-black tracking-widest text-muted-foreground uppercase font-mono">
-                        Monitorando
+                        MONITORANDO
                       </div>
                     ) : (
                       <div
