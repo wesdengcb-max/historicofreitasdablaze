@@ -145,15 +145,6 @@ export function PredictiveSignals() {
 
   const hasOpportunity = active.length > 0;
 
-  const generate = useCallback(() => {
-    if (showBranco) {
-      setShowBranco(false);
-      setHasClicked(false);
-      setMode1(null);
-      setMode2(null);
-      setPredictiveSignals([]);
-      return;
-    }
 
     setShowBranco(true);
     setHasClicked(true);
