@@ -244,9 +244,9 @@ function LandingPage() {
             description="Visualize gráficos, tendências e informações importantes dos dados."
           />
           <FeatureCard 
-            icon={<Search size={28} />} 
-            title="Probabilidades" 
-            description="Ferramentas de análise baseadas nos dados históricos disponíveis."
+            icon={<Target size={28} />} 
+            title="Probabilidades Reais" 
+            description="Saiba as chances reais de cada cor, número ou padrão."
           />
           <FeatureCard 
             icon={<Shield size={28} />} 
