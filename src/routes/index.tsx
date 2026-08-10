@@ -260,6 +260,19 @@ function LandingPage() {
         </div>
       </section>
 
+      {/* DADOS CONFIÁVEIS DETAIL SECTION */}
+      <section className="relative z-10 px-6 py-20 bg-black/50 border-y border-white/5">
+        <div className="max-w-4xl mx-auto flex flex-col items-center text-center">
+          <div className="w-20 h-20 bg-red-600/10 rounded-full flex items-center justify-center mb-8 border border-red-600/20 shadow-[0_0_40px_rgba(229,9,20,0.2)]">
+            <CheckCircle2 size={40} className="text-[#E50914]" />
+          </div>
+          <h3 className="text-3xl font-black uppercase tracking-tighter mb-4">Dados Confiáveis</h3>
+          <p className="text-gray-400 text-lg leading-relaxed font-medium">
+            Informações 100% reais, seguras e atualizadas em tempo real. Nossa plataforma utiliza tecnologia de ponta para garantir a precisão de cada dado processado.
+          </p>
+        </div>
+      </section>
+
       {/* FOOTER */}
       <footer className="relative z-10 border-t border-white/5 bg-[#050505] pt-20 pb-10 px-6">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
