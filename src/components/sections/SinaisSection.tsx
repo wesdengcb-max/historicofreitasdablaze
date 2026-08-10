@@ -158,12 +158,9 @@ function buildSignals(results: Result[]): Signal[] {
           : "pending";
       const matchedWhiteTime = matchedWhite ? parseIso(matchedWhite.createdAt).getTime() : null;
       const removeAt =
-
-        outcome === "green"
-          ? Math.max(matchedWhiteTime ?? targetTime, targetTime) + RESULT_VISIBLE_MS
-          : outcome === "red"
-            ? windowEnd + RESULT_VISIBLE_MS
-            : Number.POSITIVE_INFINITY;
+        outcome === "green" || outcome === "red"
+          ? (matchedWhiteTime ?? windowEnd) + 3 * 60_000 // Remove após 3 minutos se for GREEN ou LOSS
+          : Number.POSITIVE_INFINITY;
 
       if (now > removeAt) continue;
 
@@ -258,9 +255,8 @@ export default function SinaisSection() {
 
   const signals = useMemo(() => {
     void tick;
-    const now = Date.now();
     const auto = buildSignals(results);
-    const manual = manualSignals.filter((s) => s.entryDate.getTime() > now);
+    const manual = manualSignals;
     return [...auto, ...manual].sort((a, b) => a.entryDate.getTime() - b.entryDate.getTime());
   }, [results, tick, manualSignals]);
 
@@ -430,32 +426,6 @@ export default function SinaisSection() {
       {/* Roleta ao vivo */}
       <BlazeRoulette results={results} />
 
-      {/* Estratégias Personalizadas */}
-      <Card className="glass-card !p-0 overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.05] bg-white/[0.02]">
-          <div className="flex items-center gap-4">
-            <div className="grid h-10 w-10 place-items-center rounded-xl bg-amber-500/10 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.1)]">
-              <Cpu className="h-5 w-5" />
-            </div>
-            <h2 className="font-black text-xl text-white font-outfit uppercase tracking-tight">Estratégias Personalizadas</h2>
-          </div>
-          <div className="text-[11px] tracking-widest font-mono text-muted-foreground border border-border rounded-full px-3 py-1">
-            [ ● 0 ATIVAS ]
-          </div>
-        </div>
-        <div className="grid grid-cols-[80px_1fr_1fr_100px] px-5 py-3 text-[10px] tracking-widest text-muted-foreground font-mono border-b border-border">
-          <div>BOT</div><div>PADRÃO</div><div>PLACAR</div><div className="text-right">AÇÕES</div>
-        </div>
-        <div className="py-14 flex flex-col items-center justify-center text-center">
-          <div className="grid h-16 w-16 place-items-center rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 mb-4">
-            <Cpu className="h-7 w-7" />
-          </div>
-          <div className="font-bold">Nenhuma estratégia cadastrada</div>
-          <div className="text-sm text-muted-foreground max-w-xs">
-            Crie uma estratégia automática com padrão de cores para o bot seguir.
-          </div>
-        </div>
-      </Card>
 
       {/* Lista de Sinais */}
       <Card className="glass-card !p-0 overflow-hidden">
@@ -527,16 +497,22 @@ export default function SinaisSection() {
                 </tr>
               ))}
 
-              {/* Sinais Manuais e Automáticos de Histórico */}
+              {visible.length > 0 && (
+                <tr className="bg-white/[0.02]">
+                  <td colSpan={6} className="px-4 py-3 text-[10px] font-black tracking-[0.3em] text-muted-foreground/40 uppercase font-outfit border-b border-white/[0.05]">
+                    [ Histórico de Sinais ]
+                  </td>
+                </tr>
+              )}
               {visible.map((s) => (
                 <tr
                   key={s.id}
-                  className={`border-b last:border-0 transition-colors ${
+                  className={`border-b border-white/[0.03] transition-colors ${
                     s.outcome === "green"
-                      ? "border-emerald-500/30 bg-emerald-500/10"
+                      ? "bg-emerald-500/5 hover:bg-emerald-500/10"
                       : s.outcome === "red"
-                        ? "border-red-500/30 bg-red-500/10"
-                        : "border-border hover:bg-surface/40"
+                        ? "bg-red-500/5 hover:bg-red-500/10"
+                        : "hover:bg-white/[0.03]"
                   }`}
                 >
                   <td className="px-4 py-4">
@@ -546,20 +522,19 @@ export default function SinaisSection() {
                     />
                   </td>
                   <td className="px-3 py-4">
-                    <div className="font-bold font-mono">{s.time}</div>
+                    <div className="font-bold font-mono text-white">{s.time}</div>
                     <div className="text-[10px] text-muted-foreground font-mono">{s.date}</div>
                   </td>
                   <td className="px-3 py-4">
-                    <div className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5">
+                    <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.05] bg-white/[0.02] px-3 py-1.5">
                       <ResultCircle color={s.color} size="sm" animate={false} />
-                      <span className="text-sm font-semibold">
+                      <span className="text-xs font-bold text-white/90">
                         {s.color === "white" ? "Branco" : s.color === "red" ? "Vermelho" : "Preto"}
                       </span>
-
                     </div>
                   </td>
                   <td className="px-3 py-4">
-                    <div className="inline-flex items-center rounded-md border border-border bg-surface px-3 py-1 font-mono text-xs">
+                    <div className="inline-flex items-center rounded-md border border-white/[0.05] bg-white/[0.02] px-3 py-1 font-mono text-[10px] text-white/70">
                       {s.entry}ª · G{s.entry - 1}
                     </div>
                   </td>
@@ -570,19 +545,19 @@ export default function SinaisSection() {
                           checked={!disabled.has(s.id)}
                           onCheckedChange={() => toggleStatus(s.id)}
                         />
-                        <span className="text-xs font-mono tracking-widest text-muted-foreground">
-                          AGUARDANDO
+                        <span className="text-[10px] font-black tracking-widest text-muted-foreground/60 uppercase font-mono">
+                          Aguardando
                         </span>
                       </div>
                     ) : (
                       <div
-                        className={`inline-flex items-center rounded-md px-3 py-1 font-mono text-xs font-black tracking-widest ${
+                        className={`inline-flex items-center rounded-md px-3 py-1 font-mono text-[10px] font-black tracking-widest border ${
                           s.outcome === "green"
-                            ? "bg-emerald-500/20 text-emerald-300"
-                            : "bg-red-500/20 text-red-300"
+                            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                            : "bg-red-500/10 text-red-400 border-red-500/20"
                         }`}
                       >
-                        {s.outcome === "green" ? "GREEN" : "RED"}
+                        {s.outcome === "green" ? "WIN" : "LOSS"}
                         {s.resultTime ? ` · ${s.resultTime}` : ""}
                       </div>
                     )}
@@ -590,10 +565,10 @@ export default function SinaisSection() {
                   <td className="px-3 py-4">
                     <button
                       onClick={() => removeSignal(s.id)}
-                      className="grid h-9 w-9 place-items-center rounded-md border border-border hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/40 transition-colors"
+                      className="grid h-8 w-8 place-items-center rounded-lg border border-white/[0.05] hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/20 transition-colors"
                       aria-label="Remover"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-3.5 w-3.5" />
                     </button>
                   </td>
                 </tr>
