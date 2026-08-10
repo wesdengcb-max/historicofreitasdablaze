@@ -114,13 +114,13 @@ function LandingPage() {
               </span>
             </div>
 
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black leading-[0.9] tracking-tighter uppercase mb-8">
+            <h1 className="text-5xl md:text-7xl lg:text-[5.5rem] font-black leading-[0.9] tracking-tighter uppercase mb-8">
               O histórico que separa <br />
               amadores de <span className="text-[#E50914] drop-shadow-[0_0_20px_rgba(229,9,20,0.5)]">vencedores.</span>
             </h1>
 
-            <p className="text-lg md:text-xl text-gray-400 mb-10 max-w-lg leading-relaxed font-medium">
-              Acesse cada rodada, analise padrões e tome decisões com base em dados históricos.
+            <p className="text-lg md:text-xl text-gray-400 mb-10 max-w-xl leading-relaxed font-medium">
+              Acesse cada rodada, analise padrões e tome decisões <br className="hidden md:block" /> com base em dados reais da Blaze.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-4 mb-12">
