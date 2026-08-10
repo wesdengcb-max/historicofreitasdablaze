@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useRef } from "react";
 import { 
   LayoutDashboard, 
   BarChart3, 
@@ -13,7 +13,8 @@ import {
   Lock,
   Crown,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Camera
 } from "lucide-react";
 import { setSection, useSection, type SectionId } from "@/lib/sectionStore";
 import { useVipStatus } from "@/lib/auth/vipStore";
@@ -48,13 +49,31 @@ const FERRAMENTAS: MenuItem[] = [
   { id: "simulador", title: "Simulador", icon: Dice5, isTool: true, soon: true },
 ];
 
-import fwLogoAsset from "@/assets/fw-logo-link.png.asset.json";
+import { useAvatar, setAvatar } from "@/lib/avatarStore";
 
 export const Sidebar = memo(function Sidebar() {
 
   const active = useSection();
   const isVip = useVipStatus();
   const { isCollapsed, toggle } = useSidebarStore();
+  const avatar = useAvatar();
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("Selecione um arquivo de imagem.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setAvatar(String(reader.result));
+      toast.success("Foto de perfil atualizada!");
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
 
   const handleItemClick = (item: MenuItem) => {
     if (item.soon) return;
@@ -84,14 +103,32 @@ export const Sidebar = memo(function Sidebar() {
       {/* Profile / Logo Section */}
       <div className={cn("flex flex-col items-center py-8 px-4 mt-4", isCollapsed ? "px-2" : "px-6")}>
         <div className={cn(
-          "relative mb-4 overflow-hidden rounded-full border-2 border-red-500/20 p-1 transition-all duration-300",
+          "group/avatar relative mb-4 rounded-full border-2 border-red-500/20 transition-all duration-300",
           isCollapsed ? "h-12 w-12" : "h-20 w-20"
         )}>
-          <div className="h-full w-full rounded-full bg-gradient-to-b from-red-500 to-red-900 flex items-center justify-center overflow-hidden p-2">
-             <img src={fwLogoAsset.url} alt="Blaze" className="h-full w-full object-contain" />
-          </div>
-          {!isCollapsed && (
-            <div className="absolute bottom-0 right-0 rounded-full bg-red-500 p-1 shadow-lg">
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            title="Alterar foto de perfil"
+            className="relative block h-full w-full overflow-hidden rounded-full"
+          >
+            <img src={avatar} alt="Foto de perfil" className="h-full w-full rounded-full object-cover" />
+            <span className="absolute inset-0 flex flex-col items-center justify-center gap-0.5 rounded-full bg-black/70 opacity-0 transition-opacity duration-200 group-hover/avatar:opacity-100">
+              <Camera className="h-4 w-4 text-white" />
+              {!isCollapsed && (
+                <span className="text-[8px] font-black uppercase tracking-widest text-white">Alterar</span>
+              )}
+            </span>
+          </button>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleFile}
+          />
+          {isVip && (
+            <div className="pointer-events-none absolute -bottom-1 -right-1 rounded-full bg-red-500 p-1 shadow-[0_0_12px_rgba(239,68,68,0.7)] ring-2 ring-[#0A0A0A]">
                <Crown className="h-3 w-3 text-white" />
             </div>
           )}
