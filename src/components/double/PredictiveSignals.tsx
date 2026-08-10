@@ -347,8 +347,8 @@ export function PredictiveSignals() {
     const previousHourRows = rows.filter(r => {
       const d = new Date(r.created_at);
       const dInSP = new Date(d.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
-      // Use a small 5s tolerance at the boundaries if needed, but strict is usually better for "within hour"
-      return dInSP >= startTimeInSP && dInSP <= endTimeInSP;
+      // Use 1s tolerance to ensure we don't catch the first roll of the CURRENT hour
+      return dInSP >= startTimeInSP && dInSP < new Date(currentYear, currentMonth, currentDate, currentHour, 0, 0);
     });
 
     // Agrupar por minuto e pegar EXCLUSIVAMENTE a primeira pedra de cada minuto (created_at mais antigo)

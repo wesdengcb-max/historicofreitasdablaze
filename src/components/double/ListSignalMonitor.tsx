@@ -54,19 +54,19 @@ export function ListSignalMonitor() {
         const targetColor = signal.symbols.startsWith("🔴") ? 1 : (signal.symbols.startsWith("⚫️") ? 2 : 0);
         
         // Find results in the window [signalTime, signalTime + 2min]
-        // Expanded window to capture signals that might be delayed in database recording
         const matches = latestResults.filter(r => {
           const resDate = new Date(r.created_at);
           const resTimeInSP = new Date(resDate.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" })).getTime();
-          // Look from 1.5 min before to capture early rolls, and up to Gale 1 end
-          return resTimeInSP >= (signalTime - 90_000) && resTimeInSP < (gale1EndTime + 30_000);
+          // Precise window: Start at the beginning of the minute (0s) up to Gale 1 end (120s)
+          // Use a small buffer (5s) to avoid missing rolls at the exact second
+          return resTimeInSP >= (signalTime - 5000) && resTimeInSP < (gale1EndTime + 5000);
         });
 
         const isGreen = matches.some(r => {
           const resColor = Number(r.color);
           const resRoll = Number(r.roll);
-          // Special case: Blaze result might have color 1/2 but roll 0 is white.
-          // In Blaze, 0 is white. 1-7 is Red, 8-14 is Black.
+          
+          // In Blaze: 0 is white. 1-7 is Red, 8-14 is Black.
           const isWhite = resColor === 0 || resRoll === 0;
           const isTarget = resColor === targetColor;
           
@@ -80,7 +80,17 @@ export function ListSignalMonitor() {
         }
 
         // Only mark as RED if the time window (G1) has fully passed + buffer
-        if (now > expiryTime) {
+        // AND we found at least one result in that window that wasn't the target
+        const hasPassed = now > expiryTime;
+        const hasOppositeResult = matches.some(r => {
+          const resColor = Number(r.color);
+          const resRoll = Number(r.roll);
+          const isWhite = resColor === 0 || resRoll === 0;
+          const isTarget = resColor === targetColor;
+          return !isTarget && !isWhite;
+        });
+
+        if (hasPassed || (matches.length > 0 && hasOppositeResult && !isGreen)) {
           console.log(`[ListSignalMonitor] Signal ${signal.time} is RED`, matches);
           changed = true;
           return { ...signal, outcome: "red" as const };
