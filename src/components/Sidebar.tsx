@@ -79,22 +79,7 @@ export const Sidebar = memo(function Sidebar() {
       "fixed inset-y-0 left-0 z-50 flex flex-col border-r border-white/5 bg-[#0A0A0A] transition-all duration-300 ease-in-out",
       isCollapsed ? "w-[80px] -translate-x-full lg:translate-x-0" : "w-[260px] translate-x-0"
     )}>
-      {/* Collapse Toggle */}
-      <button 
-        onClick={toggle}
-        className={cn(
-          "absolute top-10 flex h-7 w-7 items-center justify-center rounded-full border border-white/20 bg-[#1A1A1A] text-white transition hover:bg-red-500 shadow-2xl z-[60] group ring-2 ring-black/80 lg:flex hidden",
-          isCollapsed ? "-right-3.5" : "-right-3.5"
-        )}
-      >
-        <div className="flex items-center justify-center transition-transform group-active:scale-90">
-          {isCollapsed ? (
-            <ChevronRight className="h-4 w-4 stroke-[3px]" />
-          ) : (
-            <ChevronLeft className="h-4 w-4 stroke-[3px]" />
-          )}
-        </div>
-      </button>
+      {/* Collapse Toggle removido daqui para usar apenas o do Header */}
 
       {/* Profile / Logo Section */}
       <div className={cn("flex flex-col items-center py-8 px-4 mt-4", isCollapsed ? "px-2" : "px-6")}>
