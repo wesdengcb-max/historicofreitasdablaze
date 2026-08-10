@@ -40,6 +40,7 @@ import { WhiteCelebration, WhiteAlertToggleFx } from "@/components/double/WhiteC
 import { StrategyTabs } from "@/components/double/StrategyTabs";
 import { LeftStatsDrawer } from "@/components/double/LeftStatsDrawer";
 import { LiveStats } from "@/components/double/LiveStats";
+import { SinaisSectionList } from "@/components/sections/SinaisSectionList";
 
 import { colorOf, fmtTime, type Spin } from "@/components/double/types";
 import {
