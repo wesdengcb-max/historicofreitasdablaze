@@ -392,7 +392,11 @@ export function PredictiveSignals() {
           symbols,
           entryDate,
           generatedAt: nowTimestamp,
-          outcome: "pending"
+          outcome: "pending",
+          generationContext: {
+            strategy: "Primeira pedra do minuto na hora anterior (+1h)",
+            historicalRows: [firstRow]
+          }
         });
       }
     }

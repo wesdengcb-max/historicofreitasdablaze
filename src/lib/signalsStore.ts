@@ -1,4 +1,5 @@
-// Store leve para compartilhar sinais entre /sinais e /historico via localStorage.
+import { create } from 'zustand';
+
 export type StoredSignal = {
   id: string;
   color: "red" | "black" | "white";
@@ -15,29 +16,18 @@ const EVENT = "freitas:signals";
 const ROBOT_EVENT = "freitas:robot";
 const PREDICTIVE_EVENT = "freitas:predictive";
 
-function read(): StoredSignal[] {
+export function getSignals(): StoredSignal[] {
   if (typeof window === "undefined") return [];
   try {
     const raw = window.localStorage.getItem(KEY);
-    return raw ? (JSON.parse(raw) as StoredSignal[]) : [];
+    return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
   }
 }
 
-let cache: StoredSignal[] = [];
-let hydrated = false;
-
-function ensureHydrated() {
-  if (hydrated) return;
-  hydrated = true;
-  cache = read();
-}
-
 export function setSignals(next: StoredSignal[]) {
   if (typeof window === "undefined") return;
-  ensureHydrated();
-  cache = next;
   try {
     window.localStorage.setItem(KEY, JSON.stringify(next));
   } catch {
@@ -46,24 +36,24 @@ export function setSignals(next: StoredSignal[]) {
   window.dispatchEvent(new Event(EVENT));
 }
 
-export function getSignals(): StoredSignal[] {
-  ensureHydrated();
-  return cache;
-}
-
 export function subscribeSignals(listener: () => void): () => void {
   if (typeof window === "undefined") return () => {};
-  const onChange = () => {
-    cache = read();
-    listener();
-  };
-  window.addEventListener(EVENT, onChange);
+  window.addEventListener(EVENT, listener);
   window.addEventListener("storage", (e) => {
-    if (e.key === KEY) onChange();
+    if (e.key === KEY) listener();
   });
   return () => {
-    window.removeEventListener(EVENT, onChange);
+    window.removeEventListener(EVENT, listener);
   };
+}
+
+export function getRobotEnabled(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(ROBOT_KEY) === "true";
+  } catch {
+    return false;
+  }
 }
 
 export function setRobotEnabled(enabled: boolean) {
@@ -74,15 +64,6 @@ export function setRobotEnabled(enabled: boolean) {
     // ignore
   }
   window.dispatchEvent(new Event(ROBOT_EVENT));
-}
-
-export function getRobotEnabled(): boolean {
-  if (typeof window === "undefined") return false;
-  try {
-    return window.localStorage.getItem(ROBOT_KEY) === "true";
-  } catch {
-    return false;
-  }
 }
 
 export function subscribeRobot(listener: () => void): () => void {
@@ -96,7 +77,7 @@ export function subscribeRobot(listener: () => void): () => void {
   };
 }
 
-export type PredictiveSignal = {
+export interface PredictiveSignal {
   key: string;
   time: string;
   pct: number;
@@ -106,7 +87,7 @@ export type PredictiveSignal = {
   outcome?: "pending" | "green" | "red";
   resultTime?: string;
   entryDate?: Date;
-};
+}
 
 export function setPredictiveSignals(signals: PredictiveSignal[]) {
   if (typeof window === "undefined") return;
@@ -146,6 +127,11 @@ export type ProximaListaSignal = {
   entryDate: Date;
   generatedAt: number;
   outcome?: "pending" | "green" | "red" | "waiting";
+  // Audit fields
+  generationContext?: {
+    strategy: string;
+    historicalRows: any[];
+  };
 };
 
 const PROXIMA_LISTA_KEY = "freitas.proxima.lista";
