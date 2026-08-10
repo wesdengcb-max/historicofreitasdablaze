@@ -283,7 +283,7 @@ export default function SinaisSection() {
       const raw = getPredictiveSignals();
       const now = Date.now();
       const WHITE_MARGIN_MS = 60_000;
-      const MARGIN_MS = 2 * 60_000; // Window for margin green (1-2 minutes)
+      const MARGIN_MS = 2 * 60_000; // Janela de 2 minutos para margem
       const REMOVE_DELAY_MS = 3 * 60_000;
 
       const validated = raw.map(s => {
