@@ -82,7 +82,10 @@ export const Sidebar = memo(function Sidebar() {
       {/* Collapse Toggle */}
       <button 
         onClick={toggle}
-        className="absolute -right-3.5 top-10 flex h-7 w-7 items-center justify-center rounded-full border border-white/20 bg-[#1A1A1A] text-white transition hover:bg-red-500 shadow-2xl z-[60] group ring-2 ring-black/80 lg:flex hidden"
+        className={cn(
+          "absolute top-10 flex h-7 w-7 items-center justify-center rounded-full border border-white/20 bg-[#1A1A1A] text-white transition hover:bg-red-500 shadow-2xl z-[60] group ring-2 ring-black/80 lg:flex hidden",
+          isCollapsed ? "-right-3.5" : "-right-3.5"
+        )}
       >
         <div className="flex items-center justify-center transition-transform group-active:scale-90">
           {isCollapsed ? (
