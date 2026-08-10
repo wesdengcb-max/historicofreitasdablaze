@@ -82,15 +82,23 @@ export function validateSignal(
   const spTimeStr = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
   const now = new Date(spTimeStr).getTime();
 
-  // Se já passou do horário do Gale 1 (HH:mm + 2 min) e não deu green
+  // 1. Se o horário de INÍCIO do sinal ainda não chegou, é WAIT
+  if (now < signalStartTime) {
+    const reason = `Horário do sinal (${signal.time}) ainda não chegou.`;
+    console.log(`DECISÃO: WAIT | MOTIVO: ${reason}`);
+    return { status: "wait", signal, expectedColor: targetColor, reason };
+  }
+
+  // 2. Se já passou do horário do Gale 1 (HH:mm + 2 min) e não deu green
   if (now > (gale1EndTime + 5000)) {
     const reason = `Janela finalizada sem a cor esperada.`;
     console.log(`DECISÃO: RED | MOTIVO: ${reason}`);
     return { status: "red", signal, expectedColor: targetColor, gale0, gale1, reason };
   }
 
-  // Caso contrário, se o horário ainda não chegou ou a janela está aberta
-  console.log(`DECISÃO: WAIT | MOTIVO: Aguardando horário ou resultados.`);
+  // 3. Caso contrário, a janela está aberta (estamos entre signalStartTime e gale1EndTime)
+  // Mas ainda não bateu a cor (senão teria retornado Green acima)
+  console.log(`DECISÃO: WAIT | MOTIVO: Janela aberta, aguardando resultados.`);
   return { status: "wait", signal, expectedColor: targetColor, gale0, gale1, reason: "Aguardando" };
 }
 
