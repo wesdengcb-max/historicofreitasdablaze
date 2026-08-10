@@ -1,5 +1,4 @@
-import { create } from 'zustand';
-
+// Store leve para compartilhar sinais entre /sinais e /historico via localStorage.
 export type StoredSignal = {
   id: string;
   color: "red" | "black" | "white";
@@ -16,18 +15,29 @@ const EVENT = "freitas:signals";
 const ROBOT_EVENT = "freitas:robot";
 const PREDICTIVE_EVENT = "freitas:predictive";
 
-export function getSignals(): StoredSignal[] {
+function read(): StoredSignal[] {
   if (typeof window === "undefined") return [];
   try {
     const raw = window.localStorage.getItem(KEY);
-    return raw ? JSON.parse(raw) : [];
+    return raw ? (JSON.parse(raw) as StoredSignal[]) : [];
   } catch {
     return [];
   }
 }
 
+let cache: StoredSignal[] = [];
+let hydrated = false;
+
+function ensureHydrated() {
+  if (hydrated) return;
+  hydrated = true;
+  cache = read();
+}
+
 export function setSignals(next: StoredSignal[]) {
   if (typeof window === "undefined") return;
+  ensureHydrated();
+  cache = next;
   try {
     window.localStorage.setItem(KEY, JSON.stringify(next));
   } catch {
@@ -36,24 +46,24 @@ export function setSignals(next: StoredSignal[]) {
   window.dispatchEvent(new Event(EVENT));
 }
 
-export function subscribeSignals(listener: () => void): () => void {
-  if (typeof window === "undefined") return () => {};
-  window.addEventListener(EVENT, listener);
-  window.addEventListener("storage", (e) => {
-    if (e.key === KEY) listener();
-  });
-  return () => {
-    window.removeEventListener(EVENT, listener);
-  };
+export function getSignals(): StoredSignal[] {
+  ensureHydrated();
+  return cache;
 }
 
-export function getRobotEnabled(): boolean {
-  if (typeof window === "undefined") return false;
-  try {
-    return window.localStorage.getItem(ROBOT_KEY) === "true";
-  } catch {
-    return false;
-  }
+export function subscribeSignals(listener: () => void): () => void {
+  if (typeof window === "undefined") return () => {};
+  const onChange = () => {
+    cache = read();
+    listener();
+  };
+  window.addEventListener(EVENT, onChange);
+  window.addEventListener("storage", (e) => {
+    if (e.key === KEY) onChange();
+  });
+  return () => {
+    window.removeEventListener(EVENT, onChange);
+  };
 }
 
 export function setRobotEnabled(enabled: boolean) {
@@ -64,6 +74,15 @@ export function setRobotEnabled(enabled: boolean) {
     // ignore
   }
   window.dispatchEvent(new Event(ROBOT_EVENT));
+}
+
+export function getRobotEnabled(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(ROBOT_KEY) === "true";
+  } catch {
+    return false;
+  }
 }
 
 export function subscribeRobot(listener: () => void): () => void {
@@ -77,7 +96,7 @@ export function subscribeRobot(listener: () => void): () => void {
   };
 }
 
-export interface PredictiveSignal {
+export type PredictiveSignal = {
   key: string;
   time: string;
   pct: number;
@@ -87,7 +106,7 @@ export interface PredictiveSignal {
   outcome?: "pending" | "green" | "red";
   resultTime?: string;
   entryDate?: Date;
-}
+};
 
 export function setPredictiveSignals(signals: PredictiveSignal[]) {
   if (typeof window === "undefined") return;
@@ -117,53 +136,5 @@ export function subscribePredictive(listener: () => void): () => void {
   });
   return () => {
     window.removeEventListener(PREDICTIVE_EVENT, listener);
-  };
-}
-
-export type ProximaListaSignal = {
-  key: string;
-  time: string;
-  symbols: string;
-  entryDate: Date;
-  generatedAt: number;
-  outcome?: "pending" | "green" | "red" | "waiting";
-  // Audit fields
-  generationContext?: {
-    strategy: string;
-    historicalRows: any[];
-  };
-};
-
-const PROXIMA_LISTA_KEY = "freitas.proxima.lista";
-const PROXIMA_LISTA_EVENT = "freitas:proxima_lista";
-
-export function setProximaListaSignals(signals: ProximaListaSignal[]) {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(PROXIMA_LISTA_KEY, JSON.stringify(signals));
-  } catch {
-    // ignore
-  }
-  window.dispatchEvent(new Event(PROXIMA_LISTA_EVENT));
-}
-
-export function getProximaListaSignals(): ProximaListaSignal[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = window.localStorage.getItem(PROXIMA_LISTA_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
-
-export function subscribeProximaLista(listener: () => void): () => void {
-  if (typeof window === "undefined") return () => {};
-  window.addEventListener(PROXIMA_LISTA_EVENT, listener);
-  window.addEventListener("storage", (e) => {
-    if (e.key === PROXIMA_LISTA_KEY) listener();
-  });
-  return () => {
-    window.removeEventListener(PROXIMA_LISTA_EVENT, listener);
   };
 }

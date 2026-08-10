@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { setPredictiveSignals, setProximaListaSignals, getProximaListaSignals, subscribeProximaLista, type ProximaListaSignal } from "@/lib/signalsStore";
-import { Loader2, Sparkles, Target, List, Layers, CheckCircle2, XCircle, Clock } from "lucide-react";
-import { ListSignalMonitor } from "./ListSignalMonitor";
+import { setPredictiveSignals } from "@/lib/signalsStore";
+import { Loader2, Sparkles, Target, Layers } from "lucide-react";
 import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
 import { Card } from "@/components/double/Card";
 import {
@@ -87,8 +86,6 @@ export function PredictiveSignals() {
   const [mode1, setMode1] = useState<Mode1Signal[] | null>(null);
   const [mode2, setMode2] = useState<Mode2Signal[] | null>(null);
   const [hasClicked, setHasClicked] = useState(false);
-  const [showBranco, setShowBranco] = useState(false);
-  const [showProximaLista, setShowProximaLista] = useState(false);
   const [generatedAt, setGeneratedAt] = useState<Date | null>(null);
 
   useEffect(() => {
@@ -147,18 +144,6 @@ export function PredictiveSignals() {
   const hasOpportunity = active.length > 0;
 
   const generate = useCallback(() => {
-    if (showBranco) {
-      setShowBranco(false);
-      setHasClicked(false);
-      setMode1(null);
-      setMode2(null);
-      setPredictiveSignals([]);
-      return;
-    }
-
-    if (rows.length === 0 || loading) return;
-
-    setShowBranco(true);
     setHasClicked(true);
     const now = new Date();
     now.setSeconds(0, 0);
@@ -317,138 +302,135 @@ export function PredictiveSignals() {
     ].sort((a, b) => a.entryDate.getTime() - b.entryDate.getTime());
 
     setPredictiveSignals(syncSignals);
-  }, [active, engine, rows, loading, showBranco]);
+  }, [active, engine]);
 
-  
+  // Sync projections with global store for SinaisSection automatically
+  useEffect(() => {
+    if (rows.length > 0 && !loading) {
+      const now = new Date();
+      now.setSeconds(0, 0);
 
+      const m1List: Mode1Signal[] = [];
+      const usedTimes = new Set<number>();
 
-  const generateProximaLista = useCallback(() => {
-    if (rows.length === 0) return;
-
-    if (showProximaLista) {
-      setShowProximaLista(false);
-      setProximaListaSignals([]);
-      return;
-    }
-
-    setShowProximaLista(true);
-    // Horário atual no fuso de São Paulo
-    const nowInSP = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
-    const nowTimestamp = nowInSP.getTime();
-    const currentYear = nowInSP.getFullYear();
-    const currentMonth = nowInSP.getMonth();
-    const currentDate = nowInSP.getDate();
-    const currentHour = nowInSP.getHours();
-
-    // Determinar a hora anterior (ex: se agora é 02:xx, analisar 01:00-01:59)
-    const startTimeInSP = new Date(currentYear, currentMonth, currentDate, currentHour - 1, 0, 0);
-
-    // Filtrar resultados da Blaze que caíram na hora anterior (no fuso SP)
-    const previousHourRows = rows.filter(r => {
-      const d = new Date(r.created_at);
-      const dInSP = new Date(d.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
-      
-      // Criar limites da hora anterior no fuso de SP
-      const targetStart = new Date(currentYear, currentMonth, currentDate, currentHour - 1, 0, 0);
-      const targetEnd = new Date(currentYear, currentMonth, currentDate, currentHour, 0, 0);
-
-      return dInSP >= targetStart && dInSP < targetEnd;
-    });
-
-    // Agrupar por minuto e pegar EXCLUSIVAMENTE a primeira pedra de cada minuto (created_at mais antigo)
-    const firstByMinute = new Map<number, Row>();
-    previousHourRows.forEach(r => {
-      const d = new Date(r.created_at);
-      const dInSP = new Date(d.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
-      const min = dInSP.getMinutes();
-      
-      const existing = firstByMinute.get(min);
-      if (!existing || new Date(r.created_at).getTime() < new Date(existing.created_at).getTime()) {
-        firstByMinute.set(min, r);
+      // Internal calculation for Mode 1
+      const byTime = new Map<number, any>();
+      for (const item of active) {
+        const hist = engine[item.analysis].filter(c => c.value === item.value);
+        if (hist.length < MIN_GATILHOS) continue;
+        const top1 = computeTop(hist, 1)[0];
+        if (!top1 || top1.pct < MIN_ASSERTIVIDADE_TOP1) continue;
+        const at = addMinutes(item.open.triggerAt, top1.m);
+        if (at.getTime() <= now.getTime()) continue;
+        const t = at.getTime();
+        const cur = byTime.get(t);
+        if (!cur) {
+          byTime.set(t, { 
+            pct: top1.pct, 
+            label: top1.label,
+            sources: [{ analysis: item.analysis, value: item.value }],
+            analyses: new Set([item.analysis])
+          });
+        } else {
+          cur.analyses.add(item.analysis);
+          cur.sources.push({ analysis: item.analysis, value: item.value });
+          if (top1.pct > cur.pct) { cur.pct = top1.pct; cur.label = top1.label; }
+        }
       }
-    });
 
-    const listSignals: ProximaListaSignal[] = [];
-    
-    // Iterar pelos minutos 0-59
-    for (let min = 0; min <= 59; min++) {
-      const firstRow = firstByMinute.get(min);
-      if (!firstRow) continue;
+      const syncM1 = Array.from(byTime.entries()).map(([t, info]) => {
+        usedTimes.add(t);
+        return {
+          key: `m1-${t}`,
+          time: fmtClock(new Date(t)),
+          pct: info.pct,
+          label: info.label,
+          confluence: info.sources.map((src: any) => `A${src.analysis}·${src.value}`).join(", "),
+          medal: getMedalStyles(info.analyses.size)?.label,
+          entryDate: new Date(t),
+          outcome: "pending"
+        };
+      });
 
-      const roll = Number(firstRow.roll);
-      let symbols = "";
-      
-      if (roll === 6 || roll === 7) symbols = "🔴⚪️";
-      else if (roll === 8 || roll === 9) symbols = "⚫️⚪️";
-
-      if (symbols) {
-        const displayTime = `${currentHour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`;
-        // O signalStartTime deve ser EXATAMENTE HH:mm:00.000 da hora atual
-        const entryDate = new Date(currentYear, currentMonth, currentDate, currentHour, min, 0, 0);
-
-        listSignals.push({
-          key: `pl-${currentHour}-${min}-${nowTimestamp}`,
-          time: displayTime,
-          symbols,
-          entryDate,
-          generatedAt: nowTimestamp,
-          outcome: "pending",
-          generationContext: {
-            strategy: "Primeira pedra do minuto na hora anterior (+1h)",
-            historicalRows: [firstRow]
-          }
+      // Internal calculation for Mode 2 (Confluences)
+      const byMinute = new Map<number, any[]>();
+      for (const item of active) {
+        const hist = engine[item.analysis].filter(c => c.value === item.value);
+        if (hist.length < MIN_GATILHOS) continue;
+        const list = computeTop(hist, CANDIDATE_DEPTH);
+        list.forEach((g, idx) => {
+          const at = addMinutes(item.open.triggerAt, g.m).getTime();
+          if (at <= now.getTime()) return;
+          const arr = byMinute.get(at) ?? [];
+          arr.push({ analysis: item.analysis, value: item.value, pct: g.pct, top5: idx < TOP5_DEPTH });
+          byMinute.set(at, arr);
         });
       }
+
+      const syncM2: any[] = [];
+      for (const [at, projs] of byMinute) {
+        const distinctAnalyses = new Set(projs.map((p) => p.analysis));
+        if (distinctAnalyses.size < 2) continue;
+        const validators = projs.filter((p) => p.top5);
+        if (!validators.length) continue;
+        const pct = projs.reduce((s, p) => s + p.pct, 0) / projs.length;
+        if (pct < MIN_ASSERTIVIDADE_CONFLUENCIA) continue;
+        if (usedTimes.has(at)) continue;
+        usedTimes.add(at);
+
+        syncM2.push({
+          key: `m2-${at}`,
+          time: fmtClock(new Date(at)),
+          pct,
+          label: "Confluência",
+          confluence: validators.map(p => `A${p.analysis}·${p.value}`).join(", "),
+          medal: getMedalStyles(distinctAnalyses.size)?.label,
+          entryDate: new Date(at),
+          outcome: "pending"
+        });
+      }
+
+      setPredictiveSignals([...syncM1, ...syncM2].sort((a, b) => a.entryDate.getTime() - b.entryDate.getTime()));
     }
-
-    setProximaListaSignals(listSignals);
-  }, [rows, showProximaLista]);
-
+  }, [rows, loading, active, engine]);
 
   return (
-    <div className="space-y-6">
-      <ListSignalMonitor />
-      <Card className="glass-card !p-0 overflow-hidden">
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.05] bg-white/[0.02] px-6 py-5">
-          <div className="flex items-center gap-4">
-            <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary shadow-[0_0_15px_rgba(59,130,246,0.1)]">
-              <Sparkles className="h-5 w-5" />
-            </div>
-            <div>
-              <div className="text-[10px] font-black uppercase tracking-[0.4em] text-primary font-outfit">
-                Gerador preditivo
-              </div>
-              <h2 className="text-xl font-black text-white font-outfit uppercase tracking-tight">Próximo branco</h2>
-            </div>
+    <Card className="glass-card !p-0 overflow-hidden">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.05] bg-white/[0.02] px-6 py-5">
+        <div className="flex items-center gap-4">
+          <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary shadow-[0_0_15px_rgba(59,130,246,0.1)]">
+            <Sparkles className="h-5 w-5" />
           </div>
-          <button
-            type="button"
-            disabled={!hasOpportunity || loading}
-            onClick={generate}
-            className={
-              hasOpportunity && !loading
-                ? `relative overflow-hidden rounded-xl bg-gradient-to-br ${showBranco ? 'from-zinc-700 via-zinc-800 to-zinc-900 shadow-zinc-500/20' : 'from-primary via-primary/90 to-blue-600 shadow-[0_8px_20px_-6px_rgba(59,130,246,0.5)]'} px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] text-white transition-all hover:scale-[1.02] active:scale-[0.98] font-outfit border border-white/10 group`
-                : "rounded-xl border border-white/5 bg-white/[0.03] px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] text-[#9CA3AF] opacity-50 font-outfit"
-            }
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] transition-transform" />
-            <div className="relative flex items-center justify-center gap-2">
-              {loading ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" /> Carregando…
-                </>
-              ) : hasOpportunity ? (
-                <>
-                  <Sparkles className="h-3.5 w-3.5" />
-                  <span>{showBranco ? "BOTÃO" : "GERAR SINAL PRÓXIMO BRANCO"}</span>
-                </>
-              ) : (
-                "Aguardando gatilho"
-              )}
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-[0.4em] text-primary font-outfit">
+              Gerador preditivo
             </div>
-          </button>
+            <h2 className="text-xl font-black text-white font-outfit uppercase tracking-tight">Próximo branco</h2>
+          </div>
         </div>
-        <div className="space-y-5 px-5 py-5">
+        <button
+          type="button"
+          disabled={!hasOpportunity || loading}
+          onClick={generate}
+          className={
+            hasOpportunity && !loading
+              ? "relative premium-btn rounded-xl px-8 py-3.5 text-xs font-black uppercase tracking-[0.2em] text-white animate-pulse font-outfit"
+              : "rounded-xl border border-white/10 bg-white/[0.03] px-8 py-3.5 text-xs font-black uppercase tracking-[0.2em] text-[#9CA3AF] opacity-60 font-outfit"
+          }
+        >
+          {loading ? (
+            <span className="flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" /> Carregando…
+            </span>
+          ) : hasOpportunity ? (
+            "Próximo branco"
+          ) : (
+            "Aguardando novo gatilho..."
+          )}
+        </button>
+      </div>
+
+      <div className="space-y-5 px-5 py-5">
         {err && (
           <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
             {err}
@@ -463,7 +445,7 @@ export function PredictiveSignals() {
           </p>
         )}
 
-        {showBranco && hasClicked && mode1 && (
+        {hasClicked && mode1 && (
           <section className="space-y-3">
             <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               <Target className="h-3.5 w-3.5" /> Projeção Top 1
@@ -529,7 +511,7 @@ export function PredictiveSignals() {
           </section>
         )}
 
-        {showBranco && hasClicked && mode2 && (
+        {hasClicked && mode2 && (
           <section className="space-y-3">
             <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               <Layers className="h-3.5 w-3.5" /> Coincidências · validadas pelo Top 5
@@ -607,110 +589,5 @@ export function PredictiveSignals() {
         )}
       </div>
     </Card>
-
-    <Card className="glass-card !p-0 overflow-hidden">
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.05] bg-white/[0.02] px-6 py-5">
-        <div className="flex items-center gap-4">
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-red-500/10 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.1)]">
-            <List className="h-5 w-5" />
-          </div>
-          <div>
-            <div className="text-[10px] font-black uppercase tracking-[0.4em] text-red-500 font-outfit">
-              Estratégia horária
-            </div>
-            <h2 className="text-xl font-black text-white font-outfit uppercase tracking-tight">Próxima lista</h2>
-          </div>
-        </div>
-        <button
-          type="button"
-          disabled={loading}
-          onClick={generateProximaLista}
-          className={
-            !loading
-              ? `relative overflow-hidden rounded-xl bg-gradient-to-br ${showProximaLista ? 'from-zinc-700 via-zinc-800 to-zinc-900 shadow-zinc-500/20' : 'from-red-600 via-red-500 to-red-700 shadow-red-500/50'} px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] text-white transition-all hover:scale-[1.02] active:scale-[0.98] font-outfit border border-white/10 group`
-              : "rounded-xl border border-white/5 bg-white/[0.03] px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] text-[#9CA3AF] opacity-50 font-outfit"
-          }
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] transition-transform" />
-          <div className="relative flex items-center justify-center gap-2">
-            {loading ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" /> Carregando…
-              </>
-            ) : (
-              <>
-                <List className="h-3.5 w-3.5" />
-                <span>{showProximaLista ? "BOTÃO" : "GERAR LISTA DE COR"}</span>
-              </>
-            )}
-          </div>
-        </button>
-      </div>
-
-      <div className="px-5 py-5">
-        {showProximaLista && <ProximaListaDisplay />}
-      </div>
-    </Card>
-    </div>
-  );
-}
-
-function ProximaListaDisplay() {
-  const [list, setList] = useState<ProximaListaSignal[]>(getProximaListaSignals());
-
-  useEffect(() => {
-    const update = () => setList(getProximaListaSignals());
-    const sub = subscribeProximaLista(update);
-    return sub;
-  }, []);
-
-  if (list.length === 0) {
-    return (
-      <p className="text-sm text-muted-foreground">
-        Nenhuma lista gerada. Clique em "Gerar Lista de Cor" para analisar a hora anterior.
-      </p>
-    );
-  }
-
-  return (
-    <div className="rounded-2xl border border-white/[0.05] bg-white/[0.02] p-6 space-y-4">
-      <div className="text-center space-y-1">
-        <div className="text-sm font-black text-white font-outfit">
-          💥🧑🏻‍💻ATÉ G1📊@FreitasWhite
-        </div>
-      </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-        {list.map((s) => (
-          <div key={s.key} className={`flex items-center justify-between gap-2 bg-white/[0.03] rounded-lg py-2 px-3 border transition-all duration-300 ${
-            s.outcome === 'green' ? 'border-green-500/30 bg-green-500/5 shadow-[0_0_10px_rgba(34,197,94,0.1)]' :
-            s.outcome === 'red' ? 'border-red-500/30 bg-red-500/5' :
-            'border-white/[0.05]'
-          }`}>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-black tabular-nums text-white font-outfit">{s.time}</span>
-              <span className="text-lg">{s.symbols.includes('⚪️') ? s.symbols : `${s.symbols}⚪️`}</span>
-            </div>
-            {s.outcome === 'green' && (
-              <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-green-500/20 border border-green-500/30 animate-in fade-in zoom-in duration-300">
-                <CheckCircle2 size={12} className="text-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
-                <span className="text-[9px] font-black text-green-500 uppercase tracking-wider font-outfit">GREEN</span>
-              </div>
-            )}
-            {s.outcome === 'red' && (
-              <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-red-500/20 border border-red-500/30 animate-in fade-in zoom-in duration-300">
-                <XCircle size={12} className="text-red-500" />
-                <span className="text-[9px] font-black text-red-500 uppercase tracking-wider font-outfit">RED</span>
-              </div>
-            )}
-            {(!s.outcome || s.outcome === 'pending') && (
-              <div className="flex items-center gap-1 opacity-40">
-                <Clock size={10} className="text-muted-foreground animate-pulse" />
-                <span className="text-[8px] font-bold text-muted-foreground uppercase font-outfit">WAIT</span>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
   );
 }
