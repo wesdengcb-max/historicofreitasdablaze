@@ -1574,6 +1574,7 @@ const TipMinerCard = memo(function TipMinerCard({
   timeHighlight = false,
   highlightN,
   isActive: isActiveProp,
+  signal,
   onClick,
 }: {
   spin: Spin;
@@ -1584,6 +1585,7 @@ const TipMinerCard = memo(function TipMinerCard({
   timeHighlight?: boolean;
   highlightN?: Set<number> | null;
   isActive?: boolean;
+  signal?: StoredSignal;
   onClick?: () => void;
 }) {
   const isWhite = spin.color === "white";
