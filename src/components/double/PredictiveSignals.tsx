@@ -342,13 +342,12 @@ export function PredictiveSignals() {
 
     // Determinar a hora anterior (ex: se agora é 02:xx, analisar 01:00-01:59)
     const startTimeInSP = new Date(currentYear, currentMonth, currentDate, currentHour - 1, 0, 0);
-    const endTimeInSP = new Date(currentYear, currentMonth, currentDate, currentHour - 1, 59, 59, 999);
 
     // Filtrar resultados da Blaze que caíram na hora anterior (no fuso SP)
     const previousHourRows = rows.filter(r => {
       const d = new Date(r.created_at);
       const dInSP = new Date(d.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
-      // Use 1s tolerance to ensure we don't catch the first roll of the CURRENT hour
+      // Pega EXATAMENTE os minutos da hora anterior
       return dInSP >= startTimeInSP && dInSP < new Date(currentYear, currentMonth, currentDate, currentHour, 0, 0);
     });
 
@@ -367,7 +366,7 @@ export function PredictiveSignals() {
 
     const listSignals: ProximaListaSignal[] = [];
     
-    // Iterar pelos minutos 0-59 para garantir ordem e consistência
+    // Iterar pelos minutos 0-59
     for (let min = 0; min <= 59; min++) {
       const firstRow = firstByMinute.get(min);
       if (!firstRow) continue;
@@ -375,18 +374,13 @@ export function PredictiveSignals() {
       const roll = Number(firstRow.roll);
       let symbols = "";
       
-      // Regra 1: Pedra 6 ou 7 -> 🔴⚪️ (mesmo minuto + 1 hora)
-      if (roll === 6 || roll === 7) {
-        symbols = "🔴⚪️";
-      } 
-      // Regra 2: Pedra 8 ou 9 -> ⚫️⚪️ (mesmo minuto + 1 hora)
-      else if (roll === 8 || roll === 9) {
-        symbols = "⚫️⚪️";
-      }
+      if (roll === 6 || roll === 7) symbols = "🔴⚪️";
+      else if (roll === 8 || roll === 9) symbols = "⚫️⚪️";
 
       if (symbols) {
         const displayTime = `${currentHour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`;
-        const entryDate = new Date(currentYear, currentMonth, currentDate, currentHour, min, 0);
+        // O signalStartTime deve ser EXATAMENTE HH:mm:00.000 da hora atual
+        const entryDate = new Date(currentYear, currentMonth, currentDate, currentHour, min, 0, 0);
 
         listSignals.push({
           key: `pl-${currentHour}-${min}-${nowTimestamp}`,
@@ -401,6 +395,7 @@ export function PredictiveSignals() {
 
     setProximaListaSignals(listSignals);
   }, [rows, showProximaLista]);
+
 
   return (
     <div className="space-y-6">
