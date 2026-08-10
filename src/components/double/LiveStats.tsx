@@ -64,12 +64,22 @@ export const LiveStats = memo(function LiveStats({
             <span className="text-2xl font-black italic tracking-tighter text-white">blaze</span>
           </div>
           <div className="flex gap-2.5">
-            <button className="h-6 rounded border border-red-600 bg-black px-3 text-[10px] font-bold text-white transition-colors hover:bg-red-600/10">
+            <a 
+              href="https://blaze.bet.br" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex h-6 items-center rounded border border-red-600 bg-black px-3 text-[10px] font-bold text-white transition-colors hover:bg-red-600/10"
+            >
               Blaze.com
-            </button>
-            <button className="h-6 rounded border border-red-600 bg-black px-3 text-[10px] font-bold text-white transition-colors hover:bg-red-600/10">
+            </a>
+            <a 
+              href="https://blaze.bet.br/pt/games/double" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex h-6 items-center rounded border border-red-600 bg-black px-3 text-[10px] font-bold text-white transition-colors hover:bg-red-600/10"
+            >
               Double
-            </button>
+            </a>
           </div>
         </div>
       </StatsCard>
