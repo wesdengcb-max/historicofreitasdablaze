@@ -47,13 +47,22 @@ function LandingPage() {
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-red-600 to-red-900 rounded-lg flex items-center justify-center transform group-hover:rotate-12 transition-transform shadow-[0_0_15px_rgba(229,9,20,0.3)]">
-              <span className="font-black text-xl italic text-white tracking-tighter">FW</span>
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="w-12 h-12 rounded-full p-0.5 bg-gradient-to-br from-[#E50914] to-[#7f0000] shadow-[0_0_20px_rgba(229,9,20,0.4)] transition-transform duration-500 group-hover:rotate-[360deg] group-hover:scale-110">
+              <div className="w-full h-full rounded-full bg-black overflow-hidden flex items-center justify-center border border-white/10">
+                <img 
+                  src={logoPremiumAsset.url} 
+                  alt="FreitasWhite Logo" 
+                  className="w-[85%] h-auto object-contain"
+                />
+              </div>
             </div>
-            <span className="text-xl font-black tracking-tighter uppercase group-hover:text-red-500 transition-colors">
-              Freitas<span className="text-red-600">White</span>
-            </span>
+            <div className="flex flex-col">
+              <span className="text-xl font-black tracking-tighter uppercase leading-none">
+                Freitas<span className="text-[#E50914]">White</span>
+              </span>
+              <span className="text-[8px] font-bold text-gray-500 uppercase tracking-[0.3em] mt-1">Ecosystem Pro</span>
+            </div>
           </Link>
 
           {/* Navigation Links (Desktop) */}
