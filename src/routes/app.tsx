@@ -50,7 +50,7 @@ import {
   BLAZE_GAP_Y,
 } from "@/components/double/BlazeResultCard";
 
-import { getSignals, subscribeSignals, type StoredSignal, getRobotEnabled, subscribeRobot } from "@/lib/signalsStore";
+import { getSignals, subscribeSignals, type StoredSignal, getRobotEnabled, subscribeRobot, getPredictiveSignals, subscribePredictive } from "@/lib/signalsStore";
 import { Sidebar } from "@/components/Sidebar";
 import { AppHeader } from "@/components/AppHeader";
 import { useSection } from "@/lib/sectionStore";
