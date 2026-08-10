@@ -51,7 +51,7 @@ function LandingPage() {
             <div className="w-12 h-12 rounded-full p-0.5 bg-gradient-to-br from-[#E50914] to-[#7f0000] shadow-[0_0_20px_rgba(229,9,20,0.4)] transition-transform duration-500 group-hover:rotate-[360deg] group-hover:scale-110">
               <div className="w-full h-full rounded-full bg-black overflow-hidden flex items-center justify-center border border-white/10">
                 <img 
-                  src={logoPremiumAsset.url} 
+                  src={logoTextWhite.url} 
                   alt="FreitasWhite Logo" 
                   className="w-[85%] h-auto object-contain"
                 />
