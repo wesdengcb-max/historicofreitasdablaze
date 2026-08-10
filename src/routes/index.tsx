@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
+import { Crown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Shield, Zap, TrendingUp, History, Target, Clock, Lock, BarChart3, Search, Activity, Sun, Moon, CheckCircle2 } from "lucide-react"
 import heroAsset from "@/assets/freitas-white-hero.png.asset.json";
@@ -49,7 +50,10 @@ function LandingPage() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
             <div className="w-12 h-12 rounded-full p-0.5 bg-gradient-to-br from-[#E50914] to-[#7f0000] shadow-[0_0_20px_rgba(229,9,20,0.4)] transition-transform duration-500 group-hover:rotate-[360deg] group-hover:scale-110">
-              <div className="w-full h-full rounded-full bg-black overflow-hidden flex items-center justify-center border border-white/10">
+              <div className="w-full h-full rounded-full bg-black overflow-hidden flex items-center justify-center border border-white/10 relative">
+                <div className="absolute -top-2 left-1/2 -translate-x-1/2 text-[#E50914] z-10">
+                  <Crown size={14} fill="currentColor" />
+                </div>
                 <img 
                   src={logoTextWhite.url} 
                   alt="FreitasWhite Logo" 
@@ -59,7 +63,7 @@ function LandingPage() {
             </div>
             <div className="flex flex-col">
               <span className="text-xl font-black tracking-tighter uppercase leading-none">
-                Freitas<span className="text-[#E50914]">White</span>
+                Freitas<span className="relative">W<span className="text-[#E50914]">hite</span></span>
               </span>
               <span className="text-[8px] font-bold text-gray-500 uppercase tracking-[0.3em] mt-1">Ecosystem Pro</span>
             </div>
@@ -253,6 +257,19 @@ function LandingPage() {
             title="Dados Confiáveis" 
             description="Informações 100% reais, seguras e atualizadas em tempo real."
           />
+        </div>
+      </section>
+
+      {/* DADOS CONFIÁVEIS DETAIL SECTION */}
+      <section className="relative z-10 px-6 py-20 bg-black/50 border-y border-white/5">
+        <div className="max-w-4xl mx-auto flex flex-col items-center text-center">
+          <div className="w-20 h-20 bg-red-600/10 rounded-full flex items-center justify-center mb-8 border border-red-600/20 shadow-[0_0_40px_rgba(229,9,20,0.2)]">
+            <CheckCircle2 size={40} className="text-[#E50914]" />
+          </div>
+          <h3 className="text-3xl font-black uppercase tracking-tighter mb-4">Dados Confiáveis</h3>
+          <p className="text-gray-400 text-lg leading-relaxed font-medium">
+            Informações 100% reais, seguras e atualizadas em tempo real. Nossa plataforma utiliza tecnologia de ponta para garantir a precisão de cada dado processado.
+          </p>
         </div>
       </section>
 
