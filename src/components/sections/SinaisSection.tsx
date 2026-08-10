@@ -125,6 +125,7 @@ function parseIso(iso: string): Date {
 }
 
 function buildSignals(results: Result[]): Signal[] {
+  return [];
   const now = Date.now();
   const out: Signal[] = [];
   const maxOffsetMs = Math.max(...ENTRY_OFFSETS) * 60_000;
