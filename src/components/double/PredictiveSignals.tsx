@@ -318,7 +318,7 @@ export function PredictiveSignals() {
     setPredictiveSignals(syncSignals);
   }, [active, engine]);
 
-  }, [rows, loading, active, engine, showBranco]);
+  
 
 
   const generateProximaLista = useCallback(() => {
