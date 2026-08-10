@@ -57,8 +57,9 @@ export function ListSignalMonitor() {
         // We include a 30s lead buffer in case of minor timestamp drifts in the DB
         const matches = latestResults.filter(r => {
           const resDate = new Date(r.created_at);
+          // Convert result timestamp to SP time before comparing to the SP-based signalTime
           const resTimeInSP = new Date(resDate.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" })).getTime();
-          return resTimeInSP >= (signalTime - 30_000) && resTimeInSP < twoMinutesAfter;
+          return resTimeInSP >= (signalTime - 60_000) && resTimeInSP < (twoMinutesAfter + 60_000);
         });
 
         if (matches.length > 0) {
