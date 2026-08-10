@@ -14,14 +14,14 @@ interface StatsCardProps {
 
 const StatsCard = ({ title, titleSuffix, children, footer, className }: StatsCardProps) => (
   <div className={cn("flex flex-col rounded-lg bg-[#0c0c0c] border border-white/5 overflow-hidden", className)}>
-    <div className="flex flex-col items-center pt-3 px-4">
-      <div className="flex items-center gap-1.5">
-        <span className="text-[13px] font-medium text-[#eaeaea]">{title}</span>
+    <div className="flex flex-col items-center pt-3 px-4 bg-[#141414]/30">
+      <div className="flex items-center gap-1.5 pb-2.5">
+        <span className="text-[12px] font-bold uppercase tracking-wider text-[#eaeaea]">{title}</span>
         {titleSuffix}
       </div>
-      <div className="mt-2.5 w-full border-t border-white/5" />
+      <div className="w-full border-t border-white/5" />
     </div>
-    <div className="flex-1 px-4 py-3">
+    <div className="flex-1 px-4 py-4">
       {children}
     </div>
     {footer && (
