@@ -138,18 +138,18 @@ function LandingPage() {
               </Link>
             </div>
 
-            <div className="flex flex-wrap items-center gap-8 opacity-60">
+            <div className="flex flex-wrap items-center gap-8 opacity-90">
               <div className="flex items-center gap-2">
-                <Shield size={16} className="text-[#E50914]" />
-                <span className="text-[10px] font-bold uppercase tracking-widest">Dados atualizados</span>
+                <CheckCircle2 size={18} className="text-[#E50914]" />
+                <span className="text-[10px] font-bold uppercase tracking-widest">Dados 100% Reais</span>
               </div>
               <div className="flex items-center gap-2">
-                <History size={16} className="text-[#E50914]" />
-                <span className="text-[10px] font-bold uppercase tracking-widest">Histórico completo</span>
+                <CheckCircle2 size={18} className="text-[#E50914]" />
+                <span className="text-[10px] font-bold uppercase tracking-widest">Atualizado em Tempo Real</span>
               </div>
               <div className="flex items-center gap-2">
-                <Zap size={16} className="text-[#E50914]" />
-                <span className="text-[10px] font-bold uppercase tracking-widest">Plataforma confiável</span>
+                <CheckCircle2 size={18} className="text-[#E50914]" />
+                <span className="text-[10px] font-bold uppercase tracking-widest">Confiável e Seguro</span>
               </div>
             </div>
           </div>
