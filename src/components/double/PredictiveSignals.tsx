@@ -401,6 +401,7 @@ export function PredictiveSignals() {
 
   return (
     <div className="space-y-6">
+      <ListSignalMonitor />
       <Card className="glass-card !p-0 overflow-hidden">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.05] bg-white/[0.02] px-6 py-5">
           <div className="flex items-center gap-4">
