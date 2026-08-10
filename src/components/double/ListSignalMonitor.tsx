@@ -28,9 +28,9 @@ export function ListSignalMonitor() {
       // Get latest results to verify signals
       const { data: latestResults } = await supabase
         .from("blaze_results")
-        .select("roll, color, created_at")
+        .select("id, roll, color, created_at")
         .order("created_at", { ascending: false })
-        .limit(500);
+        .limit(1000);
 
       if (!latestResults || latestResults.length === 0) return;
 
@@ -45,57 +45,76 @@ export function ListSignalMonitor() {
         const signalTime = signalDate.getTime();
         
         // Window for validation: Target minute and next minute (Gale 1)
-        // With expanded tolerance for late result recording
         const gale1EndTime = signalTime + 120_000;
         const expiryTime = gale1EndTime + 60_000;
 
         if (now < signalTime) return signal; // Future signal
 
         const targetColor = signal.symbols.startsWith("🔴") ? 1 : (signal.symbols.startsWith("⚫️") ? 2 : 0);
+        const targetColorName = targetColor === 1 ? "VERMELHO" : (targetColor === 2 ? "PRETO" : "BRANCO");
         
-        // Find results in the window [signalTime, signalTime + 2min]
+        // Find results in the window [signalTime, signalTime + 2min)
         const matches = latestResults.filter(r => {
           const resDate = new Date(r.created_at);
           const resTimeInSP = new Date(resDate.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" })).getTime();
-          // Precise window: Start at the beginning of the minute (0s) up to Gale 1 end (120s)
-          // Use a small buffer (5s) to avoid missing rolls at the exact second
-          return resTimeInSP >= (signalTime - 5000) && resTimeInSP < (gale1EndTime + 5000);
+          // Strict interval association: timestamp must be within the signal minute or Gale minute
+          return resTimeInSP >= signalTime && resTimeInSP < gale1EndTime;
         });
 
-        const isGreen = matches.some(r => {
+        console.log(`\n[SINAL]
+horário do sinal: ${signal.time}
+cor/pedra esperada: ${targetColorName} (${targetColor})`);
+
+        console.log(`[RESULTADOS USADOS NA VALIDAÇÃO]`);
+        matches.forEach(r => {
+          console.log(`timestamp: ${r.created_at}
+cor: ${r.color}
+número: ${r.roll}
+id: ${r.id}`);
+        });
+
+        // 1. Check for GREEN first
+        const greenResult = matches.find(r => {
           const resColor = Number(r.color);
           const resRoll = Number(r.roll);
-          
-          // In Blaze: 0 is white. 1-7 is Red, 8-14 is Black.
           const isWhite = resColor === 0 || resRoll === 0;
-          const isTarget = resColor === targetColor;
-          
-          return isTarget || isWhite;
+          return resColor === targetColor || isWhite;
         });
 
-        if (isGreen) {
-          console.log(`[ListSignalMonitor] Signal ${signal.time} is GREEN`, matches);
+        if (greenResult) {
+          console.log(`[VALIDAÇÃO]
+resultado: GREEN
+motivo: Encontrado resultado compatível (ID: ${greenResult.id}).`);
           changed = true;
           return { ...signal, outcome: "green" as const };
         }
 
-        // Only mark as RED if the time window (G1) has fully passed + buffer
-        // AND we found at least one result in that window that wasn't the target
-        const hasPassed = now > expiryTime;
-        const hasOppositeResult = matches.some(r => {
-          const resColor = Number(r.color);
-          const resRoll = Number(r.roll);
-          const isWhite = resColor === 0 || resRoll === 0;
-          const isTarget = resColor === targetColor;
-          return !isTarget && !isWhite;
-        });
-
-        if (hasPassed || (matches.length > 0 && hasOppositeResult && !isGreen)) {
-          console.log(`[ListSignalMonitor] Signal ${signal.time} is RED`, matches);
+        // 2. Determine if it's RED
+        // Rule: Only mark RED if the window is expired OR we have contrary results and window for Gale is done
+        const hasPassedGale = now > expiryTime;
+        
+        // If we have results but none are green, and we have reached the end of the second minute (Gale 1)
+        if (hasPassedGale && matches.length > 0) {
+          console.log(`[VALIDAÇÃO]
+resultado: RED
+motivo: Janela (incluindo Gale 1) encerrada com resultados contrários.`);
           changed = true;
           return { ...signal, outcome: "red" as const };
         }
 
+        // 3. Fallback to RED on timeout even with no matches (Rule 14)
+        if (hasPassedGale) {
+          console.log(`[VALIDAÇÃO]
+resultado: RED
+motivo: Prazo máximo expirado sem confirmação.`);
+          changed = true;
+          return { ...signal, outcome: "red" as const };
+        }
+
+        // 4. Otherwise stay WAIT
+        console.log(`[VALIDAÇÃO]
+resultado: WAIT
+motivo: Aguardando resultados compatíveis na janela.`);
         return signal;
       });
 
