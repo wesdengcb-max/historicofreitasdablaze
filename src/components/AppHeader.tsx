@@ -13,9 +13,11 @@ export const AppHeader = memo(function AppHeader() {
       <div className="flex items-center gap-4">
         <button 
           onClick={toggle}
-          className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.03] text-muted-foreground transition hover:bg-white/[0.06] hover:text-white"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-[#1A1A1A] text-white transition hover:bg-red-500 shadow-2xl ring-2 ring-black/80 group lg:hidden"
         >
-          <Menu className="h-5 w-5" />
+          <div className="flex items-center justify-center transition-transform group-active:scale-90">
+            <Menu className="h-5 w-5" />
+          </div>
         </button>
         
         <div className="h-6 w-px bg-white/5 mx-2" />
