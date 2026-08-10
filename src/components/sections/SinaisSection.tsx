@@ -40,7 +40,7 @@ import {
 import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
 import { ResultCircle } from "@/components/double/ResultCircle";
 import { colorOf, fmtTime, type Color } from "@/components/double/types";
-import { setSignals, getRobotEnabled, setRobotEnabled, subscribeRobot } from "@/lib/signalsStore";
+import { setSignals, getRobotEnabled, setRobotEnabled, subscribeRobot, getPredictiveSignals, subscribePredictive, type PredictiveSignal } from "@/lib/signalsStore";
 import { BlazeRoulette } from "@/components/double/BlazeRoulette";
 import { PredictiveSignals } from "@/components/double/PredictiveSignals";
 
@@ -194,6 +194,7 @@ export default function SinaisSection() {
   const [robotOn, setRobotOn] = useState(getRobotEnabled());
   const [manualSignals, setManualSignals] = useState<Signal[]>([]);
   const [addOpen, setAddOpen] = useState(false);
+  const [predictiveList, setPredictiveList] = useState<PredictiveSignal[]>(getPredictiveSignals());
   const [menuOpen, setMenuOpen] = useState(false);
   const [formDate, setFormDate] = useState(() => spYmd());
   const [formTime, setFormTime] = useState("");
@@ -314,12 +315,6 @@ export default function SinaisSection() {
     });
   const removeSignal = (id: string) => setDisabled((prev) => new Set(prev).add(id));
 
-  const predictiveVisible = useMemo(() => {
-    // Pegar sinais do gerador preditivo via evento ou store global se disponível
-    // Como alternativa, podemos observar o PredictiveSignals
-    return [];
-  }, []);
-
   const visible = useMemo(
     () => signals.filter((s) => !disabled.has(s.id)),
     [signals, disabled],
@@ -337,6 +332,13 @@ export default function SinaisSection() {
       })),
     [visible],
   );
+
+  useEffect(() => {
+    const sub = subscribePredictive(() => {
+      setPredictiveList(getPredictiveSignals());
+    });
+    return sub;
+  }, []);
 
   useEffect(() => {
     const sub = subscribeRobot(() => {
@@ -474,15 +476,57 @@ export default function SinaisSection() {
             <thead>
               <tr className="text-[10px] tracking-widest text-muted-foreground font-mono border-b border-border">
                 <th className="w-10 px-4 py-3 text-left"></th>
-                <th className="px-3 py-3 text-left font-normal">HORÁRIO</th>
-                <th className="px-3 py-3 text-left font-normal">COR</th>
-                <th className="px-3 py-3 text-left font-normal">ENTRADA</th>
-                
-                <th className="px-3 py-3 text-left font-normal">STATUS</th>
+                <th className="px-3 py-3 text-left font-normal uppercase">Horário</th>
+                <th className="px-3 py-3 text-left font-normal uppercase">Assertividade</th>
+                <th className="px-3 py-3 text-left font-normal uppercase">Confluência / Top</th>
+                <th className="px-3 py-3 text-left font-normal uppercase">Status</th>
                 <th className="w-14 px-3 py-3"></th>
               </tr>
             </thead>
             <tbody>
+              {/* Sinais Preditos Automáticos (Próximo Branco) */}
+              {predictiveList.map((s) => (
+                <tr key={s.key} className="border-b border-white/[0.03] bg-white/[0.01] hover:bg-white/[0.03] transition-colors">
+                  <td className="px-4 py-4 text-center">
+                    <Sparkles className="h-3 w-3 text-primary/60" />
+                  </td>
+                  <td className="px-3 py-4">
+                    <div className="font-black text-lg text-white font-outfit">{s.time}</div>
+                    <div className="text-[9px] text-muted-foreground font-mono tracking-widest uppercase">PROJETADO</div>
+                  </td>
+                  <td className="px-3 py-4">
+                    <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-2.5 py-1">
+                      <span className="text-sm font-black text-primary font-outfit">{s.pct.toFixed(1)}%</span>
+                      <span className="text-[9px] opacity-60 font-bold uppercase tracking-tighter">Win Rate</span>
+                    </div>
+                  </td>
+                  <td className="px-3 py-4">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        {s.medal && (
+                          <span className={`rounded-full px-2 py-0.5 text-[8px] font-black uppercase tracking-widest border ${
+                            s.medal === "Ouro" ? "bg-yellow-400/10 text-yellow-300 border-yellow-400/20" :
+                            s.medal === "Prata" ? "bg-slate-300/10 text-slate-100 border-slate-300/20" :
+                            "bg-amber-700/10 text-amber-300 border-amber-700/20"
+                          }`}>
+                            {s.medal}
+                          </span>
+                        )}
+                        <span className="text-xs font-bold text-white/90">{s.confluence}</span>
+                      </div>
+                      <div className="text-[10px] text-muted-foreground opacity-60">Janela: {s.label}</div>
+                    </div>
+                  </td>
+                  <td className="px-3 py-4">
+                    <div className="inline-flex items-center gap-2 rounded-md bg-white/[0.05] border border-white/10 px-3 py-1 text-[10px] font-black tracking-widest text-muted-foreground uppercase font-mono">
+                      Monitorando
+                    </div>
+                  </td>
+                  <td className="px-3 py-4"></td>
+                </tr>
+              ))}
+
+              {/* Sinais Manuais e Automáticos de Histórico */}
               {visible.map((s) => (
                 <tr
                   key={s.id}

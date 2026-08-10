@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { setPredictiveSignals } from "@/lib/signalsStore";
 import { Loader2, Sparkles, Target, Layers } from "lucide-react";
 import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
 import { Card } from "@/components/double/Card";
@@ -269,6 +270,28 @@ export function PredictiveSignals() {
     }
     m2.sort((a, b) => a.times[0].getTime() - b.times[0].getTime());
     setMode2(m2);
+
+    // Sync with global store for SinaisSection
+    const syncSignals = [
+      ...m1.map(s => ({
+        key: s.key,
+        time: fmtClock(s.at),
+        pct: s.pct,
+        label: s.label,
+        confluence: s.sources.map(src => `A${src.analysis}·${src.value}`).join(", "),
+        medal: getMedalStyles(s.analysisCount)?.label
+      })),
+      ...m2.map(s => ({
+        key: s.key,
+        time: s.times.map(t => fmtClock(t)).join(" / "),
+        pct: s.pct,
+        label: "Confluência",
+        confluence: s.confluence,
+        medal: getMedalStyles(s.analysisCount)?.label
+      }))
+    ].sort((a, b) => a.time.localeCompare(b.time));
+
+    setPredictiveSignals(syncSignals);
   }, [active, engine]);
 
   // Auto-generate projections when data is ready
