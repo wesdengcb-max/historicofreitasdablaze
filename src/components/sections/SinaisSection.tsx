@@ -314,6 +314,12 @@ export default function SinaisSection() {
     });
   const removeSignal = (id: string) => setDisabled((prev) => new Set(prev).add(id));
 
+  const predictiveVisible = useMemo(() => {
+    // Pegar sinais do gerador preditivo via evento ou store global se disponível
+    // Como alternativa, podemos observar o PredictiveSignals
+    return [];
+  }, []);
+
   const visible = useMemo(
     () => signals.filter((s) => !disabled.has(s.id)),
     [signals, disabled],
