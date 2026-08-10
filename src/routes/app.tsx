@@ -873,11 +873,11 @@ function Index() {
                           "h-1.5 w-1.5 rounded-full animate-pulse",
                           countdown > 3 ? "bg-emerald-500" : "bg-red-500"
                         )} />
-                        <span className="text-[10px] font-bold text-muted-foreground">
-                          {countdown > 3 ? "Próximo giro em" : "Giro em andamento"} <span className="text-white">{countdown > 3 ? `${String(countdown).padStart(2, "0")}s` : ""}</span>
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
+                          {countdown > 3 ? "Próximo giro em" : "Giro em andamento"} <span className="text-white ml-1">{countdown > 3 ? `${String(countdown).padStart(2, "0")}s` : ""}</span>
                         </span>
                       </div>
-                      <span className="text-[10px] font-medium text-red-500">{total} rodadas</span>
+                      <span className="text-[10px] font-bold text-[#ef4444] uppercase tracking-tight">{total} rodadas</span>
                     </div>
                   </div>
                   
@@ -891,21 +891,21 @@ function Index() {
                   )}
                 </div>
 
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-3">
                   <div className="flex items-center gap-2">
-                    <Flame className="h-3 w-3 text-red-500" />
-                    <span className="text-[10px] font-bold text-muted-foreground">
+                    <Flame className="h-3.5 w-3.5 text-red-500" />
+                    <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-tight">
                       Último branco há <span className="text-white">{lastWhiteAgo}</span> rodadas
                     </span>
                   </div>
                   
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mr-1">Frequência</span>
-                    <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-col gap-2">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Frequência</span>
+                    <div className="flex flex-wrap gap-x-2 gap-y-2">
                       {freq.map((f) => (
-                        <div key={f.n} className="flex items-center gap-1 bg-white/[0.03] rounded-full px-1.5 py-0.5 border border-white/5">
+                        <div key={f.n} className="flex items-center gap-1.5 bg-white/[0.03] rounded-md px-2 py-1 border border-white/5">
                           <ResultCircle color={colorOf(f.n)} n={f.n} size="xs" animate={false} />
-                          <span className="text-[9px] font-bold tabular-nums text-white">{f.count}</span>
+                          <span className="text-[10px] font-black tabular-nums text-white">{f.count}</span>
                         </div>
                       ))}
                     </div>
