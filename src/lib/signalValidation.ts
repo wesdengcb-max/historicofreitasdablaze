@@ -27,10 +27,10 @@ export function validateSignal(
   const targetColorName = targetColor === 1 ? "VERMELHO" : (targetColor === 2 ? "PRETO" : "BRANCO");
 
   // Filtra resultados que ocorreram estritamente DENTRO da janela do horário do sinal (HH:mm:00 até HH:mm+1:59)
-  // Independente de quando o sinal foi gerado visualmente
   const allWindowResults = latestResults
     .filter(r => {
       const resTime = new Date(r.created_at).getTime();
+      // O horário do sinal já é em UTC, mas a comparação deve ser consistente
       return resTime >= signalStartTime && resTime < gale1EndTime;
     })
     .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()); // Ordem cronológica ASC
