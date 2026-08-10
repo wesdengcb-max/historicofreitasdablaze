@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { setPredictiveSignals } from "@/lib/signalsStore";
-import { Loader2, Sparkles, Target, Layers } from "lucide-react";
+import { setPredictiveSignals, setProximaListaSignals, getProximaListaSignals, type ProximaListaSignal } from "@/lib/signalsStore";
+import { Loader2, Sparkles, Target, List } from "lucide-react";
 import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
 import { Card } from "@/components/double/Card";
 import {
@@ -394,41 +394,97 @@ export function PredictiveSignals() {
     }
   }, [rows, loading, active, engine]);
 
+  const generateProximaLista = useCallback(() => {
+    if (rows.length === 0) return;
+
+    const nowInSP = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
+    const currentHour = nowInSP.getHours();
+    const previousHour = (currentHour - 1 + 24) % 24;
+
+    // Filter results from the previous hour
+    const previousHourRows = rows.filter(r => {
+      const d = new Date(r.created_at);
+      const dInSP = new Date(d.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
+      return dInSP.getHours() === previousHour;
+    });
+
+    // Group by minute and find the first row (earliest created_at) for each minute
+    const firstByMinute = new Map<number, Row>();
+    previousHourRows.forEach(r => {
+      const d = new Date(r.created_at);
+      const dInSP = new Date(d.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
+      const min = dInSP.getMinutes();
+      const existing = firstByMinute.get(min);
+      if (!existing || new Date(r.created_at).getTime() < new Date(existing.created_at).getTime()) {
+        firstByMinute.set(min, r);
+      }
+    });
+
+    const listSignals: ProximaListaSignal[] = [];
+    firstByMinute.forEach((row, min) => {
+      const roll = Number(row.roll);
+      let symbols = "";
+      if (roll === 6 || roll === 7) {
+        symbols = "🔴⚪️";
+      } else if (roll === 8 || roll === 9) {
+        symbols = "⚫️";
+      }
+
+      if (symbols) {
+        const signalHour = currentHour;
+        const entryDate = new Date();
+        entryDate.setHours(signalHour, min, 0, 0);
+
+        listSignals.push({
+          key: `pl-${signalHour}-${min}`,
+          time: `${signalHour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`,
+          symbols,
+          entryDate,
+          outcome: "pending"
+        });
+      }
+    });
+
+    listSignals.sort((a, b) => a.entryDate.getTime() - b.entryDate.getTime());
+    setProximaListaSignals(listSignals);
+  }, [rows]);
+
   return (
-    <Card className="glass-card !p-0 overflow-hidden">
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.05] bg-white/[0.02] px-6 py-5">
-        <div className="flex items-center gap-4">
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary shadow-[0_0_15px_rgba(59,130,246,0.1)]">
-            <Sparkles className="h-5 w-5" />
-          </div>
-          <div>
-            <div className="text-[10px] font-black uppercase tracking-[0.4em] text-primary font-outfit">
-              Gerador preditivo
+    <div className="space-y-6">
+      <Card className="glass-card !p-0 overflow-hidden">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.05] bg-white/[0.02] px-6 py-5">
+          <div className="flex items-center gap-4">
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary shadow-[0_0_15px_rgba(59,130,246,0.1)]">
+              <Sparkles className="h-5 w-5" />
             </div>
-            <h2 className="text-xl font-black text-white font-outfit uppercase tracking-tight">Próximo branco</h2>
+            <div>
+              <div className="text-[10px] font-black uppercase tracking-[0.4em] text-primary font-outfit">
+                Gerador preditivo
+              </div>
+              <h2 className="text-xl font-black text-white font-outfit uppercase tracking-tight">Próximo branco</h2>
+            </div>
           </div>
+          <button
+            type="button"
+            disabled={!hasOpportunity || loading}
+            onClick={generate}
+            className={
+              hasOpportunity && !loading
+                ? "relative premium-btn rounded-xl px-8 py-3.5 text-xs font-black uppercase tracking-[0.2em] text-white animate-pulse font-outfit"
+                : "rounded-xl border border-white/10 bg-white/[0.03] px-8 py-3.5 text-xs font-black uppercase tracking-[0.2em] text-[#9CA3AF] opacity-60 font-outfit"
+            }
+          >
+            {loading ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" /> Carregando…
+              </span>
+            ) : hasOpportunity ? (
+              "Próximo branco"
+            ) : (
+              "Aguardando novo gatilho..."
+            )}
+          </button>
         </div>
-        <button
-          type="button"
-          disabled={!hasOpportunity || loading}
-          onClick={generate}
-          className={
-            hasOpportunity && !loading
-              ? "relative premium-btn rounded-xl px-8 py-3.5 text-xs font-black uppercase tracking-[0.2em] text-white animate-pulse font-outfit"
-              : "rounded-xl border border-white/10 bg-white/[0.03] px-8 py-3.5 text-xs font-black uppercase tracking-[0.2em] text-[#9CA3AF] opacity-60 font-outfit"
-          }
-        >
-          {loading ? (
-            <span className="flex items-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin" /> Carregando…
-            </span>
-          ) : hasOpportunity ? (
-            "Próximo branco"
-          ) : (
-            "Aguardando novo gatilho..."
-          )}
-        </button>
-      </div>
 
       <div className="space-y-5 px-5 py-5">
         {err && (
