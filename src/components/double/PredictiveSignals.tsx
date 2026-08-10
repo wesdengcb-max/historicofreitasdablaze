@@ -334,6 +334,7 @@ export function PredictiveSignals() {
     setShowProximaLista(true);
     // Horário atual no fuso de São Paulo
     const nowInSP = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
+    const nowTimestamp = nowInSP.getTime();
     const currentYear = nowInSP.getFullYear();
     const currentMonth = nowInSP.getMonth();
     const currentDate = nowInSP.getDate();
@@ -388,10 +389,11 @@ export function PredictiveSignals() {
         const entryDate = new Date(currentYear, currentMonth, currentDate, currentHour, min, 0);
 
         listSignals.push({
-          key: `pl-${currentHour}-${min}`,
+          key: `pl-${currentHour}-${min}-${nowTimestamp}`,
           time: displayTime,
           symbols,
           entryDate,
+          generatedAt: nowTimestamp,
           outcome: "pending"
         });
       }
