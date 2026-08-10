@@ -518,7 +518,7 @@ export function PredictiveSignals() {
               ) : hasOpportunity ? (
                 <>
                   <Sparkles className="h-3.5 w-3.5" />
-                  <span>{showBranco ? "BOTÃO" : "BOTÃO"}</span>
+                  <span>{showBranco ? "BOTÃO" : "GERAR SINAL PRÓXIMO BRANCO"}</span>
                 </>
               ) : (
                 "Aguardando gatilho"
@@ -718,7 +718,7 @@ export function PredictiveSignals() {
             ) : (
               <>
                 <List className="h-3.5 w-3.5" />
-                <span>{showProximaLista ? "BOTÃO" : "BOTÃO"}</span>
+                <span>{showProximaLista ? "BOTÃO" : "GERAR LISTA DE COR"}</span>
               </>
             )}
           </div>
