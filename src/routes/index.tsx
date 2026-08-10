@@ -308,7 +308,7 @@ function LandingPage() {
 
         <div className="max-w-7xl mx-auto pt-10 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
           <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-600">
-            © {new Date().getFullYear()} FreitasWhite. Todos os direitos reservados.
+            © {new Date().getFullYear()} FreitasWhite Pro Ecosystem · MMXVI. Todos os direitos reservados.
           </span>
           <div className="flex gap-8 text-[10px] font-bold uppercase tracking-widest text-gray-600">
             <a href="#" className="hover:text-white">Privacidade</a>
