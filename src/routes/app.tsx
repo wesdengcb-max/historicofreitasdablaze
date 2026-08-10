@@ -286,6 +286,7 @@ const BlazeResultCardWrapper = memo(function BlazeResultCardWrapper({
         time={exibirSegundos ? spTimeWithSeconds(item) : item.time}
         numbered={numerado}
         timeHighlight={destaqueHorario}
+        signal={signalsByHM.get(item.time)?.[0]}
         dimmed={
           (highlightKey !== null && !isActive) ||
           (highlightN.size > 0 && !highlightN.has(item.n))
