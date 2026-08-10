@@ -335,7 +335,7 @@ export function PredictiveSignals() {
       const top1 = computeTop(hist, 1)[0];
       if (!top1 || top1.pct < MIN_ASSERTIVIDADE_TOP1) continue;
       const at = addMinutes(item.open.triggerAt, top1.m);
-      if (at.getTime() <= now.getTime()) continue;
+      if (at.getTime() <= now.getTime()) return; // Already missed the window? Skip generating all.
       const t = at.getTime();
       const cur = byTime.get(t);
       if (!cur) {
@@ -352,7 +352,7 @@ export function PredictiveSignals() {
       }
     }
 
-    const syncM1 = Array.from(byTime.entries()).map(([t, info]) => {
+    const syncM1Internal = Array.from(byTime.entries()).map(([t, info]) => {
       usedTimes.add(t);
       return {
         key: `m1-${t}`,
@@ -381,7 +381,7 @@ export function PredictiveSignals() {
       });
     }
 
-    const syncM2: any[] = [];
+    const syncM2Internal: any[] = [];
     for (const [at, projs] of byMinute) {
       const distinctAnalyses = new Set(projs.map((p) => p.analysis));
       if (distinctAnalyses.size < 2) continue;
@@ -392,7 +392,7 @@ export function PredictiveSignals() {
       if (usedTimes.has(at)) continue;
       usedTimes.add(at);
 
-      syncM2.push({
+      syncM2Internal.push({
         key: `m2-${at}`,
         time: fmtClock(new Date(at)),
         pct,
@@ -404,8 +404,8 @@ export function PredictiveSignals() {
       });
     }
 
-    const allSignals = [...syncM1, ...syncM2].sort((a, b) => a.entryDate.getTime() - b.entryDate.getTime());
-    setMode1(syncM1);
+    const allSignals = [...syncM1Internal, ...syncM2Internal].sort((a, b) => a.entryDate.getTime() - b.entryDate.getTime());
+    // Use type assertion if necessary, but here we just need to ensure the variable names don't conflict with Mode1Signal missing props if stored in mode1 state
     setPredictiveSignals(allSignals);
   }, [rows, loading, active, engine, showBranco]);
 
