@@ -30,7 +30,6 @@ export function validateSignal(
   const allWindowResults = latestResults
     .filter(r => {
       const resTime = new Date(r.created_at).getTime();
-      // O horário do sinal já é em UTC, mas a comparação deve ser consistente
       return resTime >= signalStartTime && resTime < gale1EndTime;
     })
     .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()); // Ordem cronológica ASC
@@ -66,12 +65,6 @@ export function validateSignal(
     return resTime >= signalEndTime && resTime < gale1EndTime && isAfterG0;
   });
 
-  console.log(`RESULTADOS DA JANELA:`);
-  if (gale0) {
-    console.log(`GALE 0 (Minuto ${signal.time}): ID: ${gale0.id} | roll: ${gale0.roll} | color: ${gale0.color}`);
-  }
-  if (gale1) {
-    const nextMin = new Date(signalStartTime + 60000).getMinutes();
   console.log(`GALE 0: ${gale0?.id || "N/A"}`);
   console.log(`GALE 1: ${gale1?.id || "N/A"}`);
   console.log(`-----------------------------------------------`);
@@ -80,22 +73,26 @@ export function validateSignal(
   const isWhite = (r: any) => r && (Number(r.color) === 0 || Number(r.roll) === 0);
   const isTarget = (r: any) => r && Number(r.color) === targetColor;
 
+  // Current time in SP for expiry checks
+  const spTimeStr = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
+  const now = new Date(spTimeStr).getTime();
+
   // GREEN se Gale 0 ou Gale 1 baterem
   if (isTarget(gale0) || isWhite(gale0)) {
     const reason = `Sucesso no G0 (ID: ${gale0.id})`;
-    console.log(`DECISÃO: GREEN | MOTIVO: ${reason}`);
+    console.log(`FINAL STATUS: GREEN`);
+    console.log(`REASON: ${reason}`);
+    console.log(`===============================================`);
     return { status: "green", signal, expectedColor: targetColor, gale0, gale1, reason };
   }
 
   if (isTarget(gale1) || isWhite(gale1)) {
     const reason = `Sucesso no G1 (ID: ${gale1.id})`;
-    console.log(`DECISÃO: GREEN | MOTIVO: ${reason}`);
+    console.log(`FINAL STATUS: GREEN`);
+    console.log(`REASON: ${reason}`);
+    console.log(`===============================================`);
     return { status: "green", signal, expectedColor: targetColor, gale0, gale1, reason };
   }
-
-  // Current time in SP for expiry checks
-  const spTimeStr = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
-  const now = new Date(spTimeStr).getTime();
 
   // 1. Se o horário de INÍCIO do sinal ainda não chegou, é WAIT
   if (now < signalStartTime) {
@@ -122,5 +119,3 @@ export function validateSignal(
   console.log(`===============================================`);
   return { status: "wait", signal, expectedColor: targetColor, gale0, gale1, reason };
 }
-
-
