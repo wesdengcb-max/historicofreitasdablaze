@@ -241,7 +241,7 @@ function LandingPage() {
           <FeatureCard 
             icon={<BarChart3 size={28} />} 
             title="Estatísticas Avançadas" 
-            description="Visualize gráficos, tendências e informações importantes dos dados."
+            description="Gráficos, tendências e insights para turbinar suas análises."
           />
           <FeatureCard 
             icon={<Target size={28} />} 
