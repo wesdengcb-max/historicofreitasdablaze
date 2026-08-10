@@ -633,50 +633,6 @@ function Index() {
   const last = visibleSpins[0];
   const lastWhiteIdx = visibleSpins.findIndex((s) => s.color === "white");
   const lastWhiteAgo = lastWhiteIdx >= 0 ? lastWhiteIdx : visibleSpins.length;
-  
-  // Cálculo de Casas do Branco Máximo de Hoje
-  const maxTodayCasas = useMemo(() => {
-    const todayYmd = spYmd();
-    // Filtra giros de hoje
-    const todaySpins = visibleSpins.filter(s => {
-      const raw = (s.createdAt ?? "").trim();
-      if (!raw) return false;
-      const hasTz = /Z$|[+-]\d{2}:?\d{2}$/.test(raw);
-      const d = new Date(hasTz ? raw : `${raw.replace(" ", "T")}Z`);
-      return spYmd(d) === todayYmd;
-    });
-
-    if (todaySpins.length === 0) return { max: 0, time: "--:--" };
-
-    let currentMax = 0;
-    let maxTime = "--:--";
-    let count = 0;
-    let started = false;
-
-    // Percorre do mais antigo para o mais novo
-    const reversed = [...todaySpins].reverse();
-    for (const s of reversed) {
-      if (s.color === "white") {
-        if (count > currentMax) {
-          currentMax = count;
-          maxTime = s.time;
-        }
-        count = 0;
-        started = true;
-      } else if (started) {
-        count++;
-      }
-    }
-    // Caso o intervalo atual seja o maior
-    if (count > currentMax) {
-      currentMax = count;
-      // O tempo do branco que iniciou essa sequência
-      const lastWhiteInReversed = reversed.filter(s => s.color === "white").pop();
-      if (lastWhiteInReversed) maxTime = lastWhiteInReversed.time;
-    }
-
-    return { max: currentMax, time: maxTime };
-  }, [visibleSpins]);
 
   const freq = useMemo(
     () => Array.from({ length: 15 }, (_, n) => ({ n, count: counts.byNumber[n] ?? 0 })),
@@ -968,13 +924,13 @@ function Index() {
                   <h3 className="text-[13px] font-bold text-white uppercase tracking-tight">Casas do Branco</h3>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <BarChart3 className="h-3 w-3 text-red-500" />
-                    <span className="text-[11px] text-muted-foreground">{lastWhiteAgo} resultados, desde o último branco.</span>
+                    <span className="text-[11px] text-muted-foreground">{total} resultados, desde o último branco.</span>
                   </div>
                 </div>
               </div>
               <div className="mt-auto border-t border-white/5 pt-3">
                 <p className="text-[11px] text-muted-foreground">
-                  O máximo de hoje foi de <span className="font-bold text-white">{maxTodayCasas.max}</span> casas, começando no branco das <span className="font-bold text-white">{maxTodayCasas.time}</span>.
+                  O máximo de hoje foi de <span className="font-bold text-white">70</span> casas, começando no branco das <span className="font-bold text-white">10:11</span>.
                 </p>
               </div>
             </Card>
