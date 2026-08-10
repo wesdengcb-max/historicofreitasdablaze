@@ -103,6 +103,9 @@ export type PredictiveSignal = {
   label: string;
   confluence: string;
   medal?: string;
+  outcome?: "pending" | "green" | "red";
+  resultTime?: string;
+  entryDate?: Date;
 };
 
 export function setPredictiveSignals(signals: PredictiveSignal[]) {
