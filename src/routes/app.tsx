@@ -923,7 +923,7 @@ function Index() {
             countdown={countdown}
           />
 
-          <SinaisSectionList />
+          
 
 
           <section className="space-y-3 sm:space-y-5 lg:space-y-6">
