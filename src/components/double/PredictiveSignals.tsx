@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { setPredictiveSignals, setProximaListaSignals, getProximaListaSignals, subscribeProximaLista, type ProximaListaSignal } from "@/lib/signalsStore";
-import { Loader2, Sparkles, Target, List, Layers } from "lucide-react";
+import { Loader2, Sparkles, Target, List, Layers, CheckCircle2, XCircle, Clock } from "lucide-react";
+import { ListSignalMonitor } from "./ListSignalMonitor";
 import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
 import { Card } from "@/components/double/Card";
 import {
@@ -400,6 +401,7 @@ export function PredictiveSignals() {
 
   return (
     <div className="space-y-6">
+      <ListSignalMonitor />
       <Card className="glass-card !p-0 overflow-hidden">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.05] bg-white/[0.02] px-6 py-5">
           <div className="flex items-center gap-4">
@@ -673,9 +675,20 @@ function ProximaListaDisplay() {
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
         {list.map((s) => (
-          <div key={s.key} className="flex items-center justify-center gap-2 bg-white/[0.03] rounded-lg py-2 px-3 border border-white/[0.05]">
-            <span className="text-sm font-black tabular-nums text-white font-outfit">{s.time}</span>
-            <span className="text-lg">{s.symbols.includes('⚪️') ? s.symbols : `${s.symbols}⚪️`}</span>
+          <div key={s.key} className={`flex items-center justify-between gap-2 bg-white/[0.03] rounded-lg py-2 px-3 border transition-all duration-300 ${
+            s.outcome === 'green' ? 'border-green-500/30 bg-green-500/5 shadow-[0_0_10px_rgba(34,197,94,0.1)]' :
+            s.outcome === 'red' ? 'border-red-500/30 bg-red-500/5' :
+            'border-white/[0.05]'
+          }`}>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-black tabular-nums text-white font-outfit">{s.time}</span>
+              <span className="text-lg">{s.symbols.includes('⚪️') ? s.symbols : `${s.symbols}⚪️`}</span>
+            </div>
+            {s.outcome === 'green' && <CheckCircle2 size={14} className="text-green-500" />}
+            {s.outcome === 'red' && <XCircle size={14} className="text-red-500" />}
+            {(!s.outcome || s.outcome === 'pending') && (
+              <Clock size={12} className="text-muted-foreground animate-pulse" />
+            )}
           </div>
         ))}
       </div>
