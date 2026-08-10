@@ -12,6 +12,7 @@ import {
   Trash2,
   ChevronRight,
   Sparkles,
+  List,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/double/Card";
@@ -41,7 +42,7 @@ import {
 import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
 import { ResultCircle } from "@/components/double/ResultCircle";
 import { colorOf, fmtTime, type Color } from "@/components/double/types";
-import { setSignals, getRobotEnabled, setRobotEnabled, subscribeRobot, getPredictiveSignals, subscribePredictive, type PredictiveSignal } from "@/lib/signalsStore";
+import { setSignals, getRobotEnabled, setRobotEnabled, subscribeRobot, getPredictiveSignals, subscribePredictive, type PredictiveSignal, getProximaListaSignals, subscribeProximaLista, type ProximaListaSignal } from "@/lib/signalsStore";
 import { BlazeRoulette } from "@/components/double/BlazeRoulette";
 import { PredictiveSignals } from "@/components/double/PredictiveSignals";
 
@@ -138,6 +139,7 @@ export default function SinaisSection() {
   const [manualSignals, setManualSignals] = useState<Signal[]>([]);
   const [addOpen, setAddOpen] = useState(false);
   const [predictiveList, setPredictiveList] = useState<PredictiveSignal[]>(getPredictiveSignals());
+  const [proximaLista, setProximaLista] = useState<ProximaListaSignal[]>(getProximaListaSignals());
   const [menuOpen, setMenuOpen] = useState(false);
   const [formDate, setFormDate] = useState(() => spYmd());
   const [formTime, setFormTime] = useState("");
@@ -331,9 +333,11 @@ export default function SinaisSection() {
 
     update();
     const sub = subscribePredictive(update);
+    const subPL = subscribeProximaLista(() => setProximaLista(getProximaListaSignals()));
     const interval = setInterval(update, 5000);
     return () => {
       sub();
+      subPL();
       clearInterval(interval);
     };
   }, [resultsForValidation]);
@@ -456,6 +460,35 @@ export default function SinaisSection() {
               </tr>
             </thead>
             <tbody>
+              {/* Próxima Lista Signals */}
+              {proximaLista.map((s) => (
+                <tr key={s.key} className="border-b border-white/[0.03] bg-white/[0.01] hover:bg-white/[0.03] transition-colors">
+                  <td className="px-4 py-4 text-center">
+                    <List className="h-3 w-3 text-red-500/60" />
+                  </td>
+                  <td className="px-3 py-4">
+                    <div className="font-black text-lg text-white font-outfit">{s.time}</div>
+                    <div className="text-[9px] text-muted-foreground font-mono tracking-widest uppercase font-bold">HORÁRIO</div>
+                  </td>
+                  <td className="px-3 py-4">
+                    <div className="inline-flex items-center gap-1.5 rounded-full border border-red-500/20 bg-red-500/5 px-2.5 py-1">
+                      <span className="text-sm font-black text-red-500 font-outfit">SINAL</span>
+                    </div>
+                  </td>
+                  <td className="px-3 py-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-black text-white/90">{s.symbols}</span>
+                    </div>
+                  </td>
+                  <td className="px-3 py-4">
+                    <div className="inline-flex items-center gap-2 rounded-md bg-white/[0.05] border border-white/10 px-3 py-1 text-[10px] font-black tracking-widest text-muted-foreground uppercase font-mono">
+                      AGUARDANDO
+                    </div>
+                  </td>
+                  <td className="px-3 py-4"></td>
+                </tr>
+              ))}
+
               {/* Sinais Preditos Automáticos (Próximo Branco) */}
               {predictiveList.map((s) => (
                 <tr key={s.key} className="border-b border-white/[0.03] bg-white/[0.01] hover:bg-white/[0.03] transition-colors">
