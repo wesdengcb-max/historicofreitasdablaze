@@ -1293,9 +1293,9 @@ function Index() {
                             const [hh, mmPrefix] = row.label.split(":");
                             const hm = `${hh}:${mmPrefix[0]}${ci}`;
                             const cellSignals = signalsByHM.get(hm) ?? [];
-                            const green = cellSignals.find((s) => s.outcome === "green");
-                            const pending = cellSignals.find((s) => s.outcome === "pending");
-                            const red = cellSignals.find((s) => s.outcome === "red");
+                            const green = robotOn ? cellSignals.find((s) => s.outcome === "green") : undefined;
+                            const pending = robotOn ? cellSignals.find((s) => s.outcome === "pending") : undefined;
+                            const red = robotOn ? cellSignals.find((s) => s.outcome === "red") : undefined;
                             let badge: null | { label: string; tone: "exato" | "margem" | "pending" | "loss" } = null;
                             if (green) {
                               const diff = green.matchedIso
