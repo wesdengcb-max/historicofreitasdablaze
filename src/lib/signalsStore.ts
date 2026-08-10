@@ -143,8 +143,9 @@ export type ProximaListaSignal = {
   key: string;
   time: string;
   symbols: string;
-  outcome?: "pending" | "green" | "red";
   entryDate: Date;
+  generatedAt: number;
+  outcome?: "pending" | "green" | "red" | "waiting";
 };
 
 const PROXIMA_LISTA_KEY = "freitas.proxima.lista";
