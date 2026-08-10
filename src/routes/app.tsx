@@ -906,7 +906,12 @@ function Index() {
                   <h3 className="text-[13px] font-bold text-white uppercase tracking-tight">Último Branco</h3>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <Clock className="h-3 w-3 text-red-500" />
-                    <span className="text-[11px] text-muted-foreground">{lastWhiteAgo} rodadas atrás.</span>
+                    <span className="text-[11px] text-muted-foreground">
+                      {lastWhiteAgo} rodadas atrás.
+                      {lastWhiteMinutesAgo !== null && (
+                        <span className="block mt-0.5">{lastWhiteMinutesAgo} minutos atrás.</span>
+                      )}
+                    </span>
                   </div>
                 </div>
                 <div className="flex flex-col items-end">
