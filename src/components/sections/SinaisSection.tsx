@@ -127,7 +127,6 @@ function parseIso(iso: string): Date {
 function buildSignals(results: Result[]): Signal[] {
   return [];
 }
-}
 
 export default function SinaisSection() {
   const [results, setResults] = useState<Result[]>([]);
