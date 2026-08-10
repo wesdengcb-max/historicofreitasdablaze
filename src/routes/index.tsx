@@ -50,7 +50,10 @@ function LandingPage() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
             <div className="w-12 h-12 rounded-full p-0.5 bg-gradient-to-br from-[#E50914] to-[#7f0000] shadow-[0_0_20px_rgba(229,9,20,0.4)] transition-transform duration-500 group-hover:rotate-[360deg] group-hover:scale-110">
-              <div className="w-full h-full rounded-full bg-black overflow-hidden flex items-center justify-center border border-white/10">
+              <div className="w-full h-full rounded-full bg-black overflow-hidden flex items-center justify-center border border-white/10 relative">
+                <div className="absolute -top-2 left-1/2 -translate-x-1/2 text-[#E50914] z-10">
+                  <Crown size={14} fill="currentColor" />
+                </div>
                 <img 
                   src={logoTextWhite.url} 
                   alt="FreitasWhite Logo" 
@@ -60,7 +63,7 @@ function LandingPage() {
             </div>
             <div className="flex flex-col">
               <span className="text-xl font-black tracking-tighter uppercase leading-none">
-                Freitas<span className="text-[#E50914]">White</span>
+                Freitas<span className="relative">W<span className="text-[#E50914]">hite</span></span>
               </span>
               <span className="text-[8px] font-bold text-gray-500 uppercase tracking-[0.3em] mt-1">Ecosystem Pro</span>
             </div>
