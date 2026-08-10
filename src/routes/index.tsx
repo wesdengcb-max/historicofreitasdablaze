@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight, Shield, Zap, TrendingUp } from "lucide-react"
 import bgImage from "@/assets/freitas-white-pro-bg.png.asset.json";
 import logoFreitas from "@/assets/logo-freitas.png.asset.json";
+import dashboardPreview from "@/assets/freitas-white-hero-preview.png.asset.json";
 
 export const Route = createFileRoute('/')({
   component: LandingPage,
@@ -11,17 +12,17 @@ export const Route = createFileRoute('/')({
 function LandingPage() {
   return (
     <div className="relative min-h-screen bg-[#050505] text-white font-sans overflow-hidden">
-      {/* Background Image with optimized professional overlays */}
+      {/* Background Image with professional overlays */}
       <div 
-        className="absolute inset-0 z-0 bg-center bg-cover bg-no-repeat transition-transform duration-[2000ms] hover:scale-105"
+        className="absolute inset-0 z-0 bg-center bg-cover bg-no-repeat"
         style={{ 
           backgroundImage: `url(${bgImage.url})`,
         }}
       />
       
-      {/* Dynamic Glassmorphism Overlays */}
-      <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/90 via-black/20 to-black/95" />
-      <div className="absolute inset-0 z-10 bg-[radial-gradient(circle_at_50%_50%,rgba(239,68,68,0.1),transparent_70%)]" />
+      {/* Premium Overlays */}
+      <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/95 via-black/40 to-black/95" />
+      <div className="absolute inset-0 z-10 bg-[radial-gradient(circle_at_50%_20%,rgba(239,68,68,0.15),transparent_70%)]" />
 
       {/* Navigation */}
       <nav className="absolute top-0 left-0 right-0 z-50 p-6 md:p-10 flex items-center justify-between max-w-7xl mx-auto w-full">
@@ -37,18 +38,18 @@ function LandingPage() {
         
         <Link to="/app">
           <Button variant="ghost" className="hidden md:flex text-[10px] font-black uppercase tracking-[0.2em] text-white/60 hover:text-white hover:bg-white/5 rounded-full px-8">
-            SUPORTE
+            ENTRAR
           </Button>
         </Link>
       </nav>
 
       {/* Main Content Area */}
-      <main className="relative z-20 min-h-screen flex flex-col items-center justify-center px-6 pt-20">
-        <div className="w-full max-w-5xl flex flex-col items-center text-center">
+      <main className="relative z-20 min-h-screen flex flex-col items-center justify-center px-6 pt-32 pb-20">
+        <div className="w-full max-w-6xl flex flex-col items-center text-center">
           
-          {/* Top Badge */}
-          <div className="mb-8 animate-fade-in">
-            <div className="inline-flex items-center gap-3 rounded-full bg-red-500/10 border border-red-500/20 px-6 py-2 backdrop-blur-md">
+          {/* Pro Status Badge */}
+          <div className="mb-10 animate-fade-in">
+            <div className="inline-flex items-center gap-3 rounded-full bg-red-500/10 border border-red-500/20 px-6 py-2 backdrop-blur-md shadow-[0_0_20px_rgba(239,68,68,0.1)]">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
@@ -59,61 +60,67 @@ function LandingPage() {
             </div>
           </div>
 
-          {/* Centered Large Logo for High Visibility */}
-          <div className="mb-12 relative group">
-            <div className="absolute inset-0 bg-red-500/20 blur-[100px] opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-            <img 
-              src={logoFreitas.url} 
-              alt="Freitas White Logo" 
-              className="h-32 md:h-48 w-auto drop-shadow-[0_0_50px_rgba(239,68,68,0.4)] transition-transform duration-700 hover:scale-110" 
-            />
+          {/* Floating Dashboard Preview (Reference to image-93) */}
+          <div className="relative mb-16 group perspective-1000">
+            <div className="absolute -inset-1 bg-gradient-to-r from-red-600 to-red-900 rounded-3xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+            <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0c0c0c] shadow-2xl transition-all duration-700 hover:scale-[1.02] hover:-rotate-y-2">
+              <img 
+                src={dashboardPreview.url} 
+                alt="Plataforma Profissional" 
+                className="w-full max-w-4xl h-auto object-cover opacity-90 group-hover:opacity-100 transition-opacity"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent opacity-40" />
+            </div>
+            
+            {/* Logo Overlaying or Nearby */}
+            <div className="absolute -bottom-10 -right-10 md:-right-20 z-30 hidden lg:block">
+               <img src={logoFreitas.url} className="h-40 w-auto drop-shadow-[0_0_30px_rgba(239,68,68,0.3)] animate-float" />
+            </div>
           </div>
 
-          {/* Hero Heading */}
-          <h1 className="text-6xl md:text-9xl font-black tracking-tighter uppercase mb-6 leading-[0.9] drop-shadow-2xl">
-            DOMINE O <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-gray-500">MERCADO</span>
+          {/* New Professional Headline (Replaced "Domine o Mercado") */}
+          <h1 className="text-5xl md:text-8xl font-black tracking-tighter uppercase mb-6 leading-[0.9] drop-shadow-2xl">
+            TECNOLOGIA <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-red-500">ESTRATÉGICA</span>
           </h1>
 
           {/* Description */}
           <p className="max-w-2xl text-gray-400 text-sm md:text-lg font-medium mb-12 tracking-wide leading-relaxed opacity-90">
-            A plataforma definitiva de análise em tempo real para investidores profissionais. 
-            Tecnologia preditiva de alta assertividade agora ao seu alcance.
+            O ecossistema definitivo para investidores profissionais. Análise técnica 
+            avançada com confluência de dados em tempo real.
           </p>
 
-          {/* Actions */}
-          <div className="flex flex-col sm:flex-row gap-6 w-full sm:w-auto">
-            <Link to="/app" className="w-full sm:w-auto">
-              <Button className="h-20 px-16 w-full sm:w-auto bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-sm md:text-base font-black uppercase tracking-[0.2em] rounded-2xl shadow-[0_20px_50px_rgba(239,68,68,0.5)] transition-all hover:scale-105 active:scale-95 group border-t border-white/20">
-                Entrar no sistema
-                <ArrowRight className="ml-4 h-6 w-6 transition-transform group-hover:translate-x-2" />
-              </Button>
-            </Link>
-          </div>
+          {/* Primary Action */}
+          <Link to="/app" className="w-full sm:w-auto">
+            <Button className="h-20 px-16 w-full sm:w-auto bg-red-600 hover:bg-red-700 text-sm md:text-base font-black uppercase tracking-[0.2em] rounded-2xl shadow-[0_20px_50px_rgba(239,68,68,0.4)] transition-all hover:scale-105 active:scale-95 group border-t border-white/10">
+              Acessar Sistema
+              <ArrowRight className="ml-4 h-6 w-6 transition-transform group-hover:translate-x-2" />
+            </Button>
+          </Link>
 
-          {/* Features Grid (Minimalist) */}
-          <div className="mt-24 grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-4xl opacity-50 hover:opacity-100 transition-opacity duration-500">
-            {[
-              { icon: <Shield className="h-5 w-5" />, text: "SEGURANÇA TOTAL" },
-              { icon: <Zap className="h-5 w-5" />, text: "ALTA VELOCIDADE" },
-              { icon: <TrendingUp className="h-5 w-5" />, text: "94.8% ASSERTIVIDADE" }
-            ].map((item, i) => (
-              <div key={i} className="flex items-center justify-center gap-3 border border-white/5 bg-white/5 py-4 px-6 rounded-xl backdrop-blur-sm">
-                <div className="text-red-500">{item.icon}</div>
-                <span className="text-[10px] font-black uppercase tracking-[0.2em]">{item.text}</span>
-              </div>
-            ))}
+          {/* Minimal Feature Bar */}
+          <div className="mt-20 flex flex-wrap justify-center gap-10 opacity-40">
+             <div className="flex items-center gap-3">
+               <Shield className="h-4 w-4 text-red-500" />
+               <span className="text-[10px] font-black uppercase tracking-widest">Protocolo Seguro</span>
+             </div>
+             <div className="flex items-center gap-3">
+               <Zap className="h-4 w-4 text-red-500" />
+               <span className="text-[10px] font-black uppercase tracking-widest">Tempo Real</span>
+             </div>
+             <div className="flex items-center gap-3">
+               <TrendingUp className="h-4 w-4 text-red-500" />
+               <span className="text-[10px] font-black uppercase tracking-widest">Confluência VIP</span>
+             </div>
           </div>
         </div>
       </main>
 
-      {/* Footer Branding */}
-      <footer className="absolute bottom-10 left-0 right-0 z-20 flex justify-center items-center gap-6">
-        <div className="h-[1px] w-20 bg-gradient-to-r from-transparent to-white/10" />
-        <span className="text-[9px] font-black text-white/30 uppercase tracking-[0.4em]">
-          Histórico Freitas da Blaze · 2026
+      {/* Subtle Footer */}
+      <footer className="py-10 border-t border-white/5 bg-black/20 text-center">
+        <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.5em]">
+          Freitas White Pro Ecosystem · MMXVI
         </span>
-        <div className="h-[1px] w-20 bg-gradient-to-l from-transparent to-white/10" />
       </footer>
     </div>
   )
