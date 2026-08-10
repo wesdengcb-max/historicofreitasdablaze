@@ -9,7 +9,9 @@ export type StoredSignal = {
 };
 
 const KEY = "freitas.signals.v1";
+const ROBOT_KEY = "freitas.robot.enabled";
 const EVENT = "freitas:signals";
+const ROBOT_EVENT = "freitas:robot";
 
 function read(): StoredSignal[] {
   if (typeof window === "undefined") return [];
