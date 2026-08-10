@@ -31,7 +31,7 @@ function LandingPage() {
         {/* Main Background Image */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${bgAsset.url})` }}
+          style={{ backgroundImage: `url(${bgAsset.url})`, backgroundSize: 'cover' }}
         />
         
         {/* Overlays for depth and contrast */}
