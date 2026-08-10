@@ -231,6 +231,7 @@ const ColumnBlock = memo(function ColumnBlock({
   futureSlots,
   slotPredictions,
   cycleSlotPrediction,
+  signalsByHM,
 }: any) {
   const isActive = highlightKey === String(col);
   const filtered = spins.filter((s: any) => s.time.endsWith(String(col)));
