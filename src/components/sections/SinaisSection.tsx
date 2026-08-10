@@ -126,63 +126,7 @@ function parseIso(iso: string): Date {
 
 function buildSignals(results: Result[]): Signal[] {
   return [];
-  const now = Date.now();
-  const out: Signal[] = [];
-  const maxOffsetMs = Math.max(...ENTRY_OFFSETS) * 60_000;
-  const whites = results.filter((r) => r.color === "white");
-
-  for (const w of whites) {
-    const base = parseIso(w.createdAt);
-    if (Number.isNaN(base.getTime())) continue;
-    // Só considera brancos recentes o suficiente para ainda terem entradas futuras.
-    if (now - base.getTime() > maxOffsetMs) continue;
-    const baseTime = fmtTime(w.createdAt);
-
-    for (let i = 0; i < ENTRY_OFFSETS.length; i++) {
-      const t = new Date(base.getTime() + ENTRY_OFFSETS[i] * 60_000);
-      const targetTime = t.getTime();
-      // só entra na lista se o horário do sinal ainda está no futuro
-      if (targetTime <= now) continue;
-      const windowStart = targetTime - WHITE_MARGIN_MS;
-      const windowEnd = targetTime + WHITE_MARGIN_MS;
-
-      const matchedWhite = results.find((r) => {
-        if (r.color !== "white" || r.id === w.id) return false;
-        const resultTime = parseIso(r.createdAt).getTime();
-        return resultTime >= windowStart && resultTime <= windowEnd;
-      });
-
-      const outcome: Signal["outcome"] = matchedWhite
-        ? "green"
-        : now > windowEnd
-          ? "red"
-          : "pending";
-      const matchedWhiteTime = matchedWhite ? parseIso(matchedWhite.createdAt).getTime() : null;
-      const removeAt =
-        outcome === "green" || outcome === "red"
-          ? (matchedWhiteTime ?? windowEnd) + 3 * 60_000 // Remove após 3 minutos se for GREEN ou LOSS
-          : Number.POSITIVE_INFINITY;
-
-      if (now > removeAt) continue;
-
-      out.push({
-        id: `${w.id}-${i}`,
-        time: fmtTime(t.toISOString()),
-        date: fmtDateShort(t),
-        entry: i + 1,
-        baseTime,
-        entryDate: t,
-        outcome,
-        resultTime: matchedWhite ? fmtTime(matchedWhite.createdAt) : undefined,
-        color: "white",
-        targetIso: t.toISOString(),
-        matchedIso: matchedWhite?.createdAt,
-
-
-      });
-    }
-  }
-  return out.sort((a, b) => a.entryDate.getTime() - b.entryDate.getTime());
+}
 }
 
 export default function SinaisSection() {
