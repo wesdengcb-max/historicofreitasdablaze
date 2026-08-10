@@ -33,7 +33,7 @@ export function validateSignal(
     .filter(r => {
       const resDate = new Date(r.created_at);
       const resTime = resDate.getTime();
-      return resTime > signalGenerationTime && resTime < (gale1EndTime + 30000); // 30s de margem de segurança para o DB
+      return resTime > signalGenerationTime && resTime < (gale1EndTime + 30000); 
     })
     .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()); // Ordem cronológica ASC
 
@@ -50,39 +50,25 @@ export function validateSignal(
   console.log(`timestamp exato: ${signalGenerationTime} (${new Date(signalGenerationTime).toISOString()})`);
   console.log(`cor esperada: ${targetColorName} (${targetColor})`);
 
-  console.log(`RESULTADOS ANTES DO SINAL:`);
-  if (resultsBeforeSignal.length === 0) {
-    console.log("(Nenhum resultado recente antes do sinal)");
-  }
-  resultsBeforeSignal.forEach(r => {
-    console.log(`ID: ${r.id} | created_at: ${r.created_at} | roll: ${r.roll} | color: ${r.color} -> AÇÃO: IGNORADO`);
-  });
-
   // Identificação do Gale 0 e Gale 1 baseada na cronologia real
-  // Gale 0: Primeiro resultado após a geração do sinal dentro do minuto do sinal
-  const gale0 = allPosteriorResults.find(r => {
-    const resTime = new Date(r.created_at).getTime();
-    return resTime >= signalStartTime && resTime < signalEndTime;
-  });
+  // Gale 0: Primeiro resultado após a geração do sinal que pertença ao minuto do sinal ou ao minuto seguinte se o sinal foi gerado no final do minuto
+  // Mas para simplificar e ser exato: o PRIMEIRO resultado após a geração.
+  const gale0 = allPosteriorResults[0];
 
-  // Gale 1: Primeiro resultado após o Gale 0 (ou após o minuto do sinal se não houve Gale 0) dentro do minuto do Gale 1
-  const gale1 = allPosteriorResults.find(r => {
-    const resTime = new Date(r.created_at).getTime();
-    const isAfterGale0 = gale0 ? (new Date(r.created_at).getTime() > new Date(gale0.created_at).getTime()) : true;
-    return resTime >= signalEndTime && resTime < gale1EndTime && isAfterGale0;
-  });
+  // Gale 1: O SEGUNDO resultado após a geração
+  const gale1 = allPosteriorResults[1];
 
   console.log(`RESULTADOS DEPOIS DO SINAL:`);
   if (gale0) {
     console.log(`GALE 0: ID: ${gale0.id} | created_at: ${gale0.created_at} | roll: ${gale0.roll} | color: ${gale0.color}`);
   } else {
-    console.log(`GALE 0: (Aguardando ou não encontrado no minuto)`);
+    console.log(`GALE 0: (Aguardando...)`);
   }
 
   if (gale1) {
     console.log(`GALE 1: ID: ${gale1.id} | created_at: ${gale1.created_at} | roll: ${gale1.roll} | color: ${gale1.color}`);
   } else {
-    console.log(`GALE 1: (Aguardando ou não encontrado no minuto)`);
+    console.log(`GALE 1: (Aguardando...)`);
   }
 
   // Lógica de decisão
@@ -92,36 +78,39 @@ export function validateSignal(
   // GREEN se Gale 0 ou Gale 1 baterem
   if (isTarget(gale0) || isWhite(gale0)) {
     const reason = `Sucesso no G0 (ID: ${gale0.id})`;
-    console.log(`DECISÃO: GREEN`);
-    console.log(`MOTIVO: ${reason}`);
+    console.log(`DECISÃO: GREEN | MOTIVO: ${reason}`);
     console.log(`==========================================`);
     return { status: "green", signal, expectedColor: targetColor, gale0, gale1, reason };
   }
 
   if (isTarget(gale1) || isWhite(gale1)) {
     const reason = `Sucesso no G1 (ID: ${gale1.id})`;
-    console.log(`DECISÃO: GREEN`);
-    console.log(`MOTIVO: ${reason}`);
+    console.log(`DECISÃO: GREEN | MOTIVO: ${reason}`);
     console.log(`==========================================`);
     return { status: "green", signal, expectedColor: targetColor, gale0, gale1, reason };
   }
 
-  // RED se o tempo expirou e não houve sucesso
+  // Se já temos 2 resultados e nenhum deu green, é RED
+  if (allPosteriorResults.length >= 2) {
+    const reason = `Gale 1 finalizado (ID: ${gale1.id}) sem sucesso.`;
+    console.log(`DECISÃO: RED | MOTIVO: ${reason}`);
+    console.log(`==========================================`);
+    return { status: "red", signal, expectedColor: targetColor, gale0, gale1, reason };
+  }
+
+  // Se o tempo expirou muito (ex: 3 minutos) e não temos resultados suficientes
   const spTimeStr = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
   const now = new Date(spTimeStr).getTime();
-  const expiryTime = gale1EndTime + 10000; // 10s após o fim do G1
-
-  if (now > expiryTime) {
-    const reason = gale1 ? "Gale 1 finalizado sem sucesso" : "Janela expirada sem resultados compatíveis";
-    console.log(`DECISÃO: RED`);
-    console.log(`MOTIVO: ${reason}`);
+  if (now > (signalGenerationTime + 180000)) {
+    const reason = "Tempo limite excedido sem resultados suficientes no banco.";
+    console.log(`DECISÃO: RED | MOTIVO: ${reason}`);
     console.log(`==========================================`);
     return { status: "red", signal, expectedColor: targetColor, gale0, gale1, reason };
   }
 
   // Caso contrário, WAIT
-  console.log(`DECISÃO: WAIT`);
-  console.log(`MOTIVO: Aguardando resultados da janela`);
+  console.log(`DECISÃO: WAIT | MOTIVO: Aguardando resultados posteriores ao sinal.`);
   console.log(`==========================================`);
   return { status: "wait", signal, expectedColor: targetColor, gale0, gale1, reason: "Aguardando" };
 }
+
