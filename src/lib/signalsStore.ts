@@ -10,8 +10,10 @@ export type StoredSignal = {
 
 const KEY = "freitas.signals.v1";
 const ROBOT_KEY = "freitas.robot.enabled";
+const PREDICTIVE_KEY = "freitas.predictive.signals";
 const EVENT = "freitas:signals";
 const ROBOT_EVENT = "freitas:robot";
+const PREDICTIVE_EVENT = "freitas:predictive";
 
 function read(): StoredSignal[] {
   if (typeof window === "undefined") return [];
@@ -91,5 +93,45 @@ export function subscribeRobot(listener: () => void): () => void {
   });
   return () => {
     window.removeEventListener(ROBOT_EVENT, listener);
+  };
+}
+
+export type PredictiveSignal = {
+  key: string;
+  time: string;
+  pct: number;
+  label: string;
+  confluence: string;
+  medal?: string;
+};
+
+export function setPredictiveSignals(signals: PredictiveSignal[]) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(PREDICTIVE_KEY, JSON.stringify(signals));
+  } catch {
+    // ignore
+  }
+  window.dispatchEvent(new Event(PREDICTIVE_EVENT));
+}
+
+export function getPredictiveSignals(): PredictiveSignal[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(PREDICTIVE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function subscribePredictive(listener: () => void): () => void {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener(PREDICTIVE_EVENT, listener);
+  window.addEventListener("storage", (e) => {
+    if (e.key === PREDICTIVE_KEY) listener();
+  });
+  return () => {
+    window.removeEventListener(PREDICTIVE_EVENT, listener);
   };
 }
