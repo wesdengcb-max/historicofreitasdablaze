@@ -406,7 +406,6 @@ export function PredictiveSignals() {
     }
   }, [rows, loading, active, engine]);
 
-  const [showProximaLista, setShowProximaLista] = useState(false);
 
   const generateProximaLista = useCallback(() => {
     if (rows.length === 0) return;
