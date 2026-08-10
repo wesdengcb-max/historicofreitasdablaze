@@ -296,8 +296,8 @@ export default function SinaisSection() {
         const matchedExact = resultsForValidation.find(r => {
           if (r.color !== "white") return false;
           const rt = new Date(r.createdAt).getTime();
-          // Exact is within 1 minute of projected time (before or after)
-          return rt >= targetTime - 60_000 && rt <= targetTime + 60_000;
+          // EXACT: within 1 minute of projected time AND must NOT be in the future relative to now
+          return rt >= targetTime - 60_000 && rt <= targetTime + 60_000 && rt <= now;
         });
 
         if (matchedExact) {
@@ -307,8 +307,8 @@ export default function SinaisSection() {
         const matchedMargin = resultsForValidation.find(r => {
           if (r.color !== "white") return false;
           const rt = new Date(r.createdAt).getTime();
-          // Margin is within 2 minutes of projected time (before or after) but NOT exact
-          return rt >= targetTime - MARGIN_MS && rt <= targetTime + MARGIN_MS;
+          // MARGIN: within 2 minutes of projected time AND must NOT be in the future relative to now
+          return rt >= targetTime - MARGIN_MS && rt <= targetTime + MARGIN_MS && rt <= now;
         });
 
         if (matchedMargin) {
