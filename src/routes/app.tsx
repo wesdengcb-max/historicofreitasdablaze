@@ -633,6 +633,13 @@ function Index() {
   const last = visibleSpins[0];
   const lastWhiteIdx = visibleSpins.findIndex((s) => s.color === "white");
   const lastWhiteAgo = lastWhiteIdx >= 0 ? lastWhiteIdx : visibleSpins.length;
+  
+  const lastWhiteMinutesAgo = useMemo(() => {
+    if (lastWhiteIdx < 0 || !visibleSpins[lastWhiteIdx]?.createdAt) return null;
+    const lastWhiteTime = new Date(visibleSpins[lastWhiteIdx].createdAt!).getTime();
+    const diff = Date.now() - lastWhiteTime;
+    return Math.floor(diff / 60000);
+  }, [visibleSpins, lastWhiteIdx]);
 
   const freq = useMemo(
     () => Array.from({ length: 15 }, (_, n) => ({ n, count: counts.byNumber[n] ?? 0 })),
@@ -899,7 +906,12 @@ function Index() {
                   <h3 className="text-[13px] font-bold text-white uppercase tracking-tight">Último Branco</h3>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <Clock className="h-3 w-3 text-red-500" />
-                    <span className="text-[11px] text-muted-foreground">{lastWhiteAgo} rodadas atrás.</span>
+                    <span className="text-[11px] text-muted-foreground">
+                      {lastWhiteAgo} rodadas atrás.
+                      {lastWhiteMinutesAgo !== null && (
+                        <span className="block mt-0.5">{lastWhiteMinutesAgo} minutos atrás.</span>
+                      )}
+                    </span>
                   </div>
                 </div>
                 <div className="flex flex-col items-end">
