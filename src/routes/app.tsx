@@ -859,7 +859,6 @@ function Index() {
   }, [gridRows]);
 
   const signalsByHM = useMemo(() => {
-
     const fmt = new Intl.DateTimeFormat("en-GB", {
       timeZone: "America/Sao_Paulo",
       hour: "2-digit",
@@ -875,8 +874,26 @@ function Index() {
       arr.push(s);
       map.set(key, arr);
     }
+    
+    for (const ps of predictiveSignals) {
+      if (!ps.entryDate) continue;
+      const d = new Date(ps.entryDate);
+      if (Number.isNaN(d.getTime())) continue;
+      const key = fmt.format(d); // "HH:MM"
+      const arr = map.get(key) ?? [];
+      const s: StoredSignal = {
+        id: ps.key,
+        color: "white",
+        entry: 1,
+        targetIso: new Date(ps.entryDate).toISOString(),
+        outcome: ps.outcome || "pending",
+        matchedIso: ps.resultTime ? new Date().toISOString() : undefined 
+      };
+      arr.push(s);
+      map.set(key, arr);
+    }
     return map;
-  }, [storedSignals]);
+  }, [storedSignals, predictiveSignals]);
 
 
   return (
