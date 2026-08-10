@@ -84,10 +84,10 @@ export function PredictiveSignals() {
 
   // Auto-generate projections when data is ready
   useEffect(() => {
-    if (rows.length > 0 && !mode1) {
+    if (rows.length > 0 && !mode1 && !loading) {
       generate();
     }
-  }, [rows, generate, mode1]);
+  }, [rows, generate, mode1, loading]);
 
   useEffect(() => {
     let alive = true;
