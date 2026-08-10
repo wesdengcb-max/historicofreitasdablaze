@@ -65,10 +65,12 @@ export function ListSignalMonitor() {
         if (matches.length > 0) {
           const isGreen = matches.some(r => {
             const resColor = Number(r.color);
+            // GREEN if it hits the target color OR white (protection)
             return resColor === targetColor || resColor === 0;
           });
           
           if (isGreen) {
+            console.log(`[ListSignalMonitor] Signal ${signal.time} (${signal.symbols}) is GREEN`, matches);
             changed = true;
             return { ...signal, outcome: "green" as const };
           }
@@ -76,6 +78,7 @@ export function ListSignalMonitor() {
 
         // Only mark as RED if the time window (G1) has fully passed + buffer
         if (now > expiryTime) {
+          console.log(`[ListSignalMonitor] Signal ${signal.time} (${signal.symbols}) is RED - No matches in window`, matches);
           changed = true;
           return { ...signal, outcome: "red" as const };
         }
