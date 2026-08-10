@@ -40,7 +40,7 @@ import {
 import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
 import { ResultCircle } from "@/components/double/ResultCircle";
 import { colorOf, fmtTime, type Color } from "@/components/double/types";
-import { setSignals } from "@/lib/signalsStore";
+import { setSignals, getRobotEnabled, setRobotEnabled, subscribeRobot } from "@/lib/signalsStore";
 import { BlazeRoulette } from "@/components/double/BlazeRoulette";
 import { PredictiveSignals } from "@/components/double/PredictiveSignals";
 
