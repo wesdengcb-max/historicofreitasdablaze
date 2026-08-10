@@ -1258,7 +1258,7 @@ function Index() {
                               <div
                                 key={ci}
                                 className="flex flex-col items-center justify-center p-0.5 sm:p-1"
-                                style={{ width: "100%", height: "66px", direction: "ltr" }}
+                                style={{ width: "100%", height: "80px", direction: "ltr" }}
                               >
                                 <div 
                                   className={`relative flex flex-col items-center pt-2 rounded-lg transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-primary/10" : ""}`}
