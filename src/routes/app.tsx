@@ -1173,10 +1173,10 @@ function Index() {
                       : "Nenhum resultado no período selecionado."}
                   </div>
                 ) : viewMode === "colunas" ? (
-                  <div className="history-scroll w-full overflow-x-hidden p-1 sm:p-2 lg:p-3">
-                    <div className="flex flex-col gap-0 overflow-x-auto scrollbar-none">
+                  <div className="history-scroll w-full overflow-x-auto p-1 sm:p-2 lg:p-3 scrollbar-none">
+                    <div className="flex flex-col gap-0 min-w-[1200px] w-full">
                       {/* Cabeçalho 0-9 interno para Colunas Fixas */}
-                      <div className="grid grid-cols-10 gap-[8px] mb-1 sticky top-0 z-10 bg-background/40 backdrop-blur-sm min-w-[1200px] w-full">
+                      <div className="grid grid-cols-10 gap-[8px] mb-1 sticky top-0 z-10 bg-[#0A0A0A]/80 backdrop-blur-sm w-full">
                         {Array.from({ length: 10 }).map((_, ci) => (
                           <button
                             key={`header-inner-${ci}`}
@@ -1207,7 +1207,7 @@ function Index() {
 
                       {gridRows.map((row) => (
                         <div key={row.key} className="flex flex-col gap-0 border-b border-white/[0.02]">
-                          <div className="grid grid-cols-10 gap-[8px] relative min-w-[1200px] w-full">
+                          <div className="grid grid-cols-10 gap-[8px] relative w-full">
                             {row.cells.map((cell, ci) => {
                             const [hh, mmPrefix] = row.label.split(":");
                             const hm = `${hh}:${mmPrefix[0]}${ci}`;
