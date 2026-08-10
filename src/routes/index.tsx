@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Sparkles, ShieldCheck, Zap, Globe, MessageSquare } from "lucide-react"
+import { ArrowRight, MessageSquare, ShieldCheck, Zap, Globe, Crown } from "lucide-react"
+import logoFreitas from "@/assets/logo-freitas.png.asset.json";
 
 export const Route = createFileRoute('/')({
   component: LandingPage,
@@ -8,86 +9,106 @@ export const Route = createFileRoute('/')({
 
 function LandingPage() {
   return (
-    <div className="min-h-screen bg-black text-white selection:bg-red-500/30">
+    <div className="min-h-screen bg-[#080808] text-white selection:bg-red-500/30 font-sans">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-black/80 backdrop-blur-md">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-600 font-black italic tracking-tighter text-white">
-              FW
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-[#080808]/80 backdrop-blur-xl">
+        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-8">
+          <div className="flex items-center gap-3">
+            <div className="relative h-10 w-10 overflow-hidden rounded-full border border-red-500/30 p-0.5">
+              <img src={logoFreitas.url} alt="Freitas" className="h-full w-full rounded-full object-cover" />
             </div>
-            <span className="text-lg font-black tracking-tight font-outfit uppercase">Freitas White</span>
+            <div className="flex flex-col">
+              <span className="text-sm font-black uppercase tracking-[0.2em] text-white font-outfit leading-none">Freitas White</span>
+              <span className="text-[9px] font-bold text-red-500 uppercase tracking-widest mt-0.5">Premium Analysis</span>
+            </div>
           </div>
-          <div className="hidden items-center gap-8 md:flex">
-            <a href="#features" className="text-sm font-medium text-gray-400 transition-colors hover:text-white">Recursos</a>
-            <a href="#stats" className="text-sm font-medium text-gray-400 transition-colors hover:text-white">Resultados</a>
+          
+          <div className="hidden items-center gap-10 md:flex">
+            <a href="#features" className="text-xs font-bold uppercase tracking-widest text-gray-400 transition-colors hover:text-white">Recursos</a>
+            <a href="#stats" className="text-xs font-bold uppercase tracking-widest text-gray-400 transition-colors hover:text-white">Metodologia</a>
             <Link to="/app">
-              <Button size="sm" className="bg-red-600 font-bold hover:bg-red-700">PODE ME AJUDAR?</Button>
+              <Button size="sm" className="bg-red-600 px-6 font-black uppercase tracking-widest text-[10px] hover:bg-red-700 shadow-[0_4px_15px_rgba(239,68,68,0.3)] h-10 rounded-xl">
+                Acessar Plataforma
+              </Button>
             </Link>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <header className="relative overflow-hidden pt-32 pb-20 lg:pt-48 lg:pb-32">
-        <div className="absolute top-0 left-1/2 -z-10 h-[600px] w-[1000px] -translate-x-1/2 bg-red-600/20 blur-[120px] rounded-full" />
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm font-semibold text-red-400">
-              <Sparkles className="h-4 w-4" />
-              <span>Inteligência Artificial de Elite</span>
+      <header className="relative overflow-hidden pt-40 pb-24 lg:pt-56 lg:pb-40">
+        <div className="absolute top-0 left-1/2 -z-10 h-[800px] w-[1200px] -translate-x-1/2 bg-red-600/10 blur-[140px] rounded-full opacity-50" />
+        
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="relative z-10 text-center">
+            <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-red-500/20 bg-red-500/5 px-5 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-red-500 animate-pulse">
+              <Crown className="h-3 w-3" />
+              <span>Tecnologia Preditiva 2.0</span>
             </div>
-            <h1 className="text-5xl font-black tracking-tight sm:text-7xl lg:text-8xl font-outfit uppercase leading-none">
-              DOMINE A <span className="text-red-600">BLAZE</span> <br />
-              COM PRECISÃO
+            
+            <h1 className="text-6xl font-black tracking-tighter sm:text-8xl lg:text-9xl font-outfit uppercase leading-[0.85] text-white">
+              A ELITE DA <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-b from-red-500 to-red-800">BLAZE</span>
             </h1>
-            <p className="mx-auto mt-8 max-w-2xl text-lg text-gray-400 sm:text-xl">
-              A plataforma definitiva de análise preditiva para Double. 
-              Tecnologia avançada de confluência para encontrar o próximo branco com assertividade recorde.
+            
+            <p className="mx-auto mt-10 max-w-2xl text-lg font-medium text-gray-400 sm:text-xl leading-relaxed">
+              O ecossistema definitivo para investidores de Double. <br className="hidden sm:block" />
+              Combine confluência técnica e inteligência artificial para dominar o mercado.
             </p>
-            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            
+            <div className="mt-14 flex flex-col items-center justify-center gap-6 sm:flex-row">
               <Link to="/app" className="w-full sm:w-auto">
-                <Button size="lg" className="h-14 w-full bg-red-600 px-8 text-lg font-bold hover:bg-red-700 sm:w-auto group">
+                <Button size="lg" className="h-16 w-full sm:w-64 bg-red-600 text-sm font-black uppercase tracking-[0.2em] hover:bg-red-700 group rounded-2xl shadow-[0_10px_30px_rgba(239,68,68,0.4)] transition-all hover:scale-105 active:scale-95">
                   COMEÇAR AGORA
-                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  <ArrowRight className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-2" />
                 </Button>
               </Link>
               <a href="https://t.me/freitaswhite" target="_blank" rel="noreferrer" className="w-full sm:w-auto">
-                <Button variant="outline" size="lg" className="h-14 w-full border-white/10 bg-white/5 px-8 text-lg font-bold hover:bg-white/10 sm:w-auto">
-                  <MessageSquare className="mr-2 h-5 w-5" />
+                <Button variant="outline" size="lg" className="h-16 w-full sm:w-64 border-white/5 bg-white/[0.03] text-sm font-black uppercase tracking-[0.2em] hover:bg-white/[0.08] transition-all rounded-2xl backdrop-blur-sm">
+                  <MessageSquare className="mr-3 h-5 w-5 text-red-500" />
                   GRUPO FREE
                 </Button>
               </a>
             </div>
           </div>
         </div>
+
+        {/* Decorative elements */}
+        <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
       </header>
 
       {/* Features */}
-      <section id="features" className="py-24 bg-white/[0.02]">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section id="features" className="py-32 relative">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="mb-20 text-center">
+            <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-red-500 mb-4">Arquitetura de Dados</h2>
+            <h3 className="text-3xl font-black uppercase font-outfit tracking-tight sm:text-5xl">Diferenciais Premium</h3>
+          </div>
+          
           <div className="grid gap-8 md:grid-cols-3">
             {[
               {
-                icon: <Zap className="h-8 w-8 text-red-500" />,
-                title: "ANÁLISE EM TEMPO REAL",
-                desc: "Monitoramento contínuo de cada rodada com processamento instantâneo de padrões."
+                icon: <Zap className="h-7 w-7 text-red-500" />,
+                title: "SCANNER REAL-TIME",
+                desc: "Processamento instantâneo de cada giro. Nossa engine não descansa para entregar o padrão perfeito."
               },
               {
-                icon: <ShieldCheck className="h-8 w-8 text-red-500" />,
-                title: "CONFLUÊNCIA TOP 5",
-                desc: "Algoritmos que validam entradas apenas quando múltiplos indicadores convergem."
+                icon: <ShieldCheck className="h-7 w-7 text-red-500" />,
+                title: "CONFLUÊNCIA VIP",
+                desc: "Apenas sinais que passam por 5 camadas de validação são disparados. Qualidade sobre quantidade."
               },
               {
-                icon: <Globe className="h-8 w-8 text-red-500" />,
-                title: "GESTÃO PREMIUM",
-                desc: "Ferramentas completas para controle de banca e histórico detalhado do dia."
+                icon: <Globe className="h-7 w-7 text-red-500" />,
+                title: "GLOBAL ANALYTICS",
+                desc: "Visão macro do mercado. Histórico detalhado e métricas de assertividade atualizadas em tempo real."
               }
             ].map((feature, i) => (
-              <div key={i} className="rounded-3xl border border-white/10 bg-black p-8 transition-transform hover:-translate-y-1">
-                <div className="mb-4">{feature.icon}</div>
-                <h3 className="mb-2 text-xl font-bold font-outfit uppercase">{feature.title}</h3>
-                <p className="text-gray-400 leading-relaxed">{feature.desc}</p>
+              <div key={i} className="group relative rounded-[32px] border border-white/5 bg-[#0c0c0c] p-10 transition-all hover:border-red-500/20 hover:-translate-y-2">
+                <div className="mb-8 flex h-16 w-16 items-center justify-center rounded-2xl bg-red-500/10 transition-transform group-hover:scale-110">
+                  {feature.icon}
+                </div>
+                <h3 className="mb-4 text-lg font-black font-outfit uppercase tracking-tight text-white">{feature.title}</h3>
+                <p className="text-gray-400 text-sm leading-relaxed font-medium">{feature.desc}</p>
               </div>
             ))}
           </div>
@@ -95,10 +116,16 @@ function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/10 py-12">
-        <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-          <p className="text-sm text-gray-500">
-            © {new Date().getFullYear()} Freitas White. Todos os direitos reservados.
+      <footer className="border-t border-white/5 py-16 bg-[#060606]">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8 text-center">
+          <div className="flex items-center justify-center gap-2 mb-8 opacity-50">
+             <div className="h-6 w-6 overflow-hidden rounded-full grayscale">
+              <img src={logoFreitas.url} alt="Freitas" className="h-full w-full object-cover" />
+            </div>
+            <span className="text-[10px] font-black uppercase tracking-[0.3em] font-outfit">Freitas White</span>
+          </div>
+          <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest">
+            © {new Date().getFullYear()} Freitas White · Ecosystem for Strategic Players
           </p>
         </div>
       </footer>
