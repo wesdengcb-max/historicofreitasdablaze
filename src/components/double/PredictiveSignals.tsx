@@ -85,6 +85,7 @@ export function PredictiveSignals() {
   const [err, setErr] = useState<string | null>(null);
   const [mode1, setMode1] = useState<Mode1Signal[] | null>(null);
   const [mode2, setMode2] = useState<Mode2Signal[] | null>(null);
+  const [hasClicked, setHasClicked] = useState(false);
   const [generatedAt, setGeneratedAt] = useState<Date | null>(null);
 
   useEffect(() => {
@@ -143,6 +144,7 @@ export function PredictiveSignals() {
   const hasOpportunity = active.length > 0;
 
   const generate = useCallback(() => {
+    setHasClicked(true);
     const now = new Date();
     now.setSeconds(0, 0);
     setGeneratedAt(now);
@@ -302,12 +304,58 @@ export function PredictiveSignals() {
     setPredictiveSignals(syncSignals);
   }, [active, engine]);
 
-  // Auto-generate projections when data is ready
+  // Sync projections with global store for SinaisSection even before clicking button
   useEffect(() => {
-    if (rows.length > 0 && !mode1 && !loading) {
-      generate();
+    if (rows.length > 0 && !loading) {
+      // Re-run the generation logic internally but only update the store
+      // We'll refactor generate to separate calculations from state updates if needed, 
+      // but for now let's just trigger it once to populate the store.
+      // However, we want mode1/mode2 to only show in THIS component after click.
+      
+      const now = new Date();
+      now.setSeconds(0, 0);
+
+      const byTime = new Map<number, any>();
+      for (const item of active) {
+        const hist = engine[item.analysis].filter(c => c.value === item.value);
+        if (hist.length < MIN_GATILHOS) continue;
+        const top1 = computeTop(hist, 1)[0];
+        if (!top1 || top1.pct < MIN_ASSERTIVIDADE_TOP1) continue;
+        const at = addMinutes(item.open.triggerAt, top1.m);
+        if (at.getTime() <= now.getTime()) continue;
+        const t = at.getTime();
+        const cur = byTime.get(t);
+        if (!cur) {
+          byTime.set(t, { 
+            pct: top1.pct, 
+            label: top1.label,
+            sources: [{ analysis: item.analysis, value: item.value }],
+            analyses: new Set([item.analysis])
+          });
+        } else {
+          cur.analyses.add(item.analysis);
+          cur.sources.push({ analysis: item.analysis, value: item.value });
+          if (top1.pct > cur.pct) { cur.pct = top1.pct; cur.label = top1.label; }
+        }
+      }
+
+      const m1Store = Array.from(byTime.entries()).map(([t, info]) => ({
+        key: `m1-${t}`,
+        time: fmtClock(new Date(t)),
+        pct: info.pct,
+        label: info.label,
+        confluence: info.sources.map((src: any) => `A${src.analysis}·${src.value}`).join(", "),
+        medal: getMedalStyles(info.analyses.size)?.label,
+        entryDate: new Date(t),
+        outcome: "pending"
+      }));
+
+      // Mode 2 logic for store... (simplified for brevity or just call generate with a flag)
+      // To keep it simple and DRY, I'll just make sure generate() always updates the store, 
+      // and we just control visibility of the cards here.
+      generate(); 
     }
-  }, [rows, generate, mode1, loading]);
+  }, [rows, loading, active, engine]);
 
   return (
     <Card className="glass-card !p-0 overflow-hidden">
@@ -352,7 +400,7 @@ export function PredictiveSignals() {
           </div>
         )}
 
-        {!mode1 && !err && (
+        {!hasClicked && !err && (
           <p className="text-sm text-muted-foreground">
             {hasOpportunity
               ? `${active.length} ciclo(s) em aberto. Clique em "Próximo branco" para projetar os horários.`
@@ -360,7 +408,7 @@ export function PredictiveSignals() {
           </p>
         )}
 
-        {mode1 && (
+        {hasClicked && mode1 && (
           <section className="space-y-3">
             <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               <Target className="h-3.5 w-3.5" /> Projeção Top 1
@@ -426,7 +474,7 @@ export function PredictiveSignals() {
           </section>
         )}
 
-        {mode2 && (
+        {hasClicked && mode2 && (
           <section className="space-y-3">
             <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               <Layers className="h-3.5 w-3.5" /> Coincidências · validadas pelo Top 5
