@@ -1597,13 +1597,20 @@ const TipMinerCard = memo(function TipMinerCard({
         : "#ffffff";
   const ring = isWhite ? "#16171d" : "#ffffff";
   const fg = isWhite ? "#16171d" : "#ffffff";
-  
-  const isHit = !!highlightN && highlightN.has(spin.n);
-  const isActive = isActiveProp !== undefined ? isActiveProp : true;
 
-  const delayStyle = delay > 0 ? { animationDelay: `${delay}s` } : undefined;
   return (
-    <div className="flex flex-col items-center">
+    <div className="relative flex flex-col items-center">
+      {signal && (
+        <div className="absolute top-0 z-10 flex w-full justify-center">
+          <span className={`inline-flex h-3 items-center rounded-full px-1 text-[7px] font-black tracking-wider shadow-sm sm:h-3.5 sm:px-1.5 sm:text-[8px] ${
+            signal.outcome === "green" 
+              ? "bg-emerald-500 text-black border border-emerald-300"
+              : "bg-emerald-500 text-black border border-emerald-300"
+          }`}>
+            SINAL
+          </span>
+        </div>
+      )}
       <button
         type="button"
         onClick={onClick}
