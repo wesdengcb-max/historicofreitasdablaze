@@ -81,9 +81,9 @@ function LandingPage() {
 
         {/* CTA BUTTON */}
         <Link to="/app" className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-          <Button className="h-14 px-10 bg-gradient-to-r from-[#ff4b5c] to-[#e63946] hover:from-[#ff5c6c] hover:to-[#f74a57] text-white font-black uppercase tracking-widest text-xs rounded-md flex items-center gap-3 shadow-[0px_4px_20px_rgba(230,57,70,0.4)] transition-all hover:scale-105 active:scale-95 border-none">
-            <span className="text-lg leading-none mt-[2px]">▷</span>
-            CONHECENDO AS FERRAMENTAS
+          <Button className="h-14 px-8 bg-black/40 backdrop-blur-md border border-cyan-500/30 hover:border-cyan-400 text-white font-medium rounded-full flex items-center gap-3 transition-all duration-300 hover:shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:bg-black/50 group">
+            <ArrowRight size={20} className="text-cyan-400 transition-transform duration-300 group-hover:translate-x-1" />
+            <span className="tracking-wide">CONHECENDO AS FERRAMENTAS</span>
           </Button>
         </Link>
       </main>
