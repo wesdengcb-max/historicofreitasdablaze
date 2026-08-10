@@ -72,11 +72,11 @@ function LandingPage() {
 
         {/* WELCOME TEXT */}
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mb-8 text-white animate-fade-in-up">
-          https://postimg.cc/hzs9rJ92
+          Bem-vindo, Jogador!
         </h1>
 
         <p className="text-base md:text-lg text-[#d1d5db] mb-12 max-w-[700px] leading-relaxed font-medium animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-          Segue a imagem ai q é pra por no fundo do homepage
+          Com a nossa plataforma de resultados, o mercado de apostas pode ser mais lucrativo. Tendo acesso à milhares de resultados catalogados e que podem ser manipulados através de filtros. Em conjunto com bons estudos, você pode ser mais acertivo.
         </p>
 
         {/* CTA BUTTON */}
