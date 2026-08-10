@@ -260,13 +260,22 @@ function LandingPage() {
       <footer className="relative z-10 border-t border-white/5 bg-[#050505] pt-20 pb-10 px-6">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
           <div className="lg:col-span-2">
-            <Link to="/" className="flex items-center gap-2 mb-8">
-              <div className="w-10 h-10 bg-[#E50914] rounded-lg flex items-center justify-center">
-                <span className="font-black text-xl italic tracking-tighter">FW</span>
+            <Link to="/" className="flex items-center gap-3 mb-8 group">
+              <div className="w-12 h-12 rounded-full p-0.5 bg-gradient-to-br from-[#E50914] to-[#7f0000] shadow-[0_0_20px_rgba(229,9,20,0.3)]">
+                <div className="w-full h-full rounded-full bg-black overflow-hidden flex items-center justify-center border border-white/10">
+                  <img 
+                    src={logoPremiumAsset.url} 
+                    alt="FreitasWhite Logo" 
+                    className="w-[85%] h-auto object-contain"
+                  />
+                </div>
               </div>
-              <span className="text-2xl font-black tracking-tighter uppercase">
-                Freitas<span className="text-[#E50914]">White</span>
-              </span>
+              <div className="flex flex-col">
+                <span className="text-2xl font-black tracking-tighter uppercase leading-none">
+                  Freitas<span className="text-[#E50914]">White</span>
+                </span>
+                <span className="text-[9px] font-bold text-gray-500 uppercase tracking-[0.3em] mt-1">Ecosystem Pro</span>
+              </div>
             </Link>
             <p className="text-gray-500 max-w-sm leading-relaxed mb-8">
               A maior e mais precisa plataforma de análise de dados históricos. Tecnologia de ponta para sua estratégia.
