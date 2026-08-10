@@ -305,7 +305,7 @@ export function PredictiveSignals() {
     ].sort((a, b) => a.entryDate.getTime() - b.entryDate.getTime());
 
     setPredictiveSignals(syncSignals);
-  }, [active, engine, showBranco]);
+  }, [active, engine]);
 
   const generate = useCallback(() => {
     if (showBranco) {
