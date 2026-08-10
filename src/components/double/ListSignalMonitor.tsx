@@ -80,7 +80,7 @@ export function ListSignalMonitor() {
 
         console.log(`\n[SINAL]
 horário exibido: ${signal.time}
-timestamp exato do sinal: ${signalGenerationTime} (${new Date(signalGenerationTime).toISOString()})
+timestamp exato do sinal: ${signalGenerationTime} (${new Date(signalGenerationTime || 0).toISOString()})
 cor esperada: ${targetColorName} (${targetColor})`);
 
         console.log(`[RESULTADOS ANTERIORES AO SINAL]`);
