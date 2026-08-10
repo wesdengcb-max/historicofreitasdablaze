@@ -61,7 +61,13 @@ export function ListSignalMonitor() {
         });
 
         if (matches.length > 0) {
-          const isGreen = matches.some(r => Number(r.color) === targetColor || Number(r.color) === 0);
+          // color 0 is White (⚪️), 1 is Red (🔴), 2 is Black (⚫️)
+          const isGreen = matches.some(r => {
+            const resultColor = Number(r.color);
+            // Check if result matches signal color OR is White (protection)
+            return resultColor === targetColor || resultColor === 0;
+          });
+          
           if (isGreen) {
             changed = true;
             return { ...signal, outcome: "green" as const };
