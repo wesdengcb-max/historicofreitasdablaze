@@ -49,7 +49,7 @@ function LandingPage() {
         {/* LOGO - CENTERED AT TOP OF HERO */}
         <div className="flex items-center gap-4 mb-16 animate-fade-in">
           {/* Circular Icon with Logo */}
-          <div className="w-20 h-20 relative flex items-center justify-center">
+          <div className="w-32 h-32 relative flex items-center justify-center">
             <div className="absolute inset-0 bg-red-600 rounded-full opacity-20 blur-md animate-pulse" />
             <div className="relative z-10 w-full h-full p-1 bg-black rounded-full border-2 border-red-600/50 overflow-hidden">
               <img 
