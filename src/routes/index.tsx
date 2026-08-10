@@ -5,7 +5,7 @@ import { ArrowRight, Shield, Zap, TrendingUp, History, Target, Clock, Lock, BarC
 import heroAsset from "@/assets/freitas-white-hero.png.asset.json";
 import logoTextWhite from "@/assets/logo-text-white.png.asset.json";
 import bgAsset from "@/assets/homepage-bg.png.asset.json";
-import fwLogoAsset from "@/assets/fw-logo-new.png.asset.json";
+import fwLogoAsset from "@/assets/fw-logo-link.png.asset.json";
 import { useState, useEffect } from "react";
 
 export const Route = createFileRoute('/')({
@@ -51,11 +51,11 @@ function LandingPage() {
           {/* Circular Icon with Logo */}
           <div className="w-32 h-32 relative flex items-center justify-center">
             <div className="absolute inset-0 bg-red-600 rounded-full opacity-20 blur-md animate-pulse" />
-            <div className="relative z-10 w-full h-full p-1 bg-black rounded-full border-2 border-red-600/50 overflow-hidden">
+            <div className="relative z-10 w-full h-full p-3 bg-black rounded-full border-2 border-red-600/50 overflow-hidden flex items-center justify-center">
               <img 
                 src={fwLogoAsset.url} 
                 alt="Logo" 
-                className="w-full h-full object-cover rounded-full"
+                className="w-full h-full object-contain"
               />
             </div>
           </div>
