@@ -485,8 +485,6 @@ export function PredictiveSignals() {
             )}
           </button>
         </div>
-
-      <div className="space-y-5 px-5 py-5">
         {err && (
           <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
             {err}
@@ -643,7 +641,6 @@ export function PredictiveSignals() {
             )}
           </section>
         )}
-      </div>
       </div>
     </Card>
 
