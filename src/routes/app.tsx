@@ -633,6 +633,13 @@ function Index() {
   const last = visibleSpins[0];
   const lastWhiteIdx = visibleSpins.findIndex((s) => s.color === "white");
   const lastWhiteAgo = lastWhiteIdx >= 0 ? lastWhiteIdx : visibleSpins.length;
+  
+  const lastWhiteMinutesAgo = useMemo(() => {
+    if (lastWhiteIdx < 0 || !visibleSpins[lastWhiteIdx]?.createdAt) return null;
+    const lastWhiteTime = new Date(visibleSpins[lastWhiteIdx].createdAt!).getTime();
+    const diff = Date.now() - lastWhiteTime;
+    return Math.floor(diff / 60000);
+  }, [visibleSpins, lastWhiteIdx]);
 
   const freq = useMemo(
     () => Array.from({ length: 15 }, (_, n) => ({ n, count: counts.byNumber[n] ?? 0 })),
