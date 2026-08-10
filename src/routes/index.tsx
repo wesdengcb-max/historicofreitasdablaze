@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Shield, Zap, TrendingUp, History, Target, Clock, Lock, BarChart3, Search, Activity, Sun, Moon } from "lucide-react"
+import { ArrowRight, Shield, Zap, TrendingUp, History, Target, Clock, Lock, BarChart3, Search, Activity, Sun, Moon, CheckCircle2 } from "lucide-react"
 import heroAsset from "@/assets/freitas-white-hero.png.asset.json";
-import logoPremiumAsset from "@/assets/freitas-white-logo-premium.png.asset.json";
+import logoTextWhite from "@/assets/logo-text-white.png.asset.json";
 import { useState, useEffect } from "react";
 
 export const Route = createFileRoute('/')({
