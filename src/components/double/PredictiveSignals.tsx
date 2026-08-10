@@ -82,13 +82,6 @@ export function PredictiveSignals() {
   const [mode2, setMode2] = useState<Mode2Signal[] | null>(null);
   const [generatedAt, setGeneratedAt] = useState<Date | null>(null);
 
-  // Auto-generate projections when data is ready
-  useEffect(() => {
-    if (rows.length > 0 && !mode1 && !loading) {
-      generate();
-    }
-  }, [rows, generate, mode1, loading]);
-
   useEffect(() => {
     let alive = true;
     (async () => {
