@@ -55,7 +55,9 @@ export function ListSignalMonitor() {
         // Look for matching results in the window [signalTime, signalTime + 2min)
         const matches = latestResults.filter(r => {
           const resTime = new Date(r.created_at).getTime();
-          return resTime >= signalTime && resTime < twoMinutesAfter;
+          // We look for a match in the minute of the signal OR the next minute (G1)
+          // We use a small tolerance for the comparison to handle network/processing delays
+          return resTime >= (signalTime - 30_000) && resTime < (signalTime + 120_000);
         });
 
         if (matches.length > 0) {
