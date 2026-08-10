@@ -30,13 +30,13 @@ function LandingPage() {
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
         {/* Main Background Image */}
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40 mix-blend-screen"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${bgAsset.url})` }}
         />
         
-        {/* Overlays for better contrast and integration */}
-        <div className="absolute inset-0 bg-[#020407]/80" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,transparent_0%,#020407_100%)]" />
+        {/* Overlays for depth and contrast */}
+        <div className="absolute inset-0 bg-black/60" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#020407]/40 via-transparent to-[#020407]" />
         
         {/* Atmospheric Cyan Glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100%] h-[100%] bg-cyan-500/10 blur-[150px] rounded-full" />
