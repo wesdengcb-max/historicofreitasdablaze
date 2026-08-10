@@ -1028,7 +1028,7 @@ function Index() {
                   <Switch checked={destaqueHorario} onChange={setDestaqueHorario} label="Destaque horário" />
                 </div>
                 <div className="flex shrink-0 items-center">
-                  <div className={`flex items-center gap-2 rounded-full border px-2.5 py-1 transition-all ${isVip ? "border-amber-400/30 bg-amber-400/5 text-amber-400" : "border-white/5 bg-white/5 text-muted-foreground opacity-60"}`}>
+                  <div className={`flex items-center gap-2 rounded-full border px-2.5 py-1 transition-all ${isVip ? "border-red-500/30 bg-red-500/10 text-red-500" : "border-white/5 bg-white/5 text-muted-foreground opacity-60"}`}>
                     <Crown className="h-3.5 w-3.5" />
                     <span className="text-[10px] font-bold uppercase tracking-wider font-outfit">
                       {isVip ? "VIP Ativo" : "Básico"}
