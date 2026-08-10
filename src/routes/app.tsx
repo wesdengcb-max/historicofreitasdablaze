@@ -1268,7 +1268,7 @@ function Index() {
                                       {badge.label}
                                     </span>
                                   )}
-                                  <div className="relative flex h-[56px] items-start gap-[8px]">
+                                  <div className="relative flex h-[56px] items-start gap-[12px]">
                                     {(cell.length >= 2
                                       ? [cell[0], cell[1]]
                                       : cell.length === 1
