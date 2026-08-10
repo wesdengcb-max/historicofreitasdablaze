@@ -640,9 +640,60 @@ function Index() {
   
   const lastWhiteMinutesAgo = useMemo(() => {
     if (lastWhiteIdx < 0) return null;
-    // O usuário deseja que o tempo seja baseado no número de rodadas (2 rodadas = 1 minuto)
     return Math.floor(lastWhiteIdx / 2);
   }, [lastWhiteIdx]);
+
+  const maxGapToday = useMemo(() => {
+    let maxGap = 0;
+    let currentGap = 0;
+    let maxGapStartSpin: Spin | null = null;
+    let currentGapStartSpin: Spin | null = null;
+
+    // Work with spins from today only
+    const todayYmd = spYmd();
+    const todaySpins = visibleSpins.filter(s => {
+      const raw = (s.createdAt ?? "").trim();
+      if (!raw) return false;
+      const hasTz = /Z$|[+-]\d{2}:?\d{2}$/.test(raw);
+      const d = new Date(hasTz ? raw : `${raw.replace(" ", "T")}Z`);
+      return spYmd(d) === todayYmd;
+    });
+
+    if (todaySpins.length === 0) return { gap: 0, startTime: null };
+
+    // Spins are ordered newest to oldest [0 is newest]
+    // To find gaps between whites, we iterate from oldest to newest
+    const reversedToday = [...todaySpins].reverse();
+    
+    // Start of the day until the first white of the day is also a gap, 
+    // but usually "Casas do Branco" refers to gaps BETWEEN whites or since the last white.
+    // The user photo says "O máximo de hoje foi de 70 casas, começando no branco das 10:11"
+    // This implies the gap started AFTER a white at 10:11.
+    
+    for (const spin of reversedToday) {
+      if (spin.color === "white") {
+        if (currentGap > maxGap) {
+          maxGap = currentGap;
+          maxGapStartSpin = currentGapStartSpin;
+        }
+        currentGap = 0;
+        currentGapStartSpin = spin;
+      } else {
+        currentGap++;
+      }
+    }
+    
+    // Check if the current ongoing gap is the maximum
+    if (currentGap > maxGap) {
+      maxGap = currentGap;
+      maxGapStartSpin = currentGapStartSpin;
+    }
+
+    return { 
+      gap: maxGap, 
+      startTime: maxGapStartSpin ? maxGapStartSpin.time : null 
+    };
+  }, [visibleSpins]);
 
   const freq = useMemo(
     () => Array.from({ length: 15 }, (_, n) => ({ n, count: counts.byNumber[n] ?? 0 })),
