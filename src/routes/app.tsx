@@ -636,9 +636,12 @@ function Index() {
   
   const lastWhiteMinutesAgo = useMemo(() => {
     if (lastWhiteIdx < 0 || !visibleSpins[lastWhiteIdx]?.createdAt) return null;
-    const lastWhiteTime = new Date(visibleSpins[lastWhiteIdx].createdAt!).getTime();
-    const diff = Date.now() - lastWhiteTime;
-    return Math.floor(diff / 60000);
+    const lastWhiteDate = new Date(visibleSpins[lastWhiteIdx].createdAt!);
+    const now = new Date();
+    
+    // Calcula a diferença absoluta em milissegundos
+    const diffMs = Math.abs(now.getTime() - lastWhiteDate.getTime());
+    return Math.floor(diffMs / 60000);
   }, [visibleSpins, lastWhiteIdx]);
 
   const freq = useMemo(
@@ -909,7 +912,12 @@ function Index() {
                     <span className="text-[11px] text-muted-foreground">
                       {lastWhiteAgo} rodadas atrás.
                       {lastWhiteMinutesAgo !== null && (
-                        <span className="block mt-0.5">{lastWhiteMinutesAgo} minutos atrás.</span>
+                        <span className="block mt-0.5">
+                          {lastWhiteMinutesAgo >= 60 
+                            ? `${Math.floor(lastWhiteMinutesAgo / 60)}h ${lastWhiteMinutesAgo % 60}min atrás`
+                            : `${lastWhiteMinutesAgo} minutos atrás`
+                          }
+                        </span>
                       )}
                     </span>
                   </div>
