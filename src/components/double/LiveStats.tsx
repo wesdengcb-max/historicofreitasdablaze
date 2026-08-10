@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { ResultCircle } from "./ResultCircle";
 import { cn } from "@/lib/utils";
-import blazeLogo from "@/assets/freitas-logo.jpg.asset.json";
+import blazeLogo from "@/assets/blaze-logo.png.asset.json";
 import { RefreshCcw } from "lucide-react";
 
 interface StatsCardProps {
@@ -14,14 +14,14 @@ interface StatsCardProps {
 
 const StatsCard = ({ title, titleSuffix, children, footer, className }: StatsCardProps) => (
   <div className={cn("flex flex-col rounded-lg bg-[#0c0c0c] border border-white/5 overflow-hidden", className)}>
-    <div className="flex flex-col items-center pt-3 px-4">
-      <div className="flex items-center gap-1.5">
-        <span className="text-[13px] font-medium text-[#eaeaea]">{title}</span>
+    <div className="flex flex-col items-center pt-3 px-4 bg-[#141414]/30">
+      <div className="flex items-center gap-1.5 pb-2.5">
+        <span className="text-[12px] font-bold uppercase tracking-wider text-[#eaeaea]">{title}</span>
         {titleSuffix}
       </div>
-      <div className="mt-2.5 w-full border-t border-white/5" />
+      <div className="w-full border-t border-white/5" />
     </div>
-    <div className="flex-1 px-4 py-3">
+    <div className="flex-1 px-4 py-4">
       {children}
     </div>
     {footer && (
@@ -56,19 +56,16 @@ export const LiveStats = memo(function LiveStats({
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {/* 1. Plataforma Atual */}
       <StatsCard title="Plataforma Atual">
-        <div className="flex flex-col items-center justify-center gap-4 py-2">
-          <div className="flex items-center gap-2">
-            <div className="relative h-10 w-10 overflow-hidden rounded-lg bg-black p-1">
-               <img src={blazeLogo.url} alt="Blaze" className="h-full w-full object-contain" />
-            </div>
-            <span className="text-2xl font-black italic tracking-tighter text-white">blaze</span>
+        <div className="flex flex-col items-center justify-center gap-4 py-3">
+          <div className="flex items-center justify-center w-full">
+             <img src={blazeLogo.url} alt="Blaze" className="h-16 w-auto object-contain" />
           </div>
-          <div className="flex gap-2.5">
+          <div className="flex justify-between w-full px-2 mt-2">
             <a 
               href="https://blaze.bet.br" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="flex h-6 items-center rounded border border-red-600 bg-black px-3 text-[10px] font-bold text-white transition-colors hover:bg-red-600/10"
+              className="flex h-7 items-center rounded border border-[#ef4444]/40 bg-black/40 px-4 text-[11px] font-bold text-white/90 transition-all hover:bg-[#ef4444]/10 hover:border-[#ef4444] active:scale-95"
             >
               Blaze.com
             </a>
@@ -76,7 +73,7 @@ export const LiveStats = memo(function LiveStats({
               href="https://blaze.bet.br/pt/games/double" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="flex h-6 items-center rounded border border-red-600 bg-black px-3 text-[10px] font-bold text-white transition-colors hover:bg-red-600/10"
+              className="flex h-7 items-center rounded border border-[#ef4444]/40 bg-black/40 px-4 text-[11px] font-bold text-white/90 transition-all hover:bg-[#ef4444]/10 hover:border-[#ef4444] active:scale-95"
             >
               Double
             </a>
