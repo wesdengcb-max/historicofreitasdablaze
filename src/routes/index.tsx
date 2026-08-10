@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Shield, Zap, TrendingUp, History, Target, Clock, Lock, BarChart3, Search, Activity, Sun, Moon } from "lucide-react"
+import { ArrowRight, Shield, Zap, TrendingUp, History, Target, Clock, Lock, BarChart3, Search, Activity, Sun, Moon, CheckCircle2 } from "lucide-react"
 import heroAsset from "@/assets/freitas-white-hero.png.asset.json";
-import logoPremiumAsset from "@/assets/freitas-white-logo-premium.png.asset.json";
+import logoTextWhite from "@/assets/logo-text-white.png.asset.json";
 import { useState, useEffect } from "react";
 
 export const Route = createFileRoute('/')({
@@ -51,7 +51,7 @@ function LandingPage() {
             <div className="w-12 h-12 rounded-full p-0.5 bg-gradient-to-br from-[#E50914] to-[#7f0000] shadow-[0_0_20px_rgba(229,9,20,0.4)] transition-transform duration-500 group-hover:rotate-[360deg] group-hover:scale-110">
               <div className="w-full h-full rounded-full bg-black overflow-hidden flex items-center justify-center border border-white/10">
                 <img 
-                  src={logoPremiumAsset.url} 
+                  src={logoTextWhite.url} 
                   alt="FreitasWhite Logo" 
                   className="w-[85%] h-auto object-contain"
                 />
@@ -114,13 +114,13 @@ function LandingPage() {
               </span>
             </div>
 
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black leading-[0.9] tracking-tighter uppercase mb-8">
+            <h1 className="text-5xl md:text-7xl lg:text-[5.5rem] font-black leading-[0.9] tracking-tighter uppercase mb-8">
               O histórico que separa <br />
               amadores de <span className="text-[#E50914] drop-shadow-[0_0_20px_rgba(229,9,20,0.5)]">vencedores.</span>
             </h1>
 
-            <p className="text-lg md:text-xl text-gray-400 mb-10 max-w-lg leading-relaxed font-medium">
-              Acesse cada rodada, analise padrões e tome decisões com base em dados históricos.
+            <p className="text-lg md:text-xl text-gray-400 mb-10 max-w-xl leading-relaxed font-medium">
+              Acesse cada rodada, analise padrões e tome decisões <br className="hidden md:block" /> com base em dados reais da Blaze.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-4 mb-12">
@@ -138,18 +138,18 @@ function LandingPage() {
               </Link>
             </div>
 
-            <div className="flex flex-wrap items-center gap-8 opacity-60">
+            <div className="flex flex-wrap items-center gap-8 opacity-90">
               <div className="flex items-center gap-2">
-                <Shield size={16} className="text-[#E50914]" />
-                <span className="text-[10px] font-bold uppercase tracking-widest">Dados atualizados</span>
+                <CheckCircle2 size={18} className="text-[#E50914]" />
+                <span className="text-[10px] font-bold uppercase tracking-widest">Dados 100% Reais</span>
               </div>
               <div className="flex items-center gap-2">
-                <History size={16} className="text-[#E50914]" />
-                <span className="text-[10px] font-bold uppercase tracking-widest">Histórico completo</span>
+                <CheckCircle2 size={18} className="text-[#E50914]" />
+                <span className="text-[10px] font-bold uppercase tracking-widest">Atualizado em Tempo Real</span>
               </div>
               <div className="flex items-center gap-2">
-                <Zap size={16} className="text-[#E50914]" />
-                <span className="text-[10px] font-bold uppercase tracking-widest">Plataforma confiável</span>
+                <CheckCircle2 size={18} className="text-[#E50914]" />
+                <span className="text-[10px] font-bold uppercase tracking-widest">Confiável e Seguro</span>
               </div>
             </div>
           </div>
@@ -236,22 +236,22 @@ function LandingPage() {
           <FeatureCard 
             icon={<History size={28} />} 
             title="Histórico Completo" 
-            description="Consulte as rodadas históricas de forma organizada, rápida e fácil."
+            description="Acesse todas as rodadas da Blaze com filtros avançados."
           />
           <FeatureCard 
             icon={<BarChart3 size={28} />} 
             title="Estatísticas Avançadas" 
-            description="Visualize gráficos, tendências e informações importantes dos dados."
+            description="Gráficos, tendências e insights para turbinar suas análises."
           />
           <FeatureCard 
-            icon={<Search size={28} />} 
-            title="Probabilidades" 
-            description="Ferramentas de análise baseadas nos dados históricos disponíveis."
+            icon={<Target size={28} />} 
+            title="Probabilidades Reais" 
+            description="Saiba as chances reais de cada cor, número ou padrão."
           />
           <FeatureCard 
             icon={<Shield size={28} />} 
             title="Dados Confiáveis" 
-            description="Informações organizadas e atualizadas para facilitar sua análise."
+            description="Informações 100% reais, seguras e atualizadas em tempo real."
           />
         </div>
       </section>
@@ -264,7 +264,7 @@ function LandingPage() {
               <div className="w-12 h-12 rounded-full p-0.5 bg-gradient-to-br from-[#E50914] to-[#7f0000] shadow-[0_0_20px_rgba(229,9,20,0.3)]">
                 <div className="w-full h-full rounded-full bg-black overflow-hidden flex items-center justify-center border border-white/10">
                   <img 
-                    src={logoPremiumAsset.url} 
+                    src={logoTextWhite.url} 
                     alt="FreitasWhite Logo" 
                     className="w-[85%] h-auto object-contain"
                   />
@@ -308,7 +308,7 @@ function LandingPage() {
 
         <div className="max-w-7xl mx-auto pt-10 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
           <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-600">
-            © {new Date().getFullYear()} FreitasWhite. Todos os direitos reservados.
+            © {new Date().getFullYear()} FreitasWhite Pro Ecosystem · MMXVI. Todos os direitos reservados.
           </span>
           <div className="flex gap-8 text-[10px] font-bold uppercase tracking-widest text-gray-600">
             <a href="#" className="hover:text-white">Privacidade</a>
@@ -328,19 +328,13 @@ function FeatureCard({ icon, title, description }: { icon: React.ReactNode, titl
       <div className="absolute top-0 right-0 w-32 h-32 bg-red-600/5 blur-[40px] opacity-0 group-hover:opacity-100 transition-opacity" />
       
       <div className="relative z-10">
-        <div className="w-16 h-16 bg-red-600/10 rounded-2xl flex items-center justify-center mb-8 text-[#E50914] border border-red-600/10 group-hover:scale-110 group-hover:bg-red-600 group-hover:text-white transition-all duration-500 group-hover:shadow-[0_0_30px_rgba(229,9,20,0.5)]">
+        <div className="w-16 h-16 bg-red-600/10 rounded-2xl flex items-center justify-center mb-8 text-[#E50914] border border-red-600/10 transition-all duration-500 group-hover:bg-[#E50914] group-hover:text-white group-hover:shadow-[0_0_30px_rgba(229,9,20,0.5)]">
           {icon}
         </div>
         <h3 className="text-xl font-black uppercase tracking-tighter mb-4">{title}</h3>
         <p className="text-gray-500 text-sm leading-relaxed font-medium">
           {description}
         </p>
-      </div>
-      
-      {/* Corner detail */}
-      <div className="absolute bottom-0 right-0 w-8 h-8 opacity-0 group-hover:opacity-100 transition-opacity">
-         <div className="absolute bottom-4 right-4 w-4 h-[2px] bg-red-600" />
-         <div className="absolute bottom-4 right-4 h-4 w-[2px] bg-red-600" />
       </div>
     </div>
   );
