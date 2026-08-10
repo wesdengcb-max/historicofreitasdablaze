@@ -9,7 +9,9 @@ export type StoredSignal = {
 };
 
 const KEY = "freitas.signals.v1";
+const ROBOT_KEY = "freitas.robot.enabled";
 const EVENT = "freitas:signals";
+const ROBOT_EVENT = "freitas:robot";
 
 function read(): StoredSignal[] {
   if (typeof window === "undefined") return [];
@@ -59,5 +61,35 @@ export function subscribeSignals(listener: () => void): () => void {
   });
   return () => {
     window.removeEventListener(EVENT, onChange);
+  };
+}
+
+export function setRobotEnabled(enabled: boolean) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(ROBOT_KEY, enabled ? "true" : "false");
+  } catch {
+    // ignore
+  }
+  window.dispatchEvent(new Event(ROBOT_EVENT));
+}
+
+export function getRobotEnabled(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(ROBOT_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+export function subscribeRobot(listener: () => void): () => void {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener(ROBOT_EVENT, listener);
+  window.addEventListener("storage", (e) => {
+    if (e.key === ROBOT_KEY) listener();
+  });
+  return () => {
+    window.removeEventListener(ROBOT_EVENT, listener);
   };
 }

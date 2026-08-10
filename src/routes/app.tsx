@@ -50,7 +50,7 @@ import {
   BLAZE_GAP_Y,
 } from "@/components/double/BlazeResultCard";
 
-import { getSignals, subscribeSignals, type StoredSignal } from "@/lib/signalsStore";
+import { getSignals, subscribeSignals, type StoredSignal, getRobotEnabled, subscribeRobot } from "@/lib/signalsStore";
 import { Sidebar } from "@/components/Sidebar";
 import { AppHeader } from "@/components/AppHeader";
 import { useSection } from "@/lib/sectionStore";
@@ -231,6 +231,7 @@ const ColumnBlock = memo(function ColumnBlock({
   futureSlots,
   slotPredictions,
   cycleSlotPrediction,
+  signalsByHM,
 }: any) {
   const isActive = highlightKey === String(col);
   const filtered = spins.filter((s: any) => s.time.endsWith(String(col)));
@@ -252,6 +253,7 @@ const ColumnBlock = memo(function ColumnBlock({
             numerado={numerado}
             destaqueHorario={destaqueHorario}
             exibirSegundos={exibirSegundos}
+            signalsByHM={signalsByHM}
           />
           <BlazeResultCardWrapper
             item={pair[1]}
@@ -261,6 +263,7 @@ const ColumnBlock = memo(function ColumnBlock({
             numerado={numerado}
             destaqueHorario={destaqueHorario}
             exibirSegundos={exibirSegundos}
+            signalsByHM={signalsByHM}
           />
         </div>
       ))}
@@ -276,6 +279,7 @@ const BlazeResultCardWrapper = memo(function BlazeResultCardWrapper({
   numerado,
   destaqueHorario,
   exibirSegundos,
+  signalsByHM,
 }: any) {
   if (!item) return <div className="h-[68px] w-[48px]" />;
   return (
@@ -286,6 +290,7 @@ const BlazeResultCardWrapper = memo(function BlazeResultCardWrapper({
         time={exibirSegundos ? spTimeWithSeconds(item) : item.time}
         numbered={numerado}
         timeHighlight={destaqueHorario}
+        signal={signalsByHM.get(item.time)?.[0]}
         dimmed={
           (highlightKey !== null && !isActive) ||
           (highlightN.size > 0 && !highlightN.has(item.n))
@@ -334,6 +339,14 @@ function Index() {
     setAlertFx(next ? "on" : "off");
   }, []);
   const [realtime, setRealtime] = useState(true);
+  const [robotOn, setRobotOn] = useState(getRobotEnabled());
+
+  useEffect(() => {
+    const sub = subscribeRobot(() => {
+      setRobotOn(getRobotEnabled());
+    });
+    return sub;
+  }, []);
   const [numerado, setNumerado] = useState(false);
   const [destaqueHorario, setDestaqueHorario] = useState(false);
   const [exibirSegundos, setExibirSegundos] = useState(false);
@@ -1288,9 +1301,9 @@ function Index() {
                             const [hh, mmPrefix] = row.label.split(":");
                             const hm = `${hh}:${mmPrefix[0]}${ci}`;
                             const cellSignals = signalsByHM.get(hm) ?? [];
-                            const green = cellSignals.find((s) => s.outcome === "green");
-                            const pending = cellSignals.find((s) => s.outcome === "pending");
-                            const red = cellSignals.find((s) => s.outcome === "red");
+                            const green = robotOn ? cellSignals.find((s) => s.outcome === "green") : undefined;
+                            const pending = robotOn ? cellSignals.find((s) => s.outcome === "pending") : undefined;
+                            const red = robotOn ? cellSignals.find((s) => s.outcome === "red") : undefined;
                             let badge: null | { label: string; tone: "exato" | "margem" | "pending" | "loss" } = null;
                             if (green) {
                               const diff = green.matchedIso
@@ -1341,6 +1354,7 @@ function Index() {
                                             <TipMinerCard
                                               spin={spin as Spin}
                                               highlightN={highlightN}
+                                              signal={robotOn ? signalsByHM.get(`${hm}-${i}`)?.[0] : undefined}
                                               isActive={
                                                 highlightKey 
                                                   ? highlightKey === `col-${ci}`
@@ -1560,6 +1574,7 @@ const TipMinerCard = memo(function TipMinerCard({
   timeHighlight = false,
   highlightN,
   isActive: isActiveProp,
+  signal,
   onClick,
 }: {
   spin: Spin;
@@ -1570,6 +1585,7 @@ const TipMinerCard = memo(function TipMinerCard({
   timeHighlight?: boolean;
   highlightN?: Set<number> | null;
   isActive?: boolean;
+  signal?: StoredSignal;
   onClick?: () => void;
 }) {
   const isWhite = spin.color === "white";
@@ -1584,10 +1600,21 @@ const TipMinerCard = memo(function TipMinerCard({
   
   const isHit = !!highlightN && highlightN.has(spin.n);
   const isActive = isActiveProp !== undefined ? isActiveProp : true;
-
   const delayStyle = delay > 0 ? { animationDelay: `${delay}s` } : undefined;
+
   return (
-    <div className="flex flex-col items-center">
+    <div className="relative flex flex-col items-center">
+      {signal && (
+        <div className="absolute top-0 z-10 flex w-full justify-center">
+          <span className={`inline-flex h-3 items-center rounded-full px-1 text-[7px] font-black tracking-wider shadow-sm sm:h-3.5 sm:px-1.5 sm:text-[8px] ${
+            signal.outcome === "green" 
+              ? "bg-emerald-500 text-black border border-emerald-300"
+              : "bg-emerald-500 text-black border border-emerald-300"
+          }`}>
+            SINAL
+          </span>
+        </div>
+      )}
       <button
         type="button"
         onClick={onClick}
