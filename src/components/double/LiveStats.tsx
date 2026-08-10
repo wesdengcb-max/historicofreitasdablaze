@@ -58,7 +58,7 @@ export const LiveStats = memo(function LiveStats({
       <StatsCard title="Plataforma Atual">
         <div className="flex flex-col items-center justify-center gap-4 py-3">
           <div className="flex items-center justify-center w-full">
-             <img src={fwLogoAsset.url} alt="FW Logo" className="h-16 w-auto object-contain" />
+             <img src={fwLogoAsset.url} alt="FW Logo" className="h-24 w-auto object-contain" />
           </div>
           <div className="flex justify-between w-full px-2 mt-2">
             <a 
