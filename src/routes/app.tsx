@@ -50,7 +50,7 @@ import {
   BLAZE_GAP_Y,
 } from "@/components/double/BlazeResultCard";
 
-import { getSignals, subscribeSignals, type StoredSignal } from "@/lib/signalsStore";
+import { getSignals, subscribeSignals, type StoredSignal, getRobotEnabled, subscribeRobot } from "@/lib/signalsStore";
 import { Sidebar } from "@/components/Sidebar";
 import { AppHeader } from "@/components/AppHeader";
 import { useSection } from "@/lib/sectionStore";
@@ -339,7 +339,14 @@ function Index() {
     setAlertFx(next ? "on" : "off");
   }, []);
   const [realtime, setRealtime] = useState(true);
-  const [robotOn, setRobotOn] = useState(false);
+  const [robotOn, setRobotOn] = useState(getRobotEnabled());
+
+  useEffect(() => {
+    const sub = subscribeRobot(() => {
+      setRobotOn(getRobotEnabled());
+    });
+    return sub;
+  }, []);
   const [numerado, setNumerado] = useState(false);
   const [destaqueHorario, setDestaqueHorario] = useState(false);
   const [exibirSegundos, setExibirSegundos] = useState(false);

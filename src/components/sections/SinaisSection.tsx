@@ -191,7 +191,7 @@ export default function SinaisSection() {
   const [tick, setTick] = useState(0);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [disabled, setDisabled] = useState<Set<string>>(new Set());
-  const [robotOn, setRobotOn] = useState(false);
+  const [robotOn, setRobotOn] = useState(getRobotEnabled());
   const [manualSignals, setManualSignals] = useState<Signal[]>([]);
   const [addOpen, setAddOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -332,8 +332,15 @@ export default function SinaisSection() {
     [visible],
   );
 
-  // Compartilha os sinais visíveis com o histórico. Só reflete quando o robô estiver ligado.
   useEffect(() => {
+    const sub = subscribeRobot(() => {
+      setRobotOn(getRobotEnabled());
+    });
+    return sub;
+  }, []);
+
+  useEffect(() => {
+    setRobotEnabled(robotOn);
     if (!robotOn) {
       setSignals([]);
       return;

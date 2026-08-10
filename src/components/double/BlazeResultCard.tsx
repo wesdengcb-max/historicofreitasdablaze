@@ -44,7 +44,7 @@ export const BlazeResultCard = memo(function BlazeResultCard({
 
   return (
     <div
-      className="blaze-result-card flex animate-in flex-col items-center fade-in slide-in-from-bottom-2"
+      className="blaze-result-card relative flex animate-in flex-col items-center fade-in slide-in-from-bottom-2"
       style={{
         width: `var(--blaze-card-w, ${BLAZE_CARD_W}px)`,
         animationDelay: delay > 0 ? `${delay}s` : undefined,
@@ -84,6 +84,18 @@ export const BlazeResultCard = memo(function BlazeResultCard({
           </span>
         )}
       </button>
+
+      {signal && (
+        <div className="absolute top-0 z-10 flex w-full justify-center">
+          <span className={`inline-flex h-3 items-center rounded-full px-1 text-[7px] font-black tracking-wider shadow-sm sm:h-3.5 sm:px-1.5 sm:text-[8px] ${
+            signal.outcome === "green" 
+              ? "bg-emerald-500 text-black border border-emerald-300"
+              : "bg-emerald-500 text-black border border-emerald-300"
+          }`}>
+            SINAL
+          </span>
+        </div>
+      )}
 
       {time && (
         <span
