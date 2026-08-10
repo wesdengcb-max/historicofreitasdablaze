@@ -1158,7 +1158,7 @@ function Index() {
                     ? "min-h-0 flex-1 overflow-auto rounded-2xl border border-white/5 bg-black/20"
                     : ""
                 }
-                style={{ direction: inverse && viewMode === "colunas" ? "rtl" : "ltr" }}
+                style={{ direction: inverse && viewMode === "colunas" ? "rtl" : "ltr", scrollbarWidth: 'none' }}
               >
 
 
