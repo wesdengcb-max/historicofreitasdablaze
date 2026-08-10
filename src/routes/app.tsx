@@ -1028,7 +1028,7 @@ function Index() {
                   <Switch checked={destaqueHorario} onChange={setDestaqueHorario} label="Destaque horário" />
                 </div>
                 <div className="flex shrink-0 items-center">
-                  <div className={`flex items-center gap-2 rounded-full border px-2.5 py-1 transition-all ${isVip ? "border-amber-400/30 bg-amber-400/5 text-amber-400" : "border-white/5 bg-white/5 text-muted-foreground opacity-60"}`}>
+                  <div className={`flex items-center gap-2 rounded-full border px-2.5 py-1 transition-all ${isVip ? "border-red-500/30 bg-red-500/10 text-red-500" : "border-white/5 bg-white/5 text-muted-foreground opacity-60"}`}>
                     <Crown className="h-3.5 w-3.5" />
                     <span className="text-[10px] font-bold uppercase tracking-wider font-outfit">
                       {isVip ? "VIP Ativo" : "Básico"}
@@ -1158,7 +1158,7 @@ function Index() {
                     ? "min-h-0 flex-1 overflow-auto rounded-2xl border border-white/5 bg-black/20"
                     : ""
                 }
-                style={{ direction: inverse && viewMode === "colunas" ? "rtl" : "ltr" }}
+                style={{ direction: inverse && viewMode === "colunas" ? "rtl" : "ltr", scrollbarWidth: 'none' }}
               >
 
 
@@ -1173,14 +1173,14 @@ function Index() {
                       : "Nenhum resultado no período selecionado."}
                   </div>
                 ) : viewMode === "colunas" ? (
-                  <div className="history-scroll w-full overflow-x-hidden p-1 sm:p-2 lg:p-3">
-                    <div className="flex flex-col gap-0 overflow-x-auto scrollbar-none">
+                  <div className="history-scroll w-full overflow-x-auto p-1 sm:p-2 lg:p-3 no-scrollbar">
+                    <div className="flex flex-col gap-0 min-w-[1200px] w-full">
                       {/* Cabeçalho 0-9 interno para Colunas Fixas */}
-                      <div className="grid grid-cols-10 gap-[8px] mb-1 sticky top-0 z-10 bg-background/40 backdrop-blur-sm min-w-[1200px] w-full">
+                      <div className="grid grid-cols-10 gap-[8px] mb-1 sticky top-0 z-10 bg-[#0A0A0A]/80 backdrop-blur-sm w-full">
                         {Array.from({ length: 10 }).map((_, ci) => (
                           <button
                             key={`header-inner-${ci}`}
-                            className={`flex h-[23px] w-full items-center justify-center rounded-[6px] border border-white/5 text-[14px] font-medium tabular-nums transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-primary/40 text-white shadow-[0_0_10px_rgba(255,31,61,0.3)]" : "bg-white/[0.03] text-white hover:bg-white/10"}`}
+                            className={`flex h-[23px] w-full items-center justify-center rounded-[6px] border border-white/5 text-[14px] font-bold tabular-nums transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-red-500 text-white shadow-[0_0_10px_rgba(239,68,68,0.4)]" : "bg-white/[0.03] text-white/40 hover:bg-white/10"}`}
                             onClick={() => {
                               const key = `col-${ci}`;
                               if (highlightKey === key) {
@@ -1207,7 +1207,7 @@ function Index() {
 
                       {gridRows.map((row) => (
                         <div key={row.key} className="flex flex-col gap-0 border-b border-white/[0.02]">
-                          <div className="grid grid-cols-10 gap-[8px] relative min-w-[1200px] w-full">
+                          <div className="grid grid-cols-10 gap-[8px] relative w-full">
                             {row.cells.map((cell, ci) => {
                             const [hh, mmPrefix] = row.label.split(":");
                             const hm = `${hh}:${mmPrefix[0]}${ci}`;
