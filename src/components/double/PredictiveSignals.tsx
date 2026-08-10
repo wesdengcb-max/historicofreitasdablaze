@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { setPredictiveSignals, setProximaListaSignals, getProximaListaSignals, type ProximaListaSignal } from "@/lib/signalsStore";
-import { Loader2, Sparkles, Target, List } from "lucide-react";
+import { setPredictiveSignals, setProximaListaSignals, getProximaListaSignals, subscribeProximaLista, type ProximaListaSignal } from "@/lib/signalsStore";
+import { Loader2, Sparkles, Target, List, Layers } from "lucide-react";
 import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
 import { Card } from "@/components/double/Card";
 import {
