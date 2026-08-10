@@ -347,8 +347,12 @@ export function PredictiveSignals() {
     const previousHourRows = rows.filter(r => {
       const d = new Date(r.created_at);
       const dInSP = new Date(d.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
-      // Pega EXATAMENTE os minutos da hora anterior
-      return dInSP >= startTimeInSP && dInSP < new Date(currentYear, currentMonth, currentDate, currentHour, 0, 0);
+      
+      // Criar limites da hora anterior no fuso de SP
+      const targetStart = new Date(currentYear, currentMonth, currentDate, currentHour - 1, 0, 0);
+      const targetEnd = new Date(currentYear, currentMonth, currentDate, currentHour, 0, 0);
+
+      return dInSP >= targetStart && dInSP < targetEnd;
     });
 
     // Agrupar por minuto e pegar EXCLUSIVAMENTE a primeira pedra de cada minuto (created_at mais antigo)
