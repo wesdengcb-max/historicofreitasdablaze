@@ -394,9 +394,18 @@ export function PredictiveSignals() {
     }
   }, [rows, loading, active, engine]);
 
+  const [showProximaLista, setShowProximaLista] = useState(false);
+
   const generateProximaLista = useCallback(() => {
     if (rows.length === 0) return;
 
+    if (showProximaLista) {
+      setShowProximaLista(false);
+      setProximaListaSignals([]);
+      return;
+    }
+
+    setShowProximaLista(true);
     // Horário atual no fuso de São Paulo
     const nowInSP = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
     const currentYear = nowInSP.getFullYear();
@@ -405,7 +414,6 @@ export function PredictiveSignals() {
     const currentHour = nowInSP.getHours();
 
     // Determinar a hora anterior (ex: se agora é 02:xx, analisar 01:00-01:59)
-    // Se agora for 00:xx, a hora anterior é 23:xx do dia anterior.
     const startTimeInSP = new Date(currentYear, currentMonth, currentDate, currentHour - 1, 0, 0);
     const endTimeInSP = new Date(currentYear, currentMonth, currentDate, currentHour - 1, 59, 59, 999);
 
@@ -443,16 +451,13 @@ export function PredictiveSignals() {
       if (roll === 6 || roll === 7) {
         symbols = "🔴⚪️";
       } 
-      // Regra 2: Pedra 8 ou 9 -> ⚫️ (mesmo minuto + 1 hora)
+      // Regra 2: Pedra 8 ou 9 -> ⚫️⚪️ (mesmo minuto + 1 hora)
       else if (roll === 8 || roll === 9) {
-        symbols = "⚫️";
+        symbols = "⚫️⚪️";
       }
 
       if (symbols) {
-        // O horário do sinal é EXATAMENTE a mesma hora atual (que é hora_anterior + 1)
         const displayTime = `${currentHour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`;
-        
-        // Criar data de entrada para ordenação e validação (no dia atual)
         const entryDate = new Date(currentYear, currentMonth, currentDate, currentHour, min, 0);
 
         listSignals.push({
@@ -466,7 +471,7 @@ export function PredictiveSignals() {
     }
 
     setProximaListaSignals(listSignals);
-  }, [rows]);
+  }, [rows, showProximaLista]);
 
   return (
     <div className="space-y-6">
