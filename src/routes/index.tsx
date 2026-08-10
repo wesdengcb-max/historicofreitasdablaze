@@ -5,6 +5,7 @@ import { ArrowRight, Shield, Zap, TrendingUp, History, Target, Clock, Lock, BarC
 import heroAsset from "@/assets/freitas-white-hero.png.asset.json";
 import logoTextWhite from "@/assets/logo-text-white.png.asset.json";
 import bgAsset from "@/assets/homepage-bg.png.asset.json";
+import fwLogoAsset from "@/assets/fw-logo-new.png.asset.json";
 import { useState, useEffect } from "react";
 
 export const Route = createFileRoute('/')({
