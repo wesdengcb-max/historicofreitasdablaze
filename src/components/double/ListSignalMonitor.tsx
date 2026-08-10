@@ -80,7 +80,17 @@ export function ListSignalMonitor() {
         }
 
         // Only mark as RED if the time window (G1) has fully passed + buffer
-        if (now > expiryTime) {
+        // AND we found at least one result in that window that wasn't the target
+        const hasPassed = now > expiryTime;
+        const hasOppositeResult = matches.some(r => {
+          const resColor = Number(r.color);
+          const resRoll = Number(r.roll);
+          const isWhite = resColor === 0 || resRoll === 0;
+          const isTarget = resColor === targetColor;
+          return !isTarget && !isWhite;
+        });
+
+        if (hasPassed || (matches.length > 0 && hasOppositeResult && !isGreen)) {
           console.log(`[ListSignalMonitor] Signal ${signal.time} is RED`, matches);
           changed = true;
           return { ...signal, outcome: "red" as const };
