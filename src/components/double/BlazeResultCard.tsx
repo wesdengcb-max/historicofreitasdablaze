@@ -1,6 +1,7 @@
 import { memo } from "react";
 import brancoTile from "@/assets/branco-tile.png.asset.json";
 import type { Color } from "./types";
+import type { StoredSignal } from "@/lib/signalsStore";
 
 export const BLAZE_CARD_W = 48;
 export const BLAZE_CARD_TOP_H = 48;
