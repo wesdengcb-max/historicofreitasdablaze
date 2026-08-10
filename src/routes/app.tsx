@@ -279,6 +279,7 @@ const BlazeResultCardWrapper = memo(function BlazeResultCardWrapper({
   numerado,
   destaqueHorario,
   exibirSegundos,
+  signalsByHM,
 }: any) {
   if (!item) return <div className="h-[68px] w-[48px]" />;
   return (
