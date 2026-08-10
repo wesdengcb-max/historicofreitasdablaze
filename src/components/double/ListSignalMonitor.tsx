@@ -58,13 +58,19 @@ export function ListSignalMonitor() {
         const matches = latestResults.filter(r => {
           const resDate = new Date(r.created_at);
           const resTimeInSP = new Date(resDate.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" })).getTime();
-          // Look from 1 min before (just in case) to Gale 1 end
-          return resTimeInSP >= (signalTime - 60_000) && resTimeInSP < (gale1EndTime + 30_000);
+          // Look from 1.5 min before to capture early rolls, and up to Gale 1 end
+          return resTimeInSP >= (signalTime - 90_000) && resTimeInSP < (gale1EndTime + 30_000);
         });
 
         const isGreen = matches.some(r => {
           const resColor = Number(r.color);
-          return resColor === targetColor || resColor === 0;
+          const resRoll = Number(r.roll);
+          // Special case: Blaze result might have color 1/2 but roll 0 is white.
+          // In Blaze, 0 is white. 1-7 is Red, 8-14 is Black.
+          const isWhite = resColor === 0 || resRoll === 0;
+          const isTarget = resColor === targetColor;
+          
+          return isTarget || isWhite;
         });
 
         if (isGreen) {
