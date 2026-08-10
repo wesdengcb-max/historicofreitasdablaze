@@ -315,7 +315,7 @@ export default function SinaisSection() {
           return { ...s, outcome: "green" as const, resultTime: fmtTime(matchedMargin.createdAt), label: "MARGEM" };
         }
 
-        if (now > windowEnd + 60_000) {
+        if (now > windowEnd + MARGIN_MS) {
           return { ...s, outcome: "red" as const };
         }
         return s;
