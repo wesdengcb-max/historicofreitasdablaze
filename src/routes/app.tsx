@@ -1597,6 +1597,10 @@ const TipMinerCard = memo(function TipMinerCard({
         : "#ffffff";
   const ring = isWhite ? "#16171d" : "#ffffff";
   const fg = isWhite ? "#16171d" : "#ffffff";
+  
+  const isHit = !!highlightN && highlightN.has(spin.n);
+  const isActive = isActiveProp !== undefined ? isActiveProp : true;
+  const delayStyle = delay > 0 ? { animationDelay: `${delay}s` } : undefined;
 
   return (
     <div className="relative flex flex-col items-center">
