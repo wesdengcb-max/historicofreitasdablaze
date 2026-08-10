@@ -253,6 +253,7 @@ const ColumnBlock = memo(function ColumnBlock({
             numerado={numerado}
             destaqueHorario={destaqueHorario}
             exibirSegundos={exibirSegundos}
+            signalsByHM={signalsByHM}
           />
           <BlazeResultCardWrapper
             item={pair[1]}
@@ -262,6 +263,7 @@ const ColumnBlock = memo(function ColumnBlock({
             numerado={numerado}
             destaqueHorario={destaqueHorario}
             exibirSegundos={exibirSegundos}
+            signalsByHM={signalsByHM}
           />
         </div>
       ))}
