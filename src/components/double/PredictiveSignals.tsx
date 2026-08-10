@@ -644,6 +644,82 @@ export function PredictiveSignals() {
           </section>
         )}
       </div>
+      </div>
     </Card>
+
+    <Card className="glass-card !p-0 overflow-hidden">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.05] bg-white/[0.02] px-6 py-5">
+        <div className="flex items-center gap-4">
+          <div className="grid h-10 w-10 place-items-center rounded-xl bg-red-500/10 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.1)]">
+            <List className="h-5 w-5" />
+          </div>
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-[0.4em] text-red-500 font-outfit">
+              Estratégia horária
+            </div>
+            <h2 className="text-xl font-black text-white font-outfit uppercase tracking-tight">Próxima lista</h2>
+          </div>
+        </div>
+        <button
+          type="button"
+          disabled={loading}
+          onClick={generateProximaLista}
+          className={
+            !loading
+              ? "relative premium-btn rounded-xl px-8 py-3.5 text-xs font-black uppercase tracking-[0.2em] text-white font-outfit"
+              : "rounded-xl border border-white/10 bg-white/[0.03] px-8 py-3.5 text-xs font-black uppercase tracking-[0.2em] text-[#9CA3AF] opacity-60 font-outfit"
+          }
+        >
+          {loading ? (
+            <span className="flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" /> Carregando…
+            </span>
+          ) : (
+            "Gerar Lista de Cor"
+          )}
+        </button>
+      </div>
+
+      <div className="px-5 py-5">
+        <ProximaListaDisplay />
+      </div>
+    </Card>
+    </div>
+  );
+}
+
+function ProximaListaDisplay() {
+  const [list, setList] = useState<ProximaListaSignal[]>(getProximaListaSignals());
+
+  useEffect(() => {
+    const update = () => setList(getProximaListaSignals());
+    const sub = subscribeProximaLista(update);
+    return sub;
+  }, []);
+
+  if (list.length === 0) {
+    return (
+      <p className="text-sm text-muted-foreground">
+        Nenhuma lista gerada. Clique em "Gerar Lista de Cor" para analisar a hora anterior.
+      </p>
+    );
+  }
+
+  return (
+    <div className="rounded-2xl border border-white/[0.05] bg-white/[0.02] p-6 space-y-4">
+      <div className="text-center space-y-1">
+        <div className="text-sm font-black text-white font-outfit">
+          💥🧑🏻‍💻ATÉ G1📊@FreitasWhite
+        </div>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+        {list.map((s) => (
+          <div key={s.key} className="flex items-center justify-center gap-2 bg-white/[0.03] rounded-lg py-2 px-3 border border-white/[0.05]">
+            <span className="text-sm font-black tabular-nums text-white font-outfit">{s.time}</span>
+            <span className="text-lg">{s.symbols}</span>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
