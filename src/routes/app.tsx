@@ -640,9 +640,60 @@ function Index() {
   
   const lastWhiteMinutesAgo = useMemo(() => {
     if (lastWhiteIdx < 0) return null;
-    // O usuário deseja que o tempo seja baseado no número de rodadas (2 rodadas = 1 minuto)
     return Math.floor(lastWhiteIdx / 2);
   }, [lastWhiteIdx]);
+
+  const maxGapToday = useMemo(() => {
+    let maxGap = 0;
+    let currentGap = 0;
+    let maxGapStartSpin: Spin | null = null;
+    let currentGapStartSpin: Spin | null = null;
+
+    // Work with spins from today only
+    const todayYmd = spYmd();
+    const todaySpins = visibleSpins.filter(s => {
+      const raw = (s.createdAt ?? "").trim();
+      if (!raw) return false;
+      const hasTz = /Z$|[+-]\d{2}:?\d{2}$/.test(raw);
+      const d = new Date(hasTz ? raw : `${raw.replace(" ", "T")}Z`);
+      return spYmd(d) === todayYmd;
+    });
+
+    if (todaySpins.length === 0) return { gap: 0, startTime: null };
+
+    // Spins are ordered newest to oldest [0 is newest]
+    // To find gaps between whites, we iterate from oldest to newest
+    const reversedToday = [...todaySpins].reverse();
+    
+    // Start of the day until the first white of the day is also a gap, 
+    // but usually "Casas do Branco" refers to gaps BETWEEN whites or since the last white.
+    // The user photo says "O máximo de hoje foi de 70 casas, começando no branco das 10:11"
+    // This implies the gap started AFTER a white at 10:11.
+    
+    for (const spin of reversedToday) {
+      if (spin.color === "white") {
+        if (currentGap > maxGap) {
+          maxGap = currentGap;
+          maxGapStartSpin = currentGapStartSpin;
+        }
+        currentGap = 0;
+        currentGapStartSpin = spin;
+      } else {
+        currentGap++;
+      }
+    }
+    
+    // Check if the current ongoing gap is the maximum
+    if (currentGap > maxGap) {
+      maxGap = currentGap;
+      maxGapStartSpin = currentGapStartSpin;
+    }
+
+    return { 
+      gap: maxGap, 
+      startTime: maxGapStartSpin ? maxGapStartSpin.time : null 
+    };
+  }, [visibleSpins]);
 
   const freq = useMemo(
     () => Array.from({ length: 15 }, (_, n) => ({ n, count: counts.byNumber[n] ?? 0 })),
@@ -944,13 +995,15 @@ function Index() {
                   <h3 className="text-[13px] font-bold text-white uppercase tracking-tight">Casas do Branco</h3>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <BarChart3 className="h-3 w-3 text-red-500" />
-                    <span className="text-[11px] text-muted-foreground">{total} resultados, desde o último branco.</span>
+                    <span className="text-[11px] text-muted-foreground">
+                      <span className="font-bold text-white">{lastWhiteIdx >= 0 ? lastWhiteIdx : total}</span> resultados, desde o último branco.
+                    </span>
                   </div>
                 </div>
               </div>
               <div className="mt-auto border-t border-white/5 pt-3">
                 <p className="text-[11px] text-muted-foreground">
-                  O máximo de hoje foi de <span className="font-bold text-white">70</span> casas, começando no branco das <span className="font-bold text-white">10:11</span>.
+                  O máximo de hoje foi de <span className="font-bold text-white">{maxGapToday.gap}</span> casas, {maxGapToday.startTime ? <>começando no branco das <span className="font-bold text-white">{maxGapToday.startTime}</span></> : "sem brancos registrados hoje"}.
                 </p>
               </div>
             </Card>
