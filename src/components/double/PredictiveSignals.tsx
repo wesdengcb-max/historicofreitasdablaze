@@ -489,19 +489,25 @@ export function PredictiveSignals() {
             onClick={generate}
             className={
               hasOpportunity && !loading
-                ? "relative premium-btn rounded-xl px-8 py-3.5 text-xs font-black uppercase tracking-[0.2em] text-white animate-pulse font-outfit"
-                : "rounded-xl border border-white/10 bg-white/[0.03] px-8 py-3.5 text-xs font-black uppercase tracking-[0.2em] text-[#9CA3AF] opacity-60 font-outfit"
+                ? "relative overflow-hidden rounded-xl bg-gradient-to-br from-primary via-primary/90 to-blue-600 px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] text-white shadow-[0_8px_20px_-6px_rgba(59,130,246,0.5)] transition-all hover:scale-[1.02] hover:shadow-[0_12px_25px_-6px_rgba(59,130,246,0.6)] active:scale-[0.98] font-outfit border border-white/10 group"
+                : "rounded-xl border border-white/5 bg-white/[0.03] px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] text-[#9CA3AF] opacity-50 font-outfit"
             }
           >
-            {loading ? (
-              <span className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" /> Carregando…
-              </span>
-            ) : hasOpportunity ? (
-              "Próximo branco"
-            ) : (
-              "Aguardando novo gatilho..."
-            )}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] transition-transform" />
+            <div className="relative flex items-center justify-center gap-2">
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" /> Carregando…
+                </>
+              ) : hasOpportunity ? (
+                <>
+                  <Sparkles className="h-3.5 w-3.5" />
+                  <span>Próximo branco</span>
+                </>
+              ) : (
+                "Aguardando gatilho"
+              )}
+            </div>
           </button>
         </div>
         <div className="space-y-5 px-5 py-5">
@@ -683,17 +689,23 @@ export function PredictiveSignals() {
           onClick={generateProximaLista}
           className={
             !loading
-              ? "relative premium-btn rounded-xl px-8 py-3.5 text-xs font-black uppercase tracking-[0.2em] text-white font-outfit"
-              : "rounded-xl border border-white/10 bg-white/[0.03] px-8 py-3.5 text-xs font-black uppercase tracking-[0.2em] text-[#9CA3AF] opacity-60 font-outfit"
+              ? "relative overflow-hidden rounded-xl bg-gradient-to-br from-red-600 via-red-500 to-red-700 px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] text-white shadow-[0_8px_20px_-6px_rgba(239,68,68,0.5)] transition-all hover:scale-[1.02] hover:shadow-[0_12px_25px_-6px_rgba(239,68,68,0.6)] active:scale-[0.98] font-outfit border border-white/10 group"
+              : "rounded-xl border border-white/5 bg-white/[0.03] px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] text-[#9CA3AF] opacity-50 font-outfit"
           }
         >
-          {loading ? (
-            <span className="flex items-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin" /> Carregando…
-            </span>
-          ) : (
-            "Gerar Lista de Cor"
-          )}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] transition-transform" />
+          <div className="relative flex items-center justify-center gap-2">
+            {loading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" /> Carregando…
+              </>
+            ) : (
+              <>
+                <List className="h-3.5 w-3.5" />
+                <span>Gerar Lista de Cor</span>
+              </>
+            )}
+          </div>
         </button>
       </div>
 
