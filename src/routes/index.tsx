@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight, Shield, Zap, TrendingUp, History, Target, Clock, Lock, BarChart3, Search, Activity, Sun, Moon, CheckCircle2 } from "lucide-react"
 import heroAsset from "@/assets/freitas-white-hero.png.asset.json";
 import logoTextWhite from "@/assets/logo-text-white.png.asset.json";
+import bgAsset from "@/assets/homepage-bg.png.asset.json";
 import { useState, useEffect } from "react";
 
 export const Route = createFileRoute('/')({
@@ -27,33 +28,18 @@ function LandingPage() {
       
       {/* BACKGROUND ELEMENTS */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        {/* Dark Radial Gradient */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,#0c1527_0%,#020407_70%)]" />
+        {/* Main Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40 mix-blend-screen"
+          style={{ backgroundImage: `url(${bgAsset.url})` }}
+        />
         
-        {/* Central Cyan Glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-cyan-500/5 blur-[120px] rounded-full" />
+        {/* Overlays for better contrast and integration */}
+        <div className="absolute inset-0 bg-[#020407]/80" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,transparent_0%,#020407_100%)]" />
         
-        {/* Floating Suits like Reference */}
-        <div className="absolute top-[15%] left-[15%] w-[120px] h-[120px] opacity-[0.08] rotate-[15deg] animate-pulse">
-          <svg viewBox="0 0 24 24" fill="currentColor" className="text-cyan-400">
-            <path d="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z" />
-          </svg>
-        </div>
-        <div className="absolute top-[20%] right-[20%] w-[140px] h-[140px] opacity-[0.05] rotate-[-20deg]">
-          <svg viewBox="0 0 24 24" fill="currentColor" className="text-cyan-300">
-            <path d="M12,2C12,2 4,9 4,14C4,18.42 7.58,22 12,22C16.42,22 20,18.42 20,14C20,9 12,2 12,2Z" />
-          </svg>
-        </div>
-        <div className="absolute bottom-[20%] left-[20%] w-[100px] h-[100px] opacity-[0.06] rotate-[10deg]">
-          <svg viewBox="0 0 24 24" fill="currentColor" className="text-cyan-500">
-            <path d="M12,2C9,2 7,4 7,7C7,8.6 7.6,10 8.6,11C6.7,11.3 5,13.2 5,15.5C5,18 7,20 9.5,20C10.5,20 11.5,19.6 12,19C12.5,19.6 13.5,20 14.5,20C17,20 19,18 19,15.5C19,13.2 17.3,11.3 15.4,11C16.4,10 17,8.6 17,7C17,4 15,2 12,2Z" />
-          </svg>
-        </div>
-        <div className="absolute bottom-[15%] right-[25%] w-[130px] h-[130px] opacity-[0.04] rotate-[-5deg]">
-          <svg viewBox="0 0 24 24" fill="currentColor" className="text-cyan-400">
-            <path d="M12,2L3.5,12L12,22L20.5,12L12,2Z" />
-          </svg>
-        </div>
+        {/* Atmospheric Cyan Glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100%] h-[100%] bg-cyan-500/10 blur-[150px] rounded-full" />
       </div>
 
       {/* HERO CONTENT - CENTERED VERTICALLY & HORIZONTALLY */}
