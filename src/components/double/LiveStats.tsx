@@ -60,12 +60,12 @@ export const LiveStats = memo(function LiveStats({
           <div className="flex items-center justify-center w-full">
              <img src={blazeLogo.url} alt="Blaze" className="h-16 w-auto object-contain" />
           </div>
-          <div className="flex gap-2.5">
+          <div className="flex justify-between w-full px-2 mt-2">
             <a 
               href="https://blaze.bet.br" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="flex h-6 items-center rounded border border-red-600 bg-black px-3 text-[10px] font-bold text-white transition-colors hover:bg-red-600/10"
+              className="flex h-7 items-center rounded border border-[#ef4444]/40 bg-black/40 px-4 text-[11px] font-bold text-white/90 transition-all hover:bg-[#ef4444]/10 hover:border-[#ef4444] active:scale-95"
             >
               Blaze.com
             </a>
@@ -73,7 +73,7 @@ export const LiveStats = memo(function LiveStats({
               href="https://blaze.bet.br/pt/games/double" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="flex h-6 items-center rounded border border-red-600 bg-black px-3 text-[10px] font-bold text-white transition-colors hover:bg-red-600/10"
+              className="flex h-7 items-center rounded border border-[#ef4444]/40 bg-black/40 px-4 text-[11px] font-bold text-white/90 transition-all hover:bg-[#ef4444]/10 hover:border-[#ef4444] active:scale-95"
             >
               Double
             </a>
