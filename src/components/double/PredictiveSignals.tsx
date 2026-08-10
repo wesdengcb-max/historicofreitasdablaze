@@ -271,6 +271,13 @@ export function PredictiveSignals() {
     setMode2(m2);
   }, [active, engine]);
 
+  // Auto-generate projections when data is ready
+  useEffect(() => {
+    if (rows.length > 0 && !mode1 && !loading) {
+      generate();
+    }
+  }, [rows, generate, mode1, loading]);
+
   return (
     <Card className="glass-card !p-0 overflow-hidden">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.05] bg-white/[0.02] px-6 py-5">
