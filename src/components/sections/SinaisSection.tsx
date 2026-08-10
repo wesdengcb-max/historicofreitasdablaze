@@ -191,7 +191,7 @@ export default function SinaisSection() {
   const [tick, setTick] = useState(0);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [disabled, setDisabled] = useState<Set<string>>(new Set());
-  const [robotOn, setRobotOn] = useState(true);
+  const [robotOn, setRobotOn] = useState(false);
   const [manualSignals, setManualSignals] = useState<Signal[]>([]);
   const [addOpen, setAddOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
