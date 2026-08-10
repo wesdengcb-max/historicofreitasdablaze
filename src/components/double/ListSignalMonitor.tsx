@@ -41,33 +41,36 @@ export function ListSignalMonitor() {
         const signalDate = new Date(signal.entryDate);
         const signalTime = signalDate.getTime();
         
-        // Find if the exact minute or minute+1 (G1) has passed
         const now = new Date().getTime();
+        // Give it 2 minutes + 30s buffer to account for the result being recorded
         const twoMinutesAfter = signalTime + 120_000;
+        const expiryTime = twoMinutesAfter + 30_000;
 
         if (now < signalTime) return signal; // Future signal
 
-        // Strategy verification: 
-        // Signal color is the first symbol (🔴 or ⚫️)
-        // Check for Green: Match at target minute OR next minute (G1)
         const targetColor = signal.symbols.startsWith("🔴") ? 1 : (signal.symbols.startsWith("⚫️") ? 2 : 0);
         
-        // Look for matching results in the window [signalTime, signalTime + 2min)
+        // Find results in the window [signalTime, signalTime + 2min]
+        // We include a 30s lead buffer in case of minor timestamp drifts in the DB
         const matches = latestResults.filter(r => {
           const resTime = new Date(r.created_at).getTime();
-          return resTime >= signalTime && resTime < twoMinutesAfter;
+          return resTime >= (signalTime - 30_000) && resTime < twoMinutesAfter;
         });
 
         if (matches.length > 0) {
-          const isGreen = matches.some(r => Number(r.color) === targetColor || Number(r.color) === 0);
+          const isGreen = matches.some(r => {
+            const resColor = Number(r.color);
+            return resColor === targetColor || resColor === 0;
+          });
+          
           if (isGreen) {
             changed = true;
             return { ...signal, outcome: "green" as const };
           }
         }
 
-        // If time has passed 2 minutes and no green, it's a red
-        if (now > twoMinutesAfter) {
+        // Only mark as RED if the time window (G1) has fully passed + buffer
+        if (now > expiryTime) {
           changed = true;
           return { ...signal, outcome: "red" as const };
         }

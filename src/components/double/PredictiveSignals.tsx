@@ -346,6 +346,8 @@ export function PredictiveSignals() {
     // Filtrar resultados da Blaze que caíram na hora anterior (no fuso SP)
     const previousHourRows = rows.filter(r => {
       const d = new Date(r.created_at);
+      // For strategy analysis, we strictly use UTC to match database storage if necessary, 
+      // but if the UI logic depends on SP time for grouping, we stick to it but ensure no double offset.
       const dInSP = new Date(d.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
       return dInSP >= startTimeInSP && dInSP <= endTimeInSP;
     });
