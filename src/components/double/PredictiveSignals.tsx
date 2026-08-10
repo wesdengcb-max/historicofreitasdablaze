@@ -694,7 +694,7 @@ export function PredictiveSignals() {
           onClick={generateProximaLista}
           className={
             !loading
-              ? "relative overflow-hidden rounded-xl bg-gradient-to-br from-red-600 via-red-500 to-red-700 px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] text-white shadow-[0_8px_20px_-6px_rgba(239,68,68,0.5)] transition-all hover:scale-[1.02] hover:shadow-[0_12px_25px_-6px_rgba(239,68,68,0.6)] active:scale-[0.98] font-outfit border border-white/10 group"
+              ? `relative overflow-hidden rounded-xl bg-gradient-to-br ${showProximaLista ? 'from-zinc-700 via-zinc-800 to-zinc-900 shadow-zinc-500/20' : 'from-red-600 via-red-500 to-red-700 shadow-red-500/50'} px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] text-white transition-all hover:scale-[1.02] active:scale-[0.98] font-outfit border border-white/10 group`
               : "rounded-xl border border-white/5 bg-white/[0.03] px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] text-[#9CA3AF] opacity-50 font-outfit"
           }
         >
@@ -707,7 +707,7 @@ export function PredictiveSignals() {
             ) : (
               <>
                 <List className="h-3.5 w-3.5" />
-                <span>Gerar Lista de Cor</span>
+                <span>{showProximaLista ? "FECHAR LISTA" : "GERAR LISTA DE COR"}</span>
               </>
             )}
           </div>
