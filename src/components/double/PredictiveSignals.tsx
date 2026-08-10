@@ -521,7 +521,7 @@ export function PredictiveSignals() {
           </section>
         )}
 
-        {hasClicked && mode2 && (
+        {showBranco && hasClicked && mode2 && (
           <section className="space-y-3">
             <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               <Layers className="h-3.5 w-3.5" /> Coincidências · validadas pelo Top 5
