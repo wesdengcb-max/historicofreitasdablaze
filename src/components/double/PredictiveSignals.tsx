@@ -718,7 +718,7 @@ export function PredictiveSignals() {
             ) : (
               <>
                 <List className="h-3.5 w-3.5" />
-                <span>{showProximaLista ? "BOTÃO" : "GERAR LISTA DE COR"}</span>
+                <span>{showProximaLista ? "BOTÃO" : "BOTÃO"}</span>
               </>
             )}
           </div>
