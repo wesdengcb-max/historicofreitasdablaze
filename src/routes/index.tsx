@@ -35,8 +35,8 @@ function LandingPage() {
         />
         
         {/* Overlays for depth and contrast */}
-        <div className="absolute inset-0 bg-black/60" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#020407]/40 via-transparent to-[#020407]" />
+        <div className="absolute inset-0 bg-black/40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#020407]/20 via-transparent to-[#020407]" />
         
         {/* Atmospheric Cyan Glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100%] h-[100%] bg-cyan-500/10 blur-[150px] rounded-full" />
