@@ -18,7 +18,7 @@ function LandingPage() {
               <img src={logoFreitas.url} alt="Freitas" className="h-full w-full rounded-full object-cover" />
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-black uppercase tracking-[0.2em] text-white font-outfit leading-none">Freitas White</span>
+              <span className="text-sm font-black uppercase tracking-[0.2em] text-white font-outfit leading-none">Histórico Freitas da Blaze</span>
               <span className="text-[9px] font-bold text-red-500 uppercase tracking-widest mt-0.5">Premium Analysis</span>
             </div>
           </div>
@@ -122,10 +122,10 @@ function LandingPage() {
              <div className="h-6 w-6 overflow-hidden rounded-full grayscale">
               <img src={logoFreitas.url} alt="Freitas" className="h-full w-full object-cover" />
             </div>
-            <span className="text-[10px] font-black uppercase tracking-[0.3em] font-outfit">Freitas White</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.3em] font-outfit">Histórico Freitas da Blaze</span>
           </div>
           <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest">
-            © {new Date().getFullYear()} Freitas White · Ecosystem for Strategic Players
+            © {new Date().getFullYear()} Histórico Freitas da Blaze · Ecosystem for Strategic Players
           </p>
         </div>
       </footer>
