@@ -640,7 +640,7 @@ export function PredictiveSignals() {
       </div>
 
       <div className="px-5 py-5">
-        <ProximaListaDisplay />
+        {showProximaLista && <ProximaListaDisplay />}
       </div>
     </Card>
     </div>
