@@ -1,30 +1,41 @@
+/** 
+ * Motor Preditivo FreitasWhite
+ * Arquitetura Unificada: 7 Análises, Limites de 14 tempos, 120 min timeout, Janela de 6 Gatilhos.
+ */
 import { parseUtcDate } from "@/lib/utils";
 export type Row = { id: number; roll: string; color: string; created_at: string };
 
 export type Cycle = {
   value: number;
-  analysis: 1 | 2 | 3 | 4 | 5;
+  analysis: 1 | 2 | 3 | 4 | 5 | 6 | 7;
   triggerAt: Date;
   gaps: number[];
 };
 
 export const MAX_ZEROS = 14;
-export const MAX_ZEROS_A4 = 20;
-export const MAX_ZEROS_A5 = 20;
-export const MAX_CYCLES = 5;
+export const MAX_CYCLES = 6;
+export const TIMEOUT_MINUTES = 120;
 
 function diffMinutes(a: Date, b: Date) {
   return Math.max(0, Math.round((b.getTime() - a.getTime()) / 60000));
 }
 
-function collectGaps(rows: Row[], i: number, dt: Date, analysis: number = 1): number[] {
+function collectGaps(rows: Row[], i: number, dt: Date): number[] {
   const gaps: number[] = [];
-  const limit = (analysis === 4 || analysis === 5) ? MAX_ZEROS_A4 : MAX_ZEROS;
+  const limit = MAX_ZEROS;
+  const timeoutMs = TIMEOUT_MINUTES * 60000;
+  
   for (let k = 1; i + k < rows.length && gaps.length < limit; k++) {
-    if (Number(rows[i + k].roll) !== 0) continue;
-    const zdt = parseUtcDate(rows[i + k].created_at);
+    const r = rows[i + k];
+    const zdt = parseUtcDate(r.created_at);
     if (Number.isNaN(zdt.getTime())) continue;
-    gaps.push(diffMinutes(dt, zdt));
+    
+    // Trava de Timeout (120 Minutos)
+    if (zdt.getTime() - dt.getTime() > timeoutMs) break;
+
+    if (Number(r.roll) === 0) {
+      gaps.push(diffMinutes(dt, zdt));
+    }
   }
   return gaps;
 }
@@ -38,7 +49,7 @@ export function buildA1(rows: Row[]): Cycle[] {
     const dt = parseUtcDate(r.created_at);
     if (Number.isNaN(dt.getTime())) return;
     if (dt.getMinutes() % 10 !== n) return;
-    out.push({ value: n, analysis: 1, triggerAt: dt, gaps: collectGaps(rows, i, dt, 1) });
+    out.push({ value: n, analysis: 1, triggerAt: dt, gaps: collectGaps(rows, i, dt) });
   });
   return out;
 }
@@ -52,7 +63,7 @@ export function buildA2(rows: Row[]): Cycle[] {
     if (!Number.isFinite(cur) || cur < 0 || cur > 14 || cur !== prev) continue;
     const dt = parseUtcDate(rows[i].created_at);
     if (Number.isNaN(dt.getTime())) continue;
-    out.push({ value: cur, analysis: 2, triggerAt: dt, gaps: collectGaps(rows, i, dt, 2) });
+    out.push({ value: cur, analysis: 2, triggerAt: dt, gaps: collectGaps(rows, i, dt) });
   }
   return out;
 }
@@ -68,7 +79,7 @@ export function buildA3(rows: Row[]): Cycle[] {
     const dt = parseUtcDate(rows[i].created_at);
     if (Number.isNaN(dt.getTime()) || Number.isNaN(dtPrev.getTime())) continue;
     if (dtPrev.getMinutes() % 10 !== cur && dt.getMinutes() % 10 !== cur) continue;
-    out.push({ value: cur, analysis: 3, triggerAt: dt, gaps: collectGaps(rows, i, dt, 3) });
+    out.push({ value: cur, analysis: 3, triggerAt: dt, gaps: collectGaps(rows, i, dt) });
   }
   return out;
 }
@@ -93,7 +104,7 @@ export function buildA4(rows: Row[]): Cycle[] {
     const n = Number(r.roll);
     if (!Number.isFinite(n) || n < 0 || n > 14) return;
 
-    out.push({ value: n, analysis: 4, triggerAt: dt, gaps: collectGaps(rows, i, dt, 4) });
+    out.push({ value: n, analysis: 4, triggerAt: dt, gaps: collectGaps(rows, i, dt) });
   });
   return out;
 }
@@ -125,8 +136,37 @@ export function buildA5(rows: Row[]): Cycle[] {
     const n = Number(r.roll);
     if (!Number.isFinite(n) || n < 0 || n > 14) return;
 
-    out.push({ value: n, analysis: 5, triggerAt: dt, gaps: collectGaps(rows, i, dt, 5) });
+    out.push({ value: n, analysis: 5, triggerAt: dt, gaps: collectGaps(rows, i, dt) });
   });
+  return out;
+}
+
+/** Análise 6 (O Pão) — Padrão Sanduíche (A - B - A) focando no alinhamento das pontas A. */
+export function buildA6(rows: Row[]): Cycle[] {
+  const out: Cycle[] = [];
+  for (let i = 2; i < rows.length; i++) {
+    const a1 = Number(rows[i - 2].roll);
+    const a2 = Number(rows[i].roll);
+    if (!Number.isFinite(a1) || !Number.isFinite(a2) || a1 !== a2 || a1 < 0 || a1 > 14) continue;
+    const dt = parseUtcDate(rows[i].created_at);
+    if (Number.isNaN(dt.getTime())) continue;
+    out.push({ value: a2, analysis: 6, triggerAt: dt, gaps: collectGaps(rows, i, dt) });
+  }
+  return out;
+}
+
+/** Análise 7 (A Carne) — Padrão Sanduíche (A - B - A) focando na reação da pedra B recheio. */
+export function buildA7(rows: Row[]): Cycle[] {
+  const out: Cycle[] = [];
+  for (let i = 2; i < rows.length; i++) {
+    const a1 = Number(rows[i - 2].roll);
+    const b = Number(rows[i - 1].roll);
+    const a2 = Number(rows[i].roll);
+    if (!Number.isFinite(a1) || !Number.isFinite(a2) || !Number.isFinite(b) || a1 !== a2 || b < 0 || b > 14) continue;
+    const dt = parseUtcDate(rows[i].created_at);
+    if (Number.isNaN(dt.getTime())) continue;
+    out.push({ value: b, analysis: 7, triggerAt: dt, gaps: collectGaps(rows, i, dt) });
+  }
   return out;
 }
 

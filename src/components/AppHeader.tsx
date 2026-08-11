@@ -24,7 +24,7 @@ export const AppHeader = memo(function AppHeader() {
         
         <div className="flex items-center gap-3">
           <div className="h-2 w-2 animate-pulse rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-          <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white font-outfit">Análise em tempo real</span>
+          <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white font-outfit">Análise em tempo real (Últimos 6 Gatilhos)</span>
         </div>
       </div>
 

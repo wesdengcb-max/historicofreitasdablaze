@@ -376,7 +376,7 @@ export default function SinaisSection() {
             <h1 className="text-4xl font-black tracking-tighter text-white font-outfit uppercase">Sinais</h1>
           </div>
           <p className="mt-2 text-sm text-[#9CA3AF] font-medium">
-            Gerencie sua lista de sinais e estratégias automáticas de forma premium.
+            Gerencie sua lista baseada nos últimos 6 gatilhos e estratégias automáticas (limite 120 min).
           </p>
           <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-3 py-1 text-xs">
             <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
