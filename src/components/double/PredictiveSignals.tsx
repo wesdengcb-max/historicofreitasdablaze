@@ -9,12 +9,14 @@ import {
   buildA3,
   buildA4,
   buildA5,
+  buildA6,
+  buildA7,
   computeTop,
   cyclesOf,
   fmtClock,
   latestByValue,
   MAX_ZEROS,
-  MAX_ZEROS_A4,
+  TIMEOUT_MINUTES,
   checkHighTendency,
   type Cycle,
   type Row,
@@ -27,7 +29,7 @@ type Mode1Signal = {
   pct: number; 
   label: string; 
   analysisCount: number; 
-  sources: Array<{ analysis: 1 | 2 | 3 | 4 | 5; value: number }>;
+  sources: Array<{ analysis: 1 | 2 | 3 | 4 | 5 | 6 | 7; value: number }>;
   isHighTendency: boolean;
   outcome?: "pending" | "green" | "red";
   resultTime?: string;
@@ -37,7 +39,7 @@ type Mode2Signal = {
   title: string;
   times: Date[];
   pct: number;
-  sources: Array<{ analysis: 1 | 2 | 3 | 4 | 5; value: number; pct: number; top5: boolean }>;
+  sources: Array<{ analysis: 1 | 2 | 3 | 4 | 5 | 6 | 7; value: number; pct: number; top5: boolean }>;
   confluence: string;
   analysisCount: number;
   isHighTendency: boolean;
@@ -47,7 +49,7 @@ type Mode2Signal = {
 
 const MIN_ASSERTIVIDADE_TOP1 = 65;
 const MIN_ASSERTIVIDADE_CONFLUENCIA = 55;
-const MIN_GATILHOS = 5;
+const MIN_GATILHOS = 6;
 
 function addMinutes(d: Date, m: number) {
   const out = new Date(d.getTime() + m * 60_000);
@@ -61,7 +63,22 @@ const CANDIDATE_DEPTH = 10;
 const TOP5_DEPTH = 5;
 
 const getMedalStyles = (count: number) => {
-  if (count >= 4) return { 
+  if (count >= 7) return { 
+    label: "Supremo", 
+    classes: "border-cyan-400 bg-cyan-950/50 text-cyan-300 shadow-cyan-500/20 animate-pulse",
+    badge: "bg-cyan-400/20 text-cyan-300 border-cyan-400/30"
+  };
+  if (count === 6) return { 
+    label: "Platina", 
+    classes: "border-indigo-400 bg-indigo-950/40 text-indigo-200 shadow-indigo-500/10",
+    badge: "bg-indigo-400/20 text-indigo-200 border-indigo-400/30"
+  };
+  if (count === 5) return { 
+    label: "Diamante", 
+    classes: "border-blue-400 bg-blue-950/40 text-blue-200 shadow-blue-500/10",
+    badge: "bg-blue-400/20 text-blue-200 border-blue-400/30"
+  };
+  if (count === 4) return { 
     label: "Ouro", 
     classes: "border-yellow-400 bg-yellow-950/50 text-yellow-300 shadow-yellow-500/20",
     badge: "bg-yellow-400/20 text-yellow-300 border-yellow-400/30"
@@ -125,17 +142,31 @@ export function PredictiveSignals() {
     const a3 = buildA3(rows);
     const a4 = buildA4(rows);
     const a5 = buildA5(rows);
-    return { 1: a1, 2: a2, 3: a3, 4: a4, 5: a5 } as Record<1 | 2 | 3 | 4 | 5, Cycle[]>;
+    const a6 = buildA6(rows);
+    const a7 = buildA7(rows);
+    return { 1: a1, 2: a2, 3: a3, 4: a4, 5: a5, 6: a6, 7: a7 } as Record<1 | 2 | 3 | 4 | 5 | 6 | 7, Cycle[]>;
   }, [rows]);
 
   /** Ciclos em aberto (status < MAX_ZEROS) por análise + valor. */
   const active = useMemo(() => {
-    const out: Array<{ analysis: 1 | 2 | 3 | 4 | 5; value: number; open: Cycle }> = [];
-    ([1, 2, 3, 4, 5] as const).forEach((a) => {
+    const out: Array<{ analysis: 1 | 2 | 3 | 4 | 5 | 6 | 7; value: number; open: Cycle }> = [];
+    ([1, 2, 3, 4, 5, 6, 7] as const).forEach((a) => {
       const latest = latestByValue(engine[a]);
       latest.forEach((cycle, value) => {
-        const limit = (a === 4 || a === 5) ? MAX_ZEROS_A4 : MAX_ZEROS;
-        if (cycle.gaps.length < limit) out.push({ analysis: a, value, open: cycle });
+        // Trava de Quarentena (Gatilho Morto): suspender se último gatilho teve ZERO brancos ou timeout
+        const hist = engine[a].filter(c => c.value === value);
+        if (hist.length > 0) {
+           const last = hist[hist.length - 1];
+           const now = new Date().getTime();
+           const triggerTime = new Date(last.triggerAt).getTime();
+           const isTimedOut = now - triggerTime > (TIMEOUT_MINUTES * 60000);
+           
+           // Se o último gatilho encerrado não teve brancos (está aberto e atingiu limite)
+           // Ou se ele expirou por timeout sem acertos.
+           if (last.gaps.length === 0 && isTimedOut) return;
+        }
+
+        if (cycle.gaps.length < MAX_ZEROS) out.push({ analysis: a, value, open: cycle });
       });
     });
     return out;
@@ -155,8 +186,9 @@ export function PredictiveSignals() {
       { values: number[]; analyses: Set<number>; pct: number; label: string; sources: Array<{ analysis: number; value: number }>; isHighTendency: boolean }
     >();
     for (const item of active) {
-      const hist = engine[item.analysis].filter(c => c.value === item.value);
-      // FILTRO DE MASSA CRÍTICA (Mínimo de 5 gatilhos)
+      // Janela de Histórico Recente: Últimos 6 gatilhos
+      const hist = engine[item.analysis].filter(c => c.value === item.value).slice(-6);
+      // Massa Crítica Mínima: 6 gatilhos
       if (hist.length < MIN_GATILHOS) continue;
 
       const top1 = computeTop(hist, 1)[0];
@@ -178,13 +210,13 @@ export function PredictiveSignals() {
           analyses: new Set([item.analysis]),
           pct: top1.pct, 
           label: top1.label,
-          sources: [{ analysis: item.analysis as 1 | 2 | 3 | 4 | 5, value: item.value }],
+          sources: [{ analysis: item.analysis as 1 | 2 | 3 | 4 | 5 | 6 | 7, value: item.value }],
           isHighTendency: isTendency
         });
       } else {
         if (!cur.values.includes(item.value)) cur.values.push(item.value);
         cur.analyses.add(item.analysis);
-        cur.sources.push({ analysis: item.analysis as 1 | 2 | 3 | 4 | 5, value: item.value });
+        cur.sources.push({ analysis: item.analysis as 1 | 2 | 3 | 4 | 5 | 6 | 7, value: item.value });
         if (isTendency) cur.isHighTendency = true;
         if (top1.pct > cur.pct) {
           cur.pct = top1.pct;
@@ -203,7 +235,7 @@ export function PredictiveSignals() {
           pct: info.pct,
           label: info.label,
           analysisCount: info.analyses.size,
-          sources: info.sources as Array<{ analysis: 1 | 2 | 3 | 4 | 5; value: number }>,
+          sources: info.sources as Array<{ analysis: 1 | 2 | 3 | 4 | 5 | 6 | 7; value: number }>,
           isHighTendency: info.isHighTendency
         };
       });
@@ -212,12 +244,12 @@ export function PredictiveSignals() {
     const usedTimes = new Set<number>(m1.map((s) => s.at.getTime()));
 
     // ---- Modo 2: Estratégia de Coincidência ----
-    type Proj = { analysis: 1 | 2 | 3 | 4 | 5; value: number; pct: number; top5: boolean };
+    type Proj = { analysis: 1 | 2 | 3 | 4 | 5 | 6 | 7; value: number; pct: number; top5: boolean };
     const byMinute = new Map<number, Proj[]>();
 
     for (const item of active) {
-      const hist = engine[item.analysis].filter(c => c.value === item.value);
-      // FILTRO DE MASSA CRÍTICA (Mínimo de 5 gatilhos)
+      const hist = engine[item.analysis].filter(c => c.value === item.value).slice(-6);
+      // FILTRO DE MASSA CRÍTICA (Mínimo de 6 gatilhos)
       if (hist.length < MIN_GATILHOS) continue;
 
       const list = computeTop(hist, CANDIDATE_DEPTH);
@@ -226,7 +258,7 @@ export function PredictiveSignals() {
         if (at <= now.getTime()) return;
         const arr = byMinute.get(at) ?? [];
         arr.push({
-          analysis: item.analysis as 1 | 2 | 3 | 4 | 5,
+          analysis: item.analysis as 1 | 2 | 3 | 4 | 5 | 6 | 7,
           value: item.value,
           pct: g.pct,
           top5: idx < TOP5_DEPTH,
@@ -258,7 +290,7 @@ export function PredictiveSignals() {
         .map((p) => `A${p.analysis}·${p.value}`)
         .join(", ");
       
-      const isHighTendency = projs.some(p => checkHighTendency(engine[p.analysis as 1 | 2 | 3 | 4 | 5], p.value));
+      const isHighTendency = projs.some(p => checkHighTendency(engine[p.analysis as 1 | 2 | 3 | 4 | 5 | 6 | 7], p.value));
 
       m2.push({
         key: `m2-${at}`,
@@ -316,7 +348,7 @@ export function PredictiveSignals() {
       // Internal calculation for Mode 1
       const byTime = new Map<number, any>();
       for (const item of active) {
-        const hist = engine[item.analysis].filter(c => c.value === item.value);
+        const hist = engine[item.analysis].filter(c => c.value === item.value).slice(-6);
         if (hist.length < MIN_GATILHOS) continue;
         const top1 = computeTop(hist, 1)[0];
         if (!top1 || top1.pct < MIN_ASSERTIVIDADE_TOP1) continue;
@@ -355,7 +387,7 @@ export function PredictiveSignals() {
       // Internal calculation for Mode 2 (Confluences)
       const byMinute = new Map<number, any[]>();
       for (const item of active) {
-        const hist = engine[item.analysis].filter(c => c.value === item.value);
+        const hist = engine[item.analysis].filter(c => c.value === item.value).slice(-6);
         if (hist.length < MIN_GATILHOS) continue;
         const list = computeTop(hist, CANDIDATE_DEPTH);
         list.forEach((g, idx) => {
@@ -440,7 +472,7 @@ export function PredictiveSignals() {
         {!hasClicked && !err && (
           <p className="text-sm text-muted-foreground">
             {hasOpportunity
-              ? `${active.length} ciclo(s) em aberto. Clique em "Próximo branco" para projetar os horários.`
+              ? `${active.length} ciclo(s) em aberto analisando os últimos 6 gatilhos (limite 120 min). Clique em "Próximo branco" para projetar.`
               : "Nenhum ciclo em aberto no momento."}
           </p>
         )}
