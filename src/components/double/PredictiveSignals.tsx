@@ -526,7 +526,7 @@ export function PredictiveSignals() {
                         <span className={medal ? "text-inherit" : "text-primary"}>
                           {s.pct.toFixed(1)}%
                         </span>
-                        <span className="opacity-50 text-[10px]">· janela {s.label}</span>
+                        <span className="opacity-50 text-[10px]">· janela {s.label} (limite 120m)</span>
                       </div>
                       <div className="mt-2 flex flex-wrap gap-1">
                         {s.sources.map((src, idx) => (
@@ -593,8 +593,8 @@ export function PredictiveSignals() {
                         </span>
                       </div>
                       <div className="mt-2 text-[10px] leading-relaxed text-muted-foreground opacity-80">
-                        Confluência Top 5:{" "}
-                        <span className={`font-bold ${medal ? "text-inherit" : "text-primary"}`}>{s.confluence}</span>
+                        Origem:{" "}
+                        <span className={`font-bold ${medal ? "text-inherit" : "text-primary"}`}>{s.confluence}</span> (limite 120m)
                       </div>
                       <div className="mt-1 flex flex-wrap gap-1">
                         {s.sources.map((p) => (
