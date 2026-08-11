@@ -126,7 +126,7 @@ export const LiveStats = memo(function LiveStats({
         footer={
           <div className="text-center px-1">
             <span className="text-[10px] font-medium text-[#999999]">
-              <span className="text-white">Quantidade</span> e <span className="text-white">Porcentagem</span> das cores na tela.
+              Análise dos <span className="text-white">últimos 6 gatilhos</span> (limite 120 min) e porcentagem das cores.
             </span>
           </div>
         }

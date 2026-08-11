@@ -1,3 +1,7 @@
+/** 
+ * Motor Preditivo FreitasWhite
+ * Arquitetura Unificada: 7 Análises, Limites de 14 tempos, 120 min timeout, Janela de 6 Gatilhos.
+ */
 import { parseUtcDate } from "@/lib/utils";
 export type Row = { id: number; roll: string; color: string; created_at: string };
 
