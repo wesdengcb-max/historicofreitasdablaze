@@ -375,9 +375,18 @@ export default function SinaisSection() {
           <p className="mt-2 text-sm text-[#9CA3AF] font-medium">
             Gerencie sua lista baseada nos últimos 6 gatilhos e estratégias automáticas (limite 120 min / 14 tempos).
           </p>
-          <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-3 py-1 text-xs">
-            <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
-            Martingale: 3 níveis · ×2
+          <div className="mt-4 flex flex-wrap gap-4">
+            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-3 py-1 text-xs">
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
+              Martingale: 3 níveis · ×2
+            </div>
+            <div className="flex items-center gap-2 bg-white/[0.03] border border-white/10 rounded-xl px-3 py-1">
+              <span className="text-[10px] font-black text-muted-foreground uppercase font-mono tracking-widest">Auditoria Real-Time</span>
+              <div className="flex gap-1">
+                 <span className="text-[9px] font-bold text-emerald-400">WIN_DIRETO</span>
+                 <span className="text-[9px] font-bold text-emerald-500">WIN_VIZINHO</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -427,15 +436,30 @@ export default function SinaisSection() {
 
       {/* Lista de Sinais */}
       <Card className="glass-card !p-0 overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.05] bg-white/[0.02]">
+        <div className="flex flex-wrap items-center justify-between px-6 py-5 border-b border-white/[0.05] bg-white/[0.02] gap-4">
           <div className="flex items-center gap-4">
             <div className="grid h-10 w-10 place-items-center rounded-xl bg-[#FF1F3D]/10 text-[#FF1F3D] shadow-[0_0_15px_rgba(255,31,61,0.1)]">
               <Radio className="h-5 w-5" />
             </div>
-            <h2 className="font-black text-xl text-white font-outfit uppercase tracking-tight">Lista de Sinais</h2>
+            <h2 className="font-black text-xl text-white font-outfit uppercase tracking-tight">Painel de Auditoria</h2>
           </div>
-          <div className="text-[11px] tracking-widest font-mono text-red-400 border border-red-500/40 rounded-full px-3 py-1">
-            [ ● {visible.length} SINAIS ]
+          
+          <div className="flex items-center gap-3">
+             <Select defaultValue="hoje">
+               <SelectTrigger className="w-[140px] h-9 text-[10px] font-black uppercase tracking-widest font-mono bg-black/40 border-white/10">
+                 <SelectValue placeholder="Período" />
+               </SelectTrigger>
+               <SelectContent className="bg-surface border-border">
+                 <SelectItem value="hoje">Hoje</SelectItem>
+                 <SelectItem value="ontem">Ontem</SelectItem>
+                 <SelectItem value="7dias">Últimos 7 dias</SelectItem>
+                 <SelectItem value="custom">Selecionar Data</SelectItem>
+               </SelectContent>
+             </Select>
+
+            <div className="text-[11px] tracking-widest font-mono text-red-400 border border-red-500/40 rounded-full px-3 py-1">
+              [ ● {visible.length + predictiveList.length} SINAIS ]
+            </div>
           </div>
         </div>
 
