@@ -332,15 +332,16 @@ export default function SinaisSection() {
 
       const validated = raw.map(s => {
         if (!s.entryDate) return s;
-        const targetTime = new Date(s.entryDate).getTime();
-        const windowEnd = targetTime + WHITE_MARGIN_MS;
+        // Se já é um Date, usa direto. Se for string, parseia.
+        const entryTime = typeof s.entryDate === 'string' ? new Date(s.entryDate).getTime() : s.entryDate.getTime();
+        const windowEnd = entryTime + WHITE_MARGIN_MS;
 
         if (s.outcome && s.outcome !== "pending") return s;
 
         const matchedExact = resultsForValidation.find(r => {
           if (r.color !== "white") return false;
           const rt = new Date(r.createdAt).getTime();
-          return rt >= targetTime - 60_000 && rt <= targetTime + 60_000 && rt <= now;
+          return rt >= entryTime - 60_000 && rt <= entryTime + 60_000 && rt <= now;
         });
 
         if (matchedExact) {
