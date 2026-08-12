@@ -144,6 +144,49 @@ export default function SinaisSection() {
   const [formEntry, setFormEntry] = useState<"1" | "2">("1");
   const [formColor, setFormColor] = useState<Color>("red");
 
+  const [auditFilter, setAuditFilter] = useState<"hoje" | "geral">("hoje");
+  const [auditStats, setAuditStats] = useState<{
+    wins: number;
+    losses: number;
+    pct: number;
+    tendency: boolean;
+    analysis: string;
+    total: number;
+  }>({ wins: 0, losses: 0, pct: 0, tendency: false, analysis: "---", total: 0 });
+
+  useEffect(() => {
+    const fetchAudit = async () => {
+      let query = supabase.from("historico_sinais_audit").select("*");
+      if (auditFilter === "hoje") {
+        const today = spYmd();
+        const start = spToUtcIso(today, "00:00");
+        const end = spToUtcIso(today, "23:59:59.999");
+        query = query.gte("created_at", start).lte("created_at", end);
+      }
+
+      const { data, error } = await query.order("created_at", { ascending: false });
+      if (error || !data) return;
+
+      const wins = data.filter(r => r.status.startsWith("WIN")).length;
+      const losses = data.filter(r => r.status === "LOSS").length;
+      const total = data.length;
+      const pct = total > 0 ? (wins / total) * 100 : 0;
+      const latest = data[0];
+
+      setAuditStats({
+        wins,
+        losses,
+        total,
+        pct,
+        analysis: latest?.analise || "---",
+        tendency: data.slice(0, 5).filter(r => r.status.startsWith("WIN")).length >= 4,
+      });
+    };
+    void fetchAudit();
+    const interval = setInterval(fetchAudit, 10000);
+    return () => clearInterval(interval);
+  }, [auditFilter]);
+
 
   // Re-render frequente para avaliar a margem de 1 minuto e remover expirados.
   useEffect(() => {
