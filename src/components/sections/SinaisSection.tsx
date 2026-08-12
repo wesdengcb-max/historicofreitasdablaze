@@ -350,7 +350,7 @@ export default function SinaisSection() {
         if (matchedExact) {
           const res = { ...s, outcome: "green" as const, resultTime: fmtTime(matchedExact.createdAt), label: "WIN_DIRETO" };
           // Persist to audit table
-          void supabase.from('historico_sinais_audit').insert({
+          void (supabase as any).from('historico_sinais_audit').insert({
             analise: s.confluence,
             tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
             nivel: s.medal || 'Top 1 Isolado',
