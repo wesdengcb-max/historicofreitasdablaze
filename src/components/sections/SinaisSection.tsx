@@ -159,32 +159,36 @@ export default function SinaisSection() {
 
   useEffect(() => {
     const fetchAudit = async () => {
-      let query = (supabase as any).from("historico_sinais_audit").select("*");
-      if (auditFilter === "hoje") {
-        const today = spYmd();
-        const start = spToUtcIso(today, "00:00");
-        const end = spToUtcIso(today, "23:59:59.999");
-        query = query.gte("created_at", start).lte("created_at", end);
+      try {
+        const table = 'historico_sinais_audit';
+        let query = (supabase as any).from(table).select("*");
+        if (auditFilter === "hoje") {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          query = query.gte("created_at", today.toISOString());
+        }
+
+        const { data, error } = await query.order("created_at", { ascending: false });
+        if (error || !data) return;
+
+        const auditData = data as any[];
+        const wins = auditData.filter(r => r.status && r.status.startsWith("WIN")).length;
+        const losses = auditData.filter(r => r.status === "LOSS").length;
+        const total = auditData.length;
+        const pct = total > 0 ? (wins / total) * 100 : 0;
+        const latest = auditData[0];
+
+        setAuditStats({
+          wins,
+          losses,
+          total,
+          pct,
+          analysis: latest?.analise || "Confluência · Top 1",
+          tendency: auditData.slice(0, 5).filter(r => r.status && r.status.startsWith("WIN")).length >= 4,
+        });
+      } catch (e) {
+        console.error("fetchAudit error:", e);
       }
-
-      const { data, error } = await query.order("created_at", { ascending: false });
-      if (error || !data) return;
-
-      const auditData = data as any[];
-      const wins = auditData.filter(r => r.status.startsWith("WIN")).length;
-      const losses = auditData.filter(r => r.status === "LOSS").length;
-      const total = auditData.length;
-      const pct = total > 0 ? (wins / total) * 100 : 0;
-      const latest = auditData[0];
-
-      setAuditStats({
-        wins,
-        losses,
-        total,
-        pct,
-        analysis: latest?.analise || "---",
-        tendency: auditData.slice(0, 5).filter(r => r.status.startsWith("WIN")).length >= 4,
-      });
     };
     void fetchAudit();
     const interval = setInterval(fetchAudit, 10000);
@@ -328,81 +332,89 @@ export default function SinaisSection() {
   useEffect(() => {
     const update = () => {
       const raw = getPredictiveSignals();
+      if (!Array.isArray(raw)) return;
       const now = Date.now();
       const WHITE_MARGIN_MS = 60_000;
-      const MARGIN_MS = 2 * 60_000; // Janela de 2 minutos para margem
       const REMOVE_DELAY_MS = 3 * 60_000;
 
       const validated = raw.map(s => {
-        if (!s.entryDate) return s;
-        // Se já é um Date, usa direto. Se for string, parseia.
-        const entryTime = typeof s.entryDate === 'string' ? new Date(s.entryDate).getTime() : (s.entryDate instanceof Date ? s.entryDate.getTime() : new Date(s.entryDate).getTime());
-        const windowEnd = entryTime + WHITE_MARGIN_MS;
+        try {
+          if (!s.entryDate) return s;
+          const entryTime = typeof s.entryDate === 'string' ? new Date(s.entryDate).getTime() : (s.entryDate instanceof Date ? s.entryDate.getTime() : new Date(s.entryDate).getTime());
+          
+          if (Number.isNaN(entryTime)) return s;
 
-        if (s.outcome && s.outcome !== "pending") return s;
+          if (s.outcome && s.outcome !== "pending") return s;
 
-        const matchedExact = resultsForValidation.find(r => {
-          if (r.color !== "white") return false;
-          const rt = new Date(r.createdAt).getTime();
-          return rt >= entryTime - 60_000 && rt <= entryTime + 60_000 && rt <= now;
-        });
-
-        if (matchedExact) {
-          const res = { ...s, outcome: "green" as const, resultTime: fmtTime(matchedExact.createdAt), label: "WIN_DIRETO" };
-          // Persist to audit table
-          void (supabase as any).from('historico_sinais_audit').insert({
-            analise: s.confluence,
-            tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
-            nivel: s.medal || 'Top 1 Isolado',
-            predicao_horario: s.time,
-            status: 'WIN_DIRETO',
-            minuto_alvo: (s.entryDate as any)?.toISOString()
+          const matchedExact = (resultsForValidation || []).find(r => {
+            if (!r || r.color !== "white") return false;
+            const rt = new Date(r.createdAt).getTime();
+            return rt >= entryTime - 60_000 && rt <= entryTime + 60_000 && rt <= now;
           });
-          return res;
-        }
 
-        const matchedMargin = resultsForValidation.find(r => {
-          if (r.color !== "white") return false;
-          const rt = new Date(r.createdAt).getTime();
-          // TARGET ± 1 minuto
-          return rt >= entryTime - 60_000 && rt <= entryTime + 60_000 && rt <= now;
-        });
-
-        if (matchedMargin) {
-          const res = { ...s, outcome: "green" as const, resultTime: fmtTime(matchedMargin.createdAt), label: "WIN_VIZINHO" };
-          // Persist to audit table
-          void (supabase as any).from('historico_sinais_audit').insert({
-            analise: s.confluence,
-            tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
-            nivel: s.medal || 'Top 1 Isolado',
-            predicao_horario: s.time,
-            status: 'WIN_VIZINHO',
-            minuto_alvo: (s.entryDate as any)?.toISOString()
-          });
-          return res;
-        }
-
-        if (now > entryTime + 60_000) {
-          const res = { ...s, outcome: "red" as const, label: "LOSS" };
-          // Persist to audit table in background if not already red
-          if (s.outcome !== ("red" as any)) {
-            void (supabase as any).from('historico_sinais_audit').insert({
+          if (matchedExact) {
+            const res = { ...s, outcome: "green" as const, resultTime: fmtTime(matchedExact.createdAt), label: "WIN_DIRETO" };
+            const table = 'historico_sinais_audit';
+            void (supabase as any).from(table).insert({
               analise: s.confluence,
               tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
               nivel: s.medal || 'Top 1 Isolado',
               predicao_horario: s.time,
-              status: 'LOSS',
-              minuto_alvo: (s.entryDate as any)?.toISOString()
+              status: 'WIN_DIRETO',
+              minuto_alvo: (s.entryDate as any)?.toISOString?.() || String(s.entryDate)
             });
+            return res;
           }
-          return res;
+
+          const matchedMargin = (resultsForValidation || []).find(r => {
+            if (!r || r.color !== "white") return false;
+            const rt = new Date(r.createdAt).getTime();
+            return rt >= entryTime - 60_000 && rt <= entryTime + 60_000 && rt <= now;
+          });
+
+          if (matchedMargin) {
+            const res = { ...s, outcome: "green" as const, resultTime: fmtTime(matchedMargin.createdAt), label: "WIN_VIZINHO" };
+            const table = 'historico_sinais_audit';
+            void (supabase as any).from(table).insert({
+              analise: s.confluence,
+              tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
+              nivel: s.medal || 'Top 1 Isolado',
+              predicao_horario: s.time,
+              status: 'WIN_VIZINHO',
+              minuto_alvo: (s.entryDate as any)?.toISOString?.() || String(s.entryDate)
+            });
+            return res;
+          }
+
+          if (now > entryTime + 60_000) {
+            const res = { ...s, outcome: "red" as const, label: "LOSS" };
+            if (s.outcome !== ("red" as any)) {
+              const table = 'historico_sinais_audit';
+              void (supabase as any).from(table).insert({
+                analise: s.confluence,
+                tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
+                nivel: s.medal || 'Top 1 Isolado',
+                predicao_horario: s.time,
+                status: 'LOSS',
+                minuto_alvo: (s.entryDate as any)?.toISOString?.() || String(s.entryDate)
+              });
+            }
+            return res;
+          }
+          return s;
+        } catch (e) {
+          console.error("Error validating signal:", e, s);
+          return s;
         }
-        return s;
       }).filter(s => {
-        if (!s.entryDate || !s.outcome || s.outcome === "pending") return true;
-        const entryTime = typeof s.entryDate === 'string' ? new Date(s.entryDate).getTime() : (s.entryDate instanceof Date ? s.entryDate.getTime() : new Date(s.entryDate).getTime());
-        // Remove from UI after 3 minutes to keep list clean
-        return now < entryTime + (3 * 60_000);
+        try {
+          if (!s.entryDate || !s.outcome || s.outcome === "pending") return true;
+          const entryTime = typeof s.entryDate === 'string' ? new Date(s.entryDate).getTime() : (s.entryDate instanceof Date ? s.entryDate.getTime() : new Date(s.entryDate).getTime());
+          if (Number.isNaN(entryTime)) return true;
+          return now < entryTime + (3 * 60_000);
+        } catch {
+          return true;
+        }
       });
 
       setPredictiveList(validated);
