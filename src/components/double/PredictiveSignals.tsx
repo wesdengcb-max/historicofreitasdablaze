@@ -323,7 +323,8 @@ export function PredictiveSignals() {
         confluence: s.sources.map(src => `A${src.analysis}·${src.value}`).join(", "),
         medal: getMedalStyles(s.analysisCount)?.label,
         entryDate: s.at,
-        outcome: "pending"
+        outcome: "pending",
+        isHighTendency: s.isHighTendency
       })),
       ...m2.map(s => ({
         key: s.key,
@@ -333,7 +334,8 @@ export function PredictiveSignals() {
         confluence: s.confluence,
         medal: getMedalStyles(s.analysisCount)?.label,
         entryDate: s.times[0],
-        outcome: "pending"
+        outcome: "pending",
+        isHighTendency: s.isHighTendency
       }))
     ].sort((a, b) => a.entryDate.getTime() - b.entryDate.getTime());
 

@@ -300,7 +300,17 @@ export default function SinaisSection() {
         });
 
         if (matchedExact) {
-          return { ...s, outcome: "green" as const, resultTime: fmtTime(matchedExact.createdAt), label: "WIN_DIRETO" };
+          const res = { ...s, outcome: "green" as const, resultTime: fmtTime(matchedExact.createdAt), label: "WIN_DIRETO" };
+          // Persist to audit table
+          void supabase.from('historico_sinais_audit').insert({
+            analise: s.confluence,
+            tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
+            nivel: s.medal || 'Top 1 Isolado',
+            predicao_horario: s.time,
+            status: 'WIN_DIRETO',
+            minuto_alvo: s.entryDate.toISOString()
+          });
+          return res;
         }
 
         const matchedMargin = resultsForValidation.find(r => {
@@ -310,11 +320,33 @@ export default function SinaisSection() {
         });
 
         if (matchedMargin) {
-          return { ...s, outcome: "green" as const, resultTime: fmtTime(matchedMargin.createdAt), label: "WIN_VIZINHO" };
+          const res = { ...s, outcome: "green" as const, resultTime: fmtTime(matchedMargin.createdAt), label: "WIN_VIZINHO" };
+          // Persist to audit table
+          void supabase.from('historico_sinais_audit').insert({
+            analise: s.confluence,
+            tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
+            nivel: s.medal || 'Top 1 Isolado',
+            predicao_horario: s.time,
+            status: 'WIN_VIZINHO',
+            minuto_alvo: s.entryDate.toISOString()
+          });
+          return res;
         }
 
         if (now > windowEnd + (2 * 60_000)) {
-          return { ...s, outcome: "red" as const, label: "LOSS" };
+          const res = { ...s, outcome: "red" as const, label: "LOSS" };
+          // Persist to audit table in background if not already red
+          if (s.outcome !== "red") {
+            void supabase.from('historico_sinais_audit').insert({
+              analise: s.confluence,
+              tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
+              nivel: s.medal || 'Top 1 Isolado',
+              predicao_horario: s.time,
+              status: 'LOSS',
+              minuto_alvo: s.entryDate.toISOString()
+            });
+          }
+          return res;
         }
         return s;
       }).filter(s => {
