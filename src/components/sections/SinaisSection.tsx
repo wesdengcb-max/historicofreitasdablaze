@@ -335,78 +335,83 @@ export default function SinaisSection() {
       const REMOVE_DELAY_MS = 3 * 60_000;
 
       const validated = raw.map(s => {
-        if (!s.entryDate) return s;
-        // Se já é um Date, usa direto. Se for string, parseia.
-        const entryTime = typeof s.entryDate === 'string' ? new Date(s.entryDate).getTime() : (s.entryDate instanceof Date ? s.entryDate.getTime() : new Date(s.entryDate).getTime());
-        const windowEnd = entryTime + WHITE_MARGIN_MS;
+        try {
+          if (!s.entryDate) return s;
+          const entryTime = typeof s.entryDate === 'string' ? new Date(s.entryDate).getTime() : (s.entryDate instanceof Date ? s.entryDate.getTime() : new Date(s.entryDate).getTime());
+          
+          if (Number.isNaN(entryTime)) return s;
 
-        if (s.outcome && s.outcome !== "pending") return s;
+          if (s.outcome && s.outcome !== "pending") return s;
 
-        const matchedExact = resultsForValidation.find(r => {
-          if (r.color !== "white") return false;
-          const rt = new Date(r.createdAt).getTime();
-          return rt >= entryTime - 60_000 && rt <= entryTime + 60_000 && rt <= now;
-        });
-
-        if (matchedExact) {
-          const res = { ...s, outcome: "green" as const, resultTime: fmtTime(matchedExact.createdAt), label: "WIN_DIRETO" };
-          // Persist to audit table
-          const table = 'historico_sinais_audit';
-          void (supabase as any).from(table).insert({
-            analise: s.confluence,
-            tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
-            nivel: s.medal || 'Top 1 Isolado',
-            predicao_horario: s.time,
-            status: 'WIN_DIRETO',
-            minuto_alvo: (s.entryDate as any)?.toISOString()
+          const matchedExact = (resultsForValidation || []).find(r => {
+            if (!r || r.color !== "white") return false;
+            const rt = new Date(r.createdAt).getTime();
+            return rt >= entryTime - 60_000 && rt <= entryTime + 60_000 && rt <= now;
           });
-          return res;
-        }
 
-        const matchedMargin = resultsForValidation.find(r => {
-          if (r.color !== "white") return false;
-          const rt = new Date(r.createdAt).getTime();
-          // TARGET ± 1 minuto
-          return rt >= entryTime - 60_000 && rt <= entryTime + 60_000 && rt <= now;
-        });
-
-        if (matchedMargin) {
-          const res = { ...s, outcome: "green" as const, resultTime: fmtTime(matchedMargin.createdAt), label: "WIN_VIZINHO" };
-          // Persist to audit table
-          const table = 'historico_sinais_audit';
-          void (supabase as any).from(table).insert({
-            analise: s.confluence,
-            tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
-            nivel: s.medal || 'Top 1 Isolado',
-            predicao_horario: s.time,
-            status: 'WIN_VIZINHO',
-            minuto_alvo: (s.entryDate as any)?.toISOString()
-          });
-          return res;
-        }
-
-        if (now > entryTime + 60_000) {
-          const res = { ...s, outcome: "red" as const, label: "LOSS" };
-          // Persist to audit table in background if not already red
-          if (s.outcome !== ("red" as any)) {
+          if (matchedExact) {
+            const res = { ...s, outcome: "green" as const, resultTime: fmtTime(matchedExact.createdAt), label: "WIN_DIRETO" };
             const table = 'historico_sinais_audit';
             void (supabase as any).from(table).insert({
               analise: s.confluence,
               tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
               nivel: s.medal || 'Top 1 Isolado',
               predicao_horario: s.time,
-              status: 'LOSS',
-              minuto_alvo: (s.entryDate as any)?.toISOString()
+              status: 'WIN_DIRETO',
+              minuto_alvo: (s.entryDate as any)?.toISOString?.() || String(s.entryDate)
             });
+            return res;
           }
-          return res;
+
+          const matchedMargin = (resultsForValidation || []).find(r => {
+            if (!r || r.color !== "white") return false;
+            const rt = new Date(r.createdAt).getTime();
+            return rt >= entryTime - 60_000 && rt <= entryTime + 60_000 && rt <= now;
+          });
+
+          if (matchedMargin) {
+            const res = { ...s, outcome: "green" as const, resultTime: fmtTime(matchedMargin.createdAt), label: "WIN_VIZINHO" };
+            const table = 'historico_sinais_audit';
+            void (supabase as any).from(table).insert({
+              analise: s.confluence,
+              tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
+              nivel: s.medal || 'Top 1 Isolado',
+              predicao_horario: s.time,
+              status: 'WIN_VIZINHO',
+              minuto_alvo: (s.entryDate as any)?.toISOString?.() || String(s.entryDate)
+            });
+            return res;
+          }
+
+          if (now > entryTime + 60_000) {
+            const res = { ...s, outcome: "red" as const, label: "LOSS" };
+            if (s.outcome !== ("red" as any)) {
+              const table = 'historico_sinais_audit';
+              void (supabase as any).from(table).insert({
+                analise: s.confluence,
+                tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
+                nivel: s.medal || 'Top 1 Isolado',
+                predicao_horario: s.time,
+                status: 'LOSS',
+                minuto_alvo: (s.entryDate as any)?.toISOString?.() || String(s.entryDate)
+              });
+            }
+            return res;
+          }
+          return s;
+        } catch (e) {
+          console.error("Error validating signal:", e, s);
+          return s;
         }
-        return s;
       }).filter(s => {
-        if (!s.entryDate || !s.outcome || s.outcome === "pending") return true;
-        const entryTime = typeof s.entryDate === 'string' ? new Date(s.entryDate).getTime() : (s.entryDate instanceof Date ? s.entryDate.getTime() : new Date(s.entryDate).getTime());
-        // Remove from UI after 3 minutes to keep list clean
-        return now < entryTime + (3 * 60_000);
+        try {
+          if (!s.entryDate || !s.outcome || s.outcome === "pending") return true;
+          const entryTime = typeof s.entryDate === 'string' ? new Date(s.entryDate).getTime() : (s.entryDate instanceof Date ? s.entryDate.getTime() : new Date(s.entryDate).getTime());
+          if (Number.isNaN(entryTime)) return true;
+          return now < entryTime + (3 * 60_000);
+        } catch {
+          return true;
+        }
       });
 
       setPredictiveList(validated);
