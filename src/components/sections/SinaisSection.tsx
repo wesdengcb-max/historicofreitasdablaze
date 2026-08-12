@@ -159,7 +159,7 @@ export default function SinaisSection() {
 
   useEffect(() => {
     const fetchAudit = async () => {
-      let query = supabase.from("historico_sinais_audit").select("*");
+      let query = (supabase as any).from("historico_sinais_audit").select("*");
       if (auditFilter === "hoje") {
         const today = spYmd();
         const start = spToUtcIso(today, "00:00");
@@ -170,11 +170,12 @@ export default function SinaisSection() {
       const { data, error } = await query.order("created_at", { ascending: false });
       if (error || !data) return;
 
-      const wins = data.filter(r => r.status.startsWith("WIN")).length;
-      const losses = data.filter(r => r.status === "LOSS").length;
-      const total = data.length;
+      const auditData = data as any[];
+      const wins = auditData.filter(r => r.status.startsWith("WIN")).length;
+      const losses = auditData.filter(r => r.status === "LOSS").length;
+      const total = auditData.length;
       const pct = total > 0 ? (wins / total) * 100 : 0;
-      const latest = data[0];
+      const latest = auditData[0];
 
       setAuditStats({
         wins,
@@ -182,7 +183,7 @@ export default function SinaisSection() {
         total,
         pct,
         analysis: latest?.analise || "---",
-        tendency: data.slice(0, 5).filter(r => r.status.startsWith("WIN")).length >= 4,
+        tendency: auditData.slice(0, 5).filter(r => r.status.startsWith("WIN")).length >= 4,
       });
     };
     void fetchAudit();
