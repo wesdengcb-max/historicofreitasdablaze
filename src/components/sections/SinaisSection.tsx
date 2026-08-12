@@ -296,34 +296,31 @@ export default function SinaisSection() {
         const matchedExact = resultsForValidation.find(r => {
           if (r.color !== "white") return false;
           const rt = new Date(r.createdAt).getTime();
-          // EXACT: within 1 minute of projected time AND must NOT be in the future relative to now
           return rt >= targetTime - 60_000 && rt <= targetTime + 60_000 && rt <= now;
         });
 
         if (matchedExact) {
-          return { ...s, outcome: "green" as const, resultTime: fmtTime(matchedExact.createdAt), label: "EXATO" };
+          return { ...s, outcome: "green" as const, resultTime: fmtTime(matchedExact.createdAt), label: "WIN_DIRETO" };
         }
 
         const matchedMargin = resultsForValidation.find(r => {
           if (r.color !== "white") return false;
           const rt = new Date(r.createdAt).getTime();
-          // MARGIN: within 2 minutes of projected time AND must NOT be in the future relative to now
-          return rt >= targetTime - MARGIN_MS && rt <= targetTime + MARGIN_MS && rt <= now;
+          return rt >= targetTime - (2 * 60_000) && rt <= targetTime + (2 * 60_000) && rt <= now;
         });
 
         if (matchedMargin) {
-          return { ...s, outcome: "green" as const, resultTime: fmtTime(matchedMargin.createdAt), label: "MARGEM" };
+          return { ...s, outcome: "green" as const, resultTime: fmtTime(matchedMargin.createdAt), label: "WIN_VIZINHO" };
         }
 
-        if (now > windowEnd + MARGIN_MS) {
-          return { ...s, outcome: "red" as const };
+        if (now > windowEnd + (2 * 60_000)) {
+          return { ...s, outcome: "red" as const, label: "LOSS" };
         }
         return s;
       }).filter(s => {
         if (!s.entryDate || !s.outcome || s.outcome === "pending") return true;
         const targetTime = new Date(s.entryDate).getTime();
-        // Remove 3 minutes after the outcome is decided (which is at most windowEnd + MARGIN_MS)
-        return now < targetTime + WHITE_MARGIN_MS + MARGIN_MS + REMOVE_DELAY_MS;
+        return now < targetTime + (3 * 60_000) + (2 * 60_000) + WHITE_MARGIN_MS;
       });
 
       setPredictiveList(validated);
