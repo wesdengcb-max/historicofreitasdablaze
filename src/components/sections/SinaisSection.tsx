@@ -386,7 +386,7 @@ export default function SinaisSection() {
           const res = { ...s, outcome: "red" as const, label: "LOSS" };
           // Persist to audit table in background if not already red
           if (s.outcome !== ("red" as any)) {
-            void supabase.from('historico_sinais_audit').insert({
+            void (supabase as any).from('historico_sinais_audit').insert({
               analise: s.confluence,
               tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
               nivel: s.medal || 'Top 1 Isolado',
