@@ -362,7 +362,7 @@ export default function SinaisSection() {
           if (r.color !== "white") return false;
           const rt = new Date(r.createdAt).getTime();
           // TARGET ± 1 minuto
-          return rt >= targetTime - 60_000 && rt <= targetTime + 60_000 && rt <= now;
+          return rt >= entryTime - 60_000 && rt <= entryTime + 60_000 && rt <= now;
         });
 
         if (matchedMargin) {
