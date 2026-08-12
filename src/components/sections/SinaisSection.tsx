@@ -397,7 +397,7 @@ export default function SinaisSection() {
         return s;
       }).filter(s => {
         if (!s.entryDate || !s.outcome || s.outcome === "pending") return true;
-        const entryTime = new Date(s.entryDate).getTime();
+        const entryTime = typeof s.entryDate === 'string' ? new Date(s.entryDate).getTime() : (s.entryDate instanceof Date ? s.entryDate.getTime() : new Date(s.entryDate).getTime());
         // Remove from UI after 3 minutes to keep list clean
         return now < entryTime + (3 * 60_000);
       });
