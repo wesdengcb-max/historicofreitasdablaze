@@ -360,7 +360,8 @@ export default function SinaisSection() {
         const matchedMargin = resultsForValidation.find(r => {
           if (r.color !== "white") return false;
           const rt = new Date(r.createdAt).getTime();
-          return rt >= targetTime - (2 * 60_000) && rt <= targetTime + (2 * 60_000) && rt <= now;
+          // TARGET ± 1 minuto
+          return rt >= targetTime - 60_000 && rt <= targetTime + 60_000 && rt <= now;
         });
 
         if (matchedMargin) {
@@ -377,7 +378,7 @@ export default function SinaisSection() {
           return res;
         }
 
-        if (now > windowEnd + (2 * 60_000)) {
+        if (now > targetTime + 60_000) {
           const res = { ...s, outcome: "red" as const, label: "LOSS" };
           // Persist to audit table in background if not already red
           if (s.outcome !== ("red" as any)) {
@@ -396,7 +397,8 @@ export default function SinaisSection() {
       }).filter(s => {
         if (!s.entryDate || !s.outcome || s.outcome === "pending") return true;
         const targetTime = new Date(s.entryDate).getTime();
-        return now < targetTime + (3 * 60_000) + (2 * 60_000) + WHITE_MARGIN_MS;
+        // Remove from UI after 3 minutes to keep list clean
+        return now < targetTime + (3 * 60_000);
       });
 
       setPredictiveList(validated);
