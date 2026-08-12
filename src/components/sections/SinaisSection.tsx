@@ -517,7 +517,14 @@ export default function SinaisSection() {
                   </td>
                   <td className="px-3 py-4">
                     <div className="font-black text-lg text-white font-outfit">{s.time}</div>
-                    <div className="text-[9px] text-muted-foreground font-mono tracking-widest uppercase">PROJETADO</div>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <div className="text-[9px] text-muted-foreground font-mono tracking-widest uppercase">PROJETADO</div>
+                      {s.isHighTendency && (
+                        <span className="flex items-center gap-1 rounded bg-red-500/20 px-1 py-0.5 text-[8px] font-black text-red-400 animate-pulse border border-red-500/30">
+                          🔥 ALTA
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-3 py-4">
                     <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-2.5 py-1">
@@ -529,11 +536,7 @@ export default function SinaisSection() {
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         {s.medal && (
-                          <span className={`rounded-full px-2 py-0.5 text-[8px] font-black uppercase tracking-widest border ${
-                            s.medal === "Ouro" ? "bg-yellow-400/10 text-yellow-300 border-yellow-400/20" :
-                            s.medal === "Prata" ? "bg-slate-300/10 text-slate-100 border-slate-300/20" :
-                            "bg-amber-700/10 text-amber-300 border-amber-700/20"
-                          }`}>
+                          <span className="rounded-full border border-red-500/30 bg-red-500/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest text-red-400">
                             {s.medal}
                           </span>
                         )}
