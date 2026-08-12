@@ -769,7 +769,7 @@ export default function SinaisSection() {
                   </td>
                 </tr>
               ))}
-              {visible.length === 0 && (
+              {visible.length === 0 && predictiveList.length === 0 && (
                 <tr>
                   <td colSpan={7} className="py-10 text-center text-sm text-muted-foreground">
                     Nenhum sinal ativo. Aguardando próximo branco…
