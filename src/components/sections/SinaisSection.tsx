@@ -159,7 +159,8 @@ export default function SinaisSection() {
 
   useEffect(() => {
     const fetchAudit = async () => {
-      let query = (supabase as any).from("historico_sinais_audit").select("*");
+      const table = 'historico_sinais_audit';
+      let query = (supabase as any).from(table).select("*");
       if (auditFilter === "hoje") {
         const today = spYmd();
         const start = spToUtcIso(today, "00:00");
@@ -350,7 +351,8 @@ export default function SinaisSection() {
         if (matchedExact) {
           const res = { ...s, outcome: "green" as const, resultTime: fmtTime(matchedExact.createdAt), label: "WIN_DIRETO" };
           // Persist to audit table
-          void (supabase as any).from('historico_sinais_audit').insert({
+          const table = 'historico_sinais_audit';
+          void (supabase as any).from(table).insert({
             analise: s.confluence,
             tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
             nivel: s.medal || 'Top 1 Isolado',
@@ -371,7 +373,8 @@ export default function SinaisSection() {
         if (matchedMargin) {
           const res = { ...s, outcome: "green" as const, resultTime: fmtTime(matchedMargin.createdAt), label: "WIN_VIZINHO" };
           // Persist to audit table
-          void (supabase as any).from('historico_sinais_audit').insert({
+          const table = 'historico_sinais_audit';
+          void (supabase as any).from(table).insert({
             analise: s.confluence,
             tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
             nivel: s.medal || 'Top 1 Isolado',
@@ -386,7 +389,8 @@ export default function SinaisSection() {
           const res = { ...s, outcome: "red" as const, label: "LOSS" };
           // Persist to audit table in background if not already red
           if (s.outcome !== ("red" as any)) {
-            void (supabase as any).from('historico_sinais_audit').insert({
+            const table = 'historico_sinais_audit';
+            void (supabase as any).from(table).insert({
               analise: s.confluence,
               tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
               nivel: s.medal || 'Top 1 Isolado',
