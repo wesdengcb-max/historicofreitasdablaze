@@ -336,14 +336,14 @@ export default function SinaisSection() {
         if (now > windowEnd + (2 * 60_000)) {
           const res = { ...s, outcome: "red" as const, label: "LOSS" };
           // Persist to audit table in background if not already red
-          if (s.outcome !== "red") {
+          if (s.outcome !== ("red" as any)) {
             void supabase.from('historico_sinais_audit').insert({
               analise: s.confluence,
               tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
               nivel: s.medal || 'Top 1 Isolado',
               predicao_horario: s.time,
               status: 'LOSS',
-              minuto_alvo: s.entryDate.toISOString()
+              minuto_alvo: (s.entryDate as Date).toISOString()
             });
           }
           return res;
