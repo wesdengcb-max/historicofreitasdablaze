@@ -396,9 +396,9 @@ export default function SinaisSection() {
         return s;
       }).filter(s => {
         if (!s.entryDate || !s.outcome || s.outcome === "pending") return true;
-        const targetTime = new Date(s.entryDate).getTime();
+        const entryTime = new Date(s.entryDate).getTime();
         // Remove from UI after 3 minutes to keep list clean
-        return now < targetTime + (3 * 60_000);
+        return now < entryTime + (3 * 60_000);
       });
 
       setPredictiveList(validated);
