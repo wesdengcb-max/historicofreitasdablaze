@@ -598,30 +598,18 @@ function Index() {
     if (spins.length === 0) return;
     const newestWhite = spins.find((s) => s.color === "white");
     if (!newestWhite) return;
+    if (newestWhite.id === lastWhiteId.current) return;
+    lastWhiteId.current = newestWhite.id;
     if (isFirstLoad.current) {
-      lastWhiteId.current = newestWhite.id;
       isFirstLoad.current = false;
       return;
     }
-    if (newestWhite.id === lastWhiteId.current) return;
-    lastWhiteId.current = newestWhite.id;
     if (!whiteAlert) return;
     setWhiteFlash(newestWhite);
     try {
-      const AC =
-        window.AudioContext ||
-        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      const ctx = new AC();
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.type = "sine";
-      o.frequency.value = 880;
-      g.gain.value = 0.08;
-      o.connect(g).connect(ctx.destination);
-      o.start();
-      o.frequency.exponentialRampToValueAtTime(1320, ctx.currentTime + 0.25);
-      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.6);
-      o.stop(ctx.currentTime + 0.65);
+      const audio = new Audio("https://www.soundjay.com/buttons/sounds/button-3.mp3");
+      audio.volume = 0.5;
+      audio.play().catch(e => console.error("Audio play failed:", e));
     } catch {
       /* noop */
     }
