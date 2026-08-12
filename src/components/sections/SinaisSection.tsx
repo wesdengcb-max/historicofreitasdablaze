@@ -13,6 +13,7 @@ import {
   ChevronRight,
   Sparkles,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/double/Card";
 import { Switch } from "@/components/ui/switch";
