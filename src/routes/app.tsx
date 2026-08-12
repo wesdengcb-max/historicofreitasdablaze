@@ -332,7 +332,7 @@ function Index() {
     }
   }, [section, isVip]);
 
-  const [whiteAlert, setWhiteAlert] = useState(false);
+  const [whiteAlert, setWhiteAlert] = useState(true);
   const [alertFx, setAlertFx] = useState<"on" | "off" | null>(null);
   const toggleWhiteAlert = useCallback((next: boolean) => {
     setWhiteAlert(next);
