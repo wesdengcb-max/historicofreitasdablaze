@@ -25,21 +25,21 @@ type Props = {
 };
 
 export const ResultCircle = memo(function ResultCircle({ color, n, size = "md", animate = true, delay = 0, glow = false, className }: Props) {
-  const base = "relative grid place-items-center overflow-hidden font-semibold tabular-nums tile-shadow ring-1 transition-transform duration-200 hover:scale-[1.08]";
+  const base = "relative grid place-items-center overflow-hidden font-bold tabular-nums shadow-sm transition-transform duration-200 hover:scale-[1.08]";
 
   const colorClasses =
     color === "red"
-      ? "text-white ring-white/10"
+      ? "text-white"
       : color === "white"
-        ? "text-black ring-white/40"
-        : "text-white ring-white/10";
+        ? "text-[#16171d]"
+        : "text-white";
 
   const bgStyle =
     color === "red"
       ? { background: "linear-gradient(180deg, #FF3554 0%, #FF1F3D 100%)" }
       : color === "white"
         ? { background: "#FFFFFF" }
-        : { background: "linear-gradient(180deg, #2A2A2A 0%, #1A1A1A 100%)" };
+        : { background: "#16171d" };
 
   const glowStyle = glow
     ? color === "red"
@@ -50,7 +50,7 @@ export const ResultCircle = memo(function ResultCircle({ color, n, size = "md", 
     : {};
 
   const content =
-    color === "white" && (n === 0 || n === undefined) ? (
+    color === "white" ? (
       <img
         src={brancoAsset.url}
         alt="Branco"
@@ -59,7 +59,9 @@ export const ResultCircle = memo(function ResultCircle({ color, n, size = "md", 
       />
 
     ) : (
-      n
+      <span className="flex items-center justify-center rounded-full border-2 border-white/90 h-[70%] w-[70%] text-[0.8em]">
+        {n}
+      </span>
     );
 
   if (!animate) {
