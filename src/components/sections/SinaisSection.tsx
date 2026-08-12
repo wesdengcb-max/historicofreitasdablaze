@@ -333,7 +333,7 @@ export default function SinaisSection() {
       const validated = raw.map(s => {
         if (!s.entryDate) return s;
         // Se já é um Date, usa direto. Se for string, parseia.
-        const entryTime = typeof s.entryDate === 'string' ? new Date(s.entryDate).getTime() : s.entryDate.getTime();
+        const entryTime = typeof s.entryDate === 'string' ? new Date(s.entryDate).getTime() : (s.entryDate instanceof Date ? s.entryDate.getTime() : new Date(s.entryDate).getTime());
         const windowEnd = entryTime + WHITE_MARGIN_MS;
 
         if (s.outcome && s.outcome !== "pending") return s;
