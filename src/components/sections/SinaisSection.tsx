@@ -39,7 +39,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
+import { supabase } from "@/integrations/supabase/client";
+import { blazeSupabase } from "@/integrations/supabase/blaze-client";
 import { ResultCircle } from "@/components/double/ResultCircle";
 import { colorOf, fmtTime, type Color } from "@/components/double/types";
 import { setSignals, getRobotEnabled, setRobotEnabled, subscribeRobot, getPredictiveSignals, subscribePredictive, type PredictiveSignal } from "@/lib/signalsStore";
