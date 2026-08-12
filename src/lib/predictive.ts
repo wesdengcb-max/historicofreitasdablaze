@@ -27,6 +27,7 @@ function collectGaps(rows: Row[], i: number, dt: Date): number[] {
   
   for (let k = 1; i + k < rows.length && gaps.length < limit; k++) {
     const r = rows[i + k];
+    if (!r) continue;
     const zdt = parseUtcDate(r.created_at);
     if (Number.isNaN(zdt.getTime())) continue;
     
