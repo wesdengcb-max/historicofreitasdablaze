@@ -379,7 +379,7 @@ export default function SinaisSection() {
           return res;
         }
 
-        if (now > targetTime + 60_000) {
+        if (now > entryTime + 60_000) {
           const res = { ...s, outcome: "red" as const, label: "LOSS" };
           // Persist to audit table in background if not already red
           if (s.outcome !== ("red" as any)) {
