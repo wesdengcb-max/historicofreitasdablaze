@@ -39,7 +39,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
+import { supabase } from "@/integrations/supabase/client";
+import { blazeSupabase } from "@/integrations/supabase/blaze-client";
 import { ResultCircle } from "@/components/double/ResultCircle";
 import { colorOf, fmtTime, type Color } from "@/components/double/types";
 import { setSignals, getRobotEnabled, setRobotEnabled, subscribeRobot, getPredictiveSignals, subscribePredictive, type PredictiveSignal } from "@/lib/signalsStore";
@@ -126,6 +127,7 @@ function parseIso(iso: string): Date {
 }
 
 function buildSignals(results: Result[]): Signal[] {
+  // Returns empty to avoid duplication as manual signals handle auditing
   return [];
 }
 
@@ -157,7 +159,7 @@ export default function SinaisSection() {
 
   useEffect(() => {
     const fetchAudit = async () => {
-      let query = supabase.from("historico_sinais_audit").select("*");
+      let query = (supabase as any).from("historico_sinais_audit").select("*");
       if (auditFilter === "hoje") {
         const today = spYmd();
         const start = spToUtcIso(today, "00:00");
@@ -168,11 +170,12 @@ export default function SinaisSection() {
       const { data, error } = await query.order("created_at", { ascending: false });
       if (error || !data) return;
 
-      const wins = data.filter(r => r.status.startsWith("WIN")).length;
-      const losses = data.filter(r => r.status === "LOSS").length;
-      const total = data.length;
+      const auditData = data as any[];
+      const wins = auditData.filter(r => r.status.startsWith("WIN")).length;
+      const losses = auditData.filter(r => r.status === "LOSS").length;
+      const total = auditData.length;
       const pct = total > 0 ? (wins / total) * 100 : 0;
-      const latest = data[0];
+      const latest = auditData[0];
 
       setAuditStats({
         wins,
@@ -180,7 +183,7 @@ export default function SinaisSection() {
         total,
         pct,
         analysis: latest?.analise || "---",
-        tendency: data.slice(0, 5).filter(r => r.status.startsWith("WIN")).length >= 4,
+        tendency: auditData.slice(0, 5).filter(r => r.status.startsWith("WIN")).length >= 4,
       });
     };
     void fetchAudit();
@@ -202,7 +205,7 @@ export default function SinaisSection() {
       const today = spYmd();
       const start = new Date(spToUtcIso(today, "00:00")).getTime() - 30 * 60_000;
       const end = spToUtcIso(today, "23:59:59.999");
-      const { data, error } = await supabase
+      const { data, error } = await (blazeSupabase as any)
         .from("blaze_results")
         .select("id, color, roll, created_at")
         .gte("created_at", new Date(start).toISOString())
@@ -210,7 +213,7 @@ export default function SinaisSection() {
         .order("created_at", { ascending: false })
         .limit(1000);
       if (error || !alive) return;
-      const rows = (data ?? []) as Array<{ id: number; color: string; roll: string; created_at: string }>;
+      const rows = data as any[];
       const mapped = rows.map(rowToResult);
       setResults(mapped);
       setResultsForValidation(mapped);
@@ -332,21 +335,22 @@ export default function SinaisSection() {
 
       const validated = raw.map(s => {
         if (!s.entryDate) return s;
-        const targetTime = new Date(s.entryDate).getTime();
-        const windowEnd = targetTime + WHITE_MARGIN_MS;
+        // Se já é um Date, usa direto. Se for string, parseia.
+        const entryTime = typeof s.entryDate === 'string' ? new Date(s.entryDate).getTime() : (s.entryDate instanceof Date ? s.entryDate.getTime() : new Date(s.entryDate).getTime());
+        const windowEnd = entryTime + WHITE_MARGIN_MS;
 
         if (s.outcome && s.outcome !== "pending") return s;
 
         const matchedExact = resultsForValidation.find(r => {
           if (r.color !== "white") return false;
           const rt = new Date(r.createdAt).getTime();
-          return rt >= targetTime - 60_000 && rt <= targetTime + 60_000 && rt <= now;
+          return rt >= entryTime - 60_000 && rt <= entryTime + 60_000 && rt <= now;
         });
 
         if (matchedExact) {
           const res = { ...s, outcome: "green" as const, resultTime: fmtTime(matchedExact.createdAt), label: "WIN_DIRETO" };
           // Persist to audit table
-          void supabase.from('historico_sinais_audit').insert({
+          void (supabase as any).from('historico_sinais_audit').insert({
             analise: s.confluence,
             tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
             nivel: s.medal || 'Top 1 Isolado',
@@ -361,13 +365,13 @@ export default function SinaisSection() {
           if (r.color !== "white") return false;
           const rt = new Date(r.createdAt).getTime();
           // TARGET ± 1 minuto
-          return rt >= targetTime - 60_000 && rt <= targetTime + 60_000 && rt <= now;
+          return rt >= entryTime - 60_000 && rt <= entryTime + 60_000 && rt <= now;
         });
 
         if (matchedMargin) {
           const res = { ...s, outcome: "green" as const, resultTime: fmtTime(matchedMargin.createdAt), label: "WIN_VIZINHO" };
           // Persist to audit table
-          void supabase.from('historico_sinais_audit').insert({
+          void (supabase as any).from('historico_sinais_audit').insert({
             analise: s.confluence,
             tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
             nivel: s.medal || 'Top 1 Isolado',
@@ -378,11 +382,11 @@ export default function SinaisSection() {
           return res;
         }
 
-        if (now > targetTime + 60_000) {
+        if (now > entryTime + 60_000) {
           const res = { ...s, outcome: "red" as const, label: "LOSS" };
           // Persist to audit table in background if not already red
           if (s.outcome !== ("red" as any)) {
-            void supabase.from('historico_sinais_audit').insert({
+            void (supabase as any).from('historico_sinais_audit').insert({
               analise: s.confluence,
               tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
               nivel: s.medal || 'Top 1 Isolado',
@@ -396,9 +400,9 @@ export default function SinaisSection() {
         return s;
       }).filter(s => {
         if (!s.entryDate || !s.outcome || s.outcome === "pending") return true;
-        const targetTime = new Date(s.entryDate).getTime();
+        const entryTime = typeof s.entryDate === 'string' ? new Date(s.entryDate).getTime() : (s.entryDate instanceof Date ? s.entryDate.getTime() : new Date(s.entryDate).getTime());
         // Remove from UI after 3 minutes to keep list clean
-        return now < targetTime + (3 * 60_000);
+        return now < entryTime + (3 * 60_000);
       });
 
       setPredictiveList(validated);
@@ -767,7 +771,7 @@ export default function SinaisSection() {
                   </td>
                 </tr>
               ))}
-              {visible.length === 0 && (
+              {visible.length === 0 && predictiveList.length === 0 && (
                 <tr>
                   <td colSpan={7} className="py-10 text-center text-sm text-muted-foreground">
                     Nenhum sinal ativo. Aguardando próximo branco…
