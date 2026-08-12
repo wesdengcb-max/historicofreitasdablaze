@@ -84,7 +84,7 @@ export const LiveStats = memo(function LiveStats({
       {/* 2. Pessoas Entrando */}
       <StatsCard 
         title="Pessoas Entrando" 
-        titleSuffix={<span className="text-[13px] font-bold text-[#FBBF24]">→ {countdown > 3 ? Math.floor(700 + Math.random() * 200) : "---"}</span>}
+        titleSuffix={<span className="text-[13px] font-bold text-[#FBBF24]">→ {countdown > 3 ? "---" : "---"}</span>}
         footer={
           <div className="flex items-center justify-between px-1">
             <span className="text-[10px] font-medium text-[#999999]">
