@@ -26,6 +26,17 @@ export const AppHeader = memo(function AppHeader() {
           <div className="h-2 w-2 animate-pulse rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
           <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white font-outfit">Análise em tempo real (Últimos 6 Gatilhos)</span>
         </div>
+
+        <button
+          onClick={() => {
+            const ev = new CustomEvent('open-stats-drawer');
+            window.dispatchEvent(ev);
+          }}
+          className="ml-2 flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-muted-foreground transition-all hover:bg-white/[0.08] hover:text-red-500 active:scale-95"
+          title="Ver Estatísticas do Branco"
+        >
+          <BarChart3 className="h-4 w-4" />
+        </button>
       </div>
 
       <div className="flex items-center gap-5">

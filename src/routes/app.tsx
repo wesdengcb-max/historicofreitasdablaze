@@ -375,6 +375,13 @@ function Index() {
   const [errorMsg, setErrorMsg] = useState("");
   const [whiteFlash, setWhiteFlash] = useState<Spin | null>(null);
   const [statsOpen, setStatsOpen] = useState(false);
+
+  useEffect(() => {
+    const handleOpen = () => setStatsOpen(true);
+    window.addEventListener('open-stats-drawer', handleOpen);
+    return () => window.removeEventListener('open-stats-drawer', handleOpen);
+  }, []);
+
   const [countdown, setCountdown] = useState(15);
   const [theme, setTheme] = useState<"dark" | "light">("dark");
 
