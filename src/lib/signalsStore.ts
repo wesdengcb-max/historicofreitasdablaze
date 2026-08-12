@@ -106,6 +106,7 @@ export type PredictiveSignal = {
   outcome?: "pending" | "green" | "red";
   resultTime?: string;
   entryDate?: Date;
+  isHighTendency?: boolean;
 };
 
 export function setPredictiveSignals(signals: PredictiveSignal[]) {

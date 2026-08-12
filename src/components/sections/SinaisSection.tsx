@@ -308,7 +308,7 @@ export default function SinaisSection() {
             nivel: s.medal || 'Top 1 Isolado',
             predicao_horario: s.time,
             status: 'WIN_DIRETO',
-            minuto_alvo: s.entryDate.toISOString()
+            minuto_alvo: (s.entryDate as any)?.toISOString()
           });
           return res;
         }
@@ -328,7 +328,7 @@ export default function SinaisSection() {
             nivel: s.medal || 'Top 1 Isolado',
             predicao_horario: s.time,
             status: 'WIN_VIZINHO',
-            minuto_alvo: s.entryDate.toISOString()
+            minuto_alvo: (s.entryDate as any)?.toISOString()
           });
           return res;
         }
@@ -343,7 +343,7 @@ export default function SinaisSection() {
               nivel: s.medal || 'Top 1 Isolado',
               predicao_horario: s.time,
               status: 'LOSS',
-              minuto_alvo: (s.entryDate as Date).toISOString()
+              minuto_alvo: (s.entryDate as any)?.toISOString()
             });
           }
           return res;
