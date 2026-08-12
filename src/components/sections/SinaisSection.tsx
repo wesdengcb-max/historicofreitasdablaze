@@ -205,7 +205,7 @@ export default function SinaisSection() {
       const today = spYmd();
       const start = new Date(spToUtcIso(today, "00:00")).getTime() - 30 * 60_000;
       const end = spToUtcIso(today, "23:59:59.999");
-      const { data, error } = await supabase
+      const { data, error } = await (blazeSupabase as any)
         .from("blaze_results")
         .select("id, color, roll, created_at")
         .gte("created_at", new Date(start).toISOString())
@@ -213,7 +213,7 @@ export default function SinaisSection() {
         .order("created_at", { ascending: false })
         .limit(1000);
       if (error || !alive) return;
-      const rows = (data ?? []) as Array<{ id: number; color: string; roll: string; created_at: string }>;
+      const rows = data as any[];
       const mapped = rows.map(rowToResult);
       setResults(mapped);
       setResultsForValidation(mapped);
