@@ -126,6 +126,7 @@ function parseIso(iso: string): Date {
 }
 
 function buildSignals(results: Result[]): Signal[] {
+  // Returns empty to avoid duplication as manual signals handle auditing
   return [];
 }
 
