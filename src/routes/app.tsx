@@ -1647,7 +1647,7 @@ const TipMinerCard = memo(function TipMinerCard({
             style={{ 
               height: "32px", 
               width: "32px", 
-              border: `2px solid #ffffff`, 
+              border: isWhite ? `3px solid ${ring}` : `2px solid #ffffff90`, 
               color: fg, 
               fontSize: "14px" 
             }}
