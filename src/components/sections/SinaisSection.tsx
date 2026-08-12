@@ -296,34 +296,63 @@ export default function SinaisSection() {
         const matchedExact = resultsForValidation.find(r => {
           if (r.color !== "white") return false;
           const rt = new Date(r.createdAt).getTime();
-          // EXACT: within 1 minute of projected time AND must NOT be in the future relative to now
           return rt >= targetTime - 60_000 && rt <= targetTime + 60_000 && rt <= now;
         });
 
         if (matchedExact) {
-          return { ...s, outcome: "green" as const, resultTime: fmtTime(matchedExact.createdAt), label: "EXATO" };
+          const res = { ...s, outcome: "green" as const, resultTime: fmtTime(matchedExact.createdAt), label: "WIN_DIRETO" };
+          // Persist to audit table
+          void supabase.from('historico_sinais_audit').insert({
+            analise: s.confluence,
+            tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
+            nivel: s.medal || 'Top 1 Isolado',
+            predicao_horario: s.time,
+            status: 'WIN_DIRETO',
+            minuto_alvo: (s.entryDate as any)?.toISOString()
+          });
+          return res;
         }
 
         const matchedMargin = resultsForValidation.find(r => {
           if (r.color !== "white") return false;
           const rt = new Date(r.createdAt).getTime();
-          // MARGIN: within 2 minutes of projected time AND must NOT be in the future relative to now
-          return rt >= targetTime - MARGIN_MS && rt <= targetTime + MARGIN_MS && rt <= now;
+          return rt >= targetTime - (2 * 60_000) && rt <= targetTime + (2 * 60_000) && rt <= now;
         });
 
         if (matchedMargin) {
-          return { ...s, outcome: "green" as const, resultTime: fmtTime(matchedMargin.createdAt), label: "MARGEM" };
+          const res = { ...s, outcome: "green" as const, resultTime: fmtTime(matchedMargin.createdAt), label: "WIN_VIZINHO" };
+          // Persist to audit table
+          void supabase.from('historico_sinais_audit').insert({
+            analise: s.confluence,
+            tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
+            nivel: s.medal || 'Top 1 Isolado',
+            predicao_horario: s.time,
+            status: 'WIN_VIZINHO',
+            minuto_alvo: (s.entryDate as any)?.toISOString()
+          });
+          return res;
         }
 
-        if (now > windowEnd + MARGIN_MS) {
-          return { ...s, outcome: "red" as const };
+        if (now > windowEnd + (2 * 60_000)) {
+          const res = { ...s, outcome: "red" as const, label: "LOSS" };
+          // Persist to audit table in background if not already red
+          if (s.outcome !== ("red" as any)) {
+            void supabase.from('historico_sinais_audit').insert({
+              analise: s.confluence,
+              tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
+              nivel: s.medal || 'Top 1 Isolado',
+              predicao_horario: s.time,
+              status: 'LOSS',
+              minuto_alvo: (s.entryDate as any)?.toISOString()
+            });
+          }
+          return res;
         }
         return s;
       }).filter(s => {
         if (!s.entryDate || !s.outcome || s.outcome === "pending") return true;
         const targetTime = new Date(s.entryDate).getTime();
-        // Remove 3 minutes after the outcome is decided (which is at most windowEnd + MARGIN_MS)
-        return now < targetTime + WHITE_MARGIN_MS + MARGIN_MS + REMOVE_DELAY_MS;
+        return now < targetTime + (3 * 60_000) + (2 * 60_000) + WHITE_MARGIN_MS;
       });
 
       setPredictiveList(validated);
@@ -376,11 +405,20 @@ export default function SinaisSection() {
             <h1 className="text-4xl font-black tracking-tighter text-white font-outfit uppercase">Sinais</h1>
           </div>
           <p className="mt-2 text-sm text-[#9CA3AF] font-medium">
-            Gerencie sua lista baseada nos últimos 6 gatilhos e estratégias automáticas (limite 120 min).
+            Gerencie sua lista baseada nos últimos 6 gatilhos e estratégias automáticas (limite 120 min / 14 tempos).
           </p>
-          <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-3 py-1 text-xs">
-            <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
-            Martingale: 3 níveis · ×2
+          <div className="mt-4 flex flex-wrap gap-4">
+            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-3 py-1 text-xs">
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
+              Martingale: 3 níveis · ×2
+            </div>
+            <div className="flex items-center gap-2 bg-white/[0.03] border border-white/10 rounded-xl px-3 py-1">
+              <span className="text-[10px] font-black text-muted-foreground uppercase font-mono tracking-widest">Auditoria Real-Time</span>
+              <div className="flex gap-1">
+                 <span className="text-[9px] font-bold text-emerald-400">WIN_DIRETO</span>
+                 <span className="text-[9px] font-bold text-emerald-500">WIN_VIZINHO</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -430,15 +468,30 @@ export default function SinaisSection() {
 
       {/* Lista de Sinais */}
       <Card className="glass-card !p-0 overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.05] bg-white/[0.02]">
+        <div className="flex flex-wrap items-center justify-between px-6 py-5 border-b border-white/[0.05] bg-white/[0.02] gap-4">
           <div className="flex items-center gap-4">
             <div className="grid h-10 w-10 place-items-center rounded-xl bg-[#FF1F3D]/10 text-[#FF1F3D] shadow-[0_0_15px_rgba(255,31,61,0.1)]">
               <Radio className="h-5 w-5" />
             </div>
-            <h2 className="font-black text-xl text-white font-outfit uppercase tracking-tight">Lista de Sinais</h2>
+            <h2 className="font-black text-xl text-white font-outfit uppercase tracking-tight">Painel de Auditoria</h2>
           </div>
-          <div className="text-[11px] tracking-widest font-mono text-red-400 border border-red-500/40 rounded-full px-3 py-1">
-            [ ● {visible.length} SINAIS ]
+          
+          <div className="flex items-center gap-3">
+             <Select defaultValue="hoje">
+               <SelectTrigger className="w-[140px] h-9 text-[10px] font-black uppercase tracking-widest font-mono bg-black/40 border-white/10">
+                 <SelectValue placeholder="Período" />
+               </SelectTrigger>
+               <SelectContent className="bg-surface border-border">
+                 <SelectItem value="hoje">Hoje</SelectItem>
+                 <SelectItem value="ontem">Ontem</SelectItem>
+                 <SelectItem value="7dias">Últimos 7 dias</SelectItem>
+                 <SelectItem value="custom">Selecionar Data</SelectItem>
+               </SelectContent>
+             </Select>
+
+            <div className="text-[11px] tracking-widest font-mono text-red-400 border border-red-500/40 rounded-full px-3 py-1">
+              [ ● {visible.length + predictiveList.length} SINAIS ]
+            </div>
           </div>
         </div>
 
@@ -464,7 +517,14 @@ export default function SinaisSection() {
                   </td>
                   <td className="px-3 py-4">
                     <div className="font-black text-lg text-white font-outfit">{s.time}</div>
-                    <div className="text-[9px] text-muted-foreground font-mono tracking-widest uppercase">PROJETADO</div>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <div className="text-[9px] text-muted-foreground font-mono tracking-widest uppercase">PROJETADO</div>
+                      {s.isHighTendency && (
+                        <span className="flex items-center gap-1 rounded bg-red-500/20 px-1 py-0.5 text-[8px] font-black text-red-400 animate-pulse border border-red-500/30">
+                          🔥 ALTA
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-3 py-4">
                     <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-2.5 py-1">
@@ -476,11 +536,7 @@ export default function SinaisSection() {
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         {s.medal && (
-                          <span className={`rounded-full px-2 py-0.5 text-[8px] font-black uppercase tracking-widest border ${
-                            s.medal === "Ouro" ? "bg-yellow-400/10 text-yellow-300 border-yellow-400/20" :
-                            s.medal === "Prata" ? "bg-slate-300/10 text-slate-100 border-slate-300/20" :
-                            "bg-amber-700/10 text-amber-300 border-amber-700/20"
-                          }`}>
+                          <span className="rounded-full border border-red-500/30 bg-red-500/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest text-red-400">
                             {s.medal}
                           </span>
                         )}

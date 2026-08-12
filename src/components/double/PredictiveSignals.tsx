@@ -64,36 +64,40 @@ const TOP5_DEPTH = 5;
 
 const getMedalStyles = (count: number) => {
   if (count >= 7) return { 
-    label: "Supremo", 
+    label: "⚡️ Supremo", 
     classes: "border-cyan-400 bg-cyan-950/50 text-cyan-300 shadow-cyan-500/20 animate-pulse",
     badge: "bg-cyan-400/20 text-cyan-300 border-cyan-400/30"
   };
   if (count === 6) return { 
-    label: "Platina", 
+    label: "👑 Platina", 
     classes: "border-indigo-400 bg-indigo-950/40 text-indigo-200 shadow-indigo-500/10",
     badge: "bg-indigo-400/20 text-indigo-200 border-indigo-400/30"
   };
   if (count === 5) return { 
-    label: "Diamante", 
+    label: "💎 Diamante", 
     classes: "border-blue-400 bg-blue-950/40 text-blue-200 shadow-blue-500/10",
     badge: "bg-blue-400/20 text-blue-200 border-blue-400/30"
   };
   if (count === 4) return { 
-    label: "Ouro", 
+    label: "🥇 Ouro", 
     classes: "border-yellow-400 bg-yellow-950/50 text-yellow-300 shadow-yellow-500/20",
     badge: "bg-yellow-400/20 text-yellow-300 border-yellow-400/30"
   };
   if (count === 3) return { 
-    label: "Prata", 
+    label: "🥈 Prata", 
     classes: "border-slate-300 bg-slate-800/40 text-slate-100",
     badge: "bg-slate-300/20 text-slate-100 border-slate-300/30"
   };
   if (count === 2) return { 
-    label: "Bronze", 
+    label: "🥉 Bronze", 
     classes: "border-amber-700 bg-amber-950/30 text-amber-300",
     badge: "bg-amber-700/20 text-amber-300 border-amber-700/30"
   };
-  return null;
+  return {
+    label: "Top 1 Isolado",
+    classes: "border-white/[0.05] bg-white/[0.02]",
+    badge: "bg-white/10 text-white border-white/20"
+  };
 };
 
 export function PredictiveSignals() {
@@ -319,7 +323,8 @@ export function PredictiveSignals() {
         confluence: s.sources.map(src => `A${src.analysis}·${src.value}`).join(", "),
         medal: getMedalStyles(s.analysisCount)?.label,
         entryDate: s.at,
-        outcome: "pending"
+        outcome: "pending",
+        isHighTendency: s.isHighTendency
       })),
       ...m2.map(s => ({
         key: s.key,
@@ -329,7 +334,8 @@ export function PredictiveSignals() {
         confluence: s.confluence,
         medal: getMedalStyles(s.analysisCount)?.label,
         entryDate: s.times[0],
-        outcome: "pending"
+        outcome: "pending",
+        isHighTendency: s.isHighTendency
       }))
     ].sort((a, b) => a.entryDate.getTime() - b.entryDate.getTime());
 
@@ -472,7 +478,7 @@ export function PredictiveSignals() {
         {!hasClicked && !err && (
           <p className="text-sm text-muted-foreground">
             {hasOpportunity
-              ? `${active.length} ciclo(s) em aberto analisando os últimos 6 gatilhos (limite 120 min). Clique em "Próximo branco" para projetar.`
+              ? `${active.length} ciclo(s) em aberto analisando os últimos 6 gatilhos (limite 120 min / 14 tempos). Clique em "Próximo branco" para projetar.`
               : "Nenhum ciclo em aberto no momento."}
           </p>
         )}
@@ -526,7 +532,7 @@ export function PredictiveSignals() {
                         <span className={medal ? "text-inherit" : "text-primary"}>
                           {s.pct.toFixed(1)}%
                         </span>
-                        <span className="opacity-50 text-[10px]">· janela {s.label} (limite 120m)</span>
+                        <span className="opacity-50 text-[10px]">· janela {s.label} (limite 120m/14t)</span>
                       </div>
                       <div className="mt-2 flex flex-wrap gap-1">
                         {s.sources.map((src, idx) => (
@@ -594,7 +600,7 @@ export function PredictiveSignals() {
                       </div>
                       <div className="mt-2 text-[10px] leading-relaxed text-muted-foreground opacity-80">
                         Origem:{" "}
-                        <span className={`font-bold ${medal ? "text-inherit" : "text-primary"}`}>{s.confluence}</span> (limite 120m)
+                        <span className={`font-bold ${medal ? "text-inherit" : "text-primary"}`}>{s.confluence}</span> (limite 120m/14t)
                       </div>
                       <div className="mt-1 flex flex-wrap gap-1">
                         {s.sources.map((p) => (
