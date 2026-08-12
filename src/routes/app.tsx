@@ -607,8 +607,8 @@ function Index() {
     if (!whiteAlert) return;
     setWhiteFlash(newestWhite);
     try {
-      const audio = new Audio("https://www.soundjay.com/buttons/sounds/button-3.mp3");
-      audio.volume = 0.5;
+      const audio = new Audio("/branco-som.mp3");
+      audio.volume = 0.8;
       audio.play().catch(e => console.error("Audio play failed:", e));
     } catch {
       /* noop */
