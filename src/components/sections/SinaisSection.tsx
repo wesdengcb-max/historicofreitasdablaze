@@ -159,33 +159,36 @@ export default function SinaisSection() {
 
   useEffect(() => {
     const fetchAudit = async () => {
-      const table = 'historico_sinais_audit';
-      let query = (supabase as any).from(table).select("*");
-      if (auditFilter === "hoje") {
-        const today = spYmd();
-        const start = spToUtcIso(today, "00:00");
-        const end = spToUtcIso(today, "23:59:59.999");
-        query = query.gte("created_at", start).lte("created_at", end);
+      try {
+        const table = 'historico_sinais_audit';
+        let query = (supabase as any).from(table).select("*");
+        if (auditFilter === "hoje") {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          query = query.gte("created_at", today.toISOString());
+        }
+
+        const { data, error } = await query.order("created_at", { ascending: false });
+        if (error || !data) return;
+
+        const auditData = data as any[];
+        const wins = auditData.filter(r => r.status && r.status.startsWith("WIN")).length;
+        const losses = auditData.filter(r => r.status === "LOSS").length;
+        const total = auditData.length;
+        const pct = total > 0 ? (wins / total) * 100 : 0;
+        const latest = auditData[0];
+
+        setAuditStats({
+          wins,
+          losses,
+          total,
+          pct,
+          analysis: latest?.analise || "Confluência · Top 1",
+          tendency: auditData.slice(0, 5).filter(r => r.status && r.status.startsWith("WIN")).length >= 4,
+        });
+      } catch (e) {
+        console.error("fetchAudit error:", e);
       }
-
-      const { data, error } = await query.order("created_at", { ascending: false });
-      if (error || !data) return;
-
-      const auditData = data as any[];
-      const wins = auditData.filter(r => r.status.startsWith("WIN")).length;
-      const losses = auditData.filter(r => r.status === "LOSS").length;
-      const total = auditData.length;
-      const pct = total > 0 ? (wins / total) * 100 : 0;
-      const latest = auditData[0];
-
-      setAuditStats({
-        wins,
-        losses,
-        total,
-        pct,
-        analysis: latest?.analise || "---",
-        tendency: auditData.slice(0, 5).filter(r => r.status.startsWith("WIN")).length >= 4,
-      });
     };
     void fetchAudit();
     const interval = setInterval(fetchAudit, 10000);
