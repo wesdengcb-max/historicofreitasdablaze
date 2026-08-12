@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { ChevronLeft, Menu, Clock, Crown, PanelLeftOpen, PanelLeftClose } from "lucide-react";
+import { ChevronLeft, Menu, Clock, Crown, PanelLeftOpen, PanelLeftClose, BarChart3 } from "lucide-react";
 import { useVipStatus, setVipStatus } from "@/lib/auth/vipStore";
 import { useSidebarStore } from "@/lib/sidebarStore";
 import { toast } from "sonner";
