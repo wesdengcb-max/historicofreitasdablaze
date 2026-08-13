@@ -334,9 +334,7 @@ export default function SinaisSection() {
       const raw = getPredictiveSignals();
       if (!Array.isArray(raw)) return;
       const now = Date.now();
-      const WHITE_MARGIN_MS = 60_000;
-      const REMOVE_DELAY_MS = 3 * 60_000;
-
+      
       const validated = raw.map(s => {
         try {
           if (!s.entryDate) return s;
@@ -344,69 +342,61 @@ export default function SinaisSection() {
           
           if (Number.isNaN(entryTime)) return s;
 
+          // Se já está concluído, não re-valida
           if (s.outcome && s.outcome !== "pending") return s;
 
-          const matchedExact = (resultsForValidation || []).find(r => {
+          // Buscamos o branco nos resultados carregados
+          // Janela de ±1 minuto em volta do target
+          const rangeStart = entryTime - 60_000;
+          const rangeEnd = entryTime + 60_000;
+
+          const matchedResult = (resultsForValidation || []).find(r => {
             if (!r || r.color !== "white") return false;
             const rt = new Date(r.createdAt).getTime();
-            return rt >= entryTime - 60_000 && rt <= entryTime + 60_000 && rt <= now;
+            return rt >= rangeStart && rt <= rangeEnd && rt <= now;
           });
 
-          if (matchedExact) {
-            const res = { ...s, outcome: "green" as const, resultTime: fmtTime(matchedExact.createdAt), label: "WIN_DIRETO" };
+          if (matchedResult) {
+            const status = new Date(matchedResult.createdAt).getTime() === entryTime ? "WIN_DIRETO" : "WIN_VIZINHO";
+            const res = { ...s, outcome: "green" as const, resultTime: fmtTime(matchedResult.createdAt), label: status };
+            
+            // Persistimos na auditoria se for a primeira vez
             const table = 'historico_sinais_audit';
-            void (supabase as any).from(table).insert({
-              analise: s.confluence,
+            void supabase.from(table).insert({
+              analise: s.confluence || "Analise",
               tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
               nivel: s.medal || 'Top 1 Isolado',
               predicao_horario: s.time,
-              status: 'WIN_DIRETO',
-              minuto_alvo: (s.entryDate as any)?.toISOString?.() || String(s.entryDate)
+              status: status,
+              minuto_alvo: new Date(entryTime).toISOString()
             });
             return res;
           }
 
-          const matchedMargin = (resultsForValidation || []).find(r => {
-            if (!r || r.color !== "white") return false;
-            const rt = new Date(r.createdAt).getTime();
-            return rt >= entryTime - 60_000 && rt <= entryTime + 60_000 && rt <= now;
-          });
-
-          if (matchedMargin) {
-            const res = { ...s, outcome: "green" as const, resultTime: fmtTime(matchedMargin.createdAt), label: "WIN_VIZINHO" };
-            const table = 'historico_sinais_audit';
-            void (supabase as any).from(table).insert({
-              analise: s.confluence,
-              tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
-              nivel: s.medal || 'Top 1 Isolado',
-              predicao_horario: s.time,
-              status: 'WIN_VIZINHO',
-              minuto_alvo: (s.entryDate as any)?.toISOString?.() || String(s.entryDate)
-            });
-            return res;
-          }
-
-          if (now > entryTime + 60_000) {
+          // Se passou do tempo (target + 1min) e não deu green, é LOSS
+          if (now > rangeEnd) {
             const res = { ...s, outcome: "red" as const, label: "LOSS" };
-            if (s.outcome !== ("red" as any)) {
-              const table = 'historico_sinais_audit';
-              void (supabase as any).from(table).insert({
-                analise: s.confluence,
-                tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
-                nivel: s.medal || 'Top 1 Isolado',
-                predicao_horario: s.time,
-                status: 'LOSS',
-                minuto_alvo: (s.entryDate as any)?.toISOString?.() || String(s.entryDate)
-              });
-            }
+            const table = 'historico_sinais_audit';
+            void supabase.from(table).insert({
+              analise: s.confluence || "Analise",
+              tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
+              nivel: s.medal || 'Top 1 Isolado',
+              predicao_horario: s.time,
+              status: 'LOSS',
+              minuto_alvo: new Date(entryTime).toISOString()
+            });
             return res;
           }
+          
           return s;
         } catch (e) {
           console.error("Error validating signal:", e, s);
           return s;
         }
-      }).filter(s => {
+      });
+
+      // Filtramos para manter apenas os pendentes ou concluídos recentemente (3 min)
+      const visible = validated.filter(s => {
         try {
           if (!s.entryDate || !s.outcome || s.outcome === "pending") return true;
           const entryTime = typeof s.entryDate === 'string' ? new Date(s.entryDate).getTime() : (s.entryDate instanceof Date ? s.entryDate.getTime() : new Date(s.entryDate).getTime());
@@ -417,7 +407,7 @@ export default function SinaisSection() {
         }
       });
 
-      setPredictiveList(validated);
+      setPredictiveList(visible);
     };
 
     update();
