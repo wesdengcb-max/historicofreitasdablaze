@@ -161,7 +161,8 @@ export default function SinaisSection() {
     const fetchAudit = async () => {
       try {
         const table = 'historico_sinais_audit';
-        let query = (supabase as any).from(table).select("*");
+        let query = supabase.from(table).select("*");
+        
         if (auditFilter === "hoje") {
           const today = new Date();
           today.setHours(0, 0, 0, 0);
@@ -169,12 +170,15 @@ export default function SinaisSection() {
         }
 
         const { data, error } = await query.order("created_at", { ascending: false });
-        if (error || !data) return;
+        if (error || !data) {
+          console.error("fetchAudit query error:", error);
+          return;
+        }
 
-        const auditData = data as any[];
+        const auditData = data;
         const wins = auditData.filter(r => r.status && r.status.startsWith("WIN")).length;
         const losses = auditData.filter(r => r.status === "LOSS").length;
-        const total = auditData.length;
+        const total = wins + losses; // Apenas concluídos
         const pct = total > 0 ? (wins / total) * 100 : 0;
         const latest = auditData[0];
 
@@ -187,7 +191,7 @@ export default function SinaisSection() {
           tendency: auditData.slice(0, 5).filter(r => r.status && r.status.startsWith("WIN")).length >= 4,
         });
       } catch (e) {
-        console.error("fetchAudit error:", e);
+        console.error("fetchAudit execution error:", e);
       }
     };
     void fetchAudit();
@@ -334,9 +338,7 @@ export default function SinaisSection() {
       const raw = getPredictiveSignals();
       if (!Array.isArray(raw)) return;
       const now = Date.now();
-      const WHITE_MARGIN_MS = 60_000;
-      const REMOVE_DELAY_MS = 3 * 60_000;
-
+      
       const validated = raw.map(s => {
         try {
           if (!s.entryDate) return s;
@@ -344,69 +346,61 @@ export default function SinaisSection() {
           
           if (Number.isNaN(entryTime)) return s;
 
+          // Se já está concluído, não re-valida
           if (s.outcome && s.outcome !== "pending") return s;
 
-          const matchedExact = (resultsForValidation || []).find(r => {
+          // Buscamos o branco nos resultados carregados
+          // Janela de ±1 minuto em volta do target
+          const rangeStart = entryTime - 60_000;
+          const rangeEnd = entryTime + 60_000;
+
+          const matchedResult = (resultsForValidation || []).find(r => {
             if (!r || r.color !== "white") return false;
             const rt = new Date(r.createdAt).getTime();
-            return rt >= entryTime - 60_000 && rt <= entryTime + 60_000 && rt <= now;
+            return rt >= rangeStart && rt <= rangeEnd && rt <= now;
           });
 
-          if (matchedExact) {
-            const res = { ...s, outcome: "green" as const, resultTime: fmtTime(matchedExact.createdAt), label: "WIN_DIRETO" };
+          if (matchedResult) {
+            const status = new Date(matchedResult.createdAt).getTime() === entryTime ? "WIN_DIRETO" : "WIN_VIZINHO";
+            const res = { ...s, outcome: "green" as const, resultTime: fmtTime(matchedResult.createdAt), label: status };
+            
+            // Persistimos na auditoria se for a primeira vez
             const table = 'historico_sinais_audit';
-            void (supabase as any).from(table).insert({
-              analise: s.confluence,
+            void supabase.from(table).insert({
+              analise: s.confluence || "Analise",
               tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
               nivel: s.medal || 'Top 1 Isolado',
               predicao_horario: s.time,
-              status: 'WIN_DIRETO',
-              minuto_alvo: (s.entryDate as any)?.toISOString?.() || String(s.entryDate)
+              status: status,
+              minuto_alvo: new Date(entryTime).toISOString()
             });
             return res;
           }
 
-          const matchedMargin = (resultsForValidation || []).find(r => {
-            if (!r || r.color !== "white") return false;
-            const rt = new Date(r.createdAt).getTime();
-            return rt >= entryTime - 60_000 && rt <= entryTime + 60_000 && rt <= now;
-          });
-
-          if (matchedMargin) {
-            const res = { ...s, outcome: "green" as const, resultTime: fmtTime(matchedMargin.createdAt), label: "WIN_VIZINHO" };
-            const table = 'historico_sinais_audit';
-            void (supabase as any).from(table).insert({
-              analise: s.confluence,
-              tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
-              nivel: s.medal || 'Top 1 Isolado',
-              predicao_horario: s.time,
-              status: 'WIN_VIZINHO',
-              minuto_alvo: (s.entryDate as any)?.toISOString?.() || String(s.entryDate)
-            });
-            return res;
-          }
-
-          if (now > entryTime + 60_000) {
+          // Se passou do tempo (target + 1min) e não deu green, é LOSS
+          if (now > rangeEnd) {
             const res = { ...s, outcome: "red" as const, label: "LOSS" };
-            if (s.outcome !== ("red" as any)) {
-              const table = 'historico_sinais_audit';
-              void (supabase as any).from(table).insert({
-                analise: s.confluence,
-                tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
-                nivel: s.medal || 'Top 1 Isolado',
-                predicao_horario: s.time,
-                status: 'LOSS',
-                minuto_alvo: (s.entryDate as any)?.toISOString?.() || String(s.entryDate)
-              });
-            }
+            const table = 'historico_sinais_audit';
+            void supabase.from(table).insert({
+              analise: s.confluence || "Analise",
+              tipo_sinal: s.label === "Confluência" ? "Confluência" : "Top 1 Isolado",
+              nivel: s.medal || 'Top 1 Isolado',
+              predicao_horario: s.time,
+              status: 'LOSS',
+              minuto_alvo: new Date(entryTime).toISOString()
+            });
             return res;
           }
+          
           return s;
         } catch (e) {
           console.error("Error validating signal:", e, s);
           return s;
         }
-      }).filter(s => {
+      });
+
+      // Filtramos para manter apenas os pendentes ou concluídos recentemente (3 min)
+      const visible = validated.filter(s => {
         try {
           if (!s.entryDate || !s.outcome || s.outcome === "pending") return true;
           const entryTime = typeof s.entryDate === 'string' ? new Date(s.entryDate).getTime() : (s.entryDate instanceof Date ? s.entryDate.getTime() : new Date(s.entryDate).getTime());
@@ -417,7 +411,7 @@ export default function SinaisSection() {
         }
       });
 
-      setPredictiveList(validated);
+      setPredictiveList(visible);
     };
 
     update();
@@ -480,12 +474,12 @@ export default function SinaisSection() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-6">
             <div className="flex rounded-lg bg-black/40 p-1 border border-white/5">
               <button
                 onClick={() => setAuditFilter("hoje")}
                 className={cn(
-                  "px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-md transition-all",
+                  "px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-all",
                   auditFilter === "hoje" ? "bg-primary text-white" : "text-muted-foreground hover:text-white"
                 )}
               >
@@ -494,32 +488,33 @@ export default function SinaisSection() {
               <button
                 onClick={() => setAuditFilter("geral")}
                 className={cn(
-                  "px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-md transition-all",
+                  "px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-all",
                   auditFilter === "geral" ? "bg-primary text-white" : "text-muted-foreground hover:text-white"
                 )}
               >
                 Visão Geral
               </button>
             </div>
-            <div className="h-8 w-px bg-white/10 mx-1" />
-            <div className="flex items-center gap-4 px-2">
-              <div className="text-right">
-                <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Placar</div>
-                <div className="text-xs font-black text-white font-mono">
-                  <span className="text-emerald-400">{auditStats.wins}W</span>
-                  <span className="mx-1 text-white/20">/</span>
-                  <span className="text-red-400">{auditStats.losses}L</span>
-                </div>
+
+            <div className="h-10 w-px bg-white/10" />
+
+            <div className="flex items-center gap-8">
+              <div className="text-center">
+                <div className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-1">Assertividade</div>
+                <div className="text-xl font-black text-primary font-outfit">{auditStats.pct.toFixed(0)}%</div>
               </div>
-              <div className="flex items-center gap-3 bg-primary/10 border border-primary/20 rounded-xl px-4 py-2">
-                <div className="text-right">
-                  <div className="text-[9px] font-bold text-primary/60 uppercase tracking-widest">Eficiência</div>
-                  <div className="text-xl font-black text-primary font-outfit">
-                    {auditStats.pct.toFixed(1)}%
-                  </div>
-                </div>
-                <div className="text-[10px] font-bold text-muted-foreground uppercase vertical-lr tracking-tighter opacity-40">
-                  {auditStats.total}Q
+              
+              <div className="text-center">
+                <div className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-1">Placar</div>
+                <div className="text-xl font-black text-white font-outfit">{auditStats.wins}/{auditStats.total}</div>
+              </div>
+
+              <div className="text-center">
+                <div className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-1">Status</div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-black text-green-500 font-outfit">{auditStats.wins}W</span>
+                  <span className="text-white/10">/</span>
+                  <span className="text-xs font-black text-red-500 font-outfit">{auditStats.losses}L</span>
                 </div>
               </div>
             </div>
