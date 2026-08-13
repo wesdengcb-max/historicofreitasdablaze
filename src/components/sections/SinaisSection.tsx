@@ -161,7 +161,8 @@ export default function SinaisSection() {
     const fetchAudit = async () => {
       try {
         const table = 'historico_sinais_audit';
-        let query = (supabase as any).from(table).select("*");
+        let query = supabase.from(table).select("*");
+        
         if (auditFilter === "hoje") {
           const today = new Date();
           today.setHours(0, 0, 0, 0);
@@ -169,12 +170,15 @@ export default function SinaisSection() {
         }
 
         const { data, error } = await query.order("created_at", { ascending: false });
-        if (error || !data) return;
+        if (error || !data) {
+          console.error("fetchAudit query error:", error);
+          return;
+        }
 
-        const auditData = data as any[];
+        const auditData = data;
         const wins = auditData.filter(r => r.status && r.status.startsWith("WIN")).length;
         const losses = auditData.filter(r => r.status === "LOSS").length;
-        const total = auditData.length;
+        const total = wins + losses; // Apenas concluídos
         const pct = total > 0 ? (wins / total) * 100 : 0;
         const latest = auditData[0];
 
@@ -187,7 +191,7 @@ export default function SinaisSection() {
           tendency: auditData.slice(0, 5).filter(r => r.status && r.status.startsWith("WIN")).length >= 4,
         });
       } catch (e) {
-        console.error("fetchAudit error:", e);
+        console.error("fetchAudit execution error:", e);
       }
     };
     void fetchAudit();
