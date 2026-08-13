@@ -474,12 +474,12 @@ export default function SinaisSection() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-6">
             <div className="flex rounded-lg bg-black/40 p-1 border border-white/5">
               <button
                 onClick={() => setAuditFilter("hoje")}
                 className={cn(
-                  "px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-md transition-all",
+                  "px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-all",
                   auditFilter === "hoje" ? "bg-primary text-white" : "text-muted-foreground hover:text-white"
                 )}
               >
@@ -488,32 +488,33 @@ export default function SinaisSection() {
               <button
                 onClick={() => setAuditFilter("geral")}
                 className={cn(
-                  "px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-md transition-all",
+                  "px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-all",
                   auditFilter === "geral" ? "bg-primary text-white" : "text-muted-foreground hover:text-white"
                 )}
               >
                 Visão Geral
               </button>
             </div>
-            <div className="h-8 w-px bg-white/10 mx-1" />
-            <div className="flex items-center gap-4 px-2">
-              <div className="text-right">
-                <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Placar</div>
-                <div className="text-xs font-black text-white font-mono">
-                  <span className="text-emerald-400">{auditStats.wins}W</span>
-                  <span className="mx-1 text-white/20">/</span>
-                  <span className="text-red-400">{auditStats.losses}L</span>
-                </div>
+
+            <div className="h-10 w-px bg-white/10" />
+
+            <div className="flex items-center gap-8">
+              <div className="text-center">
+                <div className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-1">Assertividade</div>
+                <div className="text-xl font-black text-primary font-outfit">{auditStats.pct.toFixed(0)}%</div>
               </div>
-              <div className="flex items-center gap-3 bg-primary/10 border border-primary/20 rounded-xl px-4 py-2">
-                <div className="text-right">
-                  <div className="text-[9px] font-bold text-primary/60 uppercase tracking-widest">Eficiência</div>
-                  <div className="text-xl font-black text-primary font-outfit">
-                    {auditStats.pct.toFixed(1)}%
-                  </div>
-                </div>
-                <div className="text-[10px] font-bold text-muted-foreground uppercase vertical-lr tracking-tighter opacity-40">
-                  {auditStats.total}Q
+              
+              <div className="text-center">
+                <div className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-1">Placar</div>
+                <div className="text-xl font-black text-white font-outfit">{auditStats.wins}/{auditStats.total}</div>
+              </div>
+
+              <div className="text-center">
+                <div className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-1">Status</div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-black text-green-500 font-outfit">{auditStats.wins}W</span>
+                  <span className="text-white/10">/</span>
+                  <span className="text-xs font-black text-red-500 font-outfit">{auditStats.losses}L</span>
                 </div>
               </div>
             </div>
