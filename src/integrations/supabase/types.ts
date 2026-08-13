@@ -83,6 +83,39 @@ export type Database = {
         }
         Relationships: []
       }
+      historico_sinais_audit: {
+        Row: {
+          analise: string
+          created_at: string | null
+          id: string
+          minuto_alvo: string
+          nivel: string
+          predicao_horario: string
+          status: string
+          tipo_sinal: string
+        }
+        Insert: {
+          analise: string
+          created_at?: string | null
+          id?: string
+          minuto_alvo: string
+          nivel: string
+          predicao_horario: string
+          status: string
+          tipo_sinal: string
+        }
+        Update: {
+          analise?: string
+          created_at?: string | null
+          id?: string
+          minuto_alvo?: string
+          nivel?: string
+          predicao_horario?: string
+          status?: string
+          tipo_sinal?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
