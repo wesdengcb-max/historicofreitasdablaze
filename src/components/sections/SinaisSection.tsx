@@ -149,7 +149,7 @@ export default function SinaisSection() {
   const [formEntry, setFormEntry] = useState<"1" | "2">("1");
   const [formColor, setFormColor] = useState<Color>("red");
 
-  const [auditFilter, setAuditFilter] = useState<"hoje" | "geral">("hoje");
+  const [auditFilter, setAuditFilter] = useState<"hoje" | "geral">("geral");
   const [topStrategies, setTopStrategies] = useState<Array<{ analise: string, wins: number, total: number, pct: number }>>([]);
   const [auditStats, setAuditStats] = useState<{
     wins: number;
@@ -158,7 +158,8 @@ export default function SinaisSection() {
     tendency: boolean;
     analysis: string;
     total: number;
-  }>({ wins: 0, losses: 0, pct: 0, tendency: false, analysis: "Carregando...", total: 0 });
+  }>({ wins: 0, losses: 0, pct: 0, tendency: false, analysis: "---", total: 0 });
+
 
 
   useEffect(() => {
@@ -230,6 +231,7 @@ export default function SinaisSection() {
     const handleSwitch = (e: any) => {
       setAuditFilter("hoje");
     };
+
 
     window.addEventListener('switch-audit-filter', handleSwitch);
     return () => window.removeEventListener('switch-audit-filter', handleSwitch);
