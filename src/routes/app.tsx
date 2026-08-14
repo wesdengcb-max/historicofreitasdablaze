@@ -887,7 +887,7 @@ function Index() {
       )}
 
       {/* Área principal scrollable - flex-1 garante que ocupa o resto do espaço */}
-      <div className="flex flex-1 flex-col min-w-0 overflow-y-auto scrollbar-none">
+      <div className="flex flex-1 flex-col min-w-0 overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10 hover:scrollbar-thumb-white/20">
         <AppHeader />
         
         <div className="flex-1 overflow-y-auto scrollbar-none">
