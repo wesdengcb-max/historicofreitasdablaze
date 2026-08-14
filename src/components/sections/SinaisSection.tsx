@@ -44,6 +44,8 @@ import { blazeSupabase } from "@/integrations/supabase/blaze-client";
 import { ResultCircle } from "@/components/double/ResultCircle";
 import { colorOf, fmtTime, type Color } from "@/components/double/types";
 import { setSignals, getRobotEnabled, setRobotEnabled, subscribeRobot, getPredictiveSignals, subscribePredictive, type PredictiveSignal } from "@/lib/signalsStore";
+import { CheckCircle2 } from "lucide-react";
+
 import { BlazeRoulette } from "@/components/double/BlazeRoulette";
 import { PredictiveSignals } from "@/components/double/PredictiveSignals";
 
@@ -378,11 +380,8 @@ export default function SinaisSection() {
           
           if (Number.isNaN(entryTime)) return s;
 
-          // Se já está concluído, não re-valida
           if (s.outcome && s.outcome !== "pending") return s;
 
-          // Buscamos o branco nos resultados carregados
-          // Janela de ±1 minuto em volta do target
           const rangeStart = entryTime - 60_000;
           const rangeEnd = entryTime + 60_000;
 
@@ -393,10 +392,9 @@ export default function SinaisSection() {
           });
 
           if (matchedResult) {
-            const status = "WIN"; // Regra binária solicitada: WIN
+            const status = "WIN"; 
             const res = { ...s, outcome: "green" as const, resultTime: fmtTime(matchedResult.createdAt), label: status };
             
-            // Persistimos na auditoria se for a primeira vez
             const table = 'historico_sinais_audit';
             void supabase.from(table).insert({
               analise: s.confluence || "Analise",
@@ -404,12 +402,12 @@ export default function SinaisSection() {
               nivel: s.medal || 'Top 1 Isolado',
               predicao_horario: s.time,
               status: status,
-              minuto_alvo: new Date(entryTime).toISOString()
+              minuto_alvo: new Date(entryTime).toISOString(),
+              is_verified: s.isVerified || false
             });
             return res;
           }
 
-          // Se passou do tempo (target + 1min) e não deu green, é LOSS
           if (now > rangeEnd) {
             const res = { ...s, outcome: "red" as const, label: "LOSS" };
             const table = 'historico_sinais_audit';
@@ -419,7 +417,8 @@ export default function SinaisSection() {
               nivel: s.medal || 'Top 1 Isolado',
               predicao_horario: s.time,
               status: 'LOSS',
-              minuto_alvo: new Date(entryTime).toISOString()
+              minuto_alvo: new Date(entryTime).toISOString(),
+              is_verified: s.isVerified || false
             });
             return res;
           }
@@ -430,6 +429,7 @@ export default function SinaisSection() {
           return s;
         }
       });
+
 
       // Filtramos para manter apenas os pendentes ou concluídos recentemente (3 min)
       const visible = validated.filter(s => {
@@ -724,7 +724,14 @@ export default function SinaisSection() {
                           </span>
                         )}
                         <span className="text-xs font-bold text-white/90">{s.confluence}</span>
+                        {s.isVerified && (
+                          <span className="flex items-center gap-0.5 rounded-full bg-blue-500/20 px-1.5 py-0.5 text-[8px] font-black text-blue-400 border border-blue-500/30">
+                            <CheckCircle2 className="h-2 w-2" />
+                            Verificado
+                          </span>
+                        )}
                       </div>
+
                       <div className="text-[10px] text-muted-foreground opacity-60">Janela: {s.label}</div>
                     </div>
                   </td>
