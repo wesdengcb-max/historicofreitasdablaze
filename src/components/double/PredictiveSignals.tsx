@@ -431,34 +431,6 @@ export function PredictiveSignals() {
 
     setMode1(finalM1);
 
-    // Sync with global store
-    const syncSignals: any[] = [
-      ...finalM1.map(s => ({
-        key: s.key,
-        time: fmtClock(s.at),
-        pct: s.pct,
-        label: s.label,
-        confluence: s.sources.map(src => `A${src.analysis}·${src.value}`).join(", "),
-        medal: getMedalStyles(s.analysisCount)?.label,
-        entryDate: s.at,
-        outcome: "pending",
-        isHighTendency: s.isHighTendency,
-        isVerified: s.isVerified
-      })),
-      ...m2.map(s => ({
-        key: s.key,
-        time: s.times.map(t => fmtClock(t)).join(" / "),
-        pct: s.pct,
-        label: "Confluência",
-        confluence: s.confluence,
-        medal: getMedalStyles(s.analysisCount)?.label,
-        entryDate: s.times[0],
-        outcome: "pending",
-        isHighTendency: s.isHighTendency
-      }))
-    ].sort((a, b) => a.entryDate.getTime() - b.entryDate.getTime());
-
-    setPredictiveSignals(syncSignals);
 
   }, [active, engine]);
 
