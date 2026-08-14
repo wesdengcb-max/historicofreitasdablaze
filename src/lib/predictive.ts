@@ -7,7 +7,9 @@ export type Row = { id: number; roll: string; color: string; created_at: string 
 
 export type Cycle = {
   value: number;
-  analysis: 1 | 2 | 3 | 4 | 5 | 6 | 7;
+  analysis: 1 | 2 | 3 | 4 | 5 | 6 | 7 | number; // 1-7 main, 100+ secondary
+  isSecondary?: boolean;
+
   triggerAt: Date;
   gaps: number[];
 };
@@ -170,6 +172,40 @@ export function buildA7(rows: Row[]): Cycle[] {
   }
   return out;
 }
+
+/** 
+ * Análises Secundárias (#1 ao #9)
+ * Utilizam a mesma lógica da A1 (leitura de pedra vs unidade do minuto),
+ * mas deslocadas no tempo conforme a posição no histórico.
+ */
+export function buildSecondary(rows: Row[], offset: number): Cycle[] {
+  const out: Cycle[] = [];
+  // offset 1-9 representa a posição no histórico
+  // Aqui interpretamos como: a pedra que saiu a 'offset' rodadas atrás
+  // deve casar com o minuto em que saiu.
+  rows.forEach((r, i) => {
+    if (i < offset) return;
+    const targetRow = rows[i - offset]; 
+    const n = Number(targetRow.roll);
+    if (!Number.isFinite(n) || n < 0 || n > 9) return;
+    
+    const dt = parseUtcDate(r.created_at);
+    if (Number.isNaN(dt.getTime())) return;
+    
+    // Mesma lógica do #0: se a unidade do minuto casa com a pedra
+    if (dt.getMinutes() % 10 !== n) return;
+    
+    out.push({ 
+      value: n, 
+      analysis: 100 + offset, 
+      triggerAt: dt, 
+      gaps: collectGaps(rows, i, dt),
+      isSecondary: true
+    });
+  });
+  return out;
+}
+
 
 export type Group = { m: number; label: string; count: number; pct: number };
 

@@ -107,6 +107,7 @@ export type PredictiveSignal = {
   resultTime?: string;
   entryDate?: Date;
   isHighTendency?: boolean;
+  isVerified?: boolean;
 };
 
 export function setPredictiveSignals(signals: PredictiveSignal[]) {
