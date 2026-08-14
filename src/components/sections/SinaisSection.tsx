@@ -195,16 +195,24 @@ export default function SinaisSection() {
         }
 
         // 2. Fetch Top Strategies (Always from total history for "Geral" or filtered for "Hoje")
-        const { data: allData, error: allErr } = await supabase.from(table).select("analise, status");
+        const { data: allData, error: allErr } = await supabase.from(table).select("analise, status, minuto_alvo");
         if (!allErr && allData) {
           const strategyMap = new Map<string, { wins: number, total: number }>();
+          const today = spYmd();
+          const startLimit = new Date(spToUtcIso(today, "00:00")).getTime();
+          
           allData.forEach(r => {
             if (!r.analise || !r.status || r.status === 'PENDENTE') return;
+            
+            const itemDate = new Date(r.minuto_alvo || 0).getTime();
+            if (itemDate < startLimit) return;
+            
             const cur = strategyMap.get(r.analise) || { wins: 0, total: 0 };
             cur.total++;
             if (r.status.startsWith('WIN')) cur.wins++;
             strategyMap.set(r.analise, cur);
           });
+
 
           const sorted = Array.from(strategyMap.entries())
             .map(([analise, stats]) => ({
