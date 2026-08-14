@@ -239,7 +239,7 @@ const ColumnBlock = memo(function ColumnBlock({
 
   return (
     <div
-      className={`flex min-w-[130px] flex-col gap-y-5 rounded-lg border border-transparent p-1 transition-colors duration-300 ${
+      className={`flex min-w-[100px] flex-col gap-y-5 rounded-lg border border-transparent p-0 transition-colors duration-300 ${
         isActive ? "bg-primary/10" : ""
       }`}
     >
@@ -281,7 +281,7 @@ const BlazeResultCardWrapper = memo(function BlazeResultCardWrapper({
   exibirSegundos,
   signalsByHM,
 }: any) {
-  if (!item) return <div className="h-[74px] w-[54px]" />;
+  if (!item) return <div className="h-[65px] w-[48px]" />;
   return (
     <div className="flex flex-col items-center">
       <BlazeResultCard
@@ -903,7 +903,7 @@ function Index() {
           ) : section === "estrategias" ? (
             <Suspense fallback={<SectionFallback />}><EstrategiasSection /></Suspense>
           ) : section !== "dashboard" ? (
-            <main className="mx-auto flex w-full max-w-[1700px] flex-col gap-5 px-4 py-10 sm:gap-6 sm:px-6 sm:py-16">
+            <main className="mx-auto flex w-full max-w-[1880px] flex-col gap-5 px-4 py-10 sm:gap-6 sm:px-6 sm:py-16">
               <Card delay={0.05}>
                 <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
                   <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
@@ -918,7 +918,7 @@ function Index() {
               </Card>
             </main>
           ) : (
-            <main className="mx-auto flex w-full max-w-[1700px] flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8 lg:py-8">
+            <main className="mx-auto flex w-full max-w-[1880px] flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8 lg:py-8">
           {/* Novas métricas estilo Blaze Dashboard */}
           <LiveStats 
             total={total}
@@ -1153,7 +1153,7 @@ function Index() {
             {/* Cabeçalho das estatísticas por coluna */}
             {viewMode === "colunas" && contarColunas && (
               <div className="mb-3 w-full border-b border-white/5 pb-3 overflow-x-auto scrollbar-none">
-                <div className="grid grid-cols-10 gap-[2px] w-full">
+                <div className="grid grid-cols-10 gap-[1px] w-full">
                   {Array.from({ length: 10 }).map((_, ci) => {
                     const stats = colStats[ci];
                     return (
@@ -1260,7 +1260,7 @@ function Index() {
                   <div className="history-scroll w-full overflow-x-auto p-1 sm:p-2 lg:p-3 no-scrollbar">
                     <div className="flex flex-col gap-0 w-full">
                       {/* Cabeçalho 0-9 interno para Colunas Fixas */}
-                      <div className="grid grid-cols-10 gap-[2px] mb-1 sticky top-0 z-10 bg-[#0A0A0A]/80 backdrop-blur-sm w-full">
+                      <div className="grid grid-cols-10 gap-[1px] mb-1 sticky top-0 z-10 bg-[#0A0A0A]/80 backdrop-blur-sm w-full">
                         {Array.from({ length: 10 }).map((_, ci) => (
                           <button
                             key={`header-inner-${ci}`}
@@ -1291,7 +1291,7 @@ function Index() {
 
                       {gridRows.map((row) => (
                         <div key={row.key} className="flex flex-col gap-0 border-b border-white/[0.02]">
-                          <div className="grid grid-cols-10 gap-[2px] relative w-full">
+                          <div className="grid grid-cols-10 gap-[1px] relative w-full">
                             {row.cells.map((cell, ci) => {
                             const [hh, mmPrefix] = row.label.split(":");
                             const hm = `${hh}:${mmPrefix[0]}${ci}`;
@@ -1322,7 +1322,7 @@ function Index() {
                                 <div
                                   key={ci}
                                   className="flex flex-col items-center justify-center p-0"
-                                  style={{ width: "100%", height: "80px", direction: "ltr" }}
+                                  style={{ width: "100%", height: "70px", direction: "ltr" }}
                                 >
                                 <div 
                                   className={`relative flex flex-col items-center pt-2 rounded-lg transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-primary/10" : ""}`}
@@ -1332,7 +1332,7 @@ function Index() {
                                       {badge.label}
                                     </span>
                                   )}
-                                  <div className="relative flex h-[60px] items-start gap-[2px]">
+                                  <div className="relative flex h-[60px] items-start gap-[1px]">
                                     {(cell.length >= 2
                                       ? [cell[0], cell[1]]
                                       : cell.length === 1
