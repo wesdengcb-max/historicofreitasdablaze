@@ -239,7 +239,7 @@ const ColumnBlock = memo(function ColumnBlock({
 
   return (
     <div
-      className={`flex min-w-[120px] flex-col gap-y-5 rounded-lg border border-transparent p-1 transition-colors duration-300 ${
+      className={`flex min-w-[130px] flex-col gap-y-5 rounded-lg border border-transparent p-1 transition-colors duration-300 ${
         isActive ? "bg-primary/10" : ""
       }`}
     >
@@ -281,7 +281,7 @@ const BlazeResultCardWrapper = memo(function BlazeResultCardWrapper({
   exibirSegundos,
   signalsByHM,
 }: any) {
-  if (!item) return <div className="h-[68px] w-[48px]" />;
+  if (!item) return <div className="h-[74px] w-[54px]" />;
   return (
     <div className="flex flex-col items-center">
       <BlazeResultCard
@@ -1153,7 +1153,7 @@ function Index() {
             {/* Cabeçalho das estatísticas por coluna */}
             {viewMode === "colunas" && contarColunas && (
               <div className="mb-3 w-full border-b border-white/5 pb-3 overflow-x-auto scrollbar-none">
-                <div className="grid grid-cols-10 gap-[8px] w-full">
+                <div className="grid grid-cols-10 gap-[10px] w-full">
                   {Array.from({ length: 10 }).map((_, ci) => {
                     const stats = colStats[ci];
                     return (
@@ -1260,7 +1260,7 @@ function Index() {
                   <div className="history-scroll w-full overflow-x-auto p-1 sm:p-2 lg:p-3 no-scrollbar">
                     <div className="flex flex-col gap-0 w-full">
                       {/* Cabeçalho 0-9 interno para Colunas Fixas */}
-                      <div className="grid grid-cols-10 gap-[8px] mb-1 sticky top-0 z-10 bg-[#0A0A0A]/80 backdrop-blur-sm w-full">
+                      <div className="grid grid-cols-10 gap-[10px] mb-1 sticky top-0 z-10 bg-[#0A0A0A]/80 backdrop-blur-sm w-full">
                         {Array.from({ length: 10 }).map((_, ci) => (
                           <button
                             key={`header-inner-${ci}`}
@@ -1291,7 +1291,7 @@ function Index() {
 
                       {gridRows.map((row) => (
                         <div key={row.key} className="flex flex-col gap-0 border-b border-white/[0.02] py-2">
-                          <div className="grid grid-cols-10 gap-[8px] relative w-full">
+                          <div className="grid grid-cols-10 gap-[10px] relative w-full">
                             {row.cells.map((cell, ci) => {
                             const [hh, mmPrefix] = row.label.split(":");
                             const hm = `${hh}:${mmPrefix[0]}${ci}`;
