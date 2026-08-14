@@ -239,7 +239,7 @@ const ColumnBlock = memo(function ColumnBlock({
 
   return (
     <div
-      className={`flex min-w-[120px] flex-col gap-y-5 rounded-lg border border-transparent p-1 transition-colors duration-300 ${
+      className={`flex min-w-[130px] flex-col gap-y-5 rounded-lg border border-transparent p-1 transition-colors duration-300 ${
         isActive ? "bg-primary/10" : ""
       }`}
     >
