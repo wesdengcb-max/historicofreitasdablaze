@@ -918,7 +918,7 @@ function Index() {
               </Card>
             </main>
           ) : (
-            <main className="mx-auto flex w-full max-w-[1800px] flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8 lg:py-8">
+            <main className="mx-auto flex w-full max-w-[1920px] flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8 lg:py-8">
           {/* Novas métricas estilo Blaze Dashboard */}
           <LiveStats 
             total={total}
