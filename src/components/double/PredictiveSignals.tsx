@@ -321,7 +321,7 @@ export function PredictiveSignals() {
         .map((p) => `A${p.analysis}·${p.value}`)
         .join(", ");
       
-      const isHighTendency = projs.some(p => checkHighTendency(engine[p.analysis as 1 | 2 | 3 | 4 | 5 | 6 | 7], p.value));
+      const isHighTendency = projs.some(p => checkHighTendency(engine[p.analysis], p.value));
 
       m2.push({
         key: `m2-${at}`,
