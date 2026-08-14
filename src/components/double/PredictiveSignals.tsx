@@ -184,6 +184,9 @@ export function PredictiveSignals() {
     now.setSeconds(0, 0);
     setGeneratedAt(now);
 
+    // Dispara evento global para o SinaisSection alternar para "Rodadas Atuais"
+    window.dispatchEvent(new CustomEvent('switch-audit-filter', { detail: 'hoje' }));
+
     // ---- Modo 1: Top 1 (posição central M) de cada análise ativa, unificado por horário ----
     const byTime = new Map<
       number,

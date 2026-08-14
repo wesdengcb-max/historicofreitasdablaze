@@ -147,7 +147,8 @@ export default function SinaisSection() {
   const [formEntry, setFormEntry] = useState<"1" | "2">("1");
   const [formColor, setFormColor] = useState<Color>("red");
 
-  const [auditFilter, setAuditFilter] = useState<"hoje" | "geral">("hoje");
+  const [auditFilter, setAuditFilter] = useState<"hoje" | "geral">("geral");
+  const [topStrategies, setTopStrategies] = useState<Array<{ analise: string, wins: number, total: number, pct: number }>>([]);
   const [auditStats, setAuditStats] = useState<{
     wins: number;
     losses: number;
@@ -161,35 +162,58 @@ export default function SinaisSection() {
     const fetchAudit = async () => {
       try {
         const table = 'historico_sinais_audit';
-        let query = supabase.from(table).select("*");
         
+        // 1. Fetch statistics for the current filter
+        let statsQuery = supabase.from(table).select("*");
         if (auditFilter === "hoje") {
           const today = new Date();
           today.setHours(0, 0, 0, 0);
-          query = query.gte("created_at", today.toISOString());
+          statsQuery = statsQuery.gte("created_at", today.toISOString());
+        }
+        
+        const { data: statsData, error: statsError } = await statsQuery.order("created_at", { ascending: false });
+        
+        if (!statsError && statsData) {
+          const wins = statsData.filter(r => r.status && r.status.startsWith("WIN")).length;
+          const losses = statsData.filter(r => r.status === "LOSS").length;
+          const total = wins + losses;
+          const pct = total > 0 ? (wins / total) * 100 : 0;
+          const latest = statsData[0];
+
+          setAuditStats({
+            wins,
+            losses,
+            total,
+            pct,
+            analysis: latest?.analise || "Confluência · Top 1",
+            tendency: statsData.slice(0, 5).filter(r => r.status && r.status.startsWith("WIN")).length >= 4,
+          });
         }
 
-        const { data, error } = await query.order("created_at", { ascending: false });
-        if (error || !data) {
-          console.error("fetchAudit query error:", error);
-          return;
+        // 2. Fetch Top Strategies (Always from total history for "Geral" or filtered for "Hoje")
+        const { data: allData, error: allErr } = await supabase.from(table).select("analise, status");
+        if (!allErr && allData) {
+          const strategyMap = new Map<string, { wins: number, total: number }>();
+          allData.forEach(r => {
+            if (!r.analise || !r.status || r.status === 'PENDENTE') return;
+            const cur = strategyMap.get(r.analise) || { wins: 0, total: 0 };
+            cur.total++;
+            if (r.status.startsWith('WIN')) cur.wins++;
+            strategyMap.set(r.analise, cur);
+          });
+
+          const sorted = Array.from(strategyMap.entries())
+            .map(([analise, stats]) => ({
+              analise,
+              wins: stats.wins,
+              total: stats.total,
+              pct: (stats.wins / stats.total) * 100
+            }))
+            .sort((a, b) => b.pct - a.pct || b.total - a.total)
+            .slice(0, 5);
+          
+          setTopStrategies(sorted);
         }
-
-        const auditData = data;
-        const wins = auditData.filter(r => r.status && r.status.startsWith("WIN")).length;
-        const losses = auditData.filter(r => r.status === "LOSS").length;
-        const total = wins + losses; // Apenas concluídos
-        const pct = total > 0 ? (wins / total) * 100 : 0;
-        const latest = auditData[0];
-
-        setAuditStats({
-          wins,
-          losses,
-          total,
-          pct,
-          analysis: latest?.analise || "Confluência · Top 1",
-          tendency: auditData.slice(0, 5).filter(r => r.status && r.status.startsWith("WIN")).length >= 4,
-        });
       } catch (e) {
         console.error("fetchAudit execution error:", e);
       }
@@ -198,6 +222,14 @@ export default function SinaisSection() {
     const interval = setInterval(fetchAudit, 10000);
     return () => clearInterval(interval);
   }, [auditFilter]);
+
+  useEffect(() => {
+    const handleSwitch = (e: any) => {
+      if (e.detail) setAuditFilter(e.detail);
+    };
+    window.addEventListener('switch-audit-filter', handleSwitch);
+    return () => window.removeEventListener('switch-audit-filter', handleSwitch);
+  }, []);
 
 
   // Re-render frequente para avaliar a margem de 1 minuto e remover expirados.
@@ -361,7 +393,7 @@ export default function SinaisSection() {
           });
 
           if (matchedResult) {
-            const status = new Date(matchedResult.createdAt).getTime() === entryTime ? "WIN_DIRETO" : "WIN_VIZINHO";
+            const status = "WIN"; // Regra binária solicitada: WIN
             const res = { ...s, outcome: "green" as const, resultTime: fmtTime(matchedResult.createdAt), label: status };
             
             // Persistimos na auditoria se for a primeira vez
@@ -452,17 +484,17 @@ export default function SinaisSection() {
             </div>
             <div>
               <div className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60 font-outfit">
-                Dashboard de Auditoria
+                {auditFilter === "hoje" ? "Rodadas Atuais" : "Visão Geral (Top Estratégias)"}
               </div>
               <div className="flex items-center gap-2">
                 <h2 className="text-sm font-black text-white font-outfit uppercase">
-                  {auditStats.analysis}
+                  {auditFilter === "hoje" ? auditStats.analysis : "Catalogação Diária"}
                 </h2>
                 <span className="text-[10px] text-muted-foreground">·</span>
                 <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
-                  Assertividade Binária
+                  {auditFilter === "hoje" ? "Assertividade Binária" : "Ranking de Assertividade"}
                 </span>
-                {auditStats.tendency && (
+                {auditFilter === "hoje" && auditStats.tendency && (
                   <>
                     <span className="text-[10px] text-muted-foreground">·</span>
                     <span className="flex items-center gap-1 text-[10px] font-black text-orange-500 animate-pulse">
@@ -499,24 +531,40 @@ export default function SinaisSection() {
             <div className="h-10 w-px bg-white/10" />
 
             <div className="flex items-center gap-8">
-              <div className="text-center">
-                <div className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-1">Assertividade</div>
-                <div className="text-xl font-black text-primary font-outfit">{auditStats.pct.toFixed(0)}%</div>
-              </div>
-              
-              <div className="text-center">
-                <div className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-1">Placar</div>
-                <div className="text-xl font-black text-white font-outfit">{auditStats.wins}/{auditStats.total}</div>
-              </div>
-
-              <div className="text-center">
-                <div className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-1">Status</div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-black text-green-500 font-outfit">{auditStats.wins}W</span>
-                  <span className="text-white/10">/</span>
-                  <span className="text-xs font-black text-red-500 font-outfit">{auditStats.losses}L</span>
+              {auditFilter === "geral" ? (
+                <div className="flex gap-4">
+                  {topStrategies.map((strat, i) => (
+                    <div key={i} className="text-center">
+                      <div className="text-[8px] font-bold text-white/40 uppercase tracking-tighter mb-1 truncate max-w-[80px]">
+                        {strat.analise.replace("Analise", "A")}
+                      </div>
+                      <div className="text-sm font-black text-primary font-outfit">{strat.pct.toFixed(0)}%</div>
+                      <div className="text-[8px] text-white/20 font-bold">{strat.wins}/{strat.total}</div>
+                    </div>
+                  ))}
                 </div>
-              </div>
+              ) : (
+                <>
+                  <div className="text-center">
+                    <div className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-1">Assertividade</div>
+                    <div className="text-xl font-black text-primary font-outfit">{auditStats.pct.toFixed(0)}%</div>
+                  </div>
+                  
+                  <div className="text-center">
+                    <div className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-1">Placar</div>
+                    <div className="text-xl font-black text-white font-outfit">{auditStats.wins}/{auditStats.total}</div>
+                  </div>
+
+                  <div className="text-center">
+                    <div className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-1">Status</div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-black text-green-500 font-outfit">{auditStats.wins}W</span>
+                      <span className="text-white/10">/</span>
+                      <span className="text-xs font-black text-red-500 font-outfit">{auditStats.losses}L</span>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
