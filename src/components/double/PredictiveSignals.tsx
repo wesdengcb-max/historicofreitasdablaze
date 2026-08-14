@@ -11,6 +11,8 @@ import {
   buildA5,
   buildA6,
   buildA7,
+  buildSecondary,
+
   computeTop,
   cyclesOf,
   fmtClock,
@@ -29,8 +31,10 @@ type Mode1Signal = {
   pct: number; 
   label: string; 
   analysisCount: number; 
-  sources: Array<{ analysis: 1 | 2 | 3 | 4 | 5 | 6 | 7; value: number }>;
+  sources: Array<{ analysis: number; value: number }>;
   isHighTendency: boolean;
+  isVerified?: boolean;
+
   outcome?: "pending" | "green" | "red";
   resultTime?: string;
 };
@@ -39,10 +43,12 @@ type Mode2Signal = {
   title: string;
   times: Date[];
   pct: number;
-  sources: Array<{ analysis: 1 | 2 | 3 | 4 | 5 | 6 | 7; value: number; pct: number; top5: boolean }>;
+  sources: Array<{ analysis: number; value: number; pct: number; top5: boolean }>;
   confluence: string;
   analysisCount: number;
   isHighTendency: boolean;
+  isVerified?: boolean;
+
   outcome?: "pending" | "green" | "red";
   resultTime?: string;
 };
@@ -62,36 +68,38 @@ const CANDIDATE_DEPTH = 10;
 /** Somente as N primeiras contam como Top 5 validador. */
 const TOP5_DEPTH = 5;
 
-const getMedalStyles = (count: number) => {
-  if (count >= 7) return { 
-    label: "⚡️ Supremo", 
-    classes: "border-cyan-400 bg-cyan-950/50 text-cyan-300 shadow-cyan-500/20 animate-pulse",
-    badge: "bg-cyan-400/20 text-cyan-300 border-cyan-400/30"
+const getMedalStyles = (count: number, isConsecutive?: boolean, levelOffset: number = 0) => {
+  const totalLevel = count + levelOffset;
+  
+  if (totalLevel >= 7) return { 
+    label: "👑 Supremo", 
+    classes: "border-purple-400 bg-purple-950/50 text-purple-300 shadow-purple-500/20 animate-pulse",
+    badge: "bg-purple-400/20 text-purple-300 border-purple-400/30"
   };
-  if (count === 6) return { 
-    label: "👑 Platina", 
-    classes: "border-indigo-400 bg-indigo-950/40 text-indigo-200 shadow-indigo-500/10",
-    badge: "bg-indigo-400/20 text-indigo-200 border-indigo-400/30"
-  };
-  if (count === 5) return { 
+  if (totalLevel === 6) return { 
     label: "💎 Diamante", 
     classes: "border-blue-400 bg-blue-950/40 text-blue-200 shadow-blue-500/10",
     badge: "bg-blue-400/20 text-blue-200 border-blue-400/30"
   };
-  if (count === 4) return { 
+  if (totalLevel === 5) return { 
     label: "🥇 Ouro", 
     classes: "border-yellow-400 bg-yellow-950/50 text-yellow-300 shadow-yellow-500/20",
     badge: "bg-yellow-400/20 text-yellow-300 border-yellow-400/30"
   };
-  if (count === 3) return { 
+  if (totalLevel === 4) return { 
     label: "🥈 Prata", 
     classes: "border-slate-300 bg-slate-800/40 text-slate-100",
     badge: "bg-slate-300/20 text-slate-100 border-slate-300/30"
   };
-  if (count === 2) return { 
+  if (totalLevel === 3) return { 
     label: "🥉 Bronze", 
     classes: "border-amber-700 bg-amber-950/30 text-amber-300",
     badge: "bg-amber-700/20 text-amber-300 border-amber-700/30"
+  };
+  if (totalLevel === 2) return { 
+    label: "Top 1 + Confluência", 
+    classes: "border-cyan-400 bg-cyan-950/30 text-cyan-300 shadow-cyan-500/10",
+    badge: "bg-cyan-400/20 text-cyan-300 border-cyan-400/30"
   };
   return {
     label: "Top 1 Isolado",
@@ -99,6 +107,7 @@ const getMedalStyles = (count: number) => {
     badge: "bg-white/10 text-white border-white/20"
   };
 };
+
 
 export function PredictiveSignals() {
   const [rows, setRows] = useState<Row[]>([]);
@@ -141,40 +150,55 @@ export function PredictiveSignals() {
   }, []);
 
   const engine = useMemo(() => {
-    const a1 = buildA1(rows);
-    const a2 = buildA2(rows);
-    const a3 = buildA3(rows);
-    const a4 = buildA4(rows);
-    const a5 = buildA5(rows);
-    const a6 = buildA6(rows);
-    const a7 = buildA7(rows);
-    return { 1: a1, 2: a2, 3: a3, 4: a4, 5: a5, 6: a6, 7: a7 } as Record<1 | 2 | 3 | 4 | 5 | 6 | 7, Cycle[]>;
+    const main: Record<number, Cycle[]> = {
+      1: buildA1(rows),
+      2: buildA2(rows),
+      3: buildA3(rows),
+      4: buildA4(rows),
+      5: buildA5(rows),
+      6: buildA6(rows),
+      7: buildA7(rows),
+    };
+    const secondary: Record<number, Cycle[]> = {};
+    for (let i = 1; i <= 9; i++) {
+      secondary[100 + i] = buildSecondary(rows, i);
+    }
+    return { ...main, ...secondary } as Record<number, Cycle[]>;
   }, [rows]);
 
   /** Ciclos em aberto (status < MAX_ZEROS) por análise + valor. */
   const active = useMemo(() => {
-    const out: Array<{ analysis: 1 | 2 | 3 | 4 | 5 | 6 | 7; value: number; open: Cycle }> = [];
-    ([1, 2, 3, 4, 5, 6, 7] as const).forEach((a) => {
+    const out: Array<{ analysis: number; value: number; open: Cycle }> = [];
+    const mainIds = [1, 2, 3, 4, 5, 6, 7];
+    mainIds.forEach((a) => {
       const latest = latestByValue(engine[a]);
       latest.forEach((cycle, value) => {
-        // Trava de Quarentena (Gatilho Morto): suspender se último gatilho teve ZERO brancos ou timeout
         const hist = engine[a].filter(c => c.value === value);
         if (hist.length > 0) {
            const last = hist[hist.length - 1];
            const now = new Date().getTime();
            const triggerTime = new Date(last.triggerAt).getTime();
            const isTimedOut = now - triggerTime > (TIMEOUT_MINUTES * 60000);
-           
-           // Se o último gatilho encerrado não teve brancos (está aberto e atingiu limite)
-           // Ou se ele expirou por timeout sem acertos.
            if (last.gaps.length === 0 && isTimedOut) return;
         }
-
         if (cycle.gaps.length < MAX_ZEROS) out.push({ analysis: a, value, open: cycle });
       });
     });
     return out;
   }, [engine]);
+
+  const secondaryActive = useMemo(() => {
+    const out: Array<{ analysis: number; value: number; open: Cycle }> = [];
+    for (let i = 1; i <= 9; i++) {
+      const a = 100 + i;
+      const latest = latestByValue(engine[a]);
+      latest.forEach((cycle, value) => {
+        if (cycle.gaps.length < MAX_ZEROS) out.push({ analysis: a, value, open: cycle });
+      });
+    }
+    return out;
+  }, [engine]);
+
 
   const hasOpportunity = active.length > 0;
 
@@ -297,7 +321,7 @@ export function PredictiveSignals() {
         .map((p) => `A${p.analysis}·${p.value}`)
         .join(", ");
       
-      const isHighTendency = projs.some(p => checkHighTendency(engine[p.analysis as 1 | 2 | 3 | 4 | 5 | 6 | 7], p.value));
+      const isHighTendency = projs.some(p => checkHighTendency(engine[p.analysis], p.value));
 
       m2.push({
         key: `m2-${at}`,
@@ -316,124 +340,132 @@ export function PredictiveSignals() {
     m2.sort((a, b) => a.times[0].getTime() - b.times[0].getTime());
     setMode2(m2);
 
-    // Sync with global store for SinaisSection
-    const syncSignals: any[] = [
-      ...m1.map(s => ({
-        key: s.key,
-        time: fmtClock(s.at),
-        pct: s.pct,
-        label: s.label,
-        confluence: s.sources.map(src => `A${src.analysis}·${src.value}`).join(", "),
-        medal: getMedalStyles(s.analysisCount)?.label,
-        entryDate: s.at,
-        outcome: "pending",
-        isHighTendency: s.isHighTendency
-      })),
-      ...m2.map(s => ({
-        key: s.key,
-        time: s.times.map(t => fmtClock(t)).join(" / "),
-        pct: s.pct,
-        label: "Confluência",
-        confluence: s.confluence,
-        medal: getMedalStyles(s.analysisCount)?.label,
-        entryDate: s.times[0],
-        outcome: "pending",
-        isHighTendency: s.isHighTendency
-      }))
-    ].sort((a, b) => a.entryDate.getTime() - b.entryDate.getTime());
+    // ---- Level Elevation and Unification Logic ----
+    const unifiedM1: Mode1Signal[] = [];
+    const sortedM1 = Array.from(byTime.entries()).sort((a, b) => a[0] - b[0]);
+    
+    for (let i = 0; i < sortedM1.length; i++) {
+      const [t, info] = sortedM1[i];
+      const next1 = sortedM1[i + 1];
+      const next2 = sortedM1[i + 2];
+      
+      const isConsecutive3 = next1 && next2 && 
+        Math.abs(next1[0] - t) <= 60000 && 
+        Math.abs(next2[0] - next1[0]) <= 60000;
+      
+      const isConsecutive2 = !isConsecutive3 && next1 && 
+        Math.abs(next1[0] - t) <= 60000;
 
-    setPredictiveSignals(syncSignals);
-  }, [active, engine]);
-
-  // Sync projections with global store for SinaisSection automatically
-  useEffect(() => {
-    if (rows.length > 0 && !loading) {
-      const now = new Date();
-      now.setSeconds(0, 0);
-
-      const m1List: Mode1Signal[] = [];
-      const usedTimes = new Set<number>();
-
-      // Internal calculation for Mode 1
-      const byTime = new Map<number, any>();
-      for (const item of active) {
-        const hist = engine[item.analysis].filter(c => c.value === item.value).slice(-6);
-        if (hist.length < MIN_GATILHOS) continue;
-        const top1 = computeTop(hist, 1)[0];
-        if (!top1 || top1.pct < MIN_ASSERTIVIDADE_TOP1) continue;
-        const at = addMinutes(item.open.triggerAt, top1.m);
-        if (at.getTime() <= now.getTime()) continue;
-        const t = at.getTime();
-        const cur = byTime.get(t);
-        if (!cur) {
-          byTime.set(t, { 
-            pct: top1.pct, 
-            label: top1.label,
-            sources: [{ analysis: item.analysis, value: item.value }],
-            analyses: new Set([item.analysis])
-          });
-        } else {
-          cur.analyses.add(item.analysis);
-          cur.sources.push({ analysis: item.analysis, value: item.value });
-          if (top1.pct > cur.pct) { cur.pct = top1.pct; cur.label = top1.label; }
-        }
-      }
-
-      const syncM1 = Array.from(byTime.entries()).map(([t, info]) => {
-        usedTimes.add(t);
-        return {
+      if (isConsecutive3) {
+        // Use Middle Time, elevate level
+        const middleTime = next1[0];
+        const combinedSources = [...info.sources, ...next1[1].sources, ...next2[1].sources];
+        const combinedAnalyses = new Set([...info.analyses, ...next1[1].analyses, ...next2[1].analyses]);
+        const maxPct = Math.max(info.pct, next1[1].pct, next2[1].pct);
+        
+        unifiedM1.push({
+          key: `m1-c3-${middleTime}`,
+          title: `Supremo · ${info.values.join("+")}`,
+          at: new Date(middleTime),
+          pct: maxPct,
+          label: info.label,
+          analysisCount: combinedAnalyses.size + 4, // level elevation
+          sources: combinedSources,
+          isHighTendency: info.isHighTendency || next1[1].isHighTendency || next2[1].isHighTendency,
+          isVerified: false // will be checked below
+        });
+        i += 2; // skip next two
+      } else if (isConsecutive2) {
+        // Use highest pct time, elevate level
+        const best = info.pct >= next1[1].pct ? { t, info } : { t: next1[0], info: next1[1] };
+        const combinedSources = [...info.sources, ...next1[1].sources];
+        const combinedAnalyses = new Set([...info.analyses, ...next1[1].analyses]);
+        
+        unifiedM1.push({
+          key: `m1-c2-${best.t}`,
+          title: `Confluência · ${best.info.values.join("+")}`,
+          at: new Date(best.t),
+          pct: best.info.pct,
+          label: best.info.label,
+          analysisCount: combinedAnalyses.size + 1, // level elevation
+          sources: combinedSources,
+          isHighTendency: info.isHighTendency || next1[1].isHighTendency,
+          isVerified: false
+        });
+        i += 1;
+      } else {
+        unifiedM1.push({
           key: `m1-${t}`,
-          time: fmtClock(new Date(t)),
+          title: `Análise ${info.values.join(" + ")}`,
+          at: new Date(t),
           pct: info.pct,
           label: info.label,
-          confluence: info.sources.map((src: any) => `A${src.analysis}·${src.value}`).join(", "),
-          medal: getMedalStyles(info.analyses.size)?.label,
-          entryDate: new Date(t),
-          outcome: "pending"
-        };
-      });
-
-      // Internal calculation for Mode 2 (Confluences)
-      const byMinute = new Map<number, any[]>();
-      for (const item of active) {
-        const hist = engine[item.analysis].filter(c => c.value === item.value).slice(-6);
-        if (hist.length < MIN_GATILHOS) continue;
-        const list = computeTop(hist, CANDIDATE_DEPTH);
-        list.forEach((g, idx) => {
-          const at = addMinutes(item.open.triggerAt, g.m).getTime();
-          if (at <= now.getTime()) return;
-          const arr = byMinute.get(at) ?? [];
-          arr.push({ analysis: item.analysis, value: item.value, pct: g.pct, top5: idx < TOP5_DEPTH });
-          byMinute.set(at, arr);
+          analysisCount: info.analyses.size,
+          sources: info.sources,
+          isHighTendency: info.isHighTendency,
+          isVerified: false
         });
       }
-
-      const syncM2: any[] = [];
-      for (const [at, projs] of byMinute) {
-        const distinctAnalyses = new Set(projs.map((p) => p.analysis));
-        if (distinctAnalyses.size < 2) continue;
-        const validators = projs.filter((p) => p.top5);
-        if (!validators.length) continue;
-        const pct = projs.reduce((s, p) => s + p.pct, 0) / projs.length;
-        if (pct < MIN_ASSERTIVIDADE_CONFLUENCIA) continue;
-        if (usedTimes.has(at)) continue;
-        usedTimes.add(at);
-
-        syncM2.push({
-          key: `m2-${at}`,
-          time: fmtClock(new Date(at)),
-          pct,
-          label: "Confluência",
-          confluence: validators.map(p => `A${p.analysis}·${p.value}`).join(", "),
-          medal: getMedalStyles(distinctAnalyses.size)?.label,
-          entryDate: new Date(at),
-          outcome: "pending"
-        });
-      }
-
-      setPredictiveSignals([...syncM1, ...syncM2].sort((a, b) => a.entryDate.getTime() - b.entryDate.getTime()));
     }
-  }, [rows, loading, active, engine]);
+
+    // Secondary Verification Selo Azul Logic
+    const secondaryProjections = new Map<number, Set<number>>(); // time -> values
+    for (const item of (secondaryActive as any)) {
+      const hist = engine[item.analysis].filter((c: any) => c.value === item.value).slice(-6);
+      if (hist.length < 6) continue;
+      const top1 = computeTop(hist, 1)[0];
+      if (!top1) continue;
+      const at = addMinutes(item.open.triggerAt, top1.m).getTime();
+      if (!secondaryProjections.has(at)) secondaryProjections.set(at, new Set());
+      secondaryProjections.get(at)!.add(item.value);
+    }
+
+
+
+    const finalM1 = unifiedM1.map(s => {
+      const t = s.at.getTime();
+      const secValues = secondaryProjections.get(t);
+      const isVerified = secValues && s.sources.some(src => secValues.has(src.value));
+      return { ...s, isVerified };
+    });
+
+    setMode1(finalM1);
+
+
+  }, [active, engine]);
+
+  useEffect(() => {
+    if (rows.length > 0 && !loading && mode1 && mode2) {
+      const syncSignals: any[] = [
+        ...mode1.map(s => ({
+          key: s.key,
+          time: fmtClock(s.at),
+          pct: s.pct,
+          label: s.label,
+          confluence: s.sources.map(src => `A${src.analysis}·${src.value}`).join(", "),
+          medal: getMedalStyles(s.analysisCount)?.label,
+          entryDate: s.at,
+          outcome: "pending",
+          isHighTendency: s.isHighTendency,
+          isVerified: s.isVerified
+        })),
+        ...mode2.map(s => ({
+          key: s.key,
+          time: s.times.map(t => fmtClock(t)).join(" / "),
+          pct: s.pct,
+          label: "Confluência",
+          confluence: s.confluence,
+          medal: getMedalStyles(s.analysisCount)?.label,
+          entryDate: s.times[0],
+          outcome: "pending",
+          isHighTendency: s.isHighTendency
+        }))
+      ].sort((a, b) => a.entryDate.getTime() - b.entryDate.getTime());
+
+      setPredictiveSignals(syncSignals);
+    }
+  }, [rows, loading, mode1, mode2]);
+
 
   return (
     <Card className="glass-card !p-0 overflow-hidden">
@@ -514,13 +546,21 @@ export function PredictiveSignals() {
                       }`}
                     >
                       <div className="flex items-center justify-between gap-2">
-                        <div className="text-xs font-semibold text-muted-foreground opacity-80">{s.title}</div>
+                        <div className="flex items-center gap-2">
+                          <div className="text-xs font-semibold text-muted-foreground opacity-80">{s.title}</div>
+                          {s.isVerified && (
+                            <span className="flex items-center gap-0.5 rounded-full bg-blue-500/20 px-1.5 py-0.5 text-[8px] font-black text-blue-400 border border-blue-500/30">
+                              ✓ Verificado
+                            </span>
+                          )}
+                        </div>
                         {medal && (
                           <span className={`rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-widest ${medal.badge}`}>
                             {medal.label}
                           </span>
                         )}
                       </div>
+
                       <div className="mt-1 flex items-center justify-between">
                         <div className="text-3xl font-black tabular-nums text-white font-outfit">
                           {fmtClock(s.at)}

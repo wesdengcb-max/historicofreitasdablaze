@@ -88,6 +88,7 @@ export type Database = {
           analise: string
           created_at: string | null
           id: string
+          is_verified: boolean | null
           minuto_alvo: string
           nivel: string
           predicao_horario: string
@@ -98,6 +99,7 @@ export type Database = {
           analise: string
           created_at?: string | null
           id?: string
+          is_verified?: boolean | null
           minuto_alvo: string
           nivel: string
           predicao_horario: string
@@ -108,6 +110,7 @@ export type Database = {
           analise?: string
           created_at?: string | null
           id?: string
+          is_verified?: boolean | null
           minuto_alvo?: string
           nivel?: string
           predicao_horario?: string
