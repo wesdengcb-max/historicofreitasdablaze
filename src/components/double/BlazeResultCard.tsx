@@ -5,7 +5,7 @@ import type { StoredSignal } from "@/lib/signalsStore";
 
 export const BLAZE_CARD_W = 54;
 export const BLAZE_CARD_TOP_H = 54;
-export const BLAZE_GAP_X = 6;
+export const BLAZE_GAP_X = 10;
 export const BLAZE_GAP_Y = 16;
 
 const PALETTE: Record<Color, { bg: string; border: string; ring: string; fg: string }> = {
