@@ -876,12 +876,7 @@ function Index() {
   return (
     <div className="relative flex h-screen w-full bg-[#080808] text-white overflow-hidden">
       {/* Sidebar lateral fixa com transição suave - Mobile overlay support */}
-      <div className={cn(
-        "fixed inset-y-0 left-0 z-50 transition-all duration-300 ease-in-out lg:relative lg:z-0 lg:block lg:shrink-0",
-        isCollapsed ? "w-0 lg:w-[80px]" : "w-[260px]"
-      )}>
-        <Sidebar />
-      </div>
+      <Sidebar />
 
       {/* Background overlay for mobile when menu is open */}
       {!isCollapsed && (
@@ -892,7 +887,7 @@ function Index() {
       )}
 
       {/* Área principal scrollable - flex-1 garante que ocupa o resto do espaço */}
-      <div className="flex flex-1 flex-col min-w-0 overflow-hidden">
+      <div className="flex flex-1 flex-col min-w-0 overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10 hover:scrollbar-thumb-white/20">
         <AppHeader />
         
         <div className="flex-1 overflow-y-auto scrollbar-none">
@@ -918,7 +913,7 @@ function Index() {
               </Card>
             </main>
           ) : (
-            <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8 lg:py-8">
+            <main className="mx-auto flex w-full max-w-[1920px] flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8 lg:py-8">
           {/* Novas métricas estilo Blaze Dashboard */}
           <LiveStats 
             total={total}
@@ -1257,14 +1252,19 @@ function Index() {
                       : "Nenhum resultado no período selecionado."}
                   </div>
                 ) : viewMode === "colunas" ? (
-                  <div className="history-scroll w-full overflow-x-auto p-1 sm:p-2 lg:p-3 no-scrollbar">
-                    <div className="flex flex-col gap-0 min-w-[1200px] w-full">
+                  <div className="history-scroll w-full overflow-x-auto p-1 sm:p-2 lg:p-3 scrollbar-none">
+                    <div className="flex flex-col gap-0 w-full min-w-[1200px]">
                       {/* Cabeçalho 0-9 interno para Colunas Fixas */}
-                      <div className="grid grid-cols-10 gap-[8px] mb-1 sticky top-0 z-10 bg-[#0A0A0A]/80 backdrop-blur-sm w-full">
+                      <div className="grid grid-cols-10 gap-x-2 sm:gap-x-3 mb-1 sticky top-0 z-10 bg-[#0A0A0A]/80 backdrop-blur-sm w-full">
                         {Array.from({ length: 10 }).map((_, ci) => (
                           <button
                             key={`header-inner-${ci}`}
-                            className={`flex h-[23px] w-full items-center justify-center rounded-[6px] border border-white/5 text-[14px] font-bold tabular-nums transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-red-500 text-white shadow-[0_0_10px_rgba(239,68,68,0.4)]" : "bg-white/[0.03] text-white/40 hover:bg-white/10"}`}
+                            className={cn(
+                              "flex h-8 w-full items-center justify-center rounded-lg border text-[10px] font-black uppercase tracking-widest transition-all",
+                              highlightKey === `col-${ci}`
+                                ? "border-primary/40 bg-primary/20 text-white shadow-[0_0_15px_rgba(239,68,68,0.2)]"
+                                : "border-white/5 bg-white/[0.03] text-muted-foreground hover:border-white/20 hover:text-white"
+                            )}
                             onClick={() => {
                               const key = `col-${ci}`;
                               if (highlightKey === key) {
@@ -1273,11 +1273,9 @@ function Index() {
                                 return;
                               }
                               setHighlightKey(key);
-                              // Selecionar todos os números de ambas as pedras desta coluna (posição 0 e 1)
                               const next = new Set<number>();
                               gridRows.forEach(row => {
                                 const cells = row.cells[ci];
-                                // Pega os números das duas primeiras pedras da célula (pedra esquerda e pedra direita)
                                 if (cells[0]) next.add(cells[0].n);
                                 if (cells[1]) next.add(cells[1].n);
                               });
@@ -1291,7 +1289,7 @@ function Index() {
 
                       {gridRows.map((row) => (
                         <div key={row.key} className="flex flex-col gap-0 border-b border-white/[0.02] py-2">
-                          <div className="grid grid-cols-10 gap-[8px] relative w-full">
+                          <div className="grid grid-cols-10 gap-x-2 sm:gap-x-3 relative w-full">
                             {row.cells.map((cell, ci) => {
                             const [hh, mmPrefix] = row.label.split(":");
                             const hm = `${hh}:${mmPrefix[0]}${ci}`;
@@ -1322,17 +1320,20 @@ function Index() {
                               <div
                                 key={ci}
                                 className="flex flex-col items-center justify-center p-0.5 sm:p-1"
-                                style={{ width: "100%", height: "80px", direction: "ltr" }}
+                                style={{ width: "100%", minHeight: "80px", direction: "ltr" }}
                               >
                                 <div 
-                                  className={`relative flex flex-col items-center pt-2 rounded-lg transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-primary/10" : ""}`}
+                                  className={cn(
+                                    "relative flex flex-col items-center pt-2 rounded-lg transition-all duration-300 w-full",
+                                    highlightKey === `col-${ci}` && "bg-primary/10"
+                                  )}
                                 >
                                   {badge && (
                                     <span className={`absolute top-0 z-10 inline-flex h-3 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-3.5 sm:px-1.5 sm:text-[8px] ${badgeCls}`}>
                                       {badge.label}
                                     </span>
                                   )}
-                                  <div className="relative flex h-[56px] items-start gap-[12px]">
+                                  <div className="relative flex min-h-[56px] items-start gap-x-2 sm:gap-x-3">
                                     {(cell.length >= 2
                                       ? [cell[0], cell[1]]
                                       : cell.length === 1
