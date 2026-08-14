@@ -874,7 +874,7 @@ function Index() {
 
 
   return (
-    <div className="relative flex min-h-screen w-full bg-[#080808] text-white overflow-hidden">
+    <div className="relative flex h-screen w-full bg-[#080808] text-white overflow-hidden">
       {/* Sidebar lateral fixa com transição suave - Mobile overlay support */}
       <Sidebar />
 
@@ -887,7 +887,7 @@ function Index() {
       )}
 
       {/* Área principal scrollable - flex-1 garante que ocupa o resto do espaço */}
-      <div className="flex flex-1 flex-col min-w-0 overflow-hidden">
+      <div className="flex flex-1 flex-col min-w-0 overflow-y-auto scrollbar-none">
         <AppHeader />
         
         <div className="flex-1 overflow-y-auto scrollbar-none">
