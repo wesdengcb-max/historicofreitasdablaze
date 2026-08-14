@@ -147,7 +147,7 @@ export default function SinaisSection() {
   const [formEntry, setFormEntry] = useState<"1" | "2">("1");
   const [formColor, setFormColor] = useState<Color>("red");
 
-  const [auditFilter, setAuditFilter] = useState<"hoje" | "geral">("hoje");
+  const [auditFilter, setAuditFilter] = useState<"hoje" | "geral">("geral");
   const [topStrategies, setTopStrategies] = useState<Array<{ analise: string, wins: number, total: number, pct: number }>>([]);
   const [auditStats, setAuditStats] = useState<{
     wins: number;
@@ -484,17 +484,17 @@ export default function SinaisSection() {
             </div>
             <div>
               <div className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60 font-outfit">
-                Dashboard de Auditoria
+                {auditFilter === "hoje" ? "Rodadas Atuais" : "Visão Geral (Top Estratégias)"}
               </div>
               <div className="flex items-center gap-2">
                 <h2 className="text-sm font-black text-white font-outfit uppercase">
-                  {auditStats.analysis}
+                  {auditFilter === "hoje" ? auditStats.analysis : "Catalogação Diária"}
                 </h2>
                 <span className="text-[10px] text-muted-foreground">·</span>
                 <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
-                  Assertividade Binária
+                  {auditFilter === "hoje" ? "Assertividade Binária" : "Ranking de Assertividade"}
                 </span>
-                {auditStats.tendency && (
+                {auditFilter === "hoje" && auditStats.tendency && (
                   <>
                     <span className="text-[10px] text-muted-foreground">·</span>
                     <span className="flex items-center gap-1 text-[10px] font-black text-orange-500 animate-pulse">
