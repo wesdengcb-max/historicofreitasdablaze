@@ -16,7 +16,7 @@ export const AppHeader = memo(function AppHeader() {
           className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-[#1A1A1A] text-white transition hover:bg-red-500 shadow-2xl ring-2 ring-black/80 group"
         >
           <div className="flex items-center justify-center transition-transform group-active:scale-90">
-            <Menu className="h-5 w-5" />
+            {isCollapsed ? <PanelLeftOpen className="h-5 w-5" /> : <PanelLeftClose className="h-5 w-5" />}
           </div>
         </button>
         
