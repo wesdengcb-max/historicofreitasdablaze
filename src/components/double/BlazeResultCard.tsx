@@ -3,9 +3,9 @@ import brancoTile from "@/assets/branco-tile.png.asset.json";
 import type { Color } from "./types";
 import type { StoredSignal } from "@/lib/signalsStore";
 
-export const BLAZE_CARD_W = 54;
-export const BLAZE_CARD_TOP_H = 54;
-export const BLAZE_GAP_X = 6;
+export const BLAZE_CARD_W = 58;
+export const BLAZE_CARD_TOP_H = 58;
+export const BLAZE_GAP_X = 2;
 export const BLAZE_GAP_Y = 16;
 
 const PALETTE: Record<Color, { bg: string; border: string; ring: string; fg: string }> = {
