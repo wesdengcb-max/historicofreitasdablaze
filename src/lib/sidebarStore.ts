@@ -10,7 +10,7 @@ interface SidebarState {
 export const useSidebarStore = create<SidebarState>()(
   persist(
     (set) => ({
-      isCollapsed: true,
+      isCollapsed: false, // Iniciar aberto por padrão no PC
       toggle: () => set((state: SidebarState) => ({ isCollapsed: !state.isCollapsed })),
       setCollapsed: (isCollapsed: boolean) => set({ isCollapsed }),
     }),
