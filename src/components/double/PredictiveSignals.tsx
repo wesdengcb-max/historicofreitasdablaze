@@ -150,40 +150,55 @@ export function PredictiveSignals() {
   }, []);
 
   const engine = useMemo(() => {
-    const a1 = buildA1(rows);
-    const a2 = buildA2(rows);
-    const a3 = buildA3(rows);
-    const a4 = buildA4(rows);
-    const a5 = buildA5(rows);
-    const a6 = buildA6(rows);
-    const a7 = buildA7(rows);
-    return { 1: a1, 2: a2, 3: a3, 4: a4, 5: a5, 6: a6, 7: a7 } as Record<1 | 2 | 3 | 4 | 5 | 6 | 7, Cycle[]>;
+    const main: Record<number, Cycle[]> = {
+      1: buildA1(rows),
+      2: buildA2(rows),
+      3: buildA3(rows),
+      4: buildA4(rows),
+      5: buildA5(rows),
+      6: buildA6(rows),
+      7: buildA7(rows),
+    };
+    const secondary: Record<number, Cycle[]> = {};
+    for (let i = 1; i <= 9; i++) {
+      secondary[100 + i] = buildSecondary(rows, i);
+    }
+    return { ...main, ...secondary } as Record<number, Cycle[]>;
   }, [rows]);
 
   /** Ciclos em aberto (status < MAX_ZEROS) por análise + valor. */
   const active = useMemo(() => {
-    const out: Array<{ analysis: 1 | 2 | 3 | 4 | 5 | 6 | 7; value: number; open: Cycle }> = [];
-    ([1, 2, 3, 4, 5, 6, 7] as const).forEach((a) => {
+    const out: Array<{ analysis: number; value: number; open: Cycle }> = [];
+    const mainIds = [1, 2, 3, 4, 5, 6, 7];
+    mainIds.forEach((a) => {
       const latest = latestByValue(engine[a]);
       latest.forEach((cycle, value) => {
-        // Trava de Quarentena (Gatilho Morto): suspender se último gatilho teve ZERO brancos ou timeout
         const hist = engine[a].filter(c => c.value === value);
         if (hist.length > 0) {
            const last = hist[hist.length - 1];
            const now = new Date().getTime();
            const triggerTime = new Date(last.triggerAt).getTime();
            const isTimedOut = now - triggerTime > (TIMEOUT_MINUTES * 60000);
-           
-           // Se o último gatilho encerrado não teve brancos (está aberto e atingiu limite)
-           // Ou se ele expirou por timeout sem acertos.
            if (last.gaps.length === 0 && isTimedOut) return;
         }
-
         if (cycle.gaps.length < MAX_ZEROS) out.push({ analysis: a, value, open: cycle });
       });
     });
     return out;
   }, [engine]);
+
+  const secondaryActive = useMemo(() => {
+    const out: Array<{ analysis: number; value: number; open: Cycle }> = [];
+    for (let i = 1; i <= 9; i++) {
+      const a = 100 + i;
+      const latest = latestByValue(engine[a]);
+      latest.forEach((cycle, value) => {
+        if (cycle.gaps.length < MAX_ZEROS) out.push({ analysis: a, value, open: cycle });
+      });
+    }
+    return out;
+  }, [engine]);
+
 
   const hasOpportunity = active.length > 0;
 
