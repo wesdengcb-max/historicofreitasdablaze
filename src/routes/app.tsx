@@ -874,14 +874,9 @@ function Index() {
 
 
   return (
-    <div className="relative flex h-screen w-full bg-[#080808] text-white overflow-hidden">
+    <div className="relative flex min-h-screen w-full bg-[#080808] text-white overflow-hidden">
       {/* Sidebar lateral fixa com transição suave - Mobile overlay support */}
-      <div className={cn(
-        "fixed inset-y-0 left-0 z-50 transition-all duration-300 ease-in-out lg:relative lg:z-0 lg:block lg:shrink-0",
-        isCollapsed ? "w-0 lg:w-[80px]" : "w-[260px]"
-      )}>
-        <Sidebar />
-      </div>
+      <Sidebar />
 
       {/* Background overlay for mobile when menu is open */}
       {!isCollapsed && (
