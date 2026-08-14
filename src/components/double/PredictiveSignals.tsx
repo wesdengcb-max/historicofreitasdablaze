@@ -410,8 +410,8 @@ export function PredictiveSignals() {
 
     // Secondary Verification Selo Azul Logic
     const secondaryProjections = new Map<number, Set<number>>(); // time -> values
-    for (const item of secondaryActive) {
-      const hist = engine[item.analysis].filter((c: Cycle) => c.value === item.value).slice(-6);
+    for (const item of (secondaryActive as any)) {
+      const hist = engine[item.analysis].filter((c: any) => c.value === item.value).slice(-6);
       if (hist.length < 6) continue;
       const top1 = computeTop(hist, 1)[0];
       if (!top1) continue;
@@ -419,6 +419,7 @@ export function PredictiveSignals() {
       if (!secondaryProjections.has(at)) secondaryProjections.set(at, new Set());
       secondaryProjections.get(at)!.add(item.value);
     }
+
 
 
     const finalM1 = unifiedM1.map(s => {
