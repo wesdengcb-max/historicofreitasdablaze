@@ -239,7 +239,7 @@ const ColumnBlock = memo(function ColumnBlock({
 
   return (
     <div
-      className={`flex min-w-[120px] flex-col gap-y-5 rounded-lg border border-transparent p-1 transition-colors duration-300 ${
+      className={`flex min-w-[100px] flex-col gap-y-5 rounded-lg border border-transparent p-0 transition-colors duration-300 ${
         isActive ? "bg-primary/10" : ""
       }`}
     >
@@ -281,7 +281,7 @@ const BlazeResultCardWrapper = memo(function BlazeResultCardWrapper({
   exibirSegundos,
   signalsByHM,
 }: any) {
-  if (!item) return <div className="h-[68px] w-[48px]" />;
+  if (!item) return <div className="h-[65px] w-[48px]" />;
   return (
     <div className="flex flex-col items-center">
       <BlazeResultCard
@@ -876,7 +876,12 @@ function Index() {
   return (
     <div className="relative flex h-screen w-full bg-[#080808] text-white overflow-hidden">
       {/* Sidebar lateral fixa com transição suave - Mobile overlay support */}
-      <Sidebar />
+      <div className={cn(
+        "fixed inset-y-0 left-0 z-50 transition-all duration-300 ease-in-out lg:relative lg:z-0 lg:block lg:shrink-0",
+        isCollapsed ? "w-0 lg:w-[80px]" : "w-[260px]"
+      )}>
+        <Sidebar />
+      </div>
 
       {/* Background overlay for mobile when menu is open */}
       {!isCollapsed && (
@@ -887,7 +892,7 @@ function Index() {
       )}
 
       {/* Área principal scrollable - flex-1 garante que ocupa o resto do espaço */}
-      <div className="flex flex-1 flex-col min-w-0 overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10 hover:scrollbar-thumb-white/20">
+      <div className="flex flex-1 flex-col min-w-0 overflow-hidden">
         <AppHeader />
         
         <div className="flex-1 overflow-y-auto scrollbar-none">
@@ -898,7 +903,7 @@ function Index() {
           ) : section === "estrategias" ? (
             <Suspense fallback={<SectionFallback />}><EstrategiasSection /></Suspense>
           ) : section !== "dashboard" ? (
-            <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-5 px-4 py-10 sm:gap-6 sm:px-6 sm:py-16">
+            <main className="mx-auto flex w-full max-w-[1880px] flex-col gap-5 px-4 py-10 sm:gap-6 sm:px-6 sm:py-16">
               <Card delay={0.05}>
                 <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
                   <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
@@ -913,7 +918,7 @@ function Index() {
               </Card>
             </main>
           ) : (
-            <main className="mx-auto flex w-full max-w-[1920px] flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8 lg:py-8">
+            <main className="mx-auto flex w-full max-w-[1880px] flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8 lg:py-8">
           {/* Novas métricas estilo Blaze Dashboard */}
           <LiveStats 
             total={total}
@@ -1148,7 +1153,7 @@ function Index() {
             {/* Cabeçalho das estatísticas por coluna */}
             {viewMode === "colunas" && contarColunas && (
               <div className="mb-3 w-full border-b border-white/5 pb-3 overflow-x-auto scrollbar-none">
-                <div className="grid grid-cols-10 gap-[8px] min-w-[1200px] w-full">
+                <div className="grid grid-cols-10 gap-[1px] w-full">
                   {Array.from({ length: 10 }).map((_, ci) => {
                     const stats = colStats[ci];
                     return (
@@ -1252,19 +1257,14 @@ function Index() {
                       : "Nenhum resultado no período selecionado."}
                   </div>
                 ) : viewMode === "colunas" ? (
-                  <div className="history-scroll w-full overflow-x-auto p-1 sm:p-2 lg:p-3 scrollbar-none">
-                    <div className="flex flex-col gap-0 w-full min-w-[1200px]">
+                  <div className="history-scroll w-full overflow-x-auto p-1 sm:p-2 lg:p-3 no-scrollbar">
+                    <div className="flex flex-col gap-0 w-full">
                       {/* Cabeçalho 0-9 interno para Colunas Fixas */}
-                      <div className="grid grid-cols-10 gap-x-2 sm:gap-x-3 mb-1 sticky top-0 z-10 bg-[#0A0A0A]/80 backdrop-blur-sm w-full">
+                      <div className="grid grid-cols-10 gap-[1px] mb-1 sticky top-0 z-10 bg-[#0A0A0A]/80 backdrop-blur-sm w-full">
                         {Array.from({ length: 10 }).map((_, ci) => (
                           <button
                             key={`header-inner-${ci}`}
-                            className={cn(
-                              "flex h-8 w-full items-center justify-center rounded-lg border text-[10px] font-black uppercase tracking-widest transition-all",
-                              highlightKey === `col-${ci}`
-                                ? "border-primary/40 bg-primary/20 text-white shadow-[0_0_15px_rgba(239,68,68,0.2)]"
-                                : "border-white/5 bg-white/[0.03] text-muted-foreground hover:border-white/20 hover:text-white"
-                            )}
+                            className={`flex h-[23px] w-full items-center justify-center rounded-[6px] border border-white/5 text-[14px] font-bold tabular-nums transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-red-500 text-white shadow-[0_0_10px_rgba(239,68,68,0.4)]" : "bg-white/[0.03] text-white/40 hover:bg-white/10"}`}
                             onClick={() => {
                               const key = `col-${ci}`;
                               if (highlightKey === key) {
@@ -1273,9 +1273,11 @@ function Index() {
                                 return;
                               }
                               setHighlightKey(key);
+                              // Selecionar todos os números de ambas as pedras desta coluna (posição 0 e 1)
                               const next = new Set<number>();
                               gridRows.forEach(row => {
                                 const cells = row.cells[ci];
+                                // Pega os números das duas primeiras pedras da célula (pedra esquerda e pedra direita)
                                 if (cells[0]) next.add(cells[0].n);
                                 if (cells[1]) next.add(cells[1].n);
                               });
@@ -1288,8 +1290,8 @@ function Index() {
                       </div>
 
                       {gridRows.map((row) => (
-                        <div key={row.key} className="flex flex-col gap-0 border-b border-white/[0.02] py-2">
-                          <div className="grid grid-cols-10 gap-x-2 sm:gap-x-3 relative w-full">
+                        <div key={row.key} className="flex flex-col gap-0 border-b border-white/[0.02]">
+                          <div className="grid grid-cols-10 gap-[1px] relative w-full">
                             {row.cells.map((cell, ci) => {
                             const [hh, mmPrefix] = row.label.split(":");
                             const hm = `${hh}:${mmPrefix[0]}${ci}`;
@@ -1316,24 +1318,21 @@ function Index() {
                                 : badge?.tone === "margem"
                                   ? "bg-amber-400 text-black border border-amber-200 shadow-[0_2px_8px_rgba(245,158,11,0.35)]"
                                   : "bg-red-500 text-white border border-red-300 shadow-[0_2px_8px_rgba(239,68,68,0.35)]";
-                            return (
-                              <div
-                                key={ci}
-                                className="flex flex-col items-center justify-center p-0.5 sm:p-1"
-                                style={{ width: "100%", minHeight: "80px", direction: "ltr" }}
-                              >
+                              return (
+                                <div
+                                  key={ci}
+                                  className="flex flex-col items-center justify-center p-0"
+                                  style={{ width: "100%", height: "70px", direction: "ltr" }}
+                                >
                                 <div 
-                                  className={cn(
-                                    "relative flex flex-col items-center pt-2 rounded-lg transition-all duration-300 w-full",
-                                    highlightKey === `col-${ci}` && "bg-primary/10"
-                                  )}
+                                  className={`relative flex flex-col items-center pt-2 rounded-lg transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-primary/10" : ""}`}
                                 >
                                   {badge && (
                                     <span className={`absolute top-0 z-10 inline-flex h-3 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-3.5 sm:px-1.5 sm:text-[8px] ${badgeCls}`}>
                                       {badge.label}
                                     </span>
                                   )}
-                                  <div className="relative flex min-h-[56px] items-start gap-x-2 sm:gap-x-3">
+                                  <div className="relative flex h-[60px] items-start gap-[1px]">
                                     {(cell.length >= 2
                                       ? [cell[0], cell[1]]
                                       : cell.length === 1
@@ -1657,6 +1656,7 @@ const TipMinerCard = memo(function TipMinerCard({
           </div>
         )}
       </button>
+
 
       {showTime && (
         <span
