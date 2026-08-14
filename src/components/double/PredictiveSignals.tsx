@@ -325,9 +325,98 @@ export function PredictiveSignals() {
     m2.sort((a, b) => a.times[0].getTime() - b.times[0].getTime());
     setMode2(m2);
 
-    // Sync with global store for SinaisSection
+    // ---- Level Elevation and Unification Logic ----
+    const unifiedM1: Mode1Signal[] = [];
+    const sortedM1 = Array.from(byTime.entries()).sort((a, b) => a[0] - b[0]);
+    
+    for (let i = 0; i < sortedM1.length; i++) {
+      const [t, info] = sortedM1[i];
+      const next1 = sortedM1[i + 1];
+      const next2 = sortedM1[i + 2];
+      
+      const isConsecutive3 = next1 && next2 && 
+        Math.abs(next1[0] - t) <= 60000 && 
+        Math.abs(next2[0] - next1[0]) <= 60000;
+      
+      const isConsecutive2 = !isConsecutive3 && next1 && 
+        Math.abs(next1[0] - t) <= 60000;
+
+      if (isConsecutive3) {
+        // Use Middle Time, elevate level
+        const middleTime = next1[0];
+        const combinedSources = [...info.sources, ...next1[1].sources, ...next2[1].sources];
+        const combinedAnalyses = new Set([...info.analyses, ...next1[1].analyses, ...next2[1].analyses]);
+        const maxPct = Math.max(info.pct, next1[1].pct, next2[1].pct);
+        
+        unifiedM1.push({
+          key: `m1-c3-${middleTime}`,
+          title: `Supremo · ${info.values.join("+")}`,
+          at: new Date(middleTime),
+          pct: maxPct,
+          label: info.label,
+          analysisCount: combinedAnalyses.size + 4, // level elevation
+          sources: combinedSources,
+          isHighTendency: info.isHighTendency || next1[1].isHighTendency || next2[1].isHighTendency,
+          isVerified: false // will be checked below
+        });
+        i += 2; // skip next two
+      } else if (isConsecutive2) {
+        // Use highest pct time, elevate level
+        const best = info.pct >= next1[1].pct ? { t, info } : { t: next1[0], info: next1[1] };
+        const combinedSources = [...info.sources, ...next1[1].sources];
+        const combinedAnalyses = new Set([...info.analyses, ...next1[1].analyses]);
+        
+        unifiedM1.push({
+          key: `m1-c2-${best.t}`,
+          title: `Confluência · ${best.info.values.join("+")}`,
+          at: new Date(best.t),
+          pct: best.info.pct,
+          label: best.info.label,
+          analysisCount: combinedAnalyses.size + 1, // level elevation
+          sources: combinedSources,
+          isHighTendency: info.isHighTendency || next1[1].isHighTendency,
+          isVerified: false
+        });
+        i += 1;
+      } else {
+        unifiedM1.push({
+          key: `m1-${t}`,
+          title: `Análise ${info.values.join(" + ")}`,
+          at: new Date(t),
+          pct: info.pct,
+          label: info.label,
+          analysisCount: info.analyses.size,
+          sources: info.sources,
+          isHighTendency: info.isHighTendency,
+          isVerified: false
+        });
+      }
+    }
+
+    // Secondary Verification Selo Azul Logic
+    const secondaryProjections = new Map<number, Set<number>>(); // time -> values
+    for (const item of secondaryActive) {
+      const hist = engine[item.analysis].filter(c => c.value === item.value).slice(-6);
+      if (hist.length < 6) continue;
+      const top1 = computeTop(hist, 1)[0];
+      if (!top1) continue;
+      const at = addMinutes(item.open.triggerAt, top1.m).getTime();
+      if (!secondaryProjections.has(at)) secondaryProjections.set(at, new Set());
+      secondaryProjections.get(at)!.add(item.value);
+    }
+
+    const finalM1 = unifiedM1.map(s => {
+      const t = s.at.getTime();
+      const secValues = secondaryProjections.get(t);
+      const isVerified = secValues && s.sources.some(src => secValues.has(src.value));
+      return { ...s, isVerified };
+    });
+
+    setMode1(finalM1);
+
+    // Sync with global store
     const syncSignals: any[] = [
-      ...m1.map(s => ({
+      ...finalM1.map(s => ({
         key: s.key,
         time: fmtClock(s.at),
         pct: s.pct,
@@ -336,7 +425,8 @@ export function PredictiveSignals() {
         medal: getMedalStyles(s.analysisCount)?.label,
         entryDate: s.at,
         outcome: "pending",
-        isHighTendency: s.isHighTendency
+        isHighTendency: s.isHighTendency,
+        isVerified: s.isVerified
       })),
       ...m2.map(s => ({
         key: s.key,
@@ -352,6 +442,7 @@ export function PredictiveSignals() {
     ].sort((a, b) => a.entryDate.getTime() - b.entryDate.getTime());
 
     setPredictiveSignals(syncSignals);
+
   }, [active, engine]);
 
   // Sync projections with global store for SinaisSection automatically
@@ -523,13 +614,21 @@ export function PredictiveSignals() {
                       }`}
                     >
                       <div className="flex items-center justify-between gap-2">
-                        <div className="text-xs font-semibold text-muted-foreground opacity-80">{s.title}</div>
+                        <div className="flex items-center gap-2">
+                          <div className="text-xs font-semibold text-muted-foreground opacity-80">{s.title}</div>
+                          {s.isVerified && (
+                            <span className="flex items-center gap-0.5 rounded-full bg-blue-500/20 px-1.5 py-0.5 text-[8px] font-black text-blue-400 border border-blue-500/30">
+                              ✓ Verificado
+                            </span>
+                          )}
+                        </div>
                         {medal && (
                           <span className={`rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-widest ${medal.badge}`}>
                             {medal.label}
                           </span>
                         )}
                       </div>
+
                       <div className="mt-1 flex items-center justify-between">
                         <div className="text-3xl font-black tabular-nums text-white font-outfit">
                           {fmtClock(s.at)}
