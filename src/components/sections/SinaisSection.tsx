@@ -403,7 +403,8 @@ export default function SinaisSection() {
               predicao_horario: s.time,
               status: status,
               minuto_alvo: new Date(entryTime).toISOString(),
-              is_verified: s.isVerified || false
+              is_verified: s.isVerified ? (true as any) : (false as any)
+
             });
             return res;
           }
@@ -418,7 +419,8 @@ export default function SinaisSection() {
               predicao_horario: s.time,
               status: 'LOSS',
               minuto_alvo: new Date(entryTime).toISOString(),
-              is_verified: s.isVerified || false
+              is_verified: s.isVerified ? (true as any) : (false as any)
+
             });
             return res;
           }
