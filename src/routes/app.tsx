@@ -1290,7 +1290,7 @@ function Index() {
                       </div>
 
                       {gridRows.map((row) => (
-                        <div key={row.key} className="flex flex-col gap-0 border-b border-white/[0.02] py-2">
+                        <div key={row.key} className="flex flex-col gap-0 border-b border-white/[0.02]">
                           <div className="grid grid-cols-10 gap-[2px] relative w-full">
                             {row.cells.map((cell, ci) => {
                             const [hh, mmPrefix] = row.label.split(":");
@@ -1318,12 +1318,12 @@ function Index() {
                                 : badge?.tone === "margem"
                                   ? "bg-amber-400 text-black border border-amber-200 shadow-[0_2px_8px_rgba(245,158,11,0.35)]"
                                   : "bg-red-500 text-white border border-red-300 shadow-[0_2px_8px_rgba(239,68,68,0.35)]";
-                            return (
-                              <div
-                                key={ci}
-                                className="flex flex-col items-center justify-center p-0.5 sm:p-1"
-                                style={{ width: "100%", height: "80px", direction: "ltr" }}
-                              >
+                              return (
+                                <div
+                                  key={ci}
+                                  className="flex flex-col items-center justify-center p-0"
+                                  style={{ width: "100%", height: "80px", direction: "ltr" }}
+                                >
                                 <div 
                                   className={`relative flex flex-col items-center pt-2 rounded-lg transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-primary/10" : ""}`}
                                 >
