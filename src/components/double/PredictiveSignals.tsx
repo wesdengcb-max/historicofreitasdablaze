@@ -579,6 +579,7 @@ export function PredictiveSignals() {
                               💎 RARO
                             </span>
                           )}
+
                         </div>
                         {medal && (
                           <span className={`rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-widest ${medal.badge}`}>

@@ -641,6 +641,11 @@ export default function SinaisSection() {
                     <div className="font-black text-lg text-white font-outfit">{s.time}</div>
                     <div className="flex items-center gap-1.5 mt-0.5">
                       <div className="text-[9px] text-muted-foreground font-mono tracking-widest uppercase">PROJETADO</div>
+                      {s.confluence.split(',').map((tag: string, i: number) => (
+                        <span key={i} className="text-[8px] px-1 rounded bg-white/5 border border-white/10 text-white/40 font-mono">
+                          {tag.trim()}
+                        </span>
+                      ))}
                       {s.isHighTendency && (
                         <span className="flex items-center gap-1 rounded bg-red-500/20 px-1 py-0.5 text-[8px] font-black text-red-400 animate-pulse border border-red-500/30">
                           🔥 ALTA
@@ -648,6 +653,7 @@ export default function SinaisSection() {
                       )}
                     </div>
                   </td>
+
                   <td className="px-3 py-4">
                     <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-2.5 py-1">
                       <span className="text-sm font-black text-primary font-outfit">{s.pct.toFixed(1)}%</span>
