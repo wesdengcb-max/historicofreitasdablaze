@@ -247,7 +247,7 @@ export function PredictiveSignals() {
           analyses: new Set([item.analysis]),
           pct: top1.pct, 
           label: top1.label,
-          sources: [{ analysis: item.analysis as 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9, value: item.value }],
+          sources: [{ analysis: item.analysis, value: item.value }],
           isHighTendency: isTendency
         });
       } else {
@@ -272,7 +272,7 @@ export function PredictiveSignals() {
           pct: info.pct,
           label: info.label,
           analysisCount: info.analyses.size,
-          sources: info.sources as Array<{ analysis: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9; value: number }>,
+          sources: info.sources,
           isHighTendency: info.isHighTendency
         };
       });
@@ -281,7 +281,7 @@ export function PredictiveSignals() {
     const usedTimes = new Set<number>(m1.map((s) => s.at.getTime()));
 
     // ---- Modo 2: Estratégia de Coincidência ----
-    type Proj = { analysis: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9; value: number; pct: number; top5: boolean };
+    type Proj = { analysis: number; value: number; pct: number; top5: boolean };
     const byMinute = new Map<number, Proj[]>();
 
     for (const item of active) {
@@ -295,7 +295,7 @@ export function PredictiveSignals() {
         if (at <= now.getTime()) return;
         const arr = byMinute.get(at) ?? [];
         arr.push({
-          analysis: item.analysis as 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9,
+          analysis: item.analysis,
           value: item.value,
           pct: g.pct,
           top5: idx < TOP5_DEPTH,
