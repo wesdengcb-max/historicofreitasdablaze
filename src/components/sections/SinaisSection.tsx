@@ -160,6 +160,9 @@ export default function SinaisSection() {
     total: number;
   }>({ wins: 0, losses: 0, pct: 0, tendency: false, analysis: "---", total: 0 });
 
+  const [activeTab, setActiveTab] = useState<'sinais' | 'analises'>('sinais');
+
+
 
 
   useEffect(() => {
