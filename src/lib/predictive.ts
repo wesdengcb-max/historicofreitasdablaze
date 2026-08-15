@@ -175,10 +175,12 @@ export function buildA7(rows: Row[]): Cycle[] {
 
 /** 
  * ESTRATÉGIA A8 - BRANCO DUPLO (Gatilho: 2 Brancos Seguidos - ⚪⚪)
- * deltaMinutes = (Hora_B1 + Minuto_B1 + Minuto_B2) + Pedra_Antes + Pedra_Depois
+ * Gatilhos G1-G6 baseados em hora/minuto e pedras adjacentes.
+ * Delta = G6 + G4 + G5
  */
 export function buildA8(rows: Row[]): Cycle[] {
   const out: Cycle[] = [];
+  // Percorremos o histórico procurando por dois brancos seguidos
   for (let i = 2; i < rows.length - 1; i++) {
     const b1 = Number(rows[i - 1].roll);
     const b2 = Number(rows[i].roll);
@@ -191,15 +193,16 @@ export function buildA8(rows: Row[]): Cycle[] {
     const g1 = dt1.getHours();
     const g2 = dt1.getMinutes();
     const g3 = dt2.getMinutes();
-    const g4 = Number(rows[i - 2].roll); // Pedra antes do 1º branco
-    const g5 = Number(rows[i + 1].roll); // Pedra depois do 2º branco
-    const g6 = g1 + g2 + g3;
+    const g4 = Number(rows[i - 2].roll); // Pedra anterior ao 1º branco
+    const g5 = Number(rows[i + 1].roll); // Pedra posterior ao 2º branco
+    const g6 = g1 + g2 + g3; // Soma Temporal
 
     if (!Number.isFinite(g4) || !Number.isFinite(g5)) continue;
 
     const delta = g6 + g4 + g5;
-    // Criamos um "gaps" fake que contém apenas o delta calculado, 
-    // para o motor de auditoria tratar como projeção.
+    
+    // Projeção: Horário Alvo = Timestamp do 2º Branco + deltaMinutes.
+    // Usamos 'gaps' para transportar o delta para o motor.
     out.push({ 
       value: 0, 
       analysis: 8, 
@@ -211,8 +214,9 @@ export function buildA8(rows: Row[]): Cycle[] {
 }
 
 /** 
- * ESTRATÉGIA A9 - PÃO DE BRANCO (Gatilho: ⚪🔴⚪ / ⚪⚫⚪)
- * deltaMinutes = 30 + Pedra_Carne + Pedra_Antes + Pedra_Depois
+ * ESTRATÉGIA A9 - PÃO DE BRANCO (Gatilho: Branco + Cor Normal + Branco - ⚪🔴⚪)
+ * Gatilhos G1-G6 com peso fixo 30 e pedra "Carne".
+ * Delta = 30 + G2 + G3 + G4
  */
 export function buildA9(rows: Row[]): Cycle[] {
   const out: Cycle[] = [];
@@ -221,19 +225,23 @@ export function buildA9(rows: Row[]): Cycle[] {
     const carne = Number(rows[i].roll);
     const b2 = Number(rows[i + 1].roll);
 
+    // Gatilho: Branco + Cor Normal + Branco
     if (b1 !== 0 || b2 !== 0 || carne === 0) continue;
 
     const dtCarne = parseUtcDate(rows[i].created_at);
     if (Number.isNaN(dtCarne.getTime())) continue;
 
-    const g1 = 30; // Peso Fixo
-    const g2 = carne;
-    const g3 = Number(rows[i - 2].roll); // Antes do 1º pão
-    const g4 = Number(rows[i + 2].roll); // Depois do 2º pão
+    const g1 = 30; // Peso_Pães (fixo 30)
+    const g2 = carne; // Pedra_Carne
+    const g3 = Number(rows[i - 2].roll); // Pedra_Antes (anterior ao 1º pão)
+    const g4 = Number(rows[i + 2].roll); // Pedra_Depois (posterior ao 2º pão)
+    // G5 seria o timestamp da carne, G6 a soma. Seguimos a fórmula do delta:
     
     if (!Number.isFinite(g3) || !Number.isFinite(g4)) continue;
 
     const delta = g1 + g2 + g3 + g4;
+    
+    // Projeção: Horário Alvo = Timestamp da Carne + deltaMinutes.
     out.push({ 
       value: carne, 
       analysis: 9, 
