@@ -34,6 +34,7 @@ type Mode1Signal = {
   sources: Array<{ analysis: number; value: number }>;
   isHighTendency: boolean;
   isVerified?: boolean;
+  isRare?: boolean;
 
   outcome?: "pending" | "green" | "red";
   resultTime?: string;
@@ -48,6 +49,7 @@ type Mode2Signal = {
   analysisCount: number;
   isHighTendency: boolean;
   isVerified?: boolean;
+  isRare?: boolean;
 
   outcome?: "pending" | "green" | "red";
   resultTime?: string;
@@ -420,13 +422,22 @@ export function PredictiveSignals() {
       secondaryProjections.get(at)!.add(item.value);
     }
 
-
+    // Regra Incremental: Badge "Sinal RARO"
+    // Gatilho: 2 ou mais análises TOP 1 no mesmo minuto ou vizinhos
+    const isRareTime = (time: number) => {
+      let top1Count = 0;
+      for (const [t] of byTime) {
+        if (Math.abs(t - time) <= 60000) top1Count++;
+      }
+      return top1Count >= 2;
+    };
 
     const finalM1 = unifiedM1.map(s => {
       const t = s.at.getTime();
       const secValues = secondaryProjections.get(t);
       const isVerified = secValues && s.sources.some(src => secValues.has(src.value));
-      return { ...s, isVerified };
+      const isRare = isRareTime(t);
+      return { ...s, isVerified, isRare };
     });
 
     setMode1(finalM1);
@@ -447,7 +458,8 @@ export function PredictiveSignals() {
           entryDate: s.at,
           outcome: "pending",
           isHighTendency: s.isHighTendency,
-          isVerified: s.isVerified
+          isVerified: s.isVerified,
+          isRare: s.isRare
         })),
         ...mode2.map(s => ({
           key: s.key,
@@ -551,6 +563,11 @@ export function PredictiveSignals() {
                           {s.isVerified && (
                             <span className="flex items-center gap-0.5 rounded-full bg-blue-500/20 px-1.5 py-0.5 text-[8px] font-black text-blue-400 border border-blue-500/30">
                               ✓ Verificado
+                            </span>
+                          )}
+                          {s.isRare && (
+                            <span className="flex items-center gap-0.5 rounded-full bg-amber-500/20 px-1.5 py-0.5 text-[8px] font-black text-amber-400 border border-amber-500/30">
+                              🙌 RARO
                             </span>
                           )}
                         </div>
