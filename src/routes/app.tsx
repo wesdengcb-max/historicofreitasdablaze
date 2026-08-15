@@ -607,11 +607,18 @@ function Index() {
     if (!whiteAlert) return;
     setWhiteFlash(newestWhite);
     try {
-      const audio = new Audio("/branco-som.mp3");
-      audio.volume = 0.8;
-      audio.play().catch(e => console.error("Audio play failed:", e));
-    } catch {
-      /* noop */
+      // Usando a nova voz feminina solicitada pelo usuário
+      const audio = new Audio("/audio/voz-feminina-branco.mp3");
+      audio.volume = 1.0;
+      audio.play().catch(e => {
+        console.error("Audio play failed, trying fallback:", e);
+        // Fallback para o som antigo se o novo falhar por algum motivo
+        const fallback = new Audio("/branco-som.mp3");
+        fallback.volume = 0.8;
+        fallback.play().catch(err => console.error("Fallback audio failed:", err));
+      });
+    } catch (e) {
+      console.error("Audio error:", e);
     }
     const t = setTimeout(() => setWhiteFlash(null), 3000); // Reduzido para 3 segundos para sumir mais rápido
     return () => clearTimeout(t);
