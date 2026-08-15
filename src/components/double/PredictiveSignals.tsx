@@ -563,17 +563,23 @@ export function PredictiveSignals() {
                     >
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
-                          <div className="text-xs font-semibold text-muted-foreground opacity-80">{s.title}</div>
+                          <div className="text-xs font-semibold text-muted-foreground opacity-80 flex items-center gap-1.5">
+                            {s.title}
+                            <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-white/40">
+                              {s.sources[0]?.analysis ? `A${s.sources[0].analysis}` : "AUTO"}
+                            </span>
+                          </div>
                           {s.isVerified && (
                             <span className="flex items-center gap-0.5 rounded-full bg-blue-500/20 px-1.5 py-0.5 text-[8px] font-black text-blue-400 border border-blue-500/30">
-                              ✓ Verificado
+                              ✓ SELO AZUL
                             </span>
                           )}
                           {s.isRare && (
-                            <span className="flex items-center gap-0.5 rounded-full bg-amber-500/20 px-1.5 py-0.5 text-[8px] font-black text-amber-400 border border-amber-500/30">
-                              🙌 RARO
+                            <span className="flex items-center gap-0.5 rounded-full bg-cyan-500/20 px-1.5 py-0.5 text-[8px] font-black text-cyan-300 border border-cyan-500/30 shadow-[0_0_10px_rgba(6,182,212,0.2)]">
+                              💎 RARO
                             </span>
                           )}
+
                         </div>
                         {medal && (
                           <span className={`rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-widest ${medal.badge}`}>
@@ -636,7 +642,12 @@ export function PredictiveSignals() {
                       }`}
                     >
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-xs font-bold text-white uppercase tracking-tighter">{s.title}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-white uppercase tracking-tighter">{s.title}</span>
+                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-white/40">
+                            {s.sources[0]?.analysis ? `A${s.sources[0].analysis}` : "CONF"}
+                          </span>
+                        </div>
                         {medal ? (
                           <span className={`rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-widest ${medal.badge}`}>
                             {medal.label}
