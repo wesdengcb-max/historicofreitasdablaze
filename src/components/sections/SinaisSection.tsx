@@ -507,46 +507,8 @@ export default function SinaisSection() {
 
         {activeTab === 'sinais' ? (
           <>
-            {/* Roleta ao vivo */}
             <BlazeRoulette results={results} />
-            
-            {/* Gerador de sinais preditivos */}
             <PredictiveSignals />
-
-            {/* Resumo de Auditoria Rápido */}
-            <Card className="glass-card !p-0 overflow-hidden border-primary/20 bg-primary/[0.02]">
-              <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-4 bg-white/[0.02]">
-                <div className="flex items-center gap-4">
-                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
-                    <ShieldCheck className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <div className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60 font-outfit">
-                      Monitoramento em Tempo Real
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <h2 className="text-sm font-black text-white font-outfit uppercase">
-                        Auditoria FreitasWhite
-                      </h2>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-8">
-                  <div className="text-center">
-                    <div className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-1">Assertividade Média</div>
-                    <div className="text-xl font-black text-primary font-outfit">{auditStats.pct.toFixed(0)}%</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-1">Status</div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-black text-green-500 font-outfit">{auditStats.wins}W</span>
-                      <span className="text-white/10">/</span>
-                      <span className="text-xs font-black text-red-500 font-outfit">{auditStats.losses}L</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
           </>
         ) : (
           <AnalysesTab topStrategies={topStrategies} auditStats={auditStats} />
@@ -554,6 +516,7 @@ export default function SinaisSection() {
       </div>
 
       <div className={cn(activeTab === 'analises' ? 'hidden' : 'block', "space-y-8")}>
+
         {/* Top header da lista */}
         <div className="flex w-full flex-wrap items-start justify-between gap-4">
           <div className="min-w-0 flex-1">
