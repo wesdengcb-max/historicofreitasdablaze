@@ -174,6 +174,77 @@ export function buildA7(rows: Row[]): Cycle[] {
 }
 
 /** 
+ * ESTRATÉGIA A8 - BRANCO DUPLO (Gatilho: 2 Brancos Seguidos - ⚪⚪)
+ * deltaMinutes = (Hora_B1 + Minuto_B1 + Minuto_B2) + Pedra_Antes + Pedra_Depois
+ */
+export function buildA8(rows: Row[]): Cycle[] {
+  const out: Cycle[] = [];
+  for (let i = 2; i < rows.length - 1; i++) {
+    const b1 = Number(rows[i - 1].roll);
+    const b2 = Number(rows[i].roll);
+    if (b1 !== 0 || b2 !== 0) continue;
+
+    const dt1 = parseUtcDate(rows[i - 1].created_at);
+    const dt2 = parseUtcDate(rows[i].created_at);
+    if (Number.isNaN(dt1.getTime()) || Number.isNaN(dt2.getTime())) continue;
+
+    const g1 = dt1.getHours();
+    const g2 = dt1.getMinutes();
+    const g3 = dt2.getMinutes();
+    const g4 = Number(rows[i - 2].roll); // Pedra antes do 1º branco
+    const g5 = Number(rows[i + 1].roll); // Pedra depois do 2º branco
+    const g6 = g1 + g2 + g3;
+
+    if (!Number.isFinite(g4) || !Number.isFinite(g5)) continue;
+
+    const delta = g6 + g4 + g5;
+    // Criamos um "gaps" fake que contém apenas o delta calculado, 
+    // para o motor de auditoria tratar como projeção.
+    out.push({ 
+      value: 0, 
+      analysis: 8, 
+      triggerAt: dt2, 
+      gaps: [delta] 
+    });
+  }
+  return out;
+}
+
+/** 
+ * ESTRATÉGIA A9 - PÃO DE BRANCO (Gatilho: ⚪🔴⚪ / ⚪⚫⚪)
+ * deltaMinutes = 30 + Pedra_Carne + Pedra_Antes + Pedra_Depois
+ */
+export function buildA9(rows: Row[]): Cycle[] {
+  const out: Cycle[] = [];
+  for (let i = 2; i < rows.length - 2; i++) {
+    const b1 = Number(rows[i - 1].roll);
+    const carne = Number(rows[i].roll);
+    const b2 = Number(rows[i + 1].roll);
+
+    if (b1 !== 0 || b2 !== 0 || carne === 0) continue;
+
+    const dtCarne = parseUtcDate(rows[i].created_at);
+    if (Number.isNaN(dtCarne.getTime())) continue;
+
+    const g1 = 30; // Peso Fixo
+    const g2 = carne;
+    const g3 = Number(rows[i - 2].roll); // Antes do 1º pão
+    const g4 = Number(rows[i + 2].roll); // Depois do 2º pão
+    
+    if (!Number.isFinite(g3) || !Number.isFinite(g4)) continue;
+
+    const delta = g1 + g2 + g3 + g4;
+    out.push({ 
+      value: carne, 
+      analysis: 9, 
+      triggerAt: dtCarne, 
+      gaps: [delta] 
+    });
+  }
+  return out;
+}
+
+/** 
  * Análises Secundárias (#1 ao #9)
  * Utilizam a mesma lógica da A1 (leitura de pedra vs unidade do minuto),
  * mas deslocadas no tempo conforme a posição no histórico.
