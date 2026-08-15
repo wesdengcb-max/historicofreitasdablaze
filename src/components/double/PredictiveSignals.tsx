@@ -223,41 +223,57 @@ export function PredictiveSignals() {
       { values: number[]; analyses: Set<number>; pct: number; label: string; sources: Array<{ analysis: number; value: number }>; isHighTendency: boolean }
     >();
     for (const item of active) {
-      // Janela de Histórico Recente: Últimos 6 gatilhos
+      const isA8A9 = item.analysis === 8 || item.analysis === 9;
+      
+      // Janela de Histórico Recente: Últimos 6 gatilhos (exceto A8/A9 que são projeções diretas)
       const hist = engine[item.analysis].filter(c => c.value === item.value).slice(-6);
-      // Massa Crítica Mínima: 6 gatilhos
-      if (hist.length < MIN_GATILHOS) continue;
+      
+      let targetMinutes = 0;
+      let displayPct = 0;
+      let displayLabel = "";
 
-      const top1 = computeTop(hist, 1)[0];
-      if (!top1) continue;
-      
-      // FILTRO DE ASSERTIVIDADE RÍGIDO (Top 1 em 65%)
-      if (top1.pct < MIN_ASSERTIVIDADE_TOP1) continue;
-      
-      const at = addMinutes(item.open.triggerAt, top1.m);
+      if (isA8A9) {
+        // A8 e A9 transportam o delta diretamente no primeiro gap
+        targetMinutes = item.open.gaps[0] || 0;
+        displayPct = 100; // Estratégias matemáticas fixas
+        displayLabel = targetMinutes.toString();
+      } else {
+        // Massa Crítica Mínima: 6 gatilhos para estatística
+        if (hist.length < MIN_GATILHOS) continue;
+        const top1 = computeTop(hist, 1)[0];
+        if (!top1) continue;
+        // FILTRO DE ASSERTIVIDADE RÍGIDO (Top 1 em 65%)
+        if (top1.pct < MIN_ASSERTIVIDADE_TOP1) continue;
+        
+        targetMinutes = top1.m;
+        displayPct = top1.pct;
+        displayLabel = top1.label;
+      }
+
+      const at = addMinutes(item.open.triggerAt, targetMinutes);
       if (at.getTime() <= now.getTime()) continue; 
       const t = at.getTime();
 
-      const isTendency = checkHighTendency(engine[item.analysis], item.value);
+      const isTendency = isA8A9 ? true : checkHighTendency(engine[item.analysis], item.value);
 
       const cur = byTime.get(t);
       if (!cur) {
         byTime.set(t, { 
           values: [item.value], 
           analyses: new Set([item.analysis]),
-          pct: top1.pct, 
-          label: top1.label,
+          pct: displayPct, 
+          label: displayLabel,
           sources: [{ analysis: item.analysis, value: item.value }],
           isHighTendency: isTendency
         });
       } else {
         if (!cur.values.includes(item.value)) cur.values.push(item.value);
         cur.analyses.add(item.analysis);
-        cur.sources.push({ analysis: item.analysis as 1 | 2 | 3 | 4 | 5 | 6 | 7, value: item.value });
+        cur.sources.push({ analysis: item.analysis, value: item.value });
         if (isTendency) cur.isHighTendency = true;
-        if (top1.pct > cur.pct) {
-          cur.pct = top1.pct;
-          cur.label = top1.label;
+        if (displayPct > cur.pct) {
+          cur.pct = displayPct;
+          cur.label = displayLabel;
         }
       }
     }
