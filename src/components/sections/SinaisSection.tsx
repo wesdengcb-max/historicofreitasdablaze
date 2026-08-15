@@ -492,86 +492,50 @@ export default function SinaisSection() {
 
   return (
     <div className="mx-auto min-h-screen max-w-[1440px] bg-[#090909] px-4 py-6 sm:px-6 sm:py-8 space-y-8 w-full">
-      {/* Resumo de Assertividade (Audit Dashboard) */}
-      <Card className="glass-card !p-0 overflow-hidden border-primary/20 bg-primary/[0.02]">
-        <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-4 bg-white/[0.02]">
-          <div className="flex items-center gap-4">
-            <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
-              <ShieldCheck className="h-5 w-5" />
+      <div className="flex flex-col gap-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+             <div className="grid h-10 w-10 place-items-center rounded-xl bg-[#FF1F3D]/10 text-[#FF1F3D] shadow-[0_0_15px_rgba(255,31,61,0.1)]">
+              <Radio className="h-5 w-5" />
             </div>
-            <div>
-              <div className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60 font-outfit">
-                {auditFilter === "hoje" ? "Rodadas Atuais" : "Visão Geral (Top Estratégias)"}
-              </div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-sm font-black text-white font-outfit uppercase">
-                  {auditFilter === "hoje" ? auditStats.analysis : "Catalogação Diária"}
-                </h2>
-                <span className="text-[10px] text-muted-foreground">·</span>
-                <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
-                  {auditFilter === "hoje" ? "Assertividade Binária" : "Ranking de Assertividade"}
-                </span>
-                {auditFilter === "hoje" && auditStats.tendency && (
-                  <>
-                    <span className="text-[10px] text-muted-foreground">·</span>
-                    <span className="flex items-center gap-1 text-[10px] font-black text-orange-500 animate-pulse">
-                      🔥 ALTA TENDÊNCIA
-                    </span>
-                  </>
-                )}
-              </div>
-            </div>
+            <h1 className="text-4xl font-black tracking-tighter text-white font-outfit uppercase">
+              {activeTab === 'sinais' ? 'Feed de Sinais' : 'Painel de Análise'}
+            </h1>
           </div>
+          <SinaisTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+        </div>
 
-          <div className="flex items-center gap-6">
-            <div className="flex rounded-lg bg-black/40 p-1 border border-white/5">
-              <button
-                onClick={() => setAuditFilter("hoje")}
-                className={cn(
-                  "px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-all",
-                  auditFilter === "hoje" ? "bg-primary text-white" : "text-muted-foreground hover:text-white"
-                )}
-              >
-                Rodadas Atuais
-              </button>
-              <button
-                onClick={() => setAuditFilter("geral")}
-                className={cn(
-                  "px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-all",
-                  auditFilter === "geral" ? "bg-primary text-white" : "text-muted-foreground hover:text-white"
-                )}
-              >
-                Visão Geral
-              </button>
-            </div>
+        {activeTab === 'sinais' ? (
+          <>
+            {/* Roleta ao vivo */}
+            <BlazeRoulette results={results} />
+            
+            {/* Gerador de sinais preditivos */}
+            <PredictiveSignals />
 
-            <div className="h-10 w-px bg-white/10" />
-
-            <div className="flex items-center gap-8">
-              {auditFilter === "geral" ? (
-                <div className="flex gap-4">
-                  {topStrategies.map((strat, i) => (
-                    <div key={i} className="text-center">
-                      <div className="text-[8px] font-bold text-white/40 uppercase tracking-tighter mb-1 truncate max-w-[80px]">
-                        {strat.analise.replace("Analise", "A")}
-                      </div>
-                      <div className="text-sm font-black text-primary font-outfit">{strat.pct.toFixed(0)}%</div>
-                      <div className="text-[8px] text-white/20 font-bold">{strat.wins}/{strat.total}</div>
+            {/* Resumo de Auditoria Rápido */}
+            <Card className="glass-card !p-0 overflow-hidden border-primary/20 bg-primary/[0.02]">
+              <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-4 bg-white/[0.02]">
+                <div className="flex items-center gap-4">
+                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
+                    <ShieldCheck className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <div className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60 font-outfit">
+                      Monitoramento em Tempo Real
                     </div>
-                  ))}
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-sm font-black text-white font-outfit uppercase">
+                        Auditoria FreitasWhite
+                      </h2>
+                    </div>
+                  </div>
                 </div>
-              ) : (
-                <>
+                <div className="flex items-center gap-8">
                   <div className="text-center">
-                    <div className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-1">Assertividade</div>
+                    <div className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-1">Assertividade Média</div>
                     <div className="text-xl font-black text-primary font-outfit">{auditStats.pct.toFixed(0)}%</div>
                   </div>
-                  
-                  <div className="text-center">
-                    <div className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-1">Placar</div>
-                    <div className="text-xl font-black text-white font-outfit">{auditStats.wins}/{auditStats.total}</div>
-                  </div>
-
                   <div className="text-center">
                     <div className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-1">Status</div>
                     <div className="flex items-center gap-2">
@@ -580,33 +544,28 @@ export default function SinaisSection() {
                       <span className="text-xs font-black text-red-500 font-outfit">{auditStats.losses}L</span>
                     </div>
                   </div>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      </Card>
+                </div>
+              </div>
+            </Card>
+          </>
+        ) : (
+          <AnalysesTab topStrategies={topStrategies} auditStats={auditStats} />
+        )}
+      </div>
 
-      {/* Gerador de sinais preditivos */}
-      <PredictiveSignals />
-
-      {/* Top header */}
-      <div className="flex w-full flex-wrap items-start justify-between gap-4">
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-3 mb-2">
-            <span className="text-[10px] tracking-[0.5em] text-[#FF1F3D] font-black font-outfit uppercase">
-              [ TRANSMISSION · CONTROL ]
-            </span>
-          </div>
-          <div className="flex items-center gap-3">
-             <div className="grid h-10 w-10 place-items-center rounded-xl bg-[#FF1F3D]/10 text-[#FF1F3D] shadow-[0_0_15px_rgba(255,31,61,0.1)]">
-              <Radio className="h-5 w-5" />
+      <div className={cn(activeTab === 'analises' ? 'hidden' : 'block', "space-y-8")}>
+        {/* Top header da lista */}
+        <div className="flex w-full flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-[10px] tracking-[0.5em] text-[#FF1F3D] font-black font-outfit uppercase">
+                [ LIVE FEED · UPDATING ]
+              </span>
             </div>
-            <h1 className="text-4xl font-black tracking-tighter text-white font-outfit uppercase">Sinais</h1>
+            <p className="mt-2 text-sm text-[#9CA3AF] font-medium">
+              Sinais unificados e confluências em tempo real. Janela de ±1 min.
+            </p>
           </div>
-          <p className="mt-2 text-sm text-[#9CA3AF] font-medium">
-            Gerencie sua lista baseada nos últimos 6 gatilhos e estratégias automáticas (limite 120 min / 14 tempos).
-          </p>
           <div className="mt-4 flex flex-wrap gap-4">
             <div className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-3 py-1 text-xs">
               <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
