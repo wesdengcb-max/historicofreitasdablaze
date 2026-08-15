@@ -672,14 +672,15 @@ export default function SinaisSection() {
                         {s.isVerified && (
                           <span className="flex items-center gap-0.5 rounded-full bg-blue-500/20 px-1.5 py-0.5 text-[8px] font-black text-blue-400 border border-blue-500/30">
                             <CheckCircle2 className="h-2 w-2" />
-                            Verificado
+                            SELO AZUL
                           </span>
                         )}
                         {s.isRare && (
-                          <span className="flex items-center gap-0.5 rounded-full bg-amber-500/20 px-1.5 py-0.5 text-[8px] font-black text-amber-400 border border-amber-500/30">
-                            🙌 RARO
+                          <span className="flex items-center gap-0.5 rounded-full bg-cyan-500/20 px-1.5 py-0.5 text-[8px] font-black text-cyan-300 border border-cyan-500/30 shadow-[0_0_10px_rgba(6,182,212,0.2)]">
+                            💎 RARO
                           </span>
                         )}
+
                       </div>
 
                       <div className="text-[10px] text-muted-foreground opacity-60">Janela: {s.label}</div>
