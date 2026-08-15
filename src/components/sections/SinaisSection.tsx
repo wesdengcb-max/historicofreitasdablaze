@@ -1,5 +1,5 @@
-
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
+import { SinaisTabs, AnalysesTab } from "@/components/sections/SinaisTabs";
 import {
   Plus,
   ChevronDown,
