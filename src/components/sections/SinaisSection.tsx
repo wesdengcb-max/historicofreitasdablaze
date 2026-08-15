@@ -499,23 +499,15 @@ export default function SinaisSection() {
               <Radio className="h-5 w-5" />
             </div>
             <h1 className="text-4xl font-black tracking-tighter text-white font-outfit uppercase">
-              {activeTab === 'sinais' ? 'Feed de Sinais' : 'Painel de Análise'}
+              Feed de Sinais
             </h1>
           </div>
-          <SinaisTabs activeTab={activeTab} setActiveTab={setActiveTab} />
         </div>
-
-        {activeTab === 'sinais' ? (
-          <>
-            <BlazeRoulette results={results} />
-            <PredictiveSignals />
-          </>
-        ) : (
-          <AnalysesTab topStrategies={topStrategies} auditStats={auditStats} />
-        )}
+        
+        <PredictiveSignals />
       </div>
 
-      <div className={cn(activeTab === 'analises' ? 'hidden' : 'block', "space-y-8")}>
+      <div className="space-y-8">
 
         {/* Top header da lista */}
         <div className="flex w-full flex-wrap items-start justify-between gap-4">
@@ -584,8 +576,6 @@ export default function SinaisSection() {
         </div>
       </div>
 
-      {/* Roleta ao vivo */}
-      <BlazeRoulette results={results} />
 
 
       {/* Lista de Sinais */}
