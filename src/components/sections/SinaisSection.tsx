@@ -559,7 +559,7 @@ export default function SinaisSection() {
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-3 mb-2">
               <span className="text-[10px] tracking-[0.5em] text-[#FF1F3D] font-black font-outfit uppercase">
-                [ LIVE FEED · UPDATING ]
+                [ LIVE FEED · UPDATING · {activeTab.toUpperCase()} ]
               </span>
             </div>
             <p className="mt-2 text-sm text-[#9CA3AF] font-medium">
