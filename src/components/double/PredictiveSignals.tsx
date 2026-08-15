@@ -11,6 +11,8 @@ import {
   buildA5,
   buildA6,
   buildA7,
+  buildA8,
+  buildA9,
   buildSecondary,
 
   computeTop,
@@ -160,6 +162,8 @@ export function PredictiveSignals() {
       5: buildA5(rows),
       6: buildA6(rows),
       7: buildA7(rows),
+      8: (buildA8 as any)(rows),
+      9: (buildA9 as any)(rows),
     };
     const secondary: Record<number, Cycle[]> = {};
     for (let i = 1; i <= 9; i++) {
@@ -171,7 +175,7 @@ export function PredictiveSignals() {
   /** Ciclos em aberto (status < MAX_ZEROS) por análise + valor. */
   const active = useMemo(() => {
     const out: Array<{ analysis: number; value: number; open: Cycle }> = [];
-    const mainIds = [1, 2, 3, 4, 5, 6, 7];
+    const mainIds = [1, 2, 3, 4, 5, 6, 7, 8, 9];
     mainIds.forEach((a) => {
       const latest = latestByValue(engine[a]);
       latest.forEach((cycle, value) => {
@@ -243,7 +247,7 @@ export function PredictiveSignals() {
           analyses: new Set([item.analysis]),
           pct: top1.pct, 
           label: top1.label,
-          sources: [{ analysis: item.analysis as 1 | 2 | 3 | 4 | 5 | 6 | 7, value: item.value }],
+          sources: [{ analysis: item.analysis, value: item.value }],
           isHighTendency: isTendency
         });
       } else {
@@ -268,7 +272,7 @@ export function PredictiveSignals() {
           pct: info.pct,
           label: info.label,
           analysisCount: info.analyses.size,
-          sources: info.sources as Array<{ analysis: 1 | 2 | 3 | 4 | 5 | 6 | 7; value: number }>,
+          sources: info.sources,
           isHighTendency: info.isHighTendency
         };
       });
@@ -277,7 +281,7 @@ export function PredictiveSignals() {
     const usedTimes = new Set<number>(m1.map((s) => s.at.getTime()));
 
     // ---- Modo 2: Estratégia de Coincidência ----
-    type Proj = { analysis: 1 | 2 | 3 | 4 | 5 | 6 | 7; value: number; pct: number; top5: boolean };
+    type Proj = { analysis: number; value: number; pct: number; top5: boolean };
     const byMinute = new Map<number, Proj[]>();
 
     for (const item of active) {
@@ -291,7 +295,7 @@ export function PredictiveSignals() {
         if (at <= now.getTime()) return;
         const arr = byMinute.get(at) ?? [];
         arr.push({
-          analysis: item.analysis as 1 | 2 | 3 | 4 | 5 | 6 | 7,
+          analysis: item.analysis,
           value: item.value,
           pct: g.pct,
           top5: idx < TOP5_DEPTH,
