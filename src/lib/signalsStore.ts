@@ -108,6 +108,7 @@ export type PredictiveSignal = {
   entryDate?: Date;
   isHighTendency?: boolean;
   isVerified?: boolean;
+  isRare?: boolean;
 };
 
 export function setPredictiveSignals(signals: PredictiveSignal[]) {

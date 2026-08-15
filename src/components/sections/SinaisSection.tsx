@@ -744,6 +744,11 @@ export default function SinaisSection() {
                             Verificado
                           </span>
                         )}
+                        {s.isRare && (
+                          <span className="flex items-center gap-0.5 rounded-full bg-amber-500/20 px-1.5 py-0.5 text-[8px] font-black text-amber-400 border border-amber-500/30">
+                            🙌 RARO
+                          </span>
+                        )}
                       </div>
 
                       <div className="text-[10px] text-muted-foreground opacity-60">Janela: {s.label}</div>
