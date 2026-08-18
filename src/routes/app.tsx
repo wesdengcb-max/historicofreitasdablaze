@@ -1167,7 +1167,7 @@ function Index() {
             {/* Cabeçalho das estatísticas por coluna */}
             {viewMode === "colunas" && contarColunas && (
               <div className="mb-3 w-full border-b border-white/5 pb-3 overflow-x-auto scrollbar-none">
-                <div className="grid grid-cols-10 gap-[8px] min-w-[1200px] w-full">
+                <div className="grid grid-cols-10 gap-[6px] min-w-[1200px] w-full">
                   {Array.from({ length: 10 }).map((_, ci) => {
                     const stats = colStats[ci];
                     return (
@@ -1305,7 +1305,7 @@ function Index() {
 
                       {gridRows.map((row) => (
                         <div key={row.key} className="flex flex-col gap-0 border-b border-white/[0.02] py-2">
-                          <div className="grid grid-cols-10 gap-[8px] relative w-full">
+                          <div className="grid grid-cols-10 gap-[6px] relative w-full">
                             {row.cells.map((cell, ci) => {
                             const [hh, mmPrefix] = row.label.split(":");
                             const hm = `${hh}:${mmPrefix[0]}${ci}`;
@@ -1482,10 +1482,10 @@ function Index() {
                        <div
                          className="history-scroll grid p-1 sm:p-3 lg:p-4"
                          style={{
-                           gridTemplateColumns:
-                             `repeat(auto-fill, minmax(52px, 1fr))`,
-                           columnGap: "8px",
-                           rowGap: "16px",
+                            gridTemplateColumns:
+                              `repeat(auto-fill, minmax(52px, 1fr))`,
+                            columnGap: "6px",
+                            rowGap: "14px",
                            direction: inverse ? "rtl" : "ltr",
                          }}
                        >
