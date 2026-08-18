@@ -75,12 +75,9 @@ export const BlazeResultCard = memo(function BlazeResultCard({
             className="flex items-center justify-center font-bold leading-none tabular-nums"
             style={{
               height: "30px",
-              width: "auto",
-              minWidth: "36px",
-              padding: "0 6px",
-              borderRadius: "4px",
-              background: "rgba(255, 255, 255, 0.1)",
-              border: `2px solid ${isWhite ? c.ring : "rgba(255, 255, 255, 0.2)"}`,
+              width: "30px",
+              borderRadius: "50%",
+              border: `2px solid ${isWhite ? c.ring : "transparent"}`,
               color: c.fg,
               fontSize: "14px",
             }}
