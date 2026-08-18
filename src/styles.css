@@ -166,9 +166,20 @@
 }
 
 /* Grid Cell Styles Override */
-.grid-cols-10 > div {
+.grid-cols-10 > div,
+.blaze-result-card,
+.blaze-result-card > button {
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
   outline: none !important;
+}
+
+/* Força transparência em slots vazios do grid no modo Colunas Fixas */
+[class*="grid-cols-"] div.bg-white\/5,
+[class*="grid-cols-"] button.bg-\[\#233248\],
+[class*="grid-cols-"] button.border-dashed {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
