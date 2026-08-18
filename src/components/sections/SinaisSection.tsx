@@ -14,6 +14,9 @@ import {
   Trash2,
   ChevronRight,
   Sparkles,
+  Clock,
+  Target,
+  Layers,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
