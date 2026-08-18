@@ -239,12 +239,12 @@ const ColumnBlock = memo(function ColumnBlock({
 
   return (
     <div
-      className={`flex min-w-[120px] flex-col gap-y-5 rounded-lg border border-transparent p-1 transition-colors duration-300 ${
-        isActive ? "bg-primary/10" : ""
+      className={`flex flex-col gap-y-3 rounded-lg border border-transparent p-1 transition-colors duration-300 ${
+        isActive ? "bg-primary/5" : ""
       }`}
     >
       {rows.map((pair: any[], rIdx: number) => (
-        <div key={rIdx} className="flex gap-x-2">
+        <div key={rIdx} className="flex gap-x-1.5">
           <BlazeResultCardWrapper
             item={pair[0]}
             isActive={isActive}
@@ -281,7 +281,7 @@ const BlazeResultCardWrapper = memo(function BlazeResultCardWrapper({
   exibirSegundos,
   signalsByHM,
 }: any) {
-  if (!item) return <div className="h-[68px] w-[48px]" />;
+  if (!item) return <div className="h-[64px] w-[52px]" />;
   return (
     <div className="flex flex-col items-center">
       <BlazeResultCard
@@ -1167,7 +1167,7 @@ function Index() {
             {/* Cabeçalho das estatísticas por coluna */}
             {viewMode === "colunas" && contarColunas && (
               <div className="mb-3 w-full border-b border-white/5 pb-3 overflow-x-auto scrollbar-none">
-                <div className="grid grid-cols-10 gap-[8px] min-w-[1200px] w-full">
+                <div className="grid grid-cols-10 gap-[6px] min-w-[1200px] w-full">
                   {Array.from({ length: 10 }).map((_, ci) => {
                     const stats = colStats[ci];
                     return (
@@ -1274,7 +1274,7 @@ function Index() {
                   <div className="history-scroll w-full overflow-x-auto p-1 sm:p-2 lg:p-3 no-scrollbar">
                     <div className="flex flex-col gap-0 min-w-[1200px] w-full">
                       {/* Cabeçalho 0-9 interno para Colunas Fixas */}
-                      <div className="grid grid-cols-10 gap-[8px] mb-1 sticky top-0 z-10 bg-[#0A0A0A]/80 backdrop-blur-sm w-full">
+                      <div className="grid grid-cols-10 gap-[6px] mb-1 sticky top-0 z-10 bg-[#0A0A0A]/80 backdrop-blur-sm w-full">
                         {Array.from({ length: 10 }).map((_, ci) => (
                           <button
                             key={`header-inner-${ci}`}
@@ -1305,7 +1305,7 @@ function Index() {
 
                       {gridRows.map((row) => (
                         <div key={row.key} className="flex flex-col gap-0 border-b border-white/[0.02] py-2">
-                          <div className="grid grid-cols-10 gap-[8px] relative w-full">
+                          <div className="grid grid-cols-10 gap-[6px] relative w-full">
                             {row.cells.map((cell, ci) => {
                             const [hh, mmPrefix] = row.label.split(":");
                             const hm = `${hh}:${mmPrefix[0]}${ci}`;
@@ -1346,7 +1346,7 @@ function Index() {
                                       {badge.label}
                                     </span>
                                   )}
-                                  <div className="relative flex h-[56px] items-start gap-[12px]">
+                                  <div className="relative flex h-[50px] items-start gap-[6px]">
                                     {(cell.length >= 2
                                       ? [cell[0], cell[1]]
                                       : cell.length === 1
@@ -1401,7 +1401,7 @@ function Index() {
                                          const isSlotActive = highlightKey ? (highlightKey === `col-${ci}`) : (highlightN.size === 0);
                                          return (
                                           <div key={`p-${ci}-${i}`} className="flex flex-col items-center" style={{ opacity: isSlotActive ? 1 : 0.25 }}>
-                                            <div className="relative flex h-[48px] w-[48px] items-center justify-center overflow-hidden rounded-[6px] border-[2.5px] border-emerald-400 bg-white shadow-sm">
+                                            <div className="relative flex h-[50px] w-[52px] items-center justify-center overflow-hidden rounded-[8px] border-[2.5px] border-emerald-400 bg-white shadow-sm">
                                               <img
                                                 src={brancoTile.url}
                                                 alt="Sinal"
@@ -1431,7 +1431,7 @@ function Index() {
                                               }
                                               cycleSlotPrediction(slotKey);
                                             }}
-                                            className={`relative flex h-[48px] w-[48px] items-center justify-center rounded-[6px] border border-dashed transition-colors hover:border-white/20 ${
+                                            className={`relative flex h-[50px] w-[52px] items-center justify-center rounded-[8px] border border-dashed transition-colors hover:border-white/20 ${
                                               isLocked
                                                 ? "border-white/5 bg-white/5 opacity-50 cursor-not-allowed"
                                                 : p === "white"
@@ -1447,7 +1447,7 @@ function Index() {
                                               <Lock className="h-4 w-4 text-muted-foreground/40" />
                                             ) : (
                                               <div
-                                                className={`h-[32px] w-[32px] rounded-full border-2 transition-all ${
+                                                className={`h-[30px] w-[30px] rounded-full border-2 transition-all ${
                                                   p === "white"
                                                     ? "bg-white border-white/20"
                                                     : p === "red"
@@ -1482,10 +1482,10 @@ function Index() {
                        <div
                          className="history-scroll grid p-1 sm:p-3 lg:p-4"
                          style={{
-                           gridTemplateColumns:
-                             `repeat(auto-fill, minmax(52px, 1fr))`,
-                           columnGap: "8px",
-                           rowGap: "16px",
+                            gridTemplateColumns:
+                              `repeat(auto-fill, minmax(52px, 1fr))`,
+                            columnGap: "6px",
+                            rowGap: "14px",
                            direction: inverse ? "rtl" : "ltr",
                          }}
                        >

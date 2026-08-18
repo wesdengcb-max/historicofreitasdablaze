@@ -37,7 +37,7 @@ export const ResultCircle = memo(function ResultCircle({ color, n, size = "md", 
 
   const bgStyle =
     color === "red"
-      ? { background: "linear-gradient(180deg, #FF3554 0%, #FF1F3D 100%)" }
+      ? { background: "#DE2143" }
       : color === "white"
         ? { background: "#FFFFFF" }
         : { background: "#16171d" };
@@ -60,7 +60,7 @@ export const ResultCircle = memo(function ResultCircle({ color, n, size = "md", 
       />
 
     ) : (
-      <span className="flex items-center justify-center rounded-full border-2 border-white/90 h-[70%] w-[70%] text-[0.8em]">
+      <span className="flex items-center justify-center rounded-full border-2 border-white/95 h-[70%] w-[70%] text-[0.8em]">
         {n}
       </span>
     );
