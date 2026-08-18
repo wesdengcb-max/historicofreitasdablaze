@@ -549,6 +549,9 @@ export default function SinaisSection() {
               <div className="text-xl font-black text-white font-outfit">{auditStats.total}</div>
             </div>
           </div>
+        </div>
+      </div>
+
       <div className="flex flex-col gap-8">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
