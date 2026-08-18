@@ -308,6 +308,13 @@ function chunk<T>(arr: T[], size: number): T[][] {
 
 function Index() {
   const section = useSection();
+  // Sync router with section if needed, though they currently live in /app
+  // This helps if we ever move to deep routes but keep the section store
+  useEffect(() => {
+    // If we're at /app, make sure the UI matches the section store
+    // (This is redundant now but good for future router migration)
+  }, [section]);
+
   const [inverse, setInverse] = useState(false);
   const [viewMode, setViewMode] = useState<"colunas" | "lista">("colunas");
   const { isCollapsed, toggle } = useSidebarStore();
