@@ -1408,14 +1408,25 @@ function Index() {
                                          const isSlotActive = highlightKey ? (highlightKey === `col-${ci}`) : (highlightN.size === 0);
                                          return (
                                           <div key={`p-${ci}-${i}`} className="flex flex-col items-center" style={{ opacity: isSlotActive ? 1 : 0.25 }}>
-                                            <div className="relative flex h-[50px] w-[52px] items-center justify-center overflow-hidden rounded-[4px] border-none bg-transparent shadow-none">
+                                            <div className="relative flex h-[50px] w-[52px] items-center justify-center overflow-hidden rounded-[4px] border border-slate-700/50 bg-[#181e2a] shadow-none">
                                               <img
                                                 src={brancoTile.url}
                                                 alt="Sinal"
-                                                className="h-full w-full object-cover"
+                                                className="h-full w-full object-cover opacity-20"
                                                 draggable={false}
                                               />
                                             </div>
+                                            <span
+                                              className="mt-[8px] flex items-center justify-center font-bold leading-none tabular-nums text-white rounded-md bg-[#3f4a56] border-none"
+                                              style={{
+                                                height: "16px",
+                                                width: "100%",
+                                                fontSize: "9px",
+                                                padding: "0 2px",
+                                              }}
+                                            >
+                                              {hm}
+                                            </span>
                                           </div>
                                         );
                                       }
@@ -1435,7 +1446,7 @@ function Index() {
                                               }
                                               cycleSlotPrediction(slotKey);
                                             }}
-                                            className={`relative flex h-[50px] w-[52px] items-center justify-center rounded-[4px] border-none transition-colors shadow-none bg-transparent ${
+                                            className={`relative flex h-[50px] w-[52px] items-center justify-center rounded-[4px] border border-slate-700/50 bg-[#181e2a] transition-colors shadow-none ${
                                               isLocked
                                                 ? "opacity-50 cursor-not-allowed"
                                                 : "cursor-pointer"
@@ -1452,11 +1463,22 @@ function Index() {
                                                       ? "bg-red-500 border-red-400/20"
                                                       : p === "black"
                                                         ? "bg-slate-800 border-slate-700/20"
-                                                        : "bg-transparent border-white"
+                                                        : "bg-transparent border-white/20"
                                                 }`}
                                               />
                                             )}
                                           </button>
+                                          <span
+                                            className="mt-[8px] flex items-center justify-center font-bold leading-none tabular-nums text-white rounded-md bg-[#3f4a56] border-none"
+                                            style={{
+                                              height: "16px",
+                                              width: "100%",
+                                              fontSize: "9px",
+                                              padding: "0 2px",
+                                            }}
+                                          >
+                                            {hm}
+                                          </span>
                                         </div>
 
                                       );
