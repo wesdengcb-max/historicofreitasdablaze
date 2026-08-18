@@ -772,8 +772,7 @@ export default function SinaisSection() {
           </div>
         </Card>
       </div>
-    </div>
-
+      
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent className="bg-surface border-border max-w-lg">
           <DialogHeader>
