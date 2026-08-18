@@ -1423,7 +1423,19 @@ function Index() {
                                                 draggable={false}
                                               />
                                             </div>
-                                            <span className="mt-[4px] text-[9px] tabular-nums font-medium h-[9px] flex items-center text-muted-foreground/60">
+                                            <span
+                                              className="mt-[4px] flex items-center justify-center font-bold leading-none tabular-nums text-muted-foreground/90"
+                                              style={{
+                                                height: "14px",
+                                                width: "auto",
+                                                minWidth: "34px",
+                                                padding: "0 4px",
+                                                borderRadius: "4px",
+                                                background: "rgba(255, 255, 255, 0.1)",
+                                                border: "1px solid rgba(255, 255, 255, 0.2)",
+                                                fontSize: "9px",
+                                              }}
+                                            >
                                               {hm}
                                             </span>
                                           </div>
