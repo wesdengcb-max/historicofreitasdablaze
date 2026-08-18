@@ -525,7 +525,6 @@ export default function SinaisSection() {
       </div>
 
       <div className="space-y-8">
-
         {/* Assertividade topo */}
         <div className="flex w-full flex-wrap items-center justify-between gap-4 bg-white/[0.02] border border-white/[0.05] p-6 rounded-2xl">
           <div>
