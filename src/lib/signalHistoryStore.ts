@@ -12,7 +12,11 @@ export const useSignalHistoryStore = create<SignalHistoryStore>((set) => ({
   history: [],
   addSignal: (signal) => set((state) => {
     if (state.history.some(s => s.key === signal.key)) return state;
-    return { history: [ { ...signal, timestamp: Date.now() }, ...state.history ].slice(0, 50) };
+    const fourHoursAgo = Date.now() - 4 * 60 * 60 * 1000;
+    const newHistory = [ { ...signal, timestamp: Date.now() }, ...state.history ]
+      .filter(s => s.timestamp > fourHoursAgo)
+      .slice(0, 100);
+    return { history: newHistory };
   }),
   updateSignal: (key, updates) => set((state) => ({
     history: state.history.map(s => s.key === key ? { ...s, ...updates, timestamp: Date.now() } : s)

@@ -399,12 +399,14 @@ export default function SinaisSection() {
 
           if (s.outcome && s.outcome !== "pending") return s;
 
+          // Janela de ±1 minuto (Anterior -1, Exato 0, Posterior +1)
           const rangeStart = entryTime - 60_000;
           const rangeEnd = entryTime + 60_000;
 
           const matchedResult = (resultsForValidation || []).find(r => {
             if (!r || r.color !== "white") return false;
             const rt = new Date(r.createdAt).getTime();
+            // Verifica se está dentro da janela de 3 minutos (±1 min do alvo)
             return rt >= rangeStart && rt <= rangeEnd && rt <= now;
           });
 
@@ -430,7 +432,7 @@ export default function SinaisSection() {
             return res;
           }
 
-
+          // Só marca RED se a janela de ±1 minuto expirar completamente
           if (now > rangeEnd) {
             const res = { ...s, outcome: "red" as const, label: "LOSS", completedAt: now };
             const table = 'historico_sinais_audit';
