@@ -1482,10 +1482,9 @@ function Index() {
                        <div
                          className="history-scroll grid p-1 sm:p-3 lg:p-4"
                          style={{
-                            gridTemplateColumns:
-                              `repeat(auto-fill, minmax(52px, 1fr))`, gap: '6px 6px'
+                            gridTemplateColumns: `repeat(auto-fill, minmax(52px, 1fr))`,
                             columnGap: "6px",
-                            rowGap: "14px",
+                            rowGap: "8px",
                            direction: inverse ? "rtl" : "ltr",
                          }}
                        >
