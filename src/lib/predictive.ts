@@ -257,6 +257,41 @@ export function buildA9(rows: Row[]): Cycle[] {
  * Utilizam a mesma lógica da A1 (leitura de pedra vs unidade do minuto),
  * mas deslocadas no tempo conforme a posição no histórico.
  */
+
+/** 
+ * ESTRATÉGIA DE CONFIRMAÇÃO - SELO VERDE
+ * Gatilho: Pedra_Anterior >= 2 E Soma(Pedra_A + Pedra_B) in [17, 19, 21]
+ */
+export function buildSeloVerde(rows: Row[]): Cycle[] {
+  const out: Cycle[] = [];
+  for (let i = 2; i < rows.length; i++) {
+    const pAnt = Number(rows[i - 2].roll);
+    const pA = Number(rows[i - 1].roll);
+    const pB = Number(rows[i].roll);
+    
+    if (!Number.isFinite(pAnt) || !Number.isFinite(pA) || !Number.isFinite(pB)) continue;
+    
+    // Filtro de Segurança
+    if (pAnt < 2) continue;
+    
+    const soma = pA + pB;
+    if (![17, 19, 21].includes(soma)) continue;
+    
+    const dt = parseUtcDate(rows[i].created_at);
+    if (Number.isNaN(dt.getTime())) continue;
+
+    // Selo Verde usa gaps[0] para pular casas (Pedra_Anterior)
+    out.push({ 
+      value: soma, 
+      analysis: 200 + soma, // Tag única: 217, 219, 221
+      triggerAt: dt, 
+      gaps: [pAnt], // casas a pular
+      isSecondary: false 
+    });
+  }
+  return out;
+}
+
 export function buildSecondary(rows: Row[], offset: number): Cycle[] {
   const out: Cycle[] = [];
   // offset 1-9 representa a posição no histórico

@@ -109,6 +109,8 @@ export type PredictiveSignal = {
   isHighTendency?: boolean;
   isVerified?: boolean;
   isRare?: boolean;
+  isGreenSeal?: boolean;
+  greenSealAssertivity?: number;
 };
 
 export function setPredictiveSignals(signals: PredictiveSignal[]) {
