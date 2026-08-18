@@ -1603,8 +1603,14 @@ const TipMinerCard = memo(function TipMinerCard({
       : spin.color === "black"
         ? "#16171d"
         : "#ffffff";
-  const ring = isWhite ? "#16171d" : "#ffffff";
-  const fg = isWhite ? "#16171d" : "#ffffff";
+  const border =
+    spin.color === "red"
+      ? "rgba(255, 255, 255, 0.1)"
+      : spin.color === "black"
+        ? "rgba(255, 255, 255, 0.05)"
+        : "#ffffff";
+  const ring = isWhite ? "#DE2143" : "#ffffff";
+  const fg = isWhite ? "#DE2143" : "#ffffff";
   
   const isHit = !!highlightN && highlightN.has(spin.n);
   const isActive = isActiveProp !== undefined ? isActiveProp : true;
