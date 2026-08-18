@@ -295,6 +295,15 @@ const BlazeResultCardWrapper = memo(function BlazeResultCardWrapper({
           (highlightKey !== null && !isActive) ||
           (highlightN.size > 0 && !highlightN.has(item.n))
         }
+        selected={highlightN.has(item.n)}
+        onClick={() =>
+          setHighlightN((h) => {
+            const next = new Set(h);
+            if (next.has(item.n)) next.delete(item.n);
+            else next.add(item.n);
+            return next;
+          })
+        }
       />
     </div>
   );
