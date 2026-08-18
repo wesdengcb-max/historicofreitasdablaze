@@ -1632,41 +1632,32 @@ const TipMinerCard = memo(function TipMinerCard({
       <button
         type="button"
         onClick={onClick}
-        className={`flex items-center justify-center overflow-hidden rounded-[6px] border border-white/[0.08] shadow-sm transition-[transform,opacity] duration-200 hover:-translate-y-0.5 animate-in fade-in zoom-in-95 ${
-          isHit && isActive ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : ""
+        className={`flex items-center justify-center overflow-hidden rounded-[4px] shadow-sm transition-[transform,opacity] duration-200 hover:-translate-y-0.5 animate-in fade-in zoom-in-95 ${
+          isHit && isActive ? "border-2 border-primary" : ""
         }`}
         style={{
-          width: "var(--stone, 48px)",
-          height: "var(--stone-h, 48px)",
-          background: isWhite ? "#ffffff" : bg,
+          width: "52px",
+          height: "50px",
+          background: bg,
+          borderColor: isHit && isActive ? undefined : border,
           opacity: isActive ? 1 : 0.25,
           ...(delayStyle ?? {}),
         }}
       >
-        {isWhite ? (
-          <span className="relative flex h-full w-full items-center justify-center">
-            <img
-              src={brancoTile.url}
-              alt="Branco"
-              className="h-full w-full object-cover"
-              draggable={false}
-            />
-            {numbered && (
-              <span
-                className="absolute inset-0 grid place-items-center font-bold leading-none tabular-nums text-black/85"
-                style={{ fontSize: "14px" }}
-              >
-                {spin.n}
-              </span>
-            )}
-          </span>
+        {isWhite && !numbered ? (
+          <img
+            src={brancoTile.url}
+            alt="Branco"
+            className="h-full w-full object-cover"
+            draggable={false}
+          />
         ) : (
           <div
             className="flex items-center justify-center rounded-full font-bold leading-none tabular-nums"
             style={{ 
-              height: "32px", 
-              width: "32px", 
-              border: isWhite ? `3px solid ${ring}` : `2px solid #ffffff90`, 
+              height: "30px", 
+              width: "30px", 
+              border: `2px solid ${isWhite ? ring : "#ffffff95"}`, 
               color: fg, 
               fontSize: "14px" 
             }}
@@ -1678,10 +1669,10 @@ const TipMinerCard = memo(function TipMinerCard({
 
       {showTime && (
         <span
-          className={`mt-1 leading-none tabular-nums ${
-            timeHighlight ? "font-bold text-primary" : "text-muted-foreground"
+          className={`mt-[4px] leading-none tabular-nums font-medium ${
+            timeHighlight ? "font-bold text-primary" : "text-muted-foreground/60"
           }`}
-          style={{ fontSize: "12px" }}
+          style={{ fontSize: "9px" }}
         >
           {showSeconds ? spTimeWithSeconds(spin) : spin.time}
         </span>
