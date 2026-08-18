@@ -105,9 +105,9 @@ export const BlazeResultCard = memo(function BlazeResultCard({
             timeHighlight ? "text-primary" : "text-muted-foreground/90"
           }`}
           style={{
-            height: "16px",
+            height: "14px",
             width: "auto",
-            minWidth: "36px",
+            minWidth: "34px",
             padding: "0 4px",
             borderRadius: "4px",
             background: "rgba(255, 255, 255, 0.1)",

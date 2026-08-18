@@ -1390,7 +1390,21 @@ function Index() {
                                                 });
                                               }}
                                             />
-                                            <span className={`mt-[4px] text-[9px] tabular-nums leading-none font-medium h-[9px] flex items-center ${destaqueHorario ? "text-primary font-bold" : "text-muted-foreground/60"}`}>
+                                            <span
+                                              className={`mt-[4px] flex items-center justify-center font-bold leading-none tabular-nums ${
+                                                destaqueHorario ? "text-primary" : "text-muted-foreground/90"
+                                              }`}
+                                              style={{
+                                                height: "14px",
+                                                width: "auto",
+                                                minWidth: "34px",
+                                                padding: "0 4px",
+                                                borderRadius: "4px",
+                                                background: "rgba(255, 255, 255, 0.1)",
+                                                border: "1px solid rgba(255, 255, 255, 0.2)",
+                                                fontSize: "9px",
+                                              }}
+                                            >
                                               {exibirSegundos ? spTimeWithSeconds(spin as Spin) : (spin as Spin).time}
                                             </span>
                                           </div>
@@ -1409,7 +1423,19 @@ function Index() {
                                                 draggable={false}
                                               />
                                             </div>
-                                            <span className="mt-[4px] text-[9px] tabular-nums font-medium h-[9px] flex items-center text-muted-foreground/60">
+                                            <span
+                                              className="mt-[4px] flex items-center justify-center font-bold leading-none tabular-nums text-muted-foreground/90"
+                                              style={{
+                                                height: "14px",
+                                                width: "auto",
+                                                minWidth: "34px",
+                                                padding: "0 4px",
+                                                borderRadius: "4px",
+                                                background: "rgba(255, 255, 255, 0.1)",
+                                                border: "1px solid rgba(255, 255, 255, 0.2)",
+                                                fontSize: "9px",
+                                              }}
+                                            >
                                               {hm}
                                             </span>
                                           </div>
@@ -1656,12 +1682,9 @@ const TipMinerCard = memo(function TipMinerCard({
             className="flex items-center justify-center font-bold leading-none tabular-nums"
             style={{ 
               height: "30px", 
-              width: "auto",
-              minWidth: "36px",
-              padding: "0 6px",
-              borderRadius: "4px",
-              background: "rgba(255, 255, 255, 0.1)",
-              border: `2px solid ${isWhite ? ring : "rgba(255, 255, 255, 0.2)"}`, 
+              width: "30px",
+              borderRadius: "50%",
+              border: `2px solid ${isWhite ? ring : "transparent"}`, 
               color: fg, 
               fontSize: "14px" 
             }}
@@ -1673,10 +1696,19 @@ const TipMinerCard = memo(function TipMinerCard({
 
       {showTime && (
         <span
-          className={`mt-[4px] leading-none tabular-nums font-medium ${
-            timeHighlight ? "font-bold text-primary" : "text-muted-foreground/60"
+          className={`mt-[4px] flex items-center justify-center font-bold leading-none tabular-nums ${
+            timeHighlight ? "text-primary" : "text-muted-foreground/90"
           }`}
-          style={{ fontSize: "9px" }}
+          style={{
+            height: "14px",
+            width: "auto",
+            minWidth: "34px",
+            padding: "0 4px",
+            borderRadius: "4px",
+            background: "rgba(255, 255, 255, 0.1)",
+            border: "1px solid rgba(255, 255, 255, 0.2)",
+            fontSize: "9px",
+          }}
         >
           {showSeconds ? spTimeWithSeconds(spin) : spin.time}
         </span>
