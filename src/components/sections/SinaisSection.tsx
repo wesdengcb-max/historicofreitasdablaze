@@ -553,9 +553,7 @@ export default function SinaisSection() {
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="flex flex-col gap-8">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
           <Popover open={menuOpen} onOpenChange={setMenuOpen}>
@@ -775,6 +773,7 @@ export default function SinaisSection() {
           </div>
         </Card>
       </div>
+    </div>
 
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent className="bg-surface border-border max-w-lg">
