@@ -11,7 +11,13 @@ export type SectionId =
   | "blaze"
   | "hostman";
 
-let currentSection: SectionId = "dashboard";
+const STORAGE_KEY = "freitas-white-active-section";
+
+// Get initial state from localStorage if available, otherwise default to dashboard
+let currentSection: SectionId = (typeof window !== "undefined" 
+  ? localStorage.getItem(STORAGE_KEY) as SectionId 
+  : "dashboard") || "dashboard";
+
 const listeners = new Set<() => void>();
 
 function subscribe(cb: () => void) {
@@ -26,6 +32,9 @@ function getSnapshot() {
 export function setSection(s: SectionId) {
   if (s === currentSection) return;
   currentSection = s;
+  if (typeof window !== "undefined") {
+    localStorage.setItem(STORAGE_KEY, s);
+  }
   listeners.forEach((l) => l());
 }
 
