@@ -1350,7 +1350,7 @@ function Index() {
                                 style={{ width: "100%", height: "76px", direction: "ltr" }}
                               >
                                 <div 
-                                  className={`relative flex flex-col items-center pt-2 rounded-lg transition-all duration-300`}
+                                  className={`relative flex flex-col items-center pt-2 transition-all duration-300 bg-transparent border-none shadow-none`}
                                 >
                                   {badge && (
                                     <span className={`absolute top-0 z-10 inline-flex h-3 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-3.5 sm:px-1.5 sm:text-[8px] ${badgeCls}`}>
@@ -1401,15 +1401,10 @@ function Index() {
                                               }}
                                             />
                                             <span
-                                              className={`mt-[8px] flex items-center justify-center font-bold leading-none tabular-nums ${
-                                                destaqueHorario ? "text-primary" : "text-muted-foreground/90"
-                                              }`}
+                                              className="mt-[8px] flex items-center justify-center font-bold leading-none tabular-nums text-white rounded-md bg-[#3f4a56] border-none"
                                               style={{
                                                 height: "16px",
                                                 width: "100%",
-                                                borderRadius: "4px",
-                                                background: "rgba(255, 255, 255, 0.1)",
-                                                border: "1.5px solid rgba(255, 255, 255, 0.4)",
                                                 fontSize: "9px",
                                                 padding: "0 2px",
                                               }}
