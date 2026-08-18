@@ -650,7 +650,7 @@ export function PredictiveSignals() {
                         <span className={medal ? "text-inherit" : "text-primary"}>
                           {s.pct.toFixed(1)}%
                         </span>
-                        <span className="opacity-50 text-[10px]">· janela {s.label} (limite 120m/14t)</span>
+                        <span className="opacity-50 text-[10px]">·</span>
                       </div>
                       <div className="mt-2 flex flex-wrap gap-1">
                         {s.sources.map((src, idx) => (
