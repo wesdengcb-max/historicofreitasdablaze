@@ -1274,11 +1274,11 @@ function Index() {
                   <div className="history-scroll w-full overflow-x-auto p-1 sm:p-2 lg:p-3 no-scrollbar">
                     <div className="flex flex-col gap-0 min-w-[1200px] w-full">
                       {/* Cabeçalho 0-9 interno para Colunas Fixas */}
-                      <div className="grid grid-cols-10 gap-[6px] mb-1 sticky top-0 z-10 bg-[#0A0A0A]/80 backdrop-blur-sm w-full">
+                      <div className="grid grid-cols-10 gap-[6px] mb-2 sticky top-0 z-10 bg-[#090B0D]/90 backdrop-blur-sm w-full">
                         {Array.from({ length: 10 }).map((_, ci) => (
                           <button
                             key={`header-inner-${ci}`}
-                            className={`flex h-[23px] w-full items-center justify-center rounded-[6px] border border-white/5 text-[14px] font-bold tabular-nums transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-red-500 text-white shadow-[0_0_10px_rgba(239,68,68,0.4)]" : "bg-white/[0.03] text-white/40 hover:bg-white/10"}`}
+                            className={`flex h-[23px] w-full items-center justify-center rounded-[4px] border border-white/5 text-[14px] font-bold tabular-nums transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-red-500 text-white shadow-[0_0_10px_rgba(239,68,68,0.4)]" : "bg-white/[0.03] text-white/40 hover:bg-white/10"}`}
                             onClick={() => {
                               const key = `col-${ci}`;
                               if (highlightKey === key) {
@@ -1304,7 +1304,7 @@ function Index() {
                       </div>
 
                       {gridRows.map((row) => (
-                        <div key={row.key} className="flex flex-col gap-0 border-b border-white/[0.02] py-2">
+                        <div key={row.key} className="flex flex-col gap-0 border-b border-white/[0.01] py-1">
                           <div className="grid grid-cols-10 gap-[6px] relative w-full">
                             {row.cells.map((cell, ci) => {
                             const [hh, mmPrefix] = row.label.split(":");
@@ -1336,7 +1336,7 @@ function Index() {
                               <div
                                 key={ci}
                                 className="flex flex-col items-center justify-center p-0.5 sm:p-1"
-                                style={{ width: "100%", height: "80px", direction: "ltr" }}
+                                style={{ width: "100%", height: "76px", direction: "ltr" }}
                               >
                                 <div 
                                   className={`relative flex flex-col items-center pt-2 rounded-lg transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-primary/10" : ""}`}
@@ -1390,7 +1390,7 @@ function Index() {
                                                 });
                                               }}
                                             />
-                                            <span className={`mt-[5px] text-[11px] tabular-nums leading-none font-medium h-[11px] flex items-center ${destaqueHorario ? "text-primary font-bold" : "text-[#8ebcf0]"}`}>
+                                            <span className={`mt-[4px] text-[9px] tabular-nums leading-none font-medium h-[9px] flex items-center ${destaqueHorario ? "text-primary font-bold" : "text-muted-foreground/60"}`}>
                                               {exibirSegundos ? spTimeWithSeconds(spin as Spin) : (spin as Spin).time}
                                             </span>
                                           </div>
@@ -1401,7 +1401,7 @@ function Index() {
                                          const isSlotActive = highlightKey ? (highlightKey === `col-${ci}`) : (highlightN.size === 0);
                                          return (
                                           <div key={`p-${ci}-${i}`} className="flex flex-col items-center" style={{ opacity: isSlotActive ? 1 : 0.25 }}>
-                                            <div className="relative flex h-[50px] w-[52px] items-center justify-center overflow-hidden rounded-[8px] border-[2.5px] border-emerald-400 bg-white shadow-sm">
+                                            <div className="relative flex h-[50px] w-[52px] items-center justify-center overflow-hidden rounded-[4px] border-[2px] border-emerald-400 bg-white shadow-sm">
                                               <img
                                                 src={brancoTile.url}
                                                 alt="Sinal"
@@ -1409,7 +1409,7 @@ function Index() {
                                                 draggable={false}
                                               />
                                             </div>
-                                            <span className="mt-[5px] text-[11px] tabular-nums font-medium h-[11px] flex items-center text-[#8ebcf0]">
+                                            <span className="mt-[4px] text-[9px] tabular-nums font-medium h-[9px] flex items-center text-muted-foreground/60">
                                               {hm}
                                             </span>
                                           </div>
@@ -1431,7 +1431,7 @@ function Index() {
                                               }
                                               cycleSlotPrediction(slotKey);
                                             }}
-                                            className={`relative flex h-[50px] w-[52px] items-center justify-center rounded-[8px] border border-dashed transition-colors hover:border-white/20 ${
+                                            className={`relative flex h-[50px] w-[52px] items-center justify-center rounded-[4px] border border-dashed transition-colors hover:border-white/20 ${
                                               isLocked
                                                 ? "border-white/5 bg-white/5 opacity-50 cursor-not-allowed"
                                                 : p === "white"
@@ -1459,7 +1459,7 @@ function Index() {
                                               />
                                             )}
                                           </button>
-                                          <span className="mt-[5px] h-[11px] text-[11px] font-medium tabular-nums text-[#8ebcf0]">
+                                          <span className="mt-[4px] h-[9px] text-[9px] font-medium tabular-nums text-muted-foreground/60">
                                             {hm}
                                           </span>
                                         </div>
@@ -1483,7 +1483,7 @@ function Index() {
                          className="history-scroll grid p-1 sm:p-3 lg:p-4"
                          style={{
                             gridTemplateColumns:
-                              `repeat(auto-fill, minmax(52px, 1fr))`,
+                              `repeat(auto-fill, minmax(52px, 1fr))`, gap: '6px 6px'
                             columnGap: "6px",
                             rowGap: "14px",
                            direction: inverse ? "rtl" : "ltr",
