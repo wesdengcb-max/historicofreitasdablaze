@@ -239,12 +239,12 @@ const ColumnBlock = memo(function ColumnBlock({
 
   return (
     <div
-      className={`flex min-w-[120px] flex-col gap-y-5 rounded-lg border border-transparent p-1 transition-colors duration-300 ${
-        isActive ? "bg-primary/10" : ""
+      className={`flex flex-col gap-y-3 rounded-lg border border-transparent p-1 transition-colors duration-300 ${
+        isActive ? "bg-primary/5" : ""
       }`}
     >
       {rows.map((pair: any[], rIdx: number) => (
-        <div key={rIdx} className="flex gap-x-2">
+        <div key={rIdx} className="flex gap-x-1.5">
           <BlazeResultCardWrapper
             item={pair[0]}
             isActive={isActive}
@@ -281,7 +281,7 @@ const BlazeResultCardWrapper = memo(function BlazeResultCardWrapper({
   exibirSegundos,
   signalsByHM,
 }: any) {
-  if (!item) return <div className="h-[68px] w-[48px]" />;
+  if (!item) return <div className="h-[64px] w-[52px]" />;
   return (
     <div className="flex flex-col items-center">
       <BlazeResultCard
