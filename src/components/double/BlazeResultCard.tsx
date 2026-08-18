@@ -77,7 +77,8 @@ export const BlazeResultCard = memo(function BlazeResultCard({
               height: "30px",
               width: "30px",
               borderRadius: "50%",
-              border: `2px solid ${isWhite ? c.ring : "transparent"}`,
+              background: "rgba(255, 255, 255, 0.1)",
+              border: `1px solid rgba(255, 255, 255, 0.2)`,
               color: c.fg,
               fontSize: "14px",
             }}
@@ -101,18 +102,17 @@ export const BlazeResultCard = memo(function BlazeResultCard({
 
       {time && (
         <span
-          className={`mt-[4px] flex items-center justify-center font-bold leading-none tabular-nums ${
+          className={`mt-[8px] flex items-center justify-center font-bold leading-none tabular-nums ${
             timeHighlight ? "text-primary" : "text-muted-foreground/90"
           }`}
           style={{
-            height: "14px",
-            width: "auto",
-            minWidth: "34px",
-            padding: "0 4px",
+            height: "16px",
+            width: "100%",
             borderRadius: "4px",
             background: "rgba(255, 255, 255, 0.1)",
             border: "1px solid rgba(255, 255, 255, 0.2)",
             fontSize: "9px",
+            padding: "0 2px",
           }}
         >
           {time}
