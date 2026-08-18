@@ -1400,17 +1400,6 @@ function Index() {
                                                 });
                                               }}
                                             />
-                                            <span
-                                              className="mt-[8px] flex items-center justify-center font-bold leading-none tabular-nums text-white rounded-md bg-[#3f4a56] border-none"
-                                              style={{
-                                                height: "16px",
-                                                width: "100%",
-                                                fontSize: "9px",
-                                                padding: "0 2px",
-                                              }}
-                                            >
-                                              {exibirSegundos ? spTimeWithSeconds(spin as Spin) : (spin as Spin).time}
-                                            </span>
                                           </div>
                                         );
                                       }
@@ -1427,17 +1416,6 @@ function Index() {
                                                 draggable={false}
                                               />
                                             </div>
-                                            <span
-                                              className="mt-[8px] flex items-center justify-center font-bold leading-none tabular-nums text-white rounded-md bg-[#3f4a56] border-none"
-                                              style={{
-                                                height: "16px",
-                                                width: "100%",
-                                                fontSize: "9px",
-                                                padding: "0 2px",
-                                              }}
-                                            >
-                                              {hm}
-                                            </span>
                                           </div>
                                         );
                                       }
@@ -1479,17 +1457,6 @@ function Index() {
                                               />
                                             )}
                                           </button>
-                                            <span
-                                              className="mt-[8px] flex items-center justify-center font-bold leading-none tabular-nums text-white rounded-md bg-[#3f4a56] border-none"
-                                              style={{
-                                                height: "16px",
-                                                width: "100%",
-                                                fontSize: "9px",
-                                                padding: "0 2px",
-                                              }}
-                                            >
-                                             {hm}
-                                           </span>
                                         </div>
 
                                       );
