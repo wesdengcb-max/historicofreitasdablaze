@@ -13,6 +13,7 @@ import {
   buildA7,
   buildA8,
   buildA9,
+  buildSeloVerde,
   buildSecondary,
 
   computeTop,
@@ -37,6 +38,8 @@ type Mode1Signal = {
   isHighTendency: boolean;
   isVerified?: boolean;
   isRare?: boolean;
+  isGreenSeal?: boolean;
+  greenSealAssertivity?: number;
 
   outcome?: "pending" | "green" | "red";
   resultTime?: string;
@@ -164,6 +167,9 @@ export function PredictiveSignals() {
       7: buildA7(rows),
       8: (buildA8 as any)(rows),
       9: (buildA9 as any)(rows),
+      217: buildSeloVerde(rows).filter(c => c.value === 17),
+      219: buildSeloVerde(rows).filter(c => c.value === 19),
+      221: buildSeloVerde(rows).filter(c => c.value === 21),
     };
     const secondary: Record<number, Cycle[]> = {};
     for (let i = 1; i <= 9; i++) {
@@ -175,7 +181,7 @@ export function PredictiveSignals() {
   /** Ciclos em aberto (status < MAX_ZEROS) por análise + valor. */
   const active = useMemo(() => {
     const out: Array<{ analysis: number; value: number; open: Cycle }> = [];
-    const mainIds = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    const mainIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 217, 219, 221];
     mainIds.forEach((a) => {
       const latest = latestByValue(engine[a]);
       latest.forEach((cycle, value) => {
@@ -208,7 +214,7 @@ export function PredictiveSignals() {
 
   const hasOpportunity = active.length > 0;
 
-  const generate = useCallback(() => {
+  const generate = useCallback(async () => {
     setHasClicked(true);
     const now = new Date();
     now.setSeconds(0, 0);
@@ -224,6 +230,7 @@ export function PredictiveSignals() {
     >();
     for (const item of active) {
       const isA8A9 = item.analysis === 8 || item.analysis === 9;
+      const isGreenSeal = item.analysis >= 217 && item.analysis <= 221;
       
       // Janela de Histórico Recente: Últimos 6 gatilhos (exceto A8/A9 que são projeções diretas)
       const hist = engine[item.analysis].filter(c => c.value === item.value).slice(-6);
@@ -232,10 +239,16 @@ export function PredictiveSignals() {
       let displayPct = 0;
       let displayLabel = "";
 
-      if (isA8A9) {
-        // A8 e A9 transportam o delta diretamente no primeiro gap
-        targetMinutes = item.open.gaps[0] || 0;
-        displayPct = 100; // Estratégias matemáticas fixas
+      if (isA8A9 || isGreenSeal) {
+        if (isGreenSeal) {
+          // Selo Verde: Pula item.open.gaps[0] (Pedra_Anterior) casas.
+          // Aproximamos 30s por casa = 0.5 min.
+          targetMinutes = Math.ceil(item.open.gaps[0] * 0.5);
+        } else {
+          targetMinutes = item.open.gaps[0] || 0;
+        }
+        
+        displayPct = 100;
         displayLabel = targetMinutes.toString();
       } else {
         // Massa Crítica Mínima: 6 gatilhos para estatística
@@ -254,7 +267,7 @@ export function PredictiveSignals() {
       if (at.getTime() <= now.getTime()) continue; 
       const t = at.getTime();
 
-      const isTendency = isA8A9 ? true : checkHighTendency(engine[item.analysis], item.value);
+      const isTendency = (isA8A9 || isGreenSeal) ? true : checkHighTendency(engine[item.analysis], item.value);
 
       const cur = byTime.get(t);
       if (!cur) {
@@ -283,7 +296,7 @@ export function PredictiveSignals() {
         const values = info.values.slice().sort((a, b) => a - b);
         return {
           key: `m1-${t}`,
-          title: `Análise ${values.join(" + ")}`,
+          title: info.analyses.has(217) || info.analyses.has(219) || info.analyses.has(221) ? `Confirmação · SOMA ${info.values[0]}` : `Análise ${values.join(" + ")}`,
           at: new Date(t),
           pct: info.pct,
           label: info.label,
@@ -452,13 +465,41 @@ export function PredictiveSignals() {
       return top1Count >= 2;
     };
 
-    const finalM1 = unifiedM1.map(s => {
+    const finalM1 = await Promise.all(unifiedM1.map(async s => {
       const t = s.at.getTime();
       const secValues = secondaryProjections.get(t);
       const isVerified = secValues && s.sources.some(src => secValues.has(src.value));
       const isRare = isRareTime(t);
-      return { ...s, isVerified, isRare };
-    });
+      
+      let isGreenSeal = false;
+      let greenSealAssertivity = 0;
+      
+      const greenSource = s.sources.find(src => src.analysis >= 217 && src.analysis <= 221);
+      if (greenSource) {
+        const tag = `SOMA_${greenSource.value}`;
+        const { data } = await supabase.from('historico_sinais_audit')
+          .select('status')
+          .eq('tag', tag)
+          .order('created_at', { ascending: false })
+          .limit(6);
+        
+        if (data && data.length === 6) {
+          const wins = data.filter(r => r.status && r.status.startsWith('WIN')).length;
+          greenSealAssertivity = (wins / 6) * 100;
+          if (greenSealAssertivity >= 65) {
+            isGreenSeal = true;
+          }
+        } else if (data && data.length > 0) {
+           // Fallback para quando tem menos de 6 mas queremos testar
+           const wins = data.filter(r => r.status && r.status.startsWith('WIN')).length;
+           greenSealAssertivity = (wins / data.length) * 100;
+           if (greenSealAssertivity >= 65) isGreenSeal = true;
+        }
+      }
+
+      return { ...s, isVerified, isRare, isGreenSeal, greenSealAssertivity };
+    }));
+
 
     setMode1(finalM1);
 
@@ -479,7 +520,9 @@ export function PredictiveSignals() {
           outcome: "pending",
           isHighTendency: s.isHighTendency,
           isVerified: s.isVerified,
-          isRare: s.isRare
+          isRare: s.isRare,
+          isGreenSeal: s.isGreenSeal,
+          greenSealAssertivity: s.greenSealAssertivity
         })),
         ...mode2.map(s => ({
           key: s.key,
