@@ -523,31 +523,33 @@ export default function SinaisSection() {
 
       <div className="space-y-8">
 
-        {/* Top header da lista */}
-        <div className="flex w-full flex-wrap items-start justify-between gap-4">
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-3 mb-2">
-              <span className="text-[10px] tracking-[0.5em] text-[#FF1F3D] font-black font-outfit uppercase">
-                [ LIVE FEED · UPDATING · {activeTab.toUpperCase()} ]
-              </span>
+        {/* Assertividade topo */}
+        <div className="flex w-full flex-wrap items-center justify-between gap-4 bg-white/[0.02] border border-white/[0.05] p-6 rounded-2xl">
+          <div>
+            <div className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] mb-1 font-outfit">
+              Histórico Operacional (4h)
             </div>
-            <p className="mt-2 text-sm text-[#9CA3AF] font-medium">
-              Sinais unificados e confluências em tempo real. Janela de ±1 min.
-            </p>
-          </div>
-          <div className="mt-4 flex flex-wrap gap-4">
-            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-3 py-1 text-xs">
-              <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
-              Martingale: 3 níveis · ×2
-            </div>
-            <div className="flex items-center gap-2 bg-white/[0.03] border border-white/10 rounded-xl px-3 py-1">
-              <span className="text-[10px] font-black text-muted-foreground uppercase font-mono tracking-widest">Auditoria Real-Time</span>
-              <div className="flex gap-1">
-                 <span className="text-[9px] font-bold text-emerald-400">WIN_DIRETO</span>
-                 <span className="text-[9px] font-bold text-emerald-500">WIN_VIZINHO</span>
-              </div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-4xl font-black text-white font-outfit">{auditStats.pct.toFixed(1)}%</span>
+              <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest">Assertividade</span>
             </div>
           </div>
+          
+          <div className="flex gap-8">
+            <div className="text-center">
+              <div className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">Acertos</div>
+              <div className="text-xl font-black text-emerald-400 font-outfit">{auditStats.wins}W</div>
+            </div>
+            <div className="text-center">
+              <div className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">Erros</div>
+              <div className="text-xl font-black text-red-500 font-outfit">{auditStats.losses}L</div>
+            </div>
+            <div className="text-center border-l border-white/10 pl-8">
+              <div className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">Total</div>
+              <div className="text-xl font-black text-white font-outfit">{auditStats.total}</div>
+            </div>
+          </div>
+        </div>
         </div>
 
         <div className="flex items-center gap-3">
