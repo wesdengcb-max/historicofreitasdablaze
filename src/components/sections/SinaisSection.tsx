@@ -17,6 +17,7 @@ import {
   Clock,
   Target,
   Layers,
+  FileDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -167,10 +168,80 @@ export default function SinaisSection() {
 
   const [activeTab, setActiveTab] = useState<'sinais' | 'analises'>('sinais');
 
+  const exportCSV = useCallback(async () => {
+    try {
+      const table = 'historico_sinais_audit';
+      const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      
+      const { data, error } = await supabase
+        .from(table)
+        .select("created_at, analise, minuto_alvo, status, level:nivel")
+        .gte("created_at", twentyFourHoursAgo)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      if (!data || data.length === 0) {
+        alert("Nenhum dado encontrado nas últimas 24 horas para exportar.");
+        return;
+      }
+
+      const headers = ["Horario_Entrada", "Estrategia_Confluencia", "Horario_Alvo", "Resultado", "Minuto_Acerto"];
+      const rows = data.map(r => {
+        const entryTime = r.created_at ? new Date(r.created_at).toLocaleString('pt-BR') : '---';
+        const targetTime = r.minuto_alvo ? new Date(r.minuto_alvo).toLocaleString('pt-BR') : '---';
+        
+        // Determinar o minuto de acerto com base no status (ex: "WIN DIRETO", "WIN +1min")
+        // Como o status no banco é salvo como "WIN" ou "LOSS" conforme PredictiveSignals.tsx, 
+        // vamos tentar extrair se houver detalhes, senão usamos o status bruto.
+        let minutoAcerto = "---";
+        if (r.status.startsWith("WIN")) {
+          minutoAcerto = "Direto"; // Simplificação, ou extrair de metadados se existissem
+        } else if (r.status === "LOSS") {
+          minutoAcerto = "RED";
+        }
+
+        return [
+          entryTime,
+          r.analise || '---',
+          targetTime,
+          r.status.startsWith("WIN") ? "WIN" : "RED",
+          minutoAcerto
+        ];
+      });
+
+      const csvContent = [
+        headers.join(","),
+        ...rows.map(row => row.map(cell => `"${cell}"`).join(","))
+      ].join("\n");
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `relatorio_sinais_24h_${new Date().getTime()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      console.error("Erro ao exportar CSV:", err);
+      alert("Erro ao gerar relatório CSV.");
+    }
+  }, []);
+
 
 
 
   useEffect(() => {
+    // Run DB cleanup for 24h retention (server-side function call)
+    const runCleanup = async () => {
+      try {
+        await supabase.rpc('cleanup_audit_24h');
+      } catch (e) {
+        console.error("Cleanup failed (expected if not service_role):", e);
+      }
+    };
+    runCleanup();
+
     const fetchAudit = async () => {
       try {
         const table = 'historico_sinais_audit';
@@ -369,10 +440,12 @@ export default function SinaisSection() {
     });
   const removeSignal = (id: string) => setDisabled((prev) => new Set(prev).add(id));
 
-  const visible = useMemo(
-    () => signals.filter((s) => !disabled.has(s.id)),
-    [signals, disabled],
-  );
+  const visible = useMemo(() => {
+    const fourHoursAgo = Date.now() - 4 * 60 * 60 * 1000;
+    return signals
+      .filter((s) => !disabled.has(s.id))
+      .filter((s) => s.entryDate.getTime() > fourHoursAgo);
+  }, [signals, disabled]);
 
   const visibleForStore = useMemo(
     () =>
@@ -701,6 +774,14 @@ export default function SinaisSection() {
             <Clock className="h-5 w-5" />
           </div>
           <h2 className="text-xl font-black text-white font-outfit uppercase tracking-tight">Resultados Anteriores</h2>
+          <Button 
+            onClick={exportCSV}
+            variant="outline" 
+            className="ml-auto bg-white/5 border-white/10 hover:bg-white/10 text-white text-[10px] font-black uppercase tracking-widest h-8 px-4"
+          >
+            <FileDown className="h-3.5 w-3.5 mr-2" />
+            Exportar CSV (24h)
+          </Button>
         </div>
 
         <Card className="glass-card !p-0 overflow-hidden">
