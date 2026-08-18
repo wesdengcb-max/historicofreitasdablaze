@@ -14,6 +14,9 @@ import {
   Trash2,
   ChevronRight,
   Sparkles,
+  Clock,
+  Target,
+  Layers,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -399,12 +402,14 @@ export default function SinaisSection() {
 
           if (s.outcome && s.outcome !== "pending") return s;
 
+          // Janela de ±1 minuto (Anterior -1, Exato 0, Posterior +1)
           const rangeStart = entryTime - 60_000;
           const rangeEnd = entryTime + 60_000;
 
           const matchedResult = (resultsForValidation || []).find(r => {
             if (!r || r.color !== "white") return false;
             const rt = new Date(r.createdAt).getTime();
+            // Verifica se está dentro da janela de 3 minutos (±1 min do alvo)
             return rt >= rangeStart && rt <= rangeEnd && rt <= now;
           });
 
@@ -430,7 +435,7 @@ export default function SinaisSection() {
             return res;
           }
 
-
+          // Só marca RED se a janela de ±1 minuto expirar completamente
           if (now > rangeEnd) {
             const res = { ...s, outcome: "red" as const, label: "LOSS", completedAt: now };
             const table = 'historico_sinais_audit';
@@ -520,34 +525,36 @@ export default function SinaisSection() {
       </div>
 
       <div className="space-y-8">
-
-        {/* Top header da lista */}
-        <div className="flex w-full flex-wrap items-start justify-between gap-4">
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-3 mb-2">
-              <span className="text-[10px] tracking-[0.5em] text-[#FF1F3D] font-black font-outfit uppercase">
-                [ LIVE FEED · UPDATING · {activeTab.toUpperCase()} ]
-              </span>
+        {/* Assertividade topo */}
+        <div className="flex w-full flex-wrap items-center justify-between gap-4 bg-white/[0.02] border border-white/[0.05] p-6 rounded-2xl">
+          <div>
+            <div className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] mb-1 font-outfit">
+              Histórico Operacional (4h)
             </div>
-            <p className="mt-2 text-sm text-[#9CA3AF] font-medium">
-              Sinais unificados e confluências em tempo real. Janela de ±1 min.
-            </p>
+            <div className="flex items-baseline gap-2">
+              <span className="text-4xl font-black text-white font-outfit">{auditStats.pct.toFixed(1)}%</span>
+              <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest">Assertividade</span>
+            </div>
           </div>
-          <div className="mt-4 flex flex-wrap gap-4">
-            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-3 py-1 text-xs">
-              <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
-              Martingale: 3 níveis · ×2
+          
+          <div className="flex gap-8">
+            <div className="text-center">
+              <div className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">Acertos</div>
+              <div className="text-xl font-black text-emerald-400 font-outfit">{auditStats.wins}W</div>
             </div>
-            <div className="flex items-center gap-2 bg-white/[0.03] border border-white/10 rounded-xl px-3 py-1">
-              <span className="text-[10px] font-black text-muted-foreground uppercase font-mono tracking-widest">Auditoria Real-Time</span>
-              <div className="flex gap-1">
-                 <span className="text-[9px] font-bold text-emerald-400">WIN_DIRETO</span>
-                 <span className="text-[9px] font-bold text-emerald-500">WIN_VIZINHO</span>
-              </div>
+            <div className="text-center">
+              <div className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">Erros</div>
+              <div className="text-xl font-black text-red-500 font-outfit">{auditStats.losses}L</div>
+            </div>
+            <div className="text-center border-l border-white/10 pl-8">
+              <div className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">Total</div>
+              <div className="text-xl font-black text-white font-outfit">{auditStats.total}</div>
             </div>
           </div>
         </div>
+      </div>
 
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Popover open={menuOpen} onOpenChange={setMenuOpen}>
             <PopoverTrigger asChild>
@@ -627,7 +634,7 @@ export default function SinaisSection() {
                 <Card
                   key={s.key}
                   title={s.medal || "Sinal Preditivo"}
-                  subtitle={`${s.time} · Janela ${s.label}`}
+                  subtitle={s.time}
                   isRare={s.isRare}
                   isGreenSeal={s.isGreenSeal}
                   greenSealAssertivity={s.greenSealAssertivity}
@@ -685,79 +692,88 @@ export default function SinaisSection() {
           </div>
         </div>
 
-        <div className="overflow-x-auto border-t border-white/5">
-          <table className="w-full min-w-[720px]">
-            <tbody>
-              {visible.length > 0 && (
-                <tr className="bg-white/[0.02]">
-                  <td colSpan={6} className="px-4 py-3 text-[10px] font-black tracking-[0.3em] text-muted-foreground/40 uppercase font-outfit border-b border-white/[0.05]">
-                    [ Histórico de Sinais Auditados ]
-                  </td>
-                </tr>
-              )}
-              {visible.map((s) => (
-                <tr
-                  key={s.id}
-                  className={`border-b border-white/[0.03] transition-colors ${
-                    s.outcome === "green"
-                      ? "bg-emerald-500/5 hover:bg-emerald-500/10"
-                      : s.outcome === "red"
-                        ? "bg-red-500/5 hover:bg-red-500/10"
-                        : "hover:bg-white/[0.03]"
-                  }`}
-                >
-                  <td className="px-4 py-4">
-                    <Checkbox
-                      checked={selected.has(s.id)}
-                      onCheckedChange={() => toggleSelect(s.id)}
-                    />
-                  </td>
-                  <td className="px-3 py-4">
-                    <div className="font-bold font-mono text-white">{s.time}</div>
-                    <div className="text-[10px] text-muted-foreground font-mono">{s.date}</div>
-                  </td>
-                  <td className="px-3 py-4">
-                    <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.05] bg-white/[0.02] px-3 py-1.5">
-                      <ResultCircle color={s.color} size="sm" animate={false} />
-                      <span className="text-xs font-bold text-white/90">
-                        {s.color === "white" ? "Branco" : s.color === "red" ? "Vermelho" : "Preto"}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-3 py-4">
-                    <div className="inline-flex items-center rounded-md border border-white/[0.05] bg-white/[0.02] px-3 py-1 font-mono text-[10px] text-white/70">
-                      {s.entry}ª · G{s.entry - 1}
-                    </div>
-                  </td>
-                  <td className="px-3 py-4">
-                    <div
-                      className={`inline-flex items-center rounded-md px-3 py-1 font-mono text-[10px] font-black tracking-widest border ${
-                        s.outcome === "green"
-                          ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                          : "bg-red-500/10 text-red-400 border-red-500/20"
-                      }`}
-                    >
-                      {s.outcome === "green" ? "WIN" : "LOSS"}
-                      {s.resultTime ? ` · ${s.resultTime}` : ""}
-                    </div>
-                  </td>
-                  <td className="px-3 py-4">
-                    <button
-                      onClick={() => removeSignal(s.id)}
-                      className="grid h-8 w-8 place-items-center rounded-lg border border-white/[0.05] hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/20 transition-colors"
-                      aria-label="Remover"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
       </Card>
 
+      {/* RESULTADOS ANTERIORES */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="grid h-9 w-9 place-items-center rounded-lg bg-white/5 text-white/40">
+            <Clock className="h-5 w-5" />
+          </div>
+          <h2 className="text-xl font-black text-white font-outfit uppercase tracking-tight">Resultados Anteriores</h2>
+        </div>
+
+        <Card className="glass-card !p-0 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[720px]">
+              <thead>
+                <tr className="bg-white/[0.02] border-b border-white/[0.05]">
+                  <th className="px-6 py-4 text-left text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Horário</th>
+                  <th className="px-6 py-4 text-left text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Estratégia / Confluência</th>
+                  <th className="px-6 py-4 text-center text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Status</th>
+                  <th className="px-6 py-4 text-right text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Ação</th>
+                </tr>
+              </thead>
+              <tbody>
+                {visible.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="px-6 py-12 text-center text-muted-foreground text-xs uppercase tracking-widest font-bold">
+                      Nenhum resultado nas últimas 4 horas
+                    </td>
+                  </tr>
+                )}
+                {visible.map((s) => (
+                  <tr
+                    key={s.id}
+                    className={`border-b border-white/[0.03] transition-colors ${
+                      s.outcome === "green"
+                        ? "bg-emerald-500/[0.02] hover:bg-emerald-500/[0.05]"
+                        : "bg-red-500/[0.02] hover:bg-red-500/[0.05]"
+                    }`}
+                  >
+                    <td className="px-6 py-5">
+                      <div className="font-black font-outfit text-white text-lg">{s.time}</div>
+                      <div className="text-[10px] text-white/30 font-mono tracking-tighter uppercase">{s.date}</div>
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <ResultCircle color={s.color} size="xs" animate={false} />
+                        <span className="text-xs font-black text-white tracking-tight uppercase">
+                          {s.color === "white" ? "Branco" : s.color === "red" ? "Vermelho" : "Preto"}
+                        </span>
+                      </div>
+                      <div className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
+                        Entrada {s.entry}ª · G{s.entry - 1}
+                      </div>
+                    </td>
+                    <td className="px-6 py-5 text-center">
+                      <div
+                        className={`inline-flex items-center rounded-lg px-4 py-1.5 font-black text-[11px] tracking-[0.2em] border shadow-sm ${
+                          s.outcome === "green"
+                            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                            : "bg-red-500/10 text-red-400 border-red-500/20"
+                        }`}
+                      >
+                        {s.outcome === "green" ? "WIN" : "RED"}
+                        {s.resultTime ? ` · ${s.resultTime}` : ""}
+                      </div>
+                    </td>
+                    <td className="px-6 py-5 text-right">
+                      <button
+                        onClick={() => removeSignal(s.id)}
+                        className="h-8 w-8 inline-grid place-items-center rounded-lg border border-white/[0.05] bg-white/[0.02] hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/20 transition-all active:scale-90"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      </div>
+      
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent className="bg-surface border-border max-w-lg">
           <DialogHeader>
@@ -814,9 +830,7 @@ export default function SinaisSection() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
     </div>
-
   );
 }
 
