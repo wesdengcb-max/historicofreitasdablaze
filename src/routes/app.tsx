@@ -899,7 +899,7 @@ function Index() {
 
 
   return (
-    <div className="relative flex h-screen w-full bg-[#080808] text-white overflow-hidden">
+    <div className="relative flex h-screen w-full bg-background text-foreground overflow-hidden">
       {/* Sidebar lateral fixa com transição suave - Mobile overlay support */}
       <div className={cn(
         "fixed inset-y-0 left-0 z-50 transition-all duration-300 ease-in-out lg:relative lg:z-0 lg:block lg:shrink-0",
@@ -1055,7 +1055,7 @@ function Index() {
                 <button
                   type="button"
                   onClick={() => setFullscreen(true)}
-                  className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 bg-white/5 text-muted-foreground transition-colors hover:bg-white/[0.09] hover:text-foreground"
+                  className="grid h-8 w-8 place-items-center rounded-lg border border-border bg-surface text-muted-foreground transition-colors hover:bg-surface-2 hover:text-foreground"
                   aria-label="Tela cheia"
                   title="Tela cheia"
                 >
@@ -1079,8 +1079,8 @@ function Index() {
                   onClick={() => setFilter(id)}
                   className={`rounded-full border px-2 py-1 text-[10px] font-medium transition-colors sm:px-3 sm:py-1.5 sm:text-[11px] ${
                     filter === id
-                      ? "border-white/20 bg-white/10 text-foreground"
-                      : "border-white/5 bg-white/[0.03] text-muted-foreground hover:text-foreground"
+                      ? "border-border bg-surface-2 text-foreground"
+                      : "border-border bg-surface text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {label}
@@ -1089,7 +1089,7 @@ function Index() {
             </div>
 
             {filter === "custom" && (
-              <div className="mb-3 grid gap-2 rounded-xl border border-white/5 bg-white/[0.02] p-3 sm:mb-4 sm:grid-cols-[repeat(4,1fr)_auto] sm:items-end">
+              <div className="mb-3 grid gap-2 rounded-xl border border-border bg-surface p-3 sm:mb-4 sm:grid-cols-[repeat(4,1fr)_auto] sm:items-end">
                 <FieldInput label="Data inicial" type="date" value={customStart} onChange={setCustomStart} />
                 <FieldInput label="Data final" type="date" value={customEnd} onChange={setCustomEnd} />
                 <FieldInput label="Hora inicial" type="time" value={timeStart} onChange={setTimeStart} placeholder="00:00" />
@@ -1150,7 +1150,7 @@ function Index() {
                     <DropdownMenuTrigger asChild>
                       <button
                         type="button"
-                        className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] font-medium text-muted-foreground transition-colors hover:bg-white/[0.09] hover:text-foreground"
+                        className="inline-flex items-center gap-1 rounded-full border border-border bg-surface px-2.5 py-1 text-[10px] font-medium text-muted-foreground transition-colors hover:bg-surface-2 hover:text-foreground"
                         title="Slots futuros"
                       >
                         <Clock className="h-3.5 w-3.5" />
@@ -1163,7 +1163,7 @@ function Index() {
                         <DropdownMenuItem
                           key={v}
                           onSelect={() => setFutureSlots(v)}
-                          className={futureSlots === v ? "bg-white/10" : ""}
+                          className={futureSlots === v ? "bg-accent/20" : ""}
                         >
                           {v === 0 ? "Off" : `+${v} min`}
                         </DropdownMenuItem>
@@ -1202,14 +1202,14 @@ function Index() {
                           });
                           setHighlightN(next);
                         }}
-                        className={`flex w-full flex-col gap-0.5 overflow-hidden rounded-[4px] p-1 text-left transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-primary/25" : "bg-white/[0.03] hover:bg-white/[0.08]"}`}
+                        className={`flex w-full flex-col gap-0.5 overflow-hidden rounded-[4px] p-1 text-left transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-primary/25" : "bg-surface hover:bg-surface-2"}`}
                         style={{ width: "100%" }}
                       >
                         <div className="flex items-center justify-between px-0.5 text-[8px] font-bold tabular-nums">
-                          <span className="text-white">B: {stats.white}</span>
-                          <span className="text-white/40">{stats.whitePct.toFixed(0)}%</span>
+                          <span className="text-foreground">B: {stats.white}</span>
+                          <span className="text-muted-foreground/60">{stats.whitePct.toFixed(0)}%</span>
                         </div>
-                        <div className="relative h-1 w-full overflow-hidden rounded-full bg-white/5">
+                        <div className="relative h-1 w-full overflow-hidden rounded-full bg-surface-2">
                           <div className="flex h-full w-full">
                             <div
                               className="h-full bg-[#DE2143] transition-all duration-500"
@@ -1240,7 +1240,7 @@ function Index() {
               className={
                 fullscreen
                   ? "fixed inset-0 z-50 flex flex-col bg-background/95 p-4 backdrop-blur-md sm:p-6"
-                  : "overflow-hidden rounded-2xl border border-white/5 bg-black/15"
+                  : "overflow-hidden rounded-2xl border border-border bg-card"
               }
             >
               {fullscreen && (
@@ -1254,7 +1254,7 @@ function Index() {
                   <button
                     type="button"
                     onClick={() => setFullscreen(false)}
-                    className="grid h-10 w-10 place-items-center rounded-xl border border-white/10 bg-white/5 text-muted-foreground transition-colors hover:bg-white/[0.09] hover:text-foreground"
+                    className="grid h-10 w-10 place-items-center rounded-xl border border-border bg-surface text-muted-foreground transition-colors hover:bg-surface-2 hover:text-foreground"
                     aria-label="Fechar tela cheia"
                   >
                     <X className="h-4 w-4" />
@@ -1417,7 +1417,7 @@ function Index() {
                                               />
                                             </div>
                                             <span
-                                              className="mt-[8px] flex items-center justify-center font-bold leading-none tabular-nums text-foreground dark:text-white rounded-md bg-slate-200 dark:bg-[#3f4a56] border-none"
+                                              className="mt-[8px] flex items-center justify-center font-bold leading-none tabular-nums text-foreground dark:text-white rounded-md bg-surface-2 dark:bg-[#3f4a56] border-none"
                                               style={{
                                                 height: "16px",
                                                 width: "100%",
@@ -1469,7 +1469,7 @@ function Index() {
                                             )}
                                           </button>
                                           <span
-                                            className="mt-[8px] flex items-center justify-center font-bold leading-none tabular-nums text-foreground dark:text-white rounded-md bg-slate-200 dark:bg-[#3f4a56] border-none"
+                                            className="mt-[8px] flex items-center justify-center font-bold leading-none tabular-nums text-foreground dark:text-white rounded-md bg-surface-2 dark:bg-[#3f4a56] border-none"
                                             style={{
                                               height: "16px",
                                               width: "100%",
@@ -1543,7 +1543,7 @@ function Index() {
                         type="button"
                         onClick={loadMore}
                         disabled={loadingMore}
-                        className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-2 text-[12px] font-semibold text-foreground transition-colors hover:bg-white/[0.09] disabled:opacity-60"
+                        className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-5 py-2 text-[12px] font-semibold text-foreground transition-colors hover:bg-surface-2 disabled:opacity-60 shadow-sm"
                       >
                         {loadingMore ? (
                           <>
@@ -1787,7 +1787,7 @@ function ThemeToggle() {
     <button
       type="button"
       onClick={toggle}
-      className="grid h-11 w-11 place-items-center rounded-xl border border-white/10 bg-white/5 text-muted-foreground transition-colors duration-200 hover:bg-white/[0.09] hover:text-foreground"
+      className="grid h-11 w-11 place-items-center rounded-xl border border-border bg-surface text-muted-foreground transition-colors duration-200 hover:bg-surface-2 hover:text-foreground shadow-sm"
       aria-label={dark ? "Ativar tema claro" : "Ativar tema escuro"}
     >
       {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
@@ -1819,7 +1819,7 @@ const FieldInput = memo(function FieldInput({
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className="h-9 rounded-lg border border-white/10 bg-black/30 px-3 text-[12px] text-foreground outline-none transition-colors focus:border-white/25"
+        className="h-9 rounded-lg border border-border bg-surface-2 px-3 text-[12px] text-foreground outline-none transition-colors focus:border-primary/50"
       />
     </label>
   );

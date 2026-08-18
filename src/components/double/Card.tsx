@@ -35,7 +35,7 @@ export const Card = memo(function Card({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
       transition={{ duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={`relative overflow-hidden rounded-xl border border-white/5 bg-[#0c0c0c] p-5 shadow-sm ${className} ${
+      className={`relative overflow-hidden rounded-xl border border-border bg-card p-5 shadow-sm ${className} ${
         outcome === "green" ? "ring-1 ring-emerald-500/20" : outcome === "red" ? "ring-1 ring-red-500/20" : ""
       }`}
     >

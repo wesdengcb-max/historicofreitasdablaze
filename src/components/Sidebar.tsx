@@ -95,7 +95,7 @@ export const Sidebar = memo(function Sidebar() {
 
   return (
     <aside className={cn(
-      "fixed inset-y-0 left-0 z-50 flex flex-col border-r border-white/5 bg-[#0A0A0A] transition-all duration-300 ease-in-out",
+      "fixed inset-y-0 left-0 z-50 flex flex-col border-r border-border bg-surface transition-all duration-300 ease-in-out",
       isCollapsed ? "w-[80px] -translate-x-full lg:translate-x-0" : "w-[260px] translate-x-0"
     )}>
       {/* Collapse Toggle removido daqui para usar apenas o do Header */}
@@ -128,14 +128,14 @@ export const Sidebar = memo(function Sidebar() {
             onChange={handleFile}
           />
           {isVip && (
-            <div className="pointer-events-none absolute -bottom-1 -right-1 rounded-full bg-red-500 p-1 shadow-[0_0_12px_rgba(239,68,68,0.7)] ring-2 ring-[#0A0A0A]">
+            <div className="pointer-events-none absolute -bottom-1 -right-1 rounded-full bg-red-500 p-1 shadow-[0_0_12px_rgba(239,68,68,0.7)] ring-2 ring-surface">
                <Crown className="h-3 w-3 text-white" />
             </div>
           )}
         </div>
         {!isCollapsed && (
           <div className="text-center">
-            <h2 className="text-lg font-black tracking-tight text-white font-outfit">Freitas da Blaze</h2>
+            <h2 className="text-lg font-black tracking-tight text-foreground font-outfit">Freitas da Blaze</h2>
             <div className="mt-1 flex items-center justify-center gap-2">
               <span className="rounded bg-red-500/10 px-2 py-0.5 text-[10px] font-bold text-red-500 uppercase tracking-widest">VIP</span>
               <span className="text-[11px] text-muted-foreground">Analista Premium</span>
@@ -187,13 +187,13 @@ export const Sidebar = memo(function Sidebar() {
       {/* VIP Upgrade Card */}
       {!isCollapsed && (
         <div className="p-4">
-          <div className="rounded-2xl border border-red-500/10 bg-red-500/[0.03] p-5 text-center">
+          <div className="rounded-2xl border border-red-500/10 bg-red-500/[0.03] p-5 text-center shadow-sm">
             <div className="mb-3 flex justify-center">
               <div className="rounded-full bg-red-500/10 p-2">
                 <Crown className="h-5 w-5 text-red-500" />
               </div>
             </div>
-            <h4 className="text-xs font-bold text-white uppercase tracking-widest">Seja VIP</h4>
+            <h4 className="text-xs font-bold text-foreground uppercase tracking-widest">Seja VIP</h4>
             <p className="mt-2 text-[10px] text-muted-foreground leading-relaxed">Tenha acesso total a todas as ferramentas e recursos exclusivos.</p>
             <a 
               href="https://t.me/freitaswhite" 
