@@ -411,8 +411,8 @@ export default function SinaisSection() {
             const res = { ...s, outcome: "green" as const, resultTime: fmtTime(matchedResult.createdAt), label: status };
             
             const table = 'historico_sinais_audit';
-            const isGreenSeal = !!s.isGreenSeal;
-            const tag = isGreenSeal ? `SOMA_${s.confluence.split('·')[1]}` : (s.isGreenSeal === false && s.greenSealAssertivity !== undefined ? `SOMA_${s.confluence.split('·')[1]}` : null);
+            const isGreenSeal = !!(s as any).isGreenSeal;
+            const tag = isGreenSeal ? `SOMA_${s.confluence.split('·')[1]}` : (((s as any).isGreenSeal === false && (s as any).greenSealAssertivity !== undefined) ? `SOMA_${s.confluence.split('·')[1]}` : null);
             
             void supabase.from(table).insert({
               analise: s.confluence || "Analise",
@@ -422,9 +422,9 @@ export default function SinaisSection() {
               status: status,
               minuto_alvo: new Date(entryTime).toISOString(),
               is_verified: s.isVerified ? (true as any) : (false as any),
-              tag: tag,
-              pedra_anterior: isGreenSeal || tag ? parseInt(s.label) : null
-            });
+              tag: tag || undefined,
+              pedra_anterior: (isGreenSeal || tag) ? parseInt(s.label) : undefined
+            } as any);
             return res;
           }
 
@@ -432,8 +432,8 @@ export default function SinaisSection() {
           if (now > rangeEnd) {
             const res = { ...s, outcome: "red" as const, label: "LOSS" };
             const table = 'historico_sinais_audit';
-            const isGreenSeal = !!s.isGreenSeal;
-            const tag = isGreenSeal ? `SOMA_${s.confluence.split('·')[1]}` : (s.isGreenSeal === false && s.greenSealAssertivity !== undefined ? `SOMA_${s.confluence.split('·')[1]}` : null);
+            const isGreenSeal = !!(s as any).isGreenSeal;
+            const tag = isGreenSeal ? `SOMA_${s.confluence.split('·')[1]}` : (((s as any).isGreenSeal === false && (s as any).greenSealAssertivity !== undefined) ? `SOMA_${s.confluence.split('·')[1]}` : null);
 
             void supabase.from(table).insert({
               analise: s.confluence || "Analise",
@@ -443,9 +443,9 @@ export default function SinaisSection() {
               status: 'LOSS',
               minuto_alvo: new Date(entryTime).toISOString(),
               is_verified: s.isVerified ? (true as any) : (false as any),
-              tag: tag,
-              pedra_anterior: isGreenSeal || tag ? parseInt(s.label) : null
-            });
+              tag: tag || undefined,
+              pedra_anterior: (isGreenSeal || tag) ? parseInt(s.label) : undefined
+            } as any);
             return res;
           }
 
