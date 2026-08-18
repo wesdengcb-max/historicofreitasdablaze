@@ -1350,7 +1350,7 @@ function Index() {
                                 style={{ width: "100%", height: "76px", direction: "ltr" }}
                               >
                                 <div 
-                                  className={`relative flex flex-col items-center pt-2 transition-all duration-300 bg-transparent border-0 shadow-none`}
+                                  className="relative flex flex-col items-center pt-2 transition-all duration-300 bg-transparent border-0 shadow-none outline-none"
                                 >
                                   {badge && (
                                     <span className={`absolute top-0 z-10 inline-flex h-3 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-3.5 sm:px-1.5 sm:text-[8px] ${badgeCls}`}>
