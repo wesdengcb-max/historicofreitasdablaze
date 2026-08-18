@@ -53,15 +53,15 @@
 :root {
   --radius: 8px;
 
-  /* FreitasWhite Theme */
-  --background: #030303;
+  /* FreitasWhite TipMiner Theme Foundation */
+  --background: #090B0D;
   --foreground: #ffffff;
 
-  --surface: #0c0c0c;
-  --surface-2: #141414;
-  --surface-3: #1a1a1a;
+  --surface: #090B0D;
+  --surface-2: #111418;
+  --surface-3: #1a1e24;
 
-  --card: #0c0c0c;
+  --card: #090B0D;
   --card-foreground: #ffffff;
   --popover: #0c0c0c;
   --popover-foreground: #ffffff;
