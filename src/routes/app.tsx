@@ -1510,7 +1510,7 @@ function Index() {
                          style={{
                             gridTemplateColumns: `repeat(auto-fill, minmax(52px, 1fr))`,
                             columnGap: "6px",
-                            rowGap: "8px",
+                            rowGap: "12px",
                            direction: inverse ? "rtl" : "ltr",
                          }}
                        >
