@@ -1457,16 +1457,10 @@ function Index() {
                                               }
                                               cycleSlotPrediction(slotKey);
                                             }}
-                                            className={`relative flex h-[50px] w-[52px] items-center justify-center rounded-[4px] border border-dashed transition-colors hover:border-white/20 shadow-none ${
+                                            className={`relative flex h-[50px] w-[52px] items-center justify-center rounded-[4px] border-none transition-colors shadow-none bg-transparent ${
                                               isLocked
-                                                ? "border-white/5 bg-white/5 opacity-50 cursor-not-allowed"
-                                                : p === "white"
-                                                  ? "border-emerald-400/50 bg-emerald-400/5"
-                                                  : p === "red"
-                                                    ? "border-red-500/50 bg-red-500/5"
-                                                    : p === "black"
-                                                      ? "border-slate-500/50 bg-slate-500/5"
-                                                      : "border-[#3b5270] bg-[#233248]"
+                                                ? "opacity-50 cursor-not-allowed"
+                                                : "cursor-pointer"
                                             }`}
                                           >
                                             {isLocked ? (

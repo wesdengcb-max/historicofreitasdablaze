@@ -45,7 +45,7 @@ export const BlazeResultCard = memo(function BlazeResultCard({
 
   return (
     <div
-      className="blaze-result-card relative flex animate-in flex-col items-center fade-in slide-in-from-bottom-2"
+      className="blaze-result-card relative flex animate-in flex-col items-center bg-transparent border-none shadow-none outline-none fade-in slide-in-from-bottom-2"
       style={{
         width: `var(--blaze-card-w, ${BLAZE_CARD_W}px)`,
         animationDelay: delay > 0 ? `${delay}s` : undefined,
@@ -54,7 +54,7 @@ export const BlazeResultCard = memo(function BlazeResultCard({
       <button
         type="button"
         onClick={onClick}
-        className="group flex w-full cursor-pointer items-center justify-center overflow-hidden transition-[transform,opacity,box-shadow,border-color] duration-200 hover:-translate-y-0.5 active:scale-95 shadow-none"
+        className="group flex w-full cursor-pointer items-center justify-center overflow-hidden transition-[transform,opacity,box-shadow,border-color] duration-200 hover:-translate-y-0.5 active:scale-95 shadow-none border-none bg-transparent"
         style={{
           height: `var(--blaze-card-h, ${BLAZE_CARD_TOP_H}px)`,
           borderRadius: 4,
