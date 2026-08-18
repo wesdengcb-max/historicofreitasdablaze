@@ -214,7 +214,7 @@ export function PredictiveSignals() {
 
   const hasOpportunity = active.length > 0;
 
-  const generate = useCallback(() => {
+  const generate = useCallback(async () => {
     setHasClicked(true);
     const now = new Date();
     now.setSeconds(0, 0);
