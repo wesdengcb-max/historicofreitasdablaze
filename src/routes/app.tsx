@@ -1435,13 +1435,10 @@ function Index() {
                                               />
                                             </div>
                                             <span
-                                              className="mt-[8px] flex items-center justify-center font-bold leading-none tabular-nums text-muted-foreground/90"
+                                              className="mt-[8px] flex items-center justify-center font-bold leading-none tabular-nums text-white rounded-md bg-[#3f4a56] border-none"
                                               style={{
                                                 height: "16px",
                                                 width: "100%",
-                                                borderRadius: "4px",
-                                                background: "rgba(255, 255, 255, 0.1)",
-                                                border: "1.5px solid rgba(255, 255, 255, 0.4)",
                                                 fontSize: "9px",
                                                 padding: "0 2px",
                                               }}
@@ -1495,20 +1492,17 @@ function Index() {
                                               />
                                             )}
                                           </button>
-                                           <span
-                                             className="mt-[8px] flex items-center justify-center font-bold leading-none tabular-nums text-muted-foreground/60"
-                                             style={{
-                                               height: "16px",
-                                               width: "100%",
-                                               borderRadius: "4px",
-                                               background: "rgba(255, 255, 255, 0.1)",
-                                               border: "1.5px solid rgba(255, 255, 255, 0.4)",
-                                               fontSize: "9px",
-                                               padding: "0 2px",
-                                             }}
-                                           >
-                                            {hm}
-                                          </span>
+                                            <span
+                                              className="mt-[8px] flex items-center justify-center font-bold leading-none tabular-nums text-white rounded-md bg-[#3f4a56] border-none"
+                                              style={{
+                                                height: "16px",
+                                                width: "100%",
+                                                fontSize: "9px",
+                                                padding: "0 2px",
+                                              }}
+                                            >
+                                             {hm}
+                                           </span>
                                         </div>
 
                                       );
