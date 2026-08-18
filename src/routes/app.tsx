@@ -222,6 +222,7 @@ const ColumnBlock = memo(function ColumnBlock({
   col,
   spins,
   highlightN,
+  setHighlightN,
   highlightKey,
   inverse,
   numerado,
@@ -250,6 +251,7 @@ const ColumnBlock = memo(function ColumnBlock({
             isActive={isActive}
             highlightKey={highlightKey}
             highlightN={highlightN}
+            setHighlightN={setHighlightN}
             numerado={numerado}
             destaqueHorario={destaqueHorario}
             exibirSegundos={exibirSegundos}
@@ -260,6 +262,7 @@ const ColumnBlock = memo(function ColumnBlock({
             isActive={isActive}
             highlightKey={highlightKey}
             highlightN={highlightN}
+            setHighlightN={setHighlightN}
             numerado={numerado}
             destaqueHorario={destaqueHorario}
             exibirSegundos={exibirSegundos}
@@ -276,6 +279,7 @@ const BlazeResultCardWrapper = memo(function BlazeResultCardWrapper({
   isActive,
   highlightKey,
   highlightN,
+  setHighlightN,
   numerado,
   destaqueHorario,
   exibirSegundos,
@@ -297,7 +301,7 @@ const BlazeResultCardWrapper = memo(function BlazeResultCardWrapper({
         }
         selected={highlightN.has(item.n)}
         onClick={() =>
-          setHighlightN((h) => {
+          setHighlightN?.((h: Set<number>) => {
             const next = new Set(h);
             if (next.has(item.n)) next.delete(item.n);
             else next.add(item.n);
