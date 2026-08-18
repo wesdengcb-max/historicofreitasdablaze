@@ -58,7 +58,7 @@ export const BlazeResultCard = memo(function BlazeResultCard({
         style={{
           height: `var(--blaze-card-h, ${BLAZE_CARD_TOP_H}px)`,
           borderRadius: 4,
-          border: selected ? `2px solid var(--primary)` : `1px solid ${c.border}`,
+          border: selected ? `2px solid var(--primary)` : `1px solid rgba(255, 255, 255, 0.2)`,
           background: c.bg,
           opacity: dimmed ? 0.25 : 1,
         }}
@@ -109,7 +109,7 @@ export const BlazeResultCard = memo(function BlazeResultCard({
             width: "100%",
             borderRadius: "4px",
             background: "rgba(255, 255, 255, 0.1)",
-            border: "1px solid rgba(255, 255, 255, 0.2)",
+            border: "1.5px solid rgba(255, 255, 255, 0.4)",
             fontSize: "9px",
             padding: "0 2px",
           }}

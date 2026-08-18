@@ -222,6 +222,7 @@ const ColumnBlock = memo(function ColumnBlock({
   col,
   spins,
   highlightN,
+  setHighlightN,
   highlightKey,
   inverse,
   numerado,
@@ -250,6 +251,7 @@ const ColumnBlock = memo(function ColumnBlock({
             isActive={isActive}
             highlightKey={highlightKey}
             highlightN={highlightN}
+            setHighlightN={setHighlightN}
             numerado={numerado}
             destaqueHorario={destaqueHorario}
             exibirSegundos={exibirSegundos}
@@ -260,6 +262,7 @@ const ColumnBlock = memo(function ColumnBlock({
             isActive={isActive}
             highlightKey={highlightKey}
             highlightN={highlightN}
+            setHighlightN={setHighlightN}
             numerado={numerado}
             destaqueHorario={destaqueHorario}
             exibirSegundos={exibirSegundos}
@@ -276,6 +279,7 @@ const BlazeResultCardWrapper = memo(function BlazeResultCardWrapper({
   isActive,
   highlightKey,
   highlightN,
+  setHighlightN,
   numerado,
   destaqueHorario,
   exibirSegundos,
@@ -294,6 +298,15 @@ const BlazeResultCardWrapper = memo(function BlazeResultCardWrapper({
         dimmed={
           (highlightKey !== null && !isActive) ||
           (highlightN.size > 0 && !highlightN.has(item.n))
+        }
+        selected={highlightN.has(item.n)}
+        onClick={() =>
+          setHighlightN?.((h: Set<number>) => {
+            const next = new Set(h);
+            if (next.has(item.n)) next.delete(item.n);
+            else next.add(item.n);
+            return next;
+          })
         }
       />
     </div>
@@ -1306,7 +1319,7 @@ function Index() {
                       {gridRows.map((row) => (
                         <div key={row.key} className="flex flex-col gap-0 border-b border-white/[0.01] py-1">
                           <div className="grid grid-cols-10 gap-[8px] relative w-full">
-                            {row.cells.map((cell, ci) => {
+                            {row.cells.map((cell: any, ci: number) => {
                             const [hh, mmPrefix] = row.label.split(":");
                             const hm = `${hh}:${mmPrefix[0]}${ci}`;
                             const cellSignals = signalsByHM.get(hm) ?? [];
@@ -1346,13 +1359,13 @@ function Index() {
                                       {badge.label}
                                     </span>
                                   )}
-                                  <div className="relative flex h-[50px] items-start gap-[6px]">
+                                  <div className="relative flex h-[50px] items-start gap-[8px]">
                                     {(cell.length >= 2
                                       ? [cell[0], cell[1]]
                                       : cell.length === 1
                                         ? [cell[0], undefined]
                                         : [undefined, undefined]
-                                    ).map((spin, i) => {
+                                    ).map((spin: any, i: number) => {
 
                                       const slotKey = `${hm}-${i}`;
                                       const isLocked = !isVip && !spin && !(pending && i === 0);
@@ -1360,19 +1373,18 @@ function Index() {
                                       if (spin) {
                                         return (
                                           <div key={(spin as Spin).id} className="flex flex-col items-center">
-                                            <TipMinerCard
-                                              spin={spin as Spin}
-                                              highlightN={highlightN}
-                                              signal={robotOn ? signalsByHM.get(`${hm}-${i}`)?.[0] : undefined}
-                                              isActive={
-                                                highlightKey 
-                                                  ? highlightKey === `col-${ci}`
-                                                  : (highlightN.size > 0 ? highlightN.has((spin as Spin).n) : true)
-                                              }
+                                            <BlazeResultCard
+                                              n={(spin as Spin).n}
+                                              color={(spin as Spin).color}
+                                              time={exibirSegundos ? spTimeWithSeconds(spin as Spin) : (spin as Spin).time}
                                               numbered={numerado}
-                                              showSeconds={exibirSegundos}
                                               timeHighlight={destaqueHorario}
-                                              showTime={false}
+                                              signal={robotOn ? signalsByHM.get(`${hm}-${i}`)?.[0] : undefined}
+                                              dimmed={
+                                                (highlightKey !== null && highlightKey !== `col-${ci}`) ||
+                                                (highlightN.size > 0 && !highlightN.has((spin as Spin).n))
+                                              }
+                                              selected={highlightN.has((spin as Spin).n)}
                                               onClick={() => {
                                                 const n = (spin as Spin).n;
                                                 // Se clicar em uma pedra e já houver uma coluna selecionada,
@@ -1391,18 +1403,17 @@ function Index() {
                                               }}
                                             />
                                             <span
-                                              className={`mt-[4px] flex items-center justify-center font-bold leading-none tabular-nums ${
+                                              className={`mt-[8px] flex items-center justify-center font-bold leading-none tabular-nums ${
                                                 destaqueHorario ? "text-primary" : "text-muted-foreground/90"
                                               }`}
                                               style={{
-                                                height: "14px",
-                                                width: "auto",
-                                                minWidth: "34px",
-                                                padding: "0 4px",
+                                                height: "16px",
+                                                width: "100%",
                                                 borderRadius: "4px",
                                                 background: "rgba(255, 255, 255, 0.1)",
-                                                border: "1px solid rgba(255, 255, 255, 0.2)",
+                                                border: "1.5px solid rgba(255, 255, 255, 0.4)",
                                                 fontSize: "9px",
+                                                padding: "0 2px",
                                               }}
                                             >
                                               {exibirSegundos ? spTimeWithSeconds(spin as Spin) : (spin as Spin).time}
@@ -1424,16 +1435,15 @@ function Index() {
                                               />
                                             </div>
                                             <span
-                                              className="mt-[4px] flex items-center justify-center font-bold leading-none tabular-nums text-muted-foreground/90"
+                                              className="mt-[8px] flex items-center justify-center font-bold leading-none tabular-nums text-muted-foreground/90"
                                               style={{
-                                                height: "14px",
-                                                width: "auto",
-                                                minWidth: "34px",
-                                                padding: "0 4px",
+                                                height: "16px",
+                                                width: "100%",
                                                 borderRadius: "4px",
                                                 background: "rgba(255, 255, 255, 0.1)",
-                                                border: "1px solid rgba(255, 255, 255, 0.2)",
+                                                border: "1.5px solid rgba(255, 255, 255, 0.4)",
                                                 fontSize: "9px",
+                                                padding: "0 2px",
                                               }}
                                             >
                                               {hm}
@@ -1485,7 +1495,18 @@ function Index() {
                                               />
                                             )}
                                           </button>
-                                          <span className="mt-[4px] h-[9px] text-[9px] font-medium tabular-nums text-muted-foreground/60">
+                                           <span
+                                             className="mt-[8px] flex items-center justify-center font-bold leading-none tabular-nums text-muted-foreground/60"
+                                             style={{
+                                               height: "16px",
+                                               width: "100%",
+                                               borderRadius: "4px",
+                                               background: "rgba(255, 255, 255, 0.1)",
+                                               border: "1.5px solid rgba(255, 255, 255, 0.4)",
+                                               fontSize: "9px",
+                                               padding: "0 2px",
+                                             }}
+                                           >
                                             {hm}
                                           </span>
                                         </div>
@@ -1509,7 +1530,7 @@ function Index() {
                          className="history-scroll grid p-1 sm:p-3 lg:p-4"
                          style={{
                             gridTemplateColumns: `repeat(auto-fill, minmax(52px, 1fr))`,
-                            columnGap: "6px",
+                            columnGap: "8px",
                             rowGap: "12px",
                            direction: inverse ? "rtl" : "ltr",
                          }}
