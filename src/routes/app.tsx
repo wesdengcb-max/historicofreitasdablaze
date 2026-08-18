@@ -240,9 +240,7 @@ const ColumnBlock = memo(function ColumnBlock({
 
   return (
     <div
-      className={`flex flex-col gap-y-2 rounded-lg border border-transparent p-1 transition-colors duration-300 ${
-        isActive ? "bg-primary/5" : ""
-      }`}
+      className={`flex flex-col gap-y-2 rounded-lg border border-transparent p-1 transition-colors duration-300`}
     >
       {rows.map((pair: any[], rIdx: number) => (
         <div key={rIdx} className="flex gap-x-[8px]">
@@ -1352,7 +1350,7 @@ function Index() {
                                 style={{ width: "100%", height: "76px", direction: "ltr" }}
                               >
                                 <div 
-                                  className={`relative flex flex-col items-center pt-2 rounded-lg transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-primary/10" : ""}`}
+                                  className={`relative flex flex-col items-center pt-2 rounded-lg transition-all duration-300`}
                                 >
                                   {badge && (
                                     <span className={`absolute top-0 z-10 inline-flex h-3 items-center rounded-full px-1 text-[7px] font-black tracking-wider sm:h-3.5 sm:px-1.5 sm:text-[8px] ${badgeCls}`}>
