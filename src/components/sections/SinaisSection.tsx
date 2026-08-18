@@ -830,9 +830,7 @@ export default function SinaisSection() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
     </div>
-
   );
 }
 
