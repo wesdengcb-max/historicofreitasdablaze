@@ -552,9 +552,10 @@ export default function SinaisSection() {
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
           <Popover open={menuOpen} onOpenChange={setMenuOpen}>
             <PopoverTrigger asChild>
               <Button className="premium-btn text-white rounded-full h-11 px-6 font-bold uppercase tracking-widest text-[11px] font-outfit">
