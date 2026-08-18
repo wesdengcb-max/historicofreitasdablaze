@@ -1417,7 +1417,7 @@ function Index() {
                                               />
                                             </div>
                                             <span
-                                              className="mt-[8px] flex items-center justify-center font-bold leading-none tabular-nums text-white rounded-md bg-[#3f4a56] border-none"
+                                              className="mt-[8px] flex items-center justify-center font-bold leading-none tabular-nums text-foreground dark:text-white rounded-md bg-slate-200 dark:bg-[#3f4a56] border-none"
                                               style={{
                                                 height: "16px",
                                                 width: "100%",
@@ -1469,7 +1469,7 @@ function Index() {
                                             )}
                                           </button>
                                           <span
-                                            className="mt-[8px] flex items-center justify-center font-bold leading-none tabular-nums text-white rounded-md bg-[#3f4a56] border-none"
+                                            className="mt-[8px] flex items-center justify-center font-bold leading-none tabular-nums text-foreground dark:text-white rounded-md bg-slate-200 dark:bg-[#3f4a56] border-none"
                                             style={{
                                               height: "16px",
                                               width: "100%",

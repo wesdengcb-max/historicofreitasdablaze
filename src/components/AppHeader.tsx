@@ -1,5 +1,5 @@
-import { memo } from "react";
-import { ChevronLeft, Menu, Clock, Crown, PanelLeftOpen, PanelLeftClose, BarChart3 } from "lucide-react";
+import { memo, useState, useEffect } from "react";
+import { ChevronLeft, Menu, Clock, Crown, PanelLeftOpen, PanelLeftClose, BarChart3, Sun, Moon } from "lucide-react";
 import { useVipStatus, setVipStatus } from "@/lib/auth/vipStore";
 import { useSidebarStore } from "@/lib/sidebarStore";
 import { toast } from "sonner";
@@ -7,9 +7,27 @@ import { toast } from "sonner";
 export const AppHeader = memo(function AppHeader() {
   const isVip = useVipStatus();
   const { isCollapsed, toggle } = useSidebarStore();
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("theme") as "dark" | "light" | null;
+    if (saved) {
+      setTheme(saved);
+      document.documentElement.classList.add(saved);
+      document.documentElement.classList.remove(saved === "dark" ? "light" : "dark");
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const next = theme === "dark" ? "light" : "dark";
+    setTheme(next);
+    localStorage.setItem("theme", next);
+    document.documentElement.classList.add(next);
+    document.documentElement.classList.remove(theme);
+  };
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b border-white/5 bg-[#0A0A0A]/80 px-6 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b border-border bg-card/80 px-6 backdrop-blur-xl">
       <div className="flex items-center gap-4">
         <button 
           onClick={toggle}
@@ -20,11 +38,11 @@ export const AppHeader = memo(function AppHeader() {
           </div>
         </button>
         
-        <div className="h-6 w-px bg-white/5 mx-2" />
+        <div className="h-6 w-px bg-border mx-2" />
         
         <div className="flex items-center gap-3">
           <div className="h-2 w-2 animate-pulse rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-          <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white font-outfit">Análise em tempo real (Últimos 6 Gatilhos)</span>
+          <span className="text-[11px] font-black uppercase tracking-[0.2em] text-foreground font-outfit">Análise em tempo real (Últimos 6 Gatilhos)</span>
         </div>
 
         <button
@@ -40,9 +58,17 @@ export const AppHeader = memo(function AppHeader() {
       </div>
 
       <div className="flex items-center gap-5">
-        <div className="hidden items-center gap-2 rounded-xl bg-white/[0.03] px-4 py-2 sm:flex">
+        <button
+          onClick={toggleTheme}
+          className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-surface text-muted-foreground transition-all duration-300 hover:bg-surface-2 hover:text-foreground active:scale-90"
+          aria-label="Trocar brilho"
+        >
+          {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+        </button>
+
+        <div className="hidden items-center gap-2 rounded-xl bg-surface px-4 py-2 sm:flex">
           <Clock className="h-3.5 w-3.5 text-red-500" />
-          <span className="text-[12px] font-bold tabular-nums text-white">16:39:49</span>
+          <span className="text-[12px] font-bold tabular-nums text-foreground">16:39:49</span>
         </div>
 
         <button 

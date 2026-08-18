@@ -53,35 +53,26 @@
 :root {
   --radius: 8px;
 
-  /* FreitasWhite TipMiner Theme Foundation */
+  /* FreitasWhite TipMiner Theme Foundation - Default DARK */
   --background: #090B0D;
   --foreground: #ffffff;
-
   --surface: #090B0D;
   --surface-2: #111418;
   --surface-3: #1a1e24;
-
   --card: #090B0D;
   --card-foreground: #ffffff;
   --popover: #0c0c0c;
   --popover-foreground: #ffffff;
-
-  /* Color of highlight - Red Blaze Premium Style */
   --primary: #E50914; 
   --primary-foreground: #ffffff;
-
   --secondary: #141414;
   --secondary-foreground: #94a3b8;
-
   --muted: #141414;
   --muted-foreground: #6b7280;
-
   --accent: #E50914;
   --accent-foreground: #ffffff;
-
   --destructive: #E50914;
   --destructive-foreground: #ffffff;
-
   --border: rgba(255, 255, 255, 0.05);
   --input: rgba(255, 255, 255, 0.03);
   --ring: #E50914;
@@ -98,6 +89,32 @@
   --shadow-elegant: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
   --shadow-glow: 0 0 20px rgba(229, 9, 20, 0.05);
   --shadow-red-glow: 0 0 15px rgba(229, 9, 20, 0.3);
+}
+
+.light {
+  --background: #f1f5f9;
+  --foreground: #0f172a;
+  --surface: #ffffff;
+  --surface-2: #e2e8f0;
+  --surface-3: #cbd5e1;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --primary: #E50914;
+  --primary-foreground: #ffffff;
+  --secondary: #f8fafc;
+  --secondary-foreground: #475569;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #E50914;
+  --accent-foreground: #ffffff;
+  --destructive: #E50914;
+  --destructive-foreground: #ffffff;
+  --border: #cbd5e1;
+  --input: #ffffff;
+  --ring: #E50914;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 @layer base {
