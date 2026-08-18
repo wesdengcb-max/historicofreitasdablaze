@@ -685,11 +685,13 @@ export default function SinaisSection() {
           </div>
         </div>
 
-
+        <div className="overflow-x-auto border-t border-white/5">
+          <table className="w-full min-w-[720px]">
+            <tbody>
               {visible.length > 0 && (
                 <tr className="bg-white/[0.02]">
                   <td colSpan={6} className="px-4 py-3 text-[10px] font-black tracking-[0.3em] text-muted-foreground/40 uppercase font-outfit border-b border-white/[0.05]">
-                    [ Histórico de Sinais ]
+                    [ Histórico de Sinais Auditados ]
                   </td>
                 </tr>
               )}
@@ -728,28 +730,16 @@ export default function SinaisSection() {
                     </div>
                   </td>
                   <td className="px-3 py-4">
-                    {s.outcome === "pending" ? (
-                      <div className="flex items-center gap-2">
-                        <Switch
-                          checked={!disabled.has(s.id)}
-                          onCheckedChange={() => toggleStatus(s.id)}
-                        />
-                        <span className="text-[10px] font-black tracking-widest text-muted-foreground/60 uppercase font-mono">
-                          Aguardando
-                        </span>
-                      </div>
-                    ) : (
-                      <div
-                        className={`inline-flex items-center rounded-md px-3 py-1 font-mono text-[10px] font-black tracking-widest border ${
-                          s.outcome === "green"
-                            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                            : "bg-red-500/10 text-red-400 border-red-500/20"
-                        }`}
-                      >
-                        {s.outcome === "green" ? "WIN" : "LOSS"}
-                        {s.resultTime ? ` · ${s.resultTime}` : ""}
-                      </div>
-                    )}
+                    <div
+                      className={`inline-flex items-center rounded-md px-3 py-1 font-mono text-[10px] font-black tracking-widest border ${
+                        s.outcome === "green"
+                          ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                          : "bg-red-500/10 text-red-400 border-red-500/20"
+                      }`}
+                    >
+                      {s.outcome === "green" ? "WIN" : "LOSS"}
+                      {s.resultTime ? ` · ${s.resultTime}` : ""}
+                    </div>
                   </td>
                   <td className="px-3 py-4">
                     <button
@@ -762,16 +752,10 @@ export default function SinaisSection() {
                   </td>
                 </tr>
               ))}
-              {visible.length === 0 && predictiveList.length === 0 && (
-                <tr>
-                  <td colSpan={7} className="py-10 text-center text-sm text-muted-foreground">
-                    Nenhum sinal ativo. Aguardando próximo branco…
-                  </td>
-                </tr>
-              )}
             </tbody>
           </table>
         </div>
+
       </Card>
 
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
