@@ -20,7 +20,7 @@ export const Switch = memo(function Switch({ checked, onChange, label, id }: Pro
         className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border transition-colors duration-300 ${
           checked
             ? "border-primary/40 bg-primary"
-            : "border-white/10 bg-white/5"
+            : "border-border bg-surface-2"
         }`}
       >
         <motion.span
@@ -31,7 +31,7 @@ export const Switch = memo(function Switch({ checked, onChange, label, id }: Pro
           }`}
         />
       </button>
-      {label && <span className="text-xs font-medium text-foreground/85">{label}</span>}
+      {label && <span className="text-xs font-medium text-foreground/80">{label}</span>}
     </label>
   );
 });

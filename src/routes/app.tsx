@@ -1163,7 +1163,7 @@ function Index() {
                         <DropdownMenuItem
                           key={v}
                           onSelect={() => setFutureSlots(v)}
-                          className={futureSlots === v ? "bg-white/10" : ""}
+                          className={futureSlots === v ? "bg-accent/20" : ""}
                         >
                           {v === 0 ? "Off" : `+${v} min`}
                         </DropdownMenuItem>
