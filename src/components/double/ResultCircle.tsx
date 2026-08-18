@@ -6,11 +6,11 @@ import brancoAsset from "@/assets/branco-vip.png.asset.json";
 type Size = "xs" | "sm" | "md" | "lg" | "fluid";
 
 const sizes: Record<Size, string> = {
-  xs: "h-5 w-5 text-[9px] rounded-sm",
-  sm: "h-7 w-7 text-[11px] rounded-md",
-  md: "h-9 w-9 sm:h-10 sm:w-10 text-xs sm:text-sm rounded-lg",
-  lg: "h-14 w-14 text-lg rounded-xl",
-  fluid: "w-full aspect-square text-[clamp(10px,2.4vw,14px)] rounded-md",
+  xs: "h-5 w-5 text-[9px] rounded-[2px]",
+  sm: "h-7 w-7 text-[11px] rounded-[3px]",
+  md: "h-9 w-9 sm:h-10 sm:w-10 text-xs sm:text-sm rounded-[4px]",
+  lg: "h-14 w-14 text-lg rounded-[6px]",
+  fluid: "w-full aspect-square text-[clamp(10px,2.4vw,14px)] rounded-[4px]",
 };
 
 

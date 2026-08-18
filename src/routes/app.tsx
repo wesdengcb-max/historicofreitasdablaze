@@ -239,12 +239,12 @@ const ColumnBlock = memo(function ColumnBlock({
 
   return (
     <div
-      className={`flex flex-col gap-y-3 rounded-lg border border-transparent p-1 transition-colors duration-300 ${
+      className={`flex flex-col gap-y-2 rounded-lg border border-transparent p-1 transition-colors duration-300 ${
         isActive ? "bg-primary/5" : ""
       }`}
     >
       {rows.map((pair: any[], rIdx: number) => (
-        <div key={rIdx} className="flex gap-x-1.5">
+        <div key={rIdx} className="flex gap-x-[6px]">
           <BlazeResultCardWrapper
             item={pair[0]}
             isActive={isActive}
@@ -1274,11 +1274,11 @@ function Index() {
                   <div className="history-scroll w-full overflow-x-auto p-1 sm:p-2 lg:p-3 no-scrollbar">
                     <div className="flex flex-col gap-0 min-w-[1200px] w-full">
                       {/* Cabeçalho 0-9 interno para Colunas Fixas */}
-                      <div className="grid grid-cols-10 gap-[6px] mb-1 sticky top-0 z-10 bg-[#0A0A0A]/80 backdrop-blur-sm w-full">
+                      <div className="grid grid-cols-10 gap-[6px] mb-2 sticky top-0 z-10 bg-[#090B0D]/90 backdrop-blur-sm w-full">
                         {Array.from({ length: 10 }).map((_, ci) => (
                           <button
                             key={`header-inner-${ci}`}
-                            className={`flex h-[23px] w-full items-center justify-center rounded-[6px] border border-white/5 text-[14px] font-bold tabular-nums transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-red-500 text-white shadow-[0_0_10px_rgba(239,68,68,0.4)]" : "bg-white/[0.03] text-white/40 hover:bg-white/10"}`}
+                            className={`flex h-[23px] w-full items-center justify-center rounded-[4px] border border-white/5 text-[14px] font-bold tabular-nums transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-red-500 text-white shadow-[0_0_10px_rgba(239,68,68,0.4)]" : "bg-white/[0.03] text-white/40 hover:bg-white/10"}`}
                             onClick={() => {
                               const key = `col-${ci}`;
                               if (highlightKey === key) {
@@ -1304,7 +1304,7 @@ function Index() {
                       </div>
 
                       {gridRows.map((row) => (
-                        <div key={row.key} className="flex flex-col gap-0 border-b border-white/[0.02] py-2">
+                        <div key={row.key} className="flex flex-col gap-0 border-b border-white/[0.01] py-1">
                           <div className="grid grid-cols-10 gap-[6px] relative w-full">
                             {row.cells.map((cell, ci) => {
                             const [hh, mmPrefix] = row.label.split(":");
@@ -1336,7 +1336,7 @@ function Index() {
                               <div
                                 key={ci}
                                 className="flex flex-col items-center justify-center p-0.5 sm:p-1"
-                                style={{ width: "100%", height: "80px", direction: "ltr" }}
+                                style={{ width: "100%", height: "76px", direction: "ltr" }}
                               >
                                 <div 
                                   className={`relative flex flex-col items-center pt-2 rounded-lg transition-all duration-300 ${highlightKey === `col-${ci}` ? "bg-primary/10" : ""}`}
@@ -1390,7 +1390,7 @@ function Index() {
                                                 });
                                               }}
                                             />
-                                            <span className={`mt-[5px] text-[11px] tabular-nums leading-none font-medium h-[11px] flex items-center ${destaqueHorario ? "text-primary font-bold" : "text-[#8ebcf0]"}`}>
+                                            <span className={`mt-[4px] text-[9px] tabular-nums leading-none font-medium h-[9px] flex items-center ${destaqueHorario ? "text-primary font-bold" : "text-muted-foreground/60"}`}>
                                               {exibirSegundos ? spTimeWithSeconds(spin as Spin) : (spin as Spin).time}
                                             </span>
                                           </div>
@@ -1401,7 +1401,7 @@ function Index() {
                                          const isSlotActive = highlightKey ? (highlightKey === `col-${ci}`) : (highlightN.size === 0);
                                          return (
                                           <div key={`p-${ci}-${i}`} className="flex flex-col items-center" style={{ opacity: isSlotActive ? 1 : 0.25 }}>
-                                            <div className="relative flex h-[50px] w-[52px] items-center justify-center overflow-hidden rounded-[8px] border-[2.5px] border-emerald-400 bg-white shadow-sm">
+                                            <div className="relative flex h-[50px] w-[52px] items-center justify-center overflow-hidden rounded-[4px] border-[2px] border-emerald-400 bg-white shadow-sm">
                                               <img
                                                 src={brancoTile.url}
                                                 alt="Sinal"
@@ -1409,7 +1409,7 @@ function Index() {
                                                 draggable={false}
                                               />
                                             </div>
-                                            <span className="mt-[5px] text-[11px] tabular-nums font-medium h-[11px] flex items-center text-[#8ebcf0]">
+                                            <span className="mt-[4px] text-[9px] tabular-nums font-medium h-[9px] flex items-center text-muted-foreground/60">
                                               {hm}
                                             </span>
                                           </div>
@@ -1431,7 +1431,7 @@ function Index() {
                                               }
                                               cycleSlotPrediction(slotKey);
                                             }}
-                                            className={`relative flex h-[50px] w-[52px] items-center justify-center rounded-[8px] border border-dashed transition-colors hover:border-white/20 ${
+                                            className={`relative flex h-[50px] w-[52px] items-center justify-center rounded-[4px] border border-dashed transition-colors hover:border-white/20 ${
                                               isLocked
                                                 ? "border-white/5 bg-white/5 opacity-50 cursor-not-allowed"
                                                 : p === "white"
@@ -1459,7 +1459,7 @@ function Index() {
                                               />
                                             )}
                                           </button>
-                                          <span className="mt-[5px] h-[11px] text-[11px] font-medium tabular-nums text-[#8ebcf0]">
+                                          <span className="mt-[4px] h-[9px] text-[9px] font-medium tabular-nums text-muted-foreground/60">
                                             {hm}
                                           </span>
                                         </div>
@@ -1482,10 +1482,9 @@ function Index() {
                        <div
                          className="history-scroll grid p-1 sm:p-3 lg:p-4"
                          style={{
-                            gridTemplateColumns:
-                              `repeat(auto-fill, minmax(52px, 1fr))`,
+                            gridTemplateColumns: `repeat(auto-fill, minmax(52px, 1fr))`,
                             columnGap: "6px",
-                            rowGap: "14px",
+                            rowGap: "8px",
                            direction: inverse ? "rtl" : "ltr",
                          }}
                        >
@@ -1604,8 +1603,14 @@ const TipMinerCard = memo(function TipMinerCard({
       : spin.color === "black"
         ? "#16171d"
         : "#ffffff";
-  const ring = isWhite ? "#16171d" : "#ffffff";
-  const fg = isWhite ? "#16171d" : "#ffffff";
+  const border =
+    spin.color === "red"
+      ? "rgba(255, 255, 255, 0.1)"
+      : spin.color === "black"
+        ? "rgba(255, 255, 255, 0.05)"
+        : "#ffffff";
+  const ring = isWhite ? "#DE2143" : "#ffffff";
+  const fg = isWhite ? "#DE2143" : "#ffffff";
   
   const isHit = !!highlightN && highlightN.has(spin.n);
   const isActive = isActiveProp !== undefined ? isActiveProp : true;
@@ -1627,41 +1632,32 @@ const TipMinerCard = memo(function TipMinerCard({
       <button
         type="button"
         onClick={onClick}
-        className={`flex items-center justify-center overflow-hidden rounded-[6px] border border-white/[0.08] shadow-sm transition-[transform,opacity] duration-200 hover:-translate-y-0.5 animate-in fade-in zoom-in-95 ${
-          isHit && isActive ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : ""
+        className={`flex items-center justify-center overflow-hidden rounded-[4px] shadow-sm transition-[transform,opacity] duration-200 hover:-translate-y-0.5 animate-in fade-in zoom-in-95 ${
+          isHit && isActive ? "border-2 border-primary" : ""
         }`}
         style={{
-          width: "var(--stone, 48px)",
-          height: "var(--stone-h, 48px)",
-          background: isWhite ? "#ffffff" : bg,
+          width: "52px",
+          height: "50px",
+          background: bg,
+          borderColor: isHit && isActive ? undefined : border,
           opacity: isActive ? 1 : 0.25,
           ...(delayStyle ?? {}),
         }}
       >
-        {isWhite ? (
-          <span className="relative flex h-full w-full items-center justify-center">
-            <img
-              src={brancoTile.url}
-              alt="Branco"
-              className="h-full w-full object-cover"
-              draggable={false}
-            />
-            {numbered && (
-              <span
-                className="absolute inset-0 grid place-items-center font-bold leading-none tabular-nums text-black/85"
-                style={{ fontSize: "14px" }}
-              >
-                {spin.n}
-              </span>
-            )}
-          </span>
+        {isWhite && !numbered ? (
+          <img
+            src={brancoTile.url}
+            alt="Branco"
+            className="h-full w-full object-cover"
+            draggable={false}
+          />
         ) : (
           <div
             className="flex items-center justify-center rounded-full font-bold leading-none tabular-nums"
             style={{ 
-              height: "32px", 
-              width: "32px", 
-              border: isWhite ? `3px solid ${ring}` : `2px solid #ffffff90`, 
+              height: "30px", 
+              width: "30px", 
+              border: `2px solid ${isWhite ? ring : "#ffffff95"}`, 
               color: fg, 
               fontSize: "14px" 
             }}
@@ -1673,10 +1669,10 @@ const TipMinerCard = memo(function TipMinerCard({
 
       {showTime && (
         <span
-          className={`mt-1 leading-none tabular-nums ${
-            timeHighlight ? "font-bold text-primary" : "text-muted-foreground"
+          className={`mt-[4px] leading-none tabular-nums font-medium ${
+            timeHighlight ? "font-bold text-primary" : "text-muted-foreground/60"
           }`}
-          style={{ fontSize: "12px" }}
+          style={{ fontSize: "9px" }}
         >
           {showSeconds ? spTimeWithSeconds(spin) : spin.time}
         </span>
