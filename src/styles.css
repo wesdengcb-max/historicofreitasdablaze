@@ -164,3 +164,11 @@
   ::-webkit-scrollbar-thumb { background: color-mix(in oklab, var(--foreground) 12%, transparent); border-radius: 999px; }
   ::-webkit-scrollbar-thumb:hover { background: color-mix(in oklab, var(--foreground) 20%, transparent); }
 }
+
+/* Grid Cell Styles Override */
+.grid-cols-10 > div {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
