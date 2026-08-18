@@ -122,8 +122,8 @@ export function PredictiveSignals() {
   const [err, setErr] = useState<string | null>(null);
   const [mode1, setMode1] = useState<Mode1Signal[] | null>(null);
   const [mode2, setMode2] = useState<Mode2Signal[] | null>(null);
-  const [hasClicked, setHasClicked] = useState(false);
   const [generatedAt, setGeneratedAt] = useState<Date | null>(null);
+
 
   useEffect(() => {
     let alive = true;
@@ -215,7 +215,7 @@ export function PredictiveSignals() {
   const hasOpportunity = active.length > 0;
 
   const generate = useCallback(async () => {
-    setHasClicked(true);
+
     const now = new Date();
     now.setSeconds(0, 0);
     setGeneratedAt(now);
@@ -506,6 +506,14 @@ export function PredictiveSignals() {
 
   }, [active, engine]);
 
+  // Auto-generate triggers
+  useEffect(() => {
+    if (active.length > 0 && !loading) {
+      generate();
+    }
+  }, [active.length, loading, generate]);
+
+
   useEffect(() => {
     if (rows.length > 0 && !loading && mode1 && mode2) {
       const syncSignals: any[] = [
@@ -553,30 +561,18 @@ export function PredictiveSignals() {
             <div className="text-[10px] font-black uppercase tracking-[0.4em] text-primary font-outfit">
               Gerador preditivo
             </div>
-            <h2 className="text-xl font-black text-white font-outfit uppercase tracking-tight">Próximo branco</h2>
+            <h2 className="text-xl font-black text-white font-outfit uppercase tracking-tight">Próximos Sinais</h2>
           </div>
         </div>
-        <button
-          type="button"
-          disabled={!hasOpportunity || loading}
-          onClick={generate}
-          className={
-            hasOpportunity && !loading
-              ? "relative premium-btn rounded-xl px-8 py-3.5 text-xs font-black uppercase tracking-[0.2em] text-white animate-pulse font-outfit"
-              : "rounded-xl border border-white/10 bg-white/[0.03] px-8 py-3.5 text-xs font-black uppercase tracking-[0.2em] text-[#9CA3AF] opacity-60 font-outfit"
-          }
-        >
-          {loading ? (
-            <span className="flex items-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin" /> Carregando…
-            </span>
-          ) : hasOpportunity ? (
-            "Próximo branco"
-          ) : (
-            "Aguardando novo gatilho..."
-          )}
-        </button>
+        <div className="flex items-center gap-2">
+           <span className="relative flex h-2 w-2">
+             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+           </span>
+           <span className="text-[10px] font-bold text-emerald-500/80 uppercase tracking-widest">Tempo Real</span>
+        </div>
       </div>
+
 
       <div className="space-y-5 px-5 py-5">
         {err && (
@@ -585,15 +581,8 @@ export function PredictiveSignals() {
           </div>
         )}
 
-        {!hasClicked && !err && (
-          <p className="text-sm text-muted-foreground">
-            {hasOpportunity
-              ? `${active.length} ciclo(s) em aberto analisando os últimos 6 gatilhos (limite 120 min / 14 tempos). Clique em "Próximo branco" para projetar.`
-              : "Nenhum ciclo em aberto no momento."}
-          </p>
-        )}
+        {!err && mode1 && (
 
-        {hasClicked && mode1 && (
           <section className="space-y-3">
             <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               <Target className="h-3.5 w-3.5" /> Projeção Top 1
@@ -678,7 +667,7 @@ export function PredictiveSignals() {
           </section>
         )}
 
-        {hasClicked && mode2 && (
+        {mode2 && (
           <section className="space-y-3">
             <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               <Layers className="h-3.5 w-3.5" /> Coincidências · validadas pelo Top 5
