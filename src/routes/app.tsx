@@ -1274,7 +1274,7 @@ function Index() {
                   <div className="history-scroll w-full overflow-x-auto p-1 sm:p-2 lg:p-3 no-scrollbar">
                     <div className="flex flex-col gap-0 min-w-[1200px] w-full">
                       {/* Cabeçalho 0-9 interno para Colunas Fixas */}
-                      <div className="grid grid-cols-10 gap-[8px] mb-1 sticky top-0 z-10 bg-[#0A0A0A]/80 backdrop-blur-sm w-full">
+                      <div className="grid grid-cols-10 gap-[6px] mb-1 sticky top-0 z-10 bg-[#0A0A0A]/80 backdrop-blur-sm w-full">
                         {Array.from({ length: 10 }).map((_, ci) => (
                           <button
                             key={`header-inner-${ci}`}
@@ -1346,7 +1346,7 @@ function Index() {
                                       {badge.label}
                                     </span>
                                   )}
-                                  <div className="relative flex h-[56px] items-start gap-[12px]">
+                                  <div className="relative flex h-[50px] items-start gap-[6px]">
                                     {(cell.length >= 2
                                       ? [cell[0], cell[1]]
                                       : cell.length === 1
@@ -1401,7 +1401,7 @@ function Index() {
                                          const isSlotActive = highlightKey ? (highlightKey === `col-${ci}`) : (highlightN.size === 0);
                                          return (
                                           <div key={`p-${ci}-${i}`} className="flex flex-col items-center" style={{ opacity: isSlotActive ? 1 : 0.25 }}>
-                                            <div className="relative flex h-[48px] w-[48px] items-center justify-center overflow-hidden rounded-[6px] border-[2.5px] border-emerald-400 bg-white shadow-sm">
+                                            <div className="relative flex h-[50px] w-[52px] items-center justify-center overflow-hidden rounded-[8px] border-[2.5px] border-emerald-400 bg-white shadow-sm">
                                               <img
                                                 src={brancoTile.url}
                                                 alt="Sinal"
@@ -1431,7 +1431,7 @@ function Index() {
                                               }
                                               cycleSlotPrediction(slotKey);
                                             }}
-                                            className={`relative flex h-[48px] w-[48px] items-center justify-center rounded-[6px] border border-dashed transition-colors hover:border-white/20 ${
+                                            className={`relative flex h-[50px] w-[52px] items-center justify-center rounded-[8px] border border-dashed transition-colors hover:border-white/20 ${
                                               isLocked
                                                 ? "border-white/5 bg-white/5 opacity-50 cursor-not-allowed"
                                                 : p === "white"
@@ -1447,7 +1447,7 @@ function Index() {
                                               <Lock className="h-4 w-4 text-muted-foreground/40" />
                                             ) : (
                                               <div
-                                                className={`h-[32px] w-[32px] rounded-full border-2 transition-all ${
+                                                className={`h-[30px] w-[30px] rounded-full border-2 transition-all ${
                                                   p === "white"
                                                     ? "bg-white border-white/20"
                                                     : p === "red"
