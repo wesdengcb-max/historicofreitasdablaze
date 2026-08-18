@@ -1495,7 +1495,18 @@ function Index() {
                                               />
                                             )}
                                           </button>
-                                          <span className="mt-[4px] h-[9px] text-[9px] font-medium tabular-nums text-muted-foreground/60">
+                                           <span
+                                             className="mt-[8px] flex items-center justify-center font-bold leading-none tabular-nums text-muted-foreground/60"
+                                             style={{
+                                               height: "16px",
+                                               width: "100%",
+                                               borderRadius: "4px",
+                                               background: "rgba(255, 255, 255, 0.1)",
+                                               border: "1.5px solid rgba(255, 255, 255, 0.4)",
+                                               fontSize: "9px",
+                                               padding: "0 2px",
+                                             }}
+                                           >
                                             {hm}
                                           </span>
                                         </div>
