@@ -629,7 +629,7 @@ export default function SinaisSection() {
                 <Card
                   key={s.key}
                   title={s.medal || "Sinal Preditivo"}
-                  subtitle={`${s.time} · Janela ${s.label}`}
+                  subtitle={s.time}
                   isRare={s.isRare}
                   isGreenSeal={s.isGreenSeal}
                   greenSealAssertivity={s.greenSealAssertivity}
