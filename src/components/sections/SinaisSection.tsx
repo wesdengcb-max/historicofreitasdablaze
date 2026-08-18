@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
+import { AnimatePresence } from "framer-motion";
 import { SinaisTabs, AnalysesTab } from "@/components/sections/SinaisTabs";
+
 import {
   Plus,
   ChevronDown,
@@ -408,7 +410,7 @@ export default function SinaisSection() {
 
           if (matchedResult) {
             const status = "WIN"; 
-            const res = { ...s, outcome: "green" as const, resultTime: fmtTime(matchedResult.createdAt), label: status };
+            const res = { ...s, outcome: "green" as const, resultTime: fmtTime(matchedResult.createdAt), label: status, completedAt: now };
             
             const table = 'historico_sinais_audit';
             const isGreenSeal = !!(s as any).isGreenSeal;
@@ -430,7 +432,7 @@ export default function SinaisSection() {
 
 
           if (now > rangeEnd) {
-            const res = { ...s, outcome: "red" as const, label: "LOSS" };
+            const res = { ...s, outcome: "red" as const, label: "LOSS", completedAt: now };
             const table = 'historico_sinais_audit';
             const isGreenSeal = !!(s as any).isGreenSeal;
             const tag = isGreenSeal ? `SOMA_${s.confluence.split('·')[1]}` : (((s as any).isGreenSeal === false && (s as any).greenSealAssertivity !== undefined) ? `SOMA_${s.confluence.split('·')[1]}` : null);
@@ -458,17 +460,17 @@ export default function SinaisSection() {
       });
 
 
-      // Filtramos para manter apenas os pendentes ou concluídos recentemente (3 min)
+      // Expiração e Limpeza Automática (1 Minuto após carimbo)
       const visible = validated.filter(s => {
         try {
-          if (!s.entryDate || !s.outcome || s.outcome === "pending") return true;
-          const entryTime = typeof s.entryDate === 'string' ? new Date(s.entryDate).getTime() : (s.entryDate instanceof Date ? s.entryDate.getTime() : new Date(s.entryDate).getTime());
-          if (Number.isNaN(entryTime)) return true;
-          return now < entryTime + (3 * 60_000);
+          if (!s.outcome || s.outcome === "pending") return true;
+          if (!s.completedAt) return true;
+          return now < s.completedAt + 60_000;
         } catch {
           return true;
         }
       });
+
 
       setPredictiveList(visible);
     };
