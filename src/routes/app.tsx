@@ -1359,13 +1359,13 @@ function Index() {
                                       {badge.label}
                                     </span>
                                   )}
-                                  <div className="relative flex h-[50px] items-start gap-[6px]">
+                                  <div className="relative flex h-[50px] items-start gap-[8px]">
                                     {(cell.length >= 2
                                       ? [cell[0], cell[1]]
                                       : cell.length === 1
                                         ? [cell[0], undefined]
                                         : [undefined, undefined]
-                                    ).map((spin, i) => {
+                                    ).map((spin: any, i: number) => {
 
                                       const slotKey = `${hm}-${i}`;
                                       const isLocked = !isVip && !spin && !(pending && i === 0);
