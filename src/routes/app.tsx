@@ -1457,7 +1457,7 @@ function Index() {
                                               }
                                               cycleSlotPrediction(slotKey);
                                             }}
-                                            className={`relative flex h-[50px] w-[52px] items-center justify-center rounded-[4px] border border-dashed transition-colors hover:border-white/20 ${
+                                            className={`relative flex h-[50px] w-[52px] items-center justify-center rounded-[4px] border border-dashed transition-colors hover:border-white/20 shadow-none ${
                                               isLocked
                                                 ? "border-white/5 bg-white/5 opacity-50 cursor-not-allowed"
                                                 : p === "white"

@@ -9,8 +9,8 @@ export const BLAZE_GAP_X = 6;
 export const BLAZE_GAP_Y = 8;
 
 const PALETTE: Record<Color, { bg: string; border: string; ring: string; fg: string; shadow?: string }> = {
-  red: { bg: "#DE2143", border: "rgba(255, 255, 255, 0.1)", ring: "#ffffff", fg: "#ffffff" },
-  black: { bg: "#16171d", border: "rgba(255, 255, 255, 0.05)", ring: "#ffffff", fg: "#ffffff" },
+  red: { bg: "#DE2143", border: "transparent", ring: "#ffffff", fg: "#ffffff" },
+  black: { bg: "#16171d", border: "transparent", ring: "#ffffff", fg: "#ffffff" },
   white: { bg: "#ffffff", border: "#ff1e46", ring: "#DE2143", fg: "#DE2143", shadow: "0 0 15px rgba(255, 30, 70, 0.85), 0 0 30px rgba(255, 30, 70, 0.45)" },
 };
 
