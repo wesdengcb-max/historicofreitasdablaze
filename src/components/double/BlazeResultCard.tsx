@@ -8,10 +8,10 @@ export const BLAZE_CARD_TOP_H = 50;
 export const BLAZE_GAP_X = 6;
 export const BLAZE_GAP_Y = 8;
 
-const PALETTE: Record<Color, { bg: string; border: string; ring: string; fg: string }> = {
+const PALETTE: Record<Color, { bg: string; border: string; ring: string; fg: string; shadow?: string }> = {
   red: { bg: "#DE2143", border: "rgba(255, 255, 255, 0.1)", ring: "#ffffff", fg: "#ffffff" },
   black: { bg: "#16171d", border: "rgba(255, 255, 255, 0.05)", ring: "#ffffff", fg: "#ffffff" },
-  white: { bg: "#ffffff", border: "#ffffff", ring: "#DE2143", fg: "#DE2143" },
+  white: { bg: "#ffffff", border: "#e11d48", ring: "#DE2143", fg: "#DE2143", shadow: "0 0 12px rgba(225, 29, 72, 0.6)" },
 };
 
 type Props = {
@@ -54,12 +54,13 @@ export const BlazeResultCard = memo(function BlazeResultCard({
       <button
         type="button"
         onClick={onClick}
-        className="group flex w-full cursor-pointer items-center justify-center overflow-hidden transition-[transform,opacity,box-shadow,border-color] duration-200 hover:-translate-y-0.5 active:scale-95"
+        className="group flex w-full cursor-pointer items-center justify-center overflow-hidden transition-[transform,opacity,box-shadow,border-color] duration-200 hover:-translate-y-0.5 active:scale-95 shadow-none"
         style={{
           height: `var(--blaze-card-h, ${BLAZE_CARD_TOP_H}px)`,
           borderRadius: 4,
-          border: selected ? `2px solid var(--primary)` : `1px solid rgba(255, 255, 255, 0.2)`,
+          border: selected ? `2px solid var(--primary)` : isWhite ? `2px solid ${c.border}` : `1px solid ${c.border}`,
           background: c.bg,
+          boxShadow: isWhite ? c.shadow : 'none',
           opacity: dimmed ? 0.25 : 1,
         }}
       >
