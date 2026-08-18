@@ -1346,7 +1346,7 @@ function Index() {
                             return (
                               <div
                                 key={ci}
-                                className="flex flex-col items-center justify-center p-0.5 sm:p-1"
+                                className="flex flex-col items-center justify-center p-0 bg-transparent border-none shadow-none outline-none"
                                 style={{ width: "100%", height: "76px", direction: "ltr" }}
                               >
                                 <div 
