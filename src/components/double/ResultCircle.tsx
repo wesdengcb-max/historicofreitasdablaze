@@ -21,10 +21,11 @@ type Props = {
   animate?: boolean;
   delay?: number;
   glow?: boolean;
+  pulse?: boolean;
   className?: string;
 };
 
-export const ResultCircle = memo(function ResultCircle({ color, n, size = "md", animate = true, delay = 0, glow = false, className }: Props) {
+export const ResultCircle = memo(function ResultCircle({ color, n, size = "md", animate = true, delay = 0, glow = false, pulse = false, className }: Props) {
   const base = "relative grid place-items-center overflow-hidden font-bold tabular-nums shadow-sm transition-transform duration-200 hover:scale-[1.08]";
 
   const colorClasses =
@@ -75,8 +76,17 @@ export const ResultCircle = memo(function ResultCircle({ color, n, size = "md", 
   return (
     <motion.div
       initial={{ scale: 0.6, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ duration: 0.35, delay, ease: [0.22, 1, 0.36, 1] }}
+      animate={{ 
+        scale: pulse ? [1, 1.1, 1] : 1, 
+        opacity: 1 
+      }}
+      transition={{ 
+        duration: pulse ? 1.5 : 0.35, 
+        delay, 
+        ease: [0.22, 1, 0.36, 1],
+        repeat: pulse ? Infinity : 0
+      }}
+
       className={`${base} ${sizes[size]} ${colorClasses} ${className || ""}`}
       style={{ ...bgStyle, ...glowStyle }}
     >
