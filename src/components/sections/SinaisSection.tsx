@@ -232,6 +232,16 @@ export default function SinaisSection() {
 
 
   useEffect(() => {
+    // Run DB cleanup for 24h retention (server-side function call)
+    const runCleanup = async () => {
+      try {
+        await supabase.rpc('cleanup_audit_24h');
+      } catch (e) {
+        console.error("Cleanup failed (expected if not service_role):", e);
+      }
+    };
+    runCleanup();
+
     const fetchAudit = async () => {
       try {
         const table = 'historico_sinais_audit';
