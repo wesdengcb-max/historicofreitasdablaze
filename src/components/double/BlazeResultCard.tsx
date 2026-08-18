@@ -11,7 +11,7 @@ export const BLAZE_GAP_Y = 8;
 const PALETTE: Record<Color, { bg: string; border: string; ring: string; fg: string; shadow?: string }> = {
   red: { bg: "#DE2143", border: "rgba(255, 255, 255, 0.1)", ring: "#ffffff", fg: "#ffffff" },
   black: { bg: "#16171d", border: "rgba(255, 255, 255, 0.05)", ring: "#ffffff", fg: "#ffffff" },
-  white: { bg: "#ffffff", border: "#e11d48", ring: "#DE2143", fg: "#DE2143", shadow: "0 0 12px rgba(225, 29, 72, 0.6)" },
+  white: { bg: "#ffffff", border: "#ff1e46", ring: "#DE2143", fg: "#DE2143", shadow: "0 0 15px rgba(255, 30, 70, 0.85), 0 0 30px rgba(255, 30, 70, 0.45)" },
 };
 
 type Props = {
