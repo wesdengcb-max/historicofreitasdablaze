@@ -167,8 +167,7 @@
 
 /* Grid Cell Styles Override */
 .grid-cols-10 > div,
-.blaze-result-card,
-.blaze-result-card > button {
+.blaze-result-card {
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
