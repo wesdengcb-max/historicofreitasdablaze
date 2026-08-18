@@ -240,9 +240,7 @@ const ColumnBlock = memo(function ColumnBlock({
 
   return (
     <div
-      className={`flex flex-col gap-y-2 rounded-lg border border-transparent p-1 transition-colors duration-300 ${
-        isActive ? "bg-primary/5" : ""
-      }`}
+      className={`flex flex-col gap-y-2 rounded-lg border border-transparent p-1 transition-colors duration-300`}
     >
       {rows.map((pair: any[], rIdx: number) => (
         <div key={rIdx} className="flex gap-x-[8px]">
