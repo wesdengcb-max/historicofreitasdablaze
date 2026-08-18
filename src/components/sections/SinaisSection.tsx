@@ -620,95 +620,71 @@ export default function SinaisSection() {
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[720px]">
-            <thead>
-              <tr className="text-[10px] tracking-widest text-muted-foreground font-mono border-b border-border">
-                <th className="w-10 px-4 py-3 text-left"></th>
-                <th className="px-3 py-3 text-left font-normal uppercase">Horário</th>
-                <th className="px-3 py-3 text-left font-normal uppercase">Assertividade</th>
-                <th className="px-3 py-3 text-left font-normal uppercase">Confluência / Top</th>
-                <th className="px-3 py-3 text-left font-normal uppercase">Status</th>
-                <th className="w-14 px-3 py-3"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {/* Sinais Preditos Automáticos (Próximo Branco) */}
-              {predictiveList.map((s) => (
-                <tr key={s.key} className="border-b border-white/[0.03] bg-white/[0.01] hover:bg-white/[0.03] transition-colors">
-                  <td className="px-4 py-4 text-center">
-                    <Sparkles className="h-3 w-3 text-primary/60" />
-                  </td>
-                  <td className="px-3 py-4">
-                    <div className="font-black text-lg text-white font-outfit">{s.time}</div>
-                    <div className="flex items-center gap-1.5 mt-0.5">
-                      <div className="text-[9px] text-muted-foreground font-mono tracking-widest uppercase">PROJETADO</div>
-                      {s.confluence.split(',').map((tag: string, i: number) => (
-                        <span key={i} className="text-[8px] px-1 rounded bg-white/5 border border-white/10 text-white/40 font-mono">
-                          {tag.trim()}
+        <div className="p-6">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <AnimatePresence mode="popLayout">
+              {predictiveList.map((s, idx) => (
+                <Card
+                  key={s.key}
+                  title={s.medal || "Sinal Preditivo"}
+                  subtitle={`${s.time} · Janela ${s.label}`}
+                  isRare={s.isRare}
+                  isGreenSeal={s.isGreenSeal}
+                  greenSealAssertivity={s.greenSealAssertivity}
+                  outcome={s.outcome}
+                  delay={idx * 0.05}
+                  className="group relative transition-all duration-500 hover:scale-[1.02]"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="relative">
+                        <ResultCircle color="white" pulse={!s.outcome || s.outcome === "pending"} />
+                        {(!s.outcome || s.outcome === "pending") && (
+                          <div className="absolute inset-0 animate-ping rounded-full bg-white/20" />
+                        )}
+                      </div>
+                      <div>
+                        <div className="text-2xl font-black text-white font-outfit leading-none">{s.time}</div>
+                        <div className="text-[10px] text-muted-foreground uppercase tracking-widest mt-1 font-bold">Horário Alvo</div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-lg font-black text-primary font-outfit">{s.pct.toFixed(0)}%</div>
+                      <div className="text-[9px] text-muted-foreground uppercase tracking-tighter font-bold">Assertividade</div>
+                    </div>
+                  </div>
+                  
+                  {s.confluence && (
+                    <div className="mt-4 flex flex-wrap gap-1 border-t border-white/5 pt-4">
+                      {s.confluence.split(',').map((c, i) => (
+                        <span key={i} className="rounded-full bg-white/5 px-2 py-0.5 text-[8px] font-black text-white/40 border border-white/5 uppercase tracking-widest">
+                          {c.trim()}
                         </span>
                       ))}
-                      {s.isHighTendency && (
-                        <span className="flex items-center gap-1 rounded bg-red-500/20 px-1 py-0.5 text-[8px] font-black text-red-400 animate-pulse border border-red-500/30">
-                          🔥 ALTA
-                        </span>
-                      )}
                     </div>
-                  </td>
+                  )}
 
-                  <td className="px-3 py-4">
-                    <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-2.5 py-1">
-                      <span className="text-sm font-black text-primary font-outfit">{s.pct.toFixed(1)}%</span>
-                      <span className="text-[9px] opacity-60 font-bold uppercase tracking-tighter">Win Rate</span>
+                  {s.isHighTendency && !s.outcome && (
+                    <div className="absolute bottom-3 right-3 flex items-center gap-1 rounded bg-red-500/20 px-1.5 py-0.5 text-[8px] font-black text-red-400 animate-pulse border border-red-500/30 uppercase">
+                      🔥 Alta Tendência
                     </div>
-                  </td>
-                  <td className="px-3 py-4">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        {s.medal && (
-                          <span className="rounded-full border border-red-500/30 bg-red-500/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest text-red-400">
-                            {s.medal}
-                          </span>
-                        )}
-                        <span className="text-xs font-bold text-white/90">{s.confluence}</span>
-                        {s.isVerified && (
-                          <span className="flex items-center gap-0.5 rounded-full bg-blue-500/20 px-1.5 py-0.5 text-[8px] font-black text-blue-400 border border-blue-500/30">
-                            <CheckCircle2 className="h-2 w-2" />
-                            SELO AZUL
-                          </span>
-                        )}
-                        {s.isRare && (
-                          <span className="flex items-center gap-0.5 rounded-full bg-cyan-500/20 px-1.5 py-0.5 text-[8px] font-black text-cyan-300 border border-cyan-500/30 shadow-[0_0_10px_rgba(6,182,212,0.2)]">
-                            💎 RARO
-                          </span>
-                        )}
-
-                      </div>
-
-                      <div className="text-[10px] text-muted-foreground opacity-60">Janela: {s.label}</div>
-                    </div>
-                  </td>
-                  <td className="px-3 py-4">
-                    {!s.outcome || s.outcome === "pending" ? (
-                      <div className="inline-flex items-center gap-2 rounded-md bg-white/[0.05] border border-white/10 px-3 py-1 text-[10px] font-black tracking-widest text-muted-foreground uppercase font-mono">
-                        MONITORANDO
-                      </div>
-                    ) : (
-                      <div
-                        className={`inline-flex items-center rounded-md px-3 py-1 font-mono text-[10px] font-black tracking-widest border ${
-                          s.outcome === "green"
-                            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                            : "bg-red-500/10 text-red-400 border-red-500/20"
-                        }`}
-                      >
-                        {s.outcome === "green" ? `WIN ${s.label === "MARGEM" ? "MARGEM" : "EXATO"}` : "LOSS"}
-                        {s.resultTime ? ` · ${s.resultTime}` : ""}
-                      </div>
-                    )}
-                  </td>
-                  <td className="px-3 py-4"></td>
-                </tr>
+                  )}
+                </Card>
               ))}
+            </AnimatePresence>
+            
+            {predictiveList.length === 0 && (
+              <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
+                <div className="h-12 w-12 rounded-full bg-white/5 flex items-center justify-center mb-4">
+                  <Cpu className="h-6 w-6 text-white/20 animate-pulse" />
+                </div>
+                <h3 className="text-white font-bold mb-1 uppercase tracking-widest text-sm">Monitoramento Ativo</h3>
+                <p className="text-muted-foreground text-[11px] max-w-[200px]">Aguardando ativação de novos gatilhos pelo motor preditivo...</p>
+              </div>
+            )}
+          </div>
+        </div>
+
 
               {visible.length > 0 && (
                 <tr className="bg-white/[0.02]">
