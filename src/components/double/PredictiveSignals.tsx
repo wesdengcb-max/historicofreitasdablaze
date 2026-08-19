@@ -691,8 +691,13 @@ export function PredictiveSignals() {
                       </div>
                       <div className="mt-1 text-[11px] tabular-nums font-bold flex items-center gap-1.5">
                         <span className={medal ? "text-inherit" : "text-primary"}>
-                          {s.pct.toFixed(1)}%
+                          {s.isGreenSeal ? (s.greenSealAssertivity || 0).toFixed(1) : s.pct.toFixed(1)}%
                         </span>
+                        {s.isGreenSeal && (
+                          <span className="flex items-center gap-1 rounded bg-emerald-500/20 px-1.5 py-0.5 text-[8px] font-black text-emerald-400 border border-emerald-500/30">
+                            ✓ SELADO
+                          </span>
+                        )}
                         <span className="opacity-50 text-[10px]">·</span>
                       </div>
                       <div className="mt-2 flex flex-wrap gap-1">
