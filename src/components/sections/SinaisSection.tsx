@@ -276,38 +276,8 @@ export default function SinaisSection() {
           }));
         }
 
-        // 2. Fetch Top Strategies (Always from total history for "Geral" or filtered for "Hoje")
-        const { data: allData, error: allErr } = await supabase.from(table).select("analise, status, minuto_alvo");
-        if (!allErr && allData) {
-          const strategyMap = new Map<string, { wins: number, total: number }>();
-          const today = spYmd();
-          const startLimit = new Date(spToUtcIso(today, "00:00")).getTime();
-          
-          allData.forEach(r => {
-            if (!r.analise || !r.status || r.status === 'PENDENTE') return;
-            
-            const itemDate = new Date(r.minuto_alvo || 0).getTime();
-            if (itemDate < startLimit) return;
-            
-            const cur = strategyMap.get(r.analise) || { wins: 0, total: 0 };
-            cur.total++;
-            if (r.status.startsWith('WIN')) cur.wins++;
-            strategyMap.set(r.analise, cur);
-          });
-
-
-          const sorted = Array.from(strategyMap.entries())
-            .map(([analise, stats]) => ({
-              analise,
-              wins: stats.wins,
-              total: stats.total,
-              pct: (stats.wins / stats.total) * 100
-            }))
-            .sort((a, b) => b.pct - a.pct || b.total - a.total)
-            .slice(0, 5);
-          
-          setTopStrategies(sorted);
-        }
+        // 2. Fetch recent raw history for tendency or other live needs if required
+        // (Removing redundant fetch as get_strategy_stats handles the summary)
       } catch (e) {
         console.error("fetchAudit execution error:", e);
       }
