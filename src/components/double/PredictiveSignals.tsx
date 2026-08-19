@@ -31,7 +31,10 @@ import {
   checkHighTendency,
   type Cycle,
   type Row,
+  type RecAlert,
+  buildRecAlerts,
 } from "@/lib/predictive";
+
 
 type Mode1Signal = { 
   key: string; 
@@ -227,24 +230,30 @@ export function PredictiveSignals() {
   const hasOpportunity = active.length > 0;
 
   const generate = useCallback(async () => {
-
     const now = new Date();
     now.setSeconds(0, 0);
     setGeneratedAt(now);
 
+    // Alertas de Segurança ("possível rec")
+    const recAlerts = buildRecAlerts(rows);
+    const activeAlerts = recAlerts.filter((alert: RecAlert) => {
+      const diff = (now.getTime() - alert.triggerAt.getTime()) / 60000;
+      return diff >= 0 && diff <= alert.duration;
+    });
+
+
     // Dispara evento global para o SinaisSection alternar para "Rodadas Atuais"
     window.dispatchEvent(new CustomEvent('switch-audit-filter', { detail: 'hoje' }));
 
-    // ---- Modo 1: Top 1 (posição central M) de cada análise ativa, unificado por horário ----
     const byTime = new Map<
       number,
-      { values: number[]; analyses: Set<number>; pct: number; label: string; sources: Array<{ analysis: number; value: number }>; isHighTendency: boolean }
+      { values: number[]; analyses: Set<number>; pct: number; label: string; sources: Array<{ analysis: number; value: number }>; isHighTendency: boolean; isPossibleRec: boolean }
     >();
+
     for (const item of active) {
       const isA8A9 = [8, 9, 10, 11, 12, 13].includes(item.analysis);
       const isGreenSeal = (item.analysis >= 217 && item.analysis <= 221) || item.analysis === 20711;
       
-      // Janela de Histórico Recente: Últimos 6 gatilhos (exceto A8/A9 que são projeções diretas)
       const hist = engine[item.analysis].filter(c => c.value === item.value).slice(-6);
       
       let targetMinutes = 0;
@@ -253,8 +262,6 @@ export function PredictiveSignals() {
 
       if (isA8A9 || isGreenSeal) {
         if (isGreenSeal && item.analysis !== 20711) {
-          // Selo Verde: Pula item.open.gaps[0] (Pedra_Anterior) casas.
-          // Aproximamos 30s por casa = 0.5 min.
           targetMinutes = Math.ceil(item.open.gaps[0] * 0.5) + 1;
         } else {
           targetMinutes = item.open.gaps[0] || 0;
@@ -263,16 +270,19 @@ export function PredictiveSignals() {
         displayPct = 100;
         displayLabel = targetMinutes.toString();
       } else {
-        // Massa Crítica Mínima: 6 gatilhos para estatística
         if (hist.length < MIN_GATILHOS) continue;
         const top1 = computeTop(hist, 1)[0];
         if (!top1) continue;
-        // FILTRO DE ASSERTIVIDADE RÍGIDO (Top 1 em 65%)
         if (top1.pct < MIN_ASSERTIVIDADE_TOP1) continue;
         
         targetMinutes = top1.m;
+        // Ajuste de Calibragem (Estratégias 17, 18 e 19)
+        if ([17, 18, 19].includes(item.analysis)) {
+          targetMinutes += 1;
+        }
+        
         displayPct = top1.pct;
-        displayLabel = top1.label;
+        displayLabel = targetMinutes.toString();
       }
 
       const at = addMinutes(item.open.triggerAt, targetMinutes);
@@ -280,6 +290,13 @@ export function PredictiveSignals() {
       const t = at.getTime();
 
       const isTendency = (isA8A9 || isGreenSeal) ? true : checkHighTendency(engine[item.analysis], item.value);
+      const isPossibleRec = activeAlerts.some((alert: RecAlert) => {
+        const signalTime = at.getTime();
+        const alertStart = alert.triggerAt.getTime();
+        const alertEnd = alertStart + alert.duration * 60000;
+        return signalTime >= alertStart && signalTime <= alertEnd;
+      });
+
 
       const cur = byTime.get(t);
       if (!cur) {
@@ -289,13 +306,15 @@ export function PredictiveSignals() {
           pct: displayPct, 
           label: displayLabel,
           sources: [{ analysis: item.analysis, value: item.value }],
-          isHighTendency: isTendency
+          isHighTendency: isTendency,
+          isPossibleRec
         });
       } else {
         if (!cur.values.includes(item.value)) cur.values.push(item.value);
         cur.analyses.add(item.analysis);
         cur.sources.push({ analysis: item.analysis, value: item.value });
         if (isTendency) cur.isHighTendency = true;
+        if (isPossibleRec) cur.isPossibleRec = true;
         if (displayPct > cur.pct) {
           cur.pct = displayPct;
           cur.label = displayLabel;
@@ -314,10 +333,13 @@ export function PredictiveSignals() {
           label: info.label,
           analysisCount: info.analyses.size,
           sources: info.sources,
-          isHighTendency: info.isHighTendency
+          isHighTendency: info.isHighTendency,
+          isPossibleRec: info.isPossibleRec,
+          isGreenSeal: info.analyses.has(20711)
         };
       });
     setMode1(m1);
+
 
     const usedTimes = new Set<number>(m1.map((s) => s.at.getTime()));
 
