@@ -1,6 +1,6 @@
 import { memo } from "react";
-import brancoTile from "@/assets/branco-tile.png.asset.json";
-const BRANCO_IMG = "/images/branco.svg";
+import brancoAsset from "@/assets/branco_new.png.asset.json";
+const BRANCO_IMG = brancoAsset.url;
 import type { Color } from "./types";
 import type { StoredSignal } from "@/lib/signalsStore";
 
@@ -60,7 +60,7 @@ export const BlazeResultCard = memo(function BlazeResultCard({
           height: `var(--blaze-card-h, ${BLAZE_CARD_TOP_H}px)`,
           borderRadius: 4,
           border: selected ? `2px solid var(--primary)` : isWhite ? `2px solid ${c.border}` : `1px solid ${c.border}`,
-          background: c.bg,
+          background: isWhite ? "transparent" : c.bg,
           boxShadow: isWhite ? c.shadow : 'none',
           opacity: dimmed ? 0.25 : 1,
         }}

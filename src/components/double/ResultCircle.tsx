@@ -1,8 +1,8 @@
 import { memo } from "react";
 import { motion } from "framer-motion";
 import type { Color } from "./types";
-import brancoAsset from "@/assets/branco-vip.png.asset.json";
-const BRANCO_IMG = "/images/branco.svg";
+import brancoAsset from "@/assets/branco_new.png.asset.json";
+const BRANCO_IMG = brancoAsset.url;
 
 type Size = "xs" | "sm" | "md" | "lg" | "fluid";
 
@@ -40,7 +40,7 @@ export const ResultCircle = memo(function ResultCircle({ color, n, size = "md", 
     color === "red"
       ? { background: "#DE2143" }
       : color === "white"
-        ? { background: "#FFFFFF" }
+        ? { background: "transparent" }
         : { background: "#16171d" };
 
   const glowStyle = glow
