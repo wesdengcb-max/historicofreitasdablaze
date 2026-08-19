@@ -769,7 +769,7 @@ export function PredictiveSignals() {
                           </span>
                         )}
                       </div>
-                      <div className="mt-1 text-[11px] tabular-nums font-black">
+                      <div className="mt-1 text-[11px] tabular-nums font-black flex items-center gap-1.5">
                         <span className={medal ? "text-inherit" : "text-primary"}>
                           {s.pct.toFixed(1)}%
                         </span>
