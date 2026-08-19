@@ -481,6 +481,7 @@ export function PredictiveSignals() {
         const { data } = await supabase.from('historico_sinais_audit')
           .select('status')
           .eq('tag', tag)
+          .neq('status', 'PENDENTE')
           .order('created_at', { ascending: false })
           .limit(6);
         
