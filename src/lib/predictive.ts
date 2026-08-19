@@ -227,11 +227,11 @@ export function buildA8_11(rows: Row[]): Cycle[] {
     const dt8 = parseUtcDate(rows[i - 1].created_at);
     if (Number.isNaN(dt8.getTime())) continue;
 
-    const ant1 = Number(rows[i - 3].roll);
-    const ant2 = Number(rows[i - 2].roll);
+    const ant1 = Number(rows[i - 2].roll); // Pedra anterior ao 8
+    const ant2 = Number(rows[i - 3].roll); // Pedra anterior à pedra anterior ao 8
     if (!Number.isFinite(ant1) || !Number.isFinite(ant2)) continue;
 
-    const delta = (ant1 + ant2) + dt8.getMinutes();
+    const delta = (ant1 + ant2);
     out.push({ value: 811, analysis: 10, triggerAt: dt8, gaps: [delta] });
   }
   return out;
@@ -248,17 +248,17 @@ export function buildA11_11(rows: Row[]): Cycle[] {
     const p2 = Number(rows[i].roll);
     if (p1 !== 11 || p2 !== 11) continue;
 
-    const dt11 = parseUtcDate(rows[i - 1].created_at);
-    if (Number.isNaN(dt11.getTime())) continue;
+    const dt11_1 = parseUtcDate(rows[i - 1].created_at);
+    if (Number.isNaN(dt11_1.getTime())) continue;
 
-    const a1 = Number(rows[i - 3].roll);
-    const a2 = Number(rows[i - 2].roll);
+    const a1 = Number(rows[i - 2].roll); // Ant 1
+    const a2 = Number(rows[i - 3].roll); // Ant 2
     const post1 = Number(rows[i + 1].roll);
     const post2 = Number(rows[i + 2].roll);
     if (!Number.isFinite(a1) || !Number.isFinite(a2) || !Number.isFinite(post1) || !Number.isFinite(post2)) continue;
 
-    const delta = (a1 + a2 + post1 + post2) + dt11.getMinutes() + 10;
-    out.push({ value: 1111, analysis: 11, triggerAt: dt11, gaps: [delta] });
+    const delta = (a1 + a2 + post1 + post2) + 10;
+    out.push({ value: 1111, analysis: 11, triggerAt: dt11_1, gaps: [delta] });
   }
   return out;
 }
@@ -321,6 +321,24 @@ export function buildA7_11(rows: Row[]): Cycle[] {
   }
   return out;
 }
+
+/**
+ * ALERTA "POSSÍVEL REC": 7-14, 4-7, 5-14
+ */
+export function buildRecAlerts(rows: Row[]): Array<{ type: string; triggerAt: Date; duration: number }> {
+  const alerts: Array<{ type: string; triggerAt: Date; duration: number }> = [];
+  for (let i = 1; i < rows.length; i++) {
+    const p1 = Number(rows[i-1].roll);
+    const p2 = Number(rows[i].roll);
+    const dt = parseUtcDate(rows[i].created_at);
+    
+    if (p1 === 7 && p2 === 14) alerts.push({ type: "7-14", triggerAt: dt, duration: 14 });
+    if (p1 === 4 && p2 === 7) alerts.push({ type: "4-7", triggerAt: dt, duration: 9 });
+    if (p1 === 5 && p2 === 14) alerts.push({ type: "5-14", triggerAt: dt, duration: 14 });
+  }
+  return alerts;
+}
+
 
 
 /** 

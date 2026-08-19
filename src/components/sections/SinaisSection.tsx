@@ -446,17 +446,27 @@ export default function SinaisSection() {
           
           if (Number.isNaN(entryTime)) return s;
 
-          if (s.outcome && s.outcome !== "pending") return s;
+          if (s.outcome && s.outcome !== "pending") {
+            // Regra C: Descarte Automático (3 minutos após carimbo)
+            if (s.completedAt && now - s.completedAt > 3 * 60_000) {
+              return null; // Será filtrado
+            }
+            return s;
+          }
 
-          // Janela de ±1 minuto (Anterior -1, Exato 0, Posterior +1)
+          // Regra A: Delay da Auditoria (Horário Alvo + 2 minutos)
+          if (now < entryTime + 2 * 60_000) {
+            return { ...s, outcome: "pending" as const };
+          }
+
+          // Regra B: Janela de ±1 minuto (Anterior -1, Exato 0, Posterior +1)
           const rangeStart = entryTime - 60_000;
           const rangeEnd = entryTime + 60_000;
 
           const matchedResult = (resultsForValidation || []).find(r => {
-            if (!r || r.color !== "white") return false;
+            if (!r || r.roll !== 0) return false; // Branco (0)
             const rt = new Date(r.createdAt).getTime();
-            // Verifica se está dentro da janela de 3 minutos (±1 min do alvo)
-            return rt >= rangeStart && rt <= rangeEnd && rt <= now;
+            return rt >= rangeStart && rt <= rangeEnd;
           });
 
           if (matchedResult) {
@@ -465,7 +475,6 @@ export default function SinaisSection() {
             
             const table = 'historico_sinais_audit';
             const isGreenSeal = !!(s as any).isGreenSeal;
-            const tag = isGreenSeal ? `SOMA_${s.confluence.split('·')[1]}` : (((s as any).isGreenSeal === false && (s as any).greenSealAssertivity !== undefined) ? `SOMA_${s.confluence.split('·')[1]}` : null);
             
             void supabase.from(table).insert({
               analise: s.confluence || "Analise",
@@ -475,29 +484,26 @@ export default function SinaisSection() {
               predicao_horario: s.time,
               minuto_alvo: new Date(entryTime).toISOString(),
               is_verified: s.isVerified ? (true as any) : (false as any),
-              tag: tag || undefined,
-              pedra_anterior: (isGreenSeal || tag) ? parseInt(s.label) : undefined
             } as any);
             return res;
           }
 
-          // Só marca RED se a janela de ±1 minuto expirar completamente
-          if (now > rangeEnd) {
-            const res = { ...s, outcome: "red" as const, label: "LOSS", completedAt: now };
-            const table = 'historico_sinais_audit';
-            const isGreenSeal = !!(s as any).isGreenSeal;
-            const tag = isGreenSeal ? `SOMA_${s.confluence.split('·')[1]}` : (((s as any).isGreenSeal === false && (s as any).greenSealAssertivity !== undefined) ? `SOMA_${s.confluence.split('·')[1]}` : null);
+          // Só marca RED se a janela de auditoria passou e não houve acerto
+          const res = { ...s, outcome: "red" as const, label: "LOSS", completedAt: now };
+          const table = 'historico_sinais_audit';
+          const isGreenSeal = !!(s as any).isGreenSeal;
 
-            void supabase.from(table).insert({
-              analise: s.confluence || "Analise",
-              tipo_sinal: isGreenSeal ? "Confirmação" : (s.label === "Confluência" ? "Confluência" : "Top 1 Isolado"),
-              nivel: s.medal || 'Top 1 Isolado',
-              predicao_horario: s.time,
-              status: 'LOSS',
-              minuto_alvo: new Date(entryTime).toISOString(),
-              is_verified: s.isVerified ? (true as any) : (false as any),
-              tag: tag || undefined,
-              pedra_anterior: (isGreenSeal || tag) ? parseInt(s.label) : undefined
+          void supabase.from(table).insert({
+            analise: s.confluence || "Analise",
+            tipo_sinal: isGreenSeal ? "Confirmação" : (s.label === "Confluência" ? "Confluência" : "Top 1 Isolado"),
+            nivel: s.medal || 'Top 1 Isolado',
+            predicao_horario: s.time,
+            status: 'LOSS',
+            minuto_alvo: new Date(entryTime).toISOString(),
+            is_verified: s.isVerified ? (true as any) : (false as any),
+          } as any);
+          return res;
+
             } as any);
             return res;
           }
