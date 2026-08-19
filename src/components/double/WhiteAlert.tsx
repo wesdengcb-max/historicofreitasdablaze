@@ -3,7 +3,7 @@ import { X } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
 import { useEffect } from "react";
 import type { Spin } from "./types";
-import brancoVip from "@/assets/branco-vip.png.asset.json";
+const BRANCO_IMG = "/images/branco.svg";
 
 type Props = {
   spin: Spin | null;
@@ -46,7 +46,7 @@ export function WhiteAlert({ spin, onClose, autoCloseTime = 5000 }: Props) {
             style={{ boxShadow: "0 24px 70px -16px oklch(0 0 0 / 0.7), 0 0 40px oklch(1 0 0 / 0.12)" }}
           >
             <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-white ring-1 ring-white/40">
-              <img src={brancoVip.url} alt="Branco" className="h-full w-full object-cover" />
+              <img src={BRANCO_IMG} alt="Branco" className="h-full w-full object-cover" />
               <span className="pointer-events-none absolute inset-0 animate-ping rounded-full bg-white/40" />
             </div>
 
