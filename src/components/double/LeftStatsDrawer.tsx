@@ -3,7 +3,7 @@ import { X } from "lucide-react";
 import { colorOf, fmtTime, mapColor, type Color, type Spin } from "./types";
 import { blazeSupabase } from "@/integrations/supabase/blaze-client";
 import { parseUtcDate } from "@/lib/utils";
-import brancoTile from "@/assets/branco-tile.png.asset.json";
+const BRANCO_IMG = "/images/branco.svg";
 
 type Props = {
   open: boolean;
@@ -269,7 +269,7 @@ function BrancoIcon({ size = 32 }: { size?: number }) {
       className="grid shrink-0 place-items-center overflow-hidden rounded-md bg-white"
       style={{ width: size, height: size }}
     >
-      <img src={brancoTile.url} alt="" className="h-full w-full object-cover" />
+      <img src={BRANCO_IMG} alt="" className="h-full w-full object-cover" />
     </div>
   );
 }

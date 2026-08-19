@@ -151,7 +151,7 @@ function spTimeWithSeconds(spin: Spin): string {
   return spSecondsFormatter.format(d);
 }
 
-import brancoTile from "@/assets/branco-tile.png.asset.json";
+const BRANCO_IMG = "/images/branco.svg";
 import freitasLogo from "@/assets/freitas-logo.jpg.asset.json";
 
 
@@ -1011,7 +1011,7 @@ function Index() {
                 </div>
                 <div className="flex flex-col items-end">
                   <div className="flex h-8 w-8 items-center justify-center rounded-md bg-white shadow-[0_0_15px_rgba(255,255,255,0.2)]">
-                    <img src={brancoTile.url} alt="Branco" className="h-5 w-5 object-contain" />
+                    <img src={BRANCO_IMG} alt="Branco" className="h-5 w-5 object-contain" />
                   </div>
                   <span className="text-[10px] font-bold text-white mt-1.5 tabular-nums">
                     {visibleSpins[lastWhiteIdx]?.time ?? "--:--"}
@@ -1410,7 +1410,7 @@ function Index() {
                                           <div key={`p-${ci}-${i}`} className="flex flex-col items-center" style={{ opacity: isSlotActive ? 1 : 0.25 }}>
                                             <div className="relative flex h-[50px] w-[52px] items-center justify-center overflow-hidden rounded-[4px] border border-slate-700/50 bg-[#181e2a] shadow-none">
                                               <img
-                                                src={brancoTile.url}
+                                                src={BRANCO_IMG}
                                                 alt="Sinal"
                                                 className="h-full w-full object-cover opacity-20"
                                                 draggable={false}
@@ -1663,7 +1663,7 @@ const TipMinerCard = memo(function TipMinerCard({
       >
         {isWhite && !numbered ? (
           <img
-            src={brancoTile.url}
+            src={BRANCO_IMG}
             alt="Branco"
             className="h-full w-full object-cover"
             draggable={false}
@@ -1739,7 +1739,7 @@ const EmptySlot = memo(function EmptySlot({
         {prediction ? (
           isWhite ? (
             <img
-              src={brancoTile.url}
+              src={BRANCO_IMG}
               alt="Branco"
               className="h-full w-full object-cover"
               draggable={false}

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import brancoAsset from "@/assets/branco-vip.png.asset.json";
+const BRANCO_IMG = "/images/branco.svg";
 import { colorOf, type Color } from "./types";
 
 type Result = { id: string; roll: number; color: Color; createdAt: string };
@@ -168,7 +168,7 @@ function TileView({ tile, centered }: { tile: Tile; centered?: boolean }) {
     >
       {color === "white" ? (
         <img
-          src={brancoAsset.url}
+          src={BRANCO_IMG}
           alt="Branco"
           className="h-[62%] w-[62%] object-contain drop-shadow-[0_2px_10px_rgba(0,0,0,0.45)] select-none pointer-events-none"
           draggable={false}
@@ -214,7 +214,7 @@ function SmallTile({ n, color }: { n: number; color: Color }) {
     >
       {color === "white" ? (
         <img
-          src={brancoAsset.url}
+          src={BRANCO_IMG}
           alt="0"
           className="h-4 w-4 object-contain select-none pointer-events-none"
           draggable={false}

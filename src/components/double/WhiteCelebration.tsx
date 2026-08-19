@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import brancoVip from "@/assets/branco-vip.png.asset.json";
+const BRANCO_IMG = "/images/branco.svg";
 import type { Spin } from "./types";
 
 type Particle = {
@@ -151,7 +151,7 @@ export function WhiteCelebration({ spin, onClose }: Props) {
               />
               <span className="pointer-events-none absolute inset-0 animate-ping rounded-full bg-white/25" />
               <motion.img
-                src={brancoVip.url}
+                src={BRANCO_IMG}
                 alt="Branco"
                 animate={{ y: [0, -12, 0], scale: [1, 1.04, 1] }}
                 transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
@@ -221,7 +221,7 @@ export function WhiteAlertToggleFx({ state, onDone }: { state: "on" | "off" | nu
             }}
           >
             <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-white ring-2 ring-primary/50">
-              <img src={brancoVip.url} alt="" className="h-full w-full object-cover" />
+              <img src={BRANCO_IMG} alt="" className="h-full w-full object-cover" />
               {state === "on" && (
                 <span className="absolute inset-0 animate-ping rounded-full bg-white/60" />
               )}
