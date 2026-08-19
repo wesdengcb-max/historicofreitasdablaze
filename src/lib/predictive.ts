@@ -5,7 +5,10 @@
 import { parseUtcDate } from "@/lib/utils";
 export type Row = { id: number; roll: string; color: string; created_at: string };
 
+export type RecAlert = { type: string; triggerAt: Date; duration: number };
+
 export type Cycle = {
+
   value: number;
   analysis: 1 | 2 | 3 | 4 | 5 | 6 | 7 | number; // 1-7 main, 100+ secondary
   isSecondary?: boolean;

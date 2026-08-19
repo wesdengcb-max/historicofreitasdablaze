@@ -31,7 +31,10 @@ import {
   checkHighTendency,
   type Cycle,
   type Row,
+  type RecAlert,
+  buildRecAlerts,
 } from "@/lib/predictive";
+
 
 type Mode1Signal = { 
   key: string; 
@@ -233,10 +236,11 @@ export function PredictiveSignals() {
 
     // Alertas de Segurança ("possível rec")
     const recAlerts = buildRecAlerts(rows);
-    const activeAlerts = recAlerts.filter(alert => {
+    const activeAlerts = recAlerts.filter((alert: RecAlert) => {
       const diff = (now.getTime() - alert.triggerAt.getTime()) / 60000;
       return diff >= 0 && diff <= alert.duration;
     });
+
 
     // Dispara evento global para o SinaisSection alternar para "Rodadas Atuais"
     window.dispatchEvent(new CustomEvent('switch-audit-filter', { detail: 'hoje' }));
@@ -286,12 +290,13 @@ export function PredictiveSignals() {
       const t = at.getTime();
 
       const isTendency = (isA8A9 || isGreenSeal) ? true : checkHighTendency(engine[item.analysis], item.value);
-      const isPossibleRec = activeAlerts.some(alert => {
+      const isPossibleRec = activeAlerts.some((alert: RecAlert) => {
         const signalTime = at.getTime();
         const alertStart = alert.triggerAt.getTime();
         const alertEnd = alertStart + alert.duration * 60000;
         return signalTime >= alertStart && signalTime <= alertEnd;
       });
+
 
       const cur = byTime.get(t);
       if (!cur) {

@@ -32,7 +32,7 @@ import { Radio, Plus, ChevronDown, PlusCircle, Cpu, Upload, Power, Trash2, FileD
 import { AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { buildSignals } from "@/components/sections/SinaisSection";
+
 import { buildRecAlerts } from "@/lib/predictive";
 
 type Signal = {
