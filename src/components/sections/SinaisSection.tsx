@@ -247,64 +247,37 @@ export default function SinaisSection() {
         const table = 'historico_sinais_audit';
         
         // 1. Fetch statistics for the current filter
-        let statsQuery = supabase.from(table).select("*");
-        if (auditFilter === "hoje") {
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
-          statsQuery = statsQuery.gte("created_at", today.toISOString());
-        }
-        
-        const { data: statsData, error: statsError } = await statsQuery.order("created_at", { ascending: false });
+        const { data: statsData, error: statsError } = await supabase.rpc('get_strategy_stats', { lookback_hours: auditFilter === 'hoje' ? 24 : 168 });
         
         if (!statsError && statsData) {
-          const wins = statsData.filter(r => r.status && r.status.startsWith("WIN")).length;
-          const losses = statsData.filter(r => r.status === "LOSS").length;
+          const wins = (statsData as any[]).reduce((s, r) => s + Number(r.wins), 0);
+          const losses = (statsData as any[]).reduce((s, r) => s + Number(r.losses), 0);
           const total = wins + losses;
           const pct = total > 0 ? (wins / total) * 100 : 0;
-          const latest = statsData[0];
+          
+          const sorted = (statsData as any[])
+            .map(r => ({
+              analise: r.analise,
+              wins: Number(r.wins),
+              total: Number(r.total),
+              pct: Number(r.assertividade)
+            }))
+            .sort((a, b) => b.pct - a.pct || b.total - a.total);
 
-          setAuditStats({
+          setTopStrategies(sorted.slice(0, 5));
+          setAuditStats(prev => ({
+            ...prev,
             wins,
             losses,
             total,
             pct,
-            analysis: latest?.analise || "Confluência · Top 1",
-            tendency: statsData.slice(0, 5).filter(r => r.status && r.status.startsWith("WIN")).length >= 4,
-          });
+            analysis: sorted[0]?.analise || "Confluência · Top 1",
+            tendency: pct >= 80
+          }));
         }
 
-        // 2. Fetch Top Strategies (Always from total history for "Geral" or filtered for "Hoje")
-        const { data: allData, error: allErr } = await supabase.from(table).select("analise, status, minuto_alvo");
-        if (!allErr && allData) {
-          const strategyMap = new Map<string, { wins: number, total: number }>();
-          const today = spYmd();
-          const startLimit = new Date(spToUtcIso(today, "00:00")).getTime();
-          
-          allData.forEach(r => {
-            if (!r.analise || !r.status || r.status === 'PENDENTE') return;
-            
-            const itemDate = new Date(r.minuto_alvo || 0).getTime();
-            if (itemDate < startLimit) return;
-            
-            const cur = strategyMap.get(r.analise) || { wins: 0, total: 0 };
-            cur.total++;
-            if (r.status.startsWith('WIN')) cur.wins++;
-            strategyMap.set(r.analise, cur);
-          });
-
-
-          const sorted = Array.from(strategyMap.entries())
-            .map(([analise, stats]) => ({
-              analise,
-              wins: stats.wins,
-              total: stats.total,
-              pct: (stats.wins / stats.total) * 100
-            }))
-            .sort((a, b) => b.pct - a.pct || b.total - a.total)
-            .slice(0, 5);
-          
-          setTopStrategies(sorted);
-        }
+        // 2. Fetch recent raw history for tendency or other live needs if required
+        // (Removing redundant fetch as get_strategy_stats handles the summary)
       } catch (e) {
         console.error("fetchAudit execution error:", e);
       }
@@ -497,9 +470,9 @@ export default function SinaisSection() {
             void supabase.from(table).insert({
               analise: s.confluence || "Analise",
               tipo_sinal: isGreenSeal ? "Confirmação" : (s.label === "Confluência" ? "Confluência" : "Top 1 Isolado"),
+              status: "WIN",
               nivel: s.medal || 'Top 1 Isolado',
               predicao_horario: s.time,
-              status: status,
               minuto_alvo: new Date(entryTime).toISOString(),
               is_verified: s.isVerified ? (true as any) : (false as any),
               tag: tag || undefined,

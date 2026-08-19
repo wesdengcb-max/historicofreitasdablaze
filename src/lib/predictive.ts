@@ -213,6 +213,116 @@ export function buildA8(rows: Row[]): Cycle[] {
   return out;
 }
 
+/**
+ * GATILHO 8-11: [8 -> 11]
+ * Soma(Ant1 + Ant2) + Minuto da pedra 8
+ */
+export function buildA8_11(rows: Row[]): Cycle[] {
+  const out: Cycle[] = [];
+  for (let i = 3; i < rows.length; i++) {
+    const p1 = Number(rows[i - 1].roll);
+    const p2 = Number(rows[i].roll);
+    if (p1 !== 8 || p2 !== 11) continue;
+
+    const dt8 = parseUtcDate(rows[i - 1].created_at);
+    if (Number.isNaN(dt8.getTime())) continue;
+
+    const ant1 = Number(rows[i - 3].roll);
+    const ant2 = Number(rows[i - 2].roll);
+    if (!Number.isFinite(ant1) || !Number.isFinite(ant2)) continue;
+
+    const delta = (ant1 + ant2) + dt8.getMinutes();
+    out.push({ value: 811, analysis: 10, triggerAt: dt8, gaps: [delta] });
+  }
+  return out;
+}
+
+/**
+ * GATILHO 11-11: [11 -> 11]
+ * Soma(Ant1 + Ant2 + Post1 + Post2) + Minuto da 1ª 11 + 10
+ */
+export function buildA11_11(rows: Row[]): Cycle[] {
+  const out: Cycle[] = [];
+  for (let i = 3; i < rows.length - 2; i++) {
+    const p1 = Number(rows[i - 1].roll);
+    const p2 = Number(rows[i].roll);
+    if (p1 !== 11 || p2 !== 11) continue;
+
+    const dt11 = parseUtcDate(rows[i - 1].created_at);
+    if (Number.isNaN(dt11.getTime())) continue;
+
+    const a1 = Number(rows[i - 3].roll);
+    const a2 = Number(rows[i - 2].roll);
+    const post1 = Number(rows[i + 1].roll);
+    const post2 = Number(rows[i + 2].roll);
+    if (!Number.isFinite(a1) || !Number.isFinite(a2) || !Number.isFinite(post1) || !Number.isFinite(post2)) continue;
+
+    const delta = (a1 + a2 + post1 + post2) + dt11.getMinutes() + 10;
+    out.push({ value: 1111, analysis: 11, triggerAt: dt11, gaps: [delta] });
+  }
+  return out;
+}
+
+/**
+ * GATILHO 4-11: [4 -> 11]
+ * Minuto da pedra 4 + 5
+ */
+export function buildA4_11(rows: Row[]): Cycle[] {
+  const out: Cycle[] = [];
+  for (let i = 1; i < rows.length; i++) {
+    const p1 = Number(rows[i - 1].roll);
+    const p2 = Number(rows[i].roll);
+    if (p1 !== 4 || p2 !== 11) continue;
+
+    const dt4 = parseUtcDate(rows[i - 1].created_at);
+    if (Number.isNaN(dt4.getTime())) continue;
+
+    out.push({ value: 411, analysis: 12, triggerAt: dt4, gaps: [5] });
+  }
+  return out;
+}
+
+/**
+ * GATILHO 4-14 ou 14-4: [4 -> 14] ou [14 -> 4]
+ * Minuto da 2ª pedra + 1
+ */
+export function buildA4_14(rows: Row[]): Cycle[] {
+  const out: Cycle[] = [];
+  for (let i = 1; i < rows.length; i++) {
+    const p1 = Number(rows[i - 1].roll);
+    const p2 = Number(rows[i].roll);
+    const isMatch = (p1 === 4 && p2 === 14) || (p1 === 14 && p2 === 4);
+    if (!isMatch) continue;
+
+    const dt2 = parseUtcDate(rows[i].created_at);
+    if (Number.isNaN(dt2.getTime())) continue;
+
+    out.push({ value: 414, analysis: 13, triggerAt: dt2, gaps: [1] });
+  }
+  return out;
+}
+
+/**
+ * GATILHO 7-11 ou 11-7: [7 -> 11] ou [11 -> 7]
+ * Minuto da 1ª pedra + 5 -> SELO VERDE
+ */
+export function buildA7_11(rows: Row[]): Cycle[] {
+  const out: Cycle[] = [];
+  for (let i = 1; i < rows.length; i++) {
+    const p1 = Number(rows[i - 1].roll);
+    const p2 = Number(rows[i].roll);
+    const isMatch = (p1 === 7 && p2 === 11) || (p1 === 11 && p2 === 7);
+    if (!isMatch) continue;
+
+    const dt1 = parseUtcDate(rows[i - 1].created_at);
+    if (Number.isNaN(dt1.getTime())) continue;
+
+    out.push({ value: 711, analysis: 20711, triggerAt: dt1, gaps: [5] });
+  }
+  return out;
+}
+
+
 /** 
  * ESTRATÉGIA A9 - PÃO DE BRANCO (Gatilho: Branco + Cor Normal + Branco - ⚪🔴⚪)
  * Gatilhos G1-G6 com peso fixo 30 e pedra "Carne".
