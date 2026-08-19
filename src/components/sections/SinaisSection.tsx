@@ -500,7 +500,6 @@ export default function SinaisSection() {
               status: "WIN",
               nivel: s.medal || 'Top 1 Isolado',
               predicao_horario: s.time,
-              status: status,
               minuto_alvo: new Date(entryTime).toISOString(),
               is_verified: s.isVerified ? (true as any) : (false as any),
               tag: tag || undefined,
