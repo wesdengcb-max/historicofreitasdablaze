@@ -261,7 +261,7 @@ export default function SinaisSection() {
           const losses = statsData.filter(r => r.status === "LOSS").length;
           const total = wins + losses;
           const pct = total > 0 ? (wins / total) * 100 : 0;
-          const latest = statsData[0];
+          const latest = statsData.find(r => r.status !== 'PENDENTE');
 
           setAuditStats({
             wins,
@@ -269,7 +269,7 @@ export default function SinaisSection() {
             total,
             pct,
             analysis: latest?.analise || "Confluência · Top 1",
-            tendency: statsData.slice(0, 5).filter(r => r.status && r.status.startsWith("WIN")).length >= 4,
+            tendency: statsData.filter(r => r.status !== 'PENDENTE').slice(0, 5).filter(r => r.status && r.status.startsWith("WIN")).length >= 4,
           });
         }
 
