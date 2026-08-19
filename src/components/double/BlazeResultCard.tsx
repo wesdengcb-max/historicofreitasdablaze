@@ -1,6 +1,5 @@
 import { memo } from "react";
-import brancoAsset from "@/assets/branco_new.png.asset.json";
-const BRANCO_IMG = brancoAsset.url;
+const BRANCO_IMG = "/images/branco.svg";
 import type { Color } from "./types";
 import type { StoredSignal } from "@/lib/signalsStore";
 

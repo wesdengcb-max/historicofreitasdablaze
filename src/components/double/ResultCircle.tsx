@@ -1,8 +1,7 @@
 import { memo } from "react";
 import { motion } from "framer-motion";
 import type { Color } from "./types";
-import brancoAsset from "@/assets/branco_new.png.asset.json";
-const BRANCO_IMG = brancoAsset.url;
+const BRANCO_IMG = "/images/branco.svg";
 
 type Size = "xs" | "sm" | "md" | "lg" | "fluid";
 
