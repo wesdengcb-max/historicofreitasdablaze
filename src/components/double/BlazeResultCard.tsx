@@ -1,5 +1,6 @@
 import { memo } from "react";
 import brancoTile from "@/assets/branco-tile.png.asset.json";
+const BRANCO_IMG = "/images/branco.svg";
 import type { Color } from "./types";
 import type { StoredSignal } from "@/lib/signalsStore";
 
@@ -66,7 +67,7 @@ export const BlazeResultCard = memo(function BlazeResultCard({
       >
         {isWhite && !numbered ? (
           <img
-            src={brancoTile.url}
+            src={BRANCO_IMG}
             alt="Branco"
             className="h-full w-full object-cover"
             draggable={false}

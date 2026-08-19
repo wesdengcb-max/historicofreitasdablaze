@@ -2,6 +2,7 @@ import { memo } from "react";
 import { motion } from "framer-motion";
 import type { Color } from "./types";
 import brancoAsset from "@/assets/branco-vip.png.asset.json";
+const BRANCO_IMG = "/images/branco.svg";
 
 type Size = "xs" | "sm" | "md" | "lg" | "fluid";
 
@@ -53,7 +54,7 @@ export const ResultCircle = memo(function ResultCircle({ color, n, size = "md", 
   const content =
     color === "white" ? (
       <img
-        src={brancoAsset.url}
+        src={BRANCO_IMG}
         alt="Branco"
         className="h-full w-full object-cover scale-110 select-none pointer-events-none"
         draggable={false}
