@@ -738,6 +738,11 @@ export function PredictiveSignals() {
                           <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-white/40">
                             {s.sources[0]?.analysis ? `A${s.sources[0].analysis}` : "CONF"}
                           </span>
+                          {(s as any).isRecAlert && (
+                            <span className="flex items-center gap-0.5 rounded-full bg-amber-500/20 px-1.5 py-0.5 text-[8px] font-black text-amber-400 border border-amber-500/30">
+                              🙌 possível rec
+                            </span>
+                          )}
                         </div>
                         {medal ? (
                           <span className={`rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-widest ${medal.badge}`}>
