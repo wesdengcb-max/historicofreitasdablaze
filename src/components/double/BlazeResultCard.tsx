@@ -11,7 +11,7 @@ export const BLAZE_GAP_Y = 8;
 const PALETTE: Record<Color, { bg: string; border: string; ring: string; fg: string; shadow?: string }> = {
   red: { bg: "#f12c4c", border: "transparent", ring: "#ffffff", fg: "#ffffff" },
   black: { bg: "#1e2330", border: "transparent", ring: "#ffffff", fg: "#ffffff" },
-  white: { bg: "transparent", border: "transparent", ring: "#DE2143", fg: "#DE2143", shadow: "none" },
+  white: { bg: "#ffffff", border: "#ff1e46", ring: "#DE2143", fg: "#DE2143", shadow: "0 0 15px rgba(255, 30, 70, 0.85), 0 0 30px rgba(255, 30, 70, 0.45)" },
 };
 
 type Props = {
@@ -58,8 +58,8 @@ export const BlazeResultCard = memo(function BlazeResultCard({
         style={{
           height: `var(--blaze-card-h, ${BLAZE_CARD_TOP_H}px)`,
           borderRadius: 4,
-          border: selected ? `2px solid var(--primary)` : "none",
-          background: "transparent",
+          border: selected ? `2px solid var(--primary)` : isWhite ? `2px solid ${c.border}` : `1px solid ${c.border}`,
+          background: isWhite ? "transparent" : c.bg,
           boxShadow: isWhite ? c.shadow : 'none',
           opacity: dimmed ? 0.25 : 1,
         }}

@@ -3,7 +3,7 @@ import { X } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
 import { useEffect } from "react";
 import type { Spin } from "./types";
-const brancoVip = { url: "/images/branco.svg" };
+import brancoVip from "@/assets/branco-vip.png.asset.json";
 
 type Props = {
   spin: Spin | null;

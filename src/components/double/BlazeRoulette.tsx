@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-const brancoAsset = { url: "/images/branco.svg" };
+import brancoAsset from "@/assets/branco-vip.png.asset.json";
 import { colorOf, type Color } from "./types";
 
 type Result = { id: string; roll: number; color: Color; createdAt: string };
@@ -152,7 +152,7 @@ function TileView({ tile, centered }: { tile: Tile; centered?: boolean }) {
       ? "linear-gradient(180deg, #FF3554 0%, #FF1F3D 100%)"
       : color === "black"
         ? "linear-gradient(180deg, #2A2A2A 0%, #1A1A1A 100%)"
-        : "transparent";
+        : "linear-gradient(180deg, #FFFFFF 0%, #D9D9D9 100%)";
   return (
     <div
       className={`relative shrink-0 grid place-items-center rounded-2xl border overflow-hidden ${
@@ -206,7 +206,7 @@ function SmallTile({ n, color }: { n: number; color: Color }) {
       ? "linear-gradient(180deg, #FF3554 0%, #FF1F3D 100%)"
       : color === "black"
         ? "linear-gradient(180deg, #2A2A2A 0%, #1A1A1A 100%)"
-        : "transparent";
+        : "#FFFFFF";
   return (
     <div
       className="grid place-items-center h-7 w-7 rounded-md border border-white/10 text-white text-[11px] font-bold tabular-nums"
