@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import brancoVip from "@/assets/branco-vip.png.asset.json";
+const brancoVip = { url: "/images/branco.svg" };
 import type { Spin } from "./types";
 
 type Particle = {
