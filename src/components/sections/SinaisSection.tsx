@@ -1,52 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { setPredictiveSignals } from "@/lib/signalsStore";
-import { Loader2, Sparkles, Target, Layers, Radio, Plus, ChevronDown, PlusCircle, Cpu, Upload, Power, Trash2, FileDown, Clock } from "lucide-react";
+import { setPredictiveSignals, getRobotEnabled, setRobotEnabled, subscribeRobot, getPredictiveSignals, subscribePredictive, type PredictiveSignal } from "@/lib/signalsStore";
+import { Radio, Power, Trash2, FileDown, Clock, Cpu } from "lucide-react";
 import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
-import { parseUtcDate } from "@/lib/utils";
-import { Card } from "@/components/double/Card";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { ResultCircle } from "@/components/double/ResultCircle";
 import { colorOf, fmtTime, type Color } from "@/components/double/types";
-import { setSignals, getRobotEnabled, setRobotEnabled, subscribeRobot, getPredictiveSignals, subscribePredictive, type PredictiveSignal } from "@/lib/signalsStore";
 import { AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { Card } from "@/components/double/Card";
 import { PredictiveSignals } from "@/components/double/PredictiveSignals";
-
-type Signal = {
-  id: string;
-  time: string;
-  date: string;
-  entry: number; 
-  baseTime: string;
-  entryDate: Date;
-  outcome: "pending" | "green" | "red";
-  resultTime?: string;
-  targetIso: string;
-  matchedIso?: string;
-  color: Color;
-  manual?: boolean;
-};
 
 type Result = {
   id: string;
@@ -54,28 +15,6 @@ type Result = {
   color: Color;
   createdAt: string;
 };
-
-function spYmd(d: Date = new Date()): string {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "America/Sao_Paulo",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(d);
-}
-
-function spToUtcIso(ymd: string, hms: string): string {
-  const time = hms.length === 5 ? `${hms}:00` : hms;
-  return new Date(`${ymd}T${time}-03:00`).toISOString();
-}
-
-function fmtDateShort(d: Date): string {
-  return new Intl.DateTimeFormat("pt-BR", {
-    timeZone: "America/Sao_Paulo",
-    day: "2-digit",
-    month: "2-digit",
-  }).format(d);
-}
 
 function normalizeColor(v: unknown): Color | null {
   const s = (v ?? "").toString().trim().toLowerCase();
@@ -100,20 +39,9 @@ function rowToResult(r: { id: number | string; color: string; roll: string; crea
 }
 
 export default function SinaisSection() {
-  const [results, setResults] = useState<Result[]>([]);
-  const [tick, setTick] = useState(0);
   const [resultsForValidation, setResultsForValidation] = useState<Result[]>([]);
-  const [disabled, setDisabled] = useState<Set<string>>(new Set());
   const [robotOn, setRobotOn] = useState(getRobotEnabled());
-  const [manualSignals, setManualSignals] = useState<Signal[]>([]);
-  const [addOpen, setAddOpen] = useState(false);
   const [predictiveList, setPredictiveList] = useState<PredictiveSignal[]>(getPredictiveSignals());
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [formDate, setFormDate] = useState(() => spYmd());
-  const [formTime, setFormTime] = useState("");
-  const [formEntry, setFormEntry] = useState<"1" | "2">("1");
-  const [formColor, setFormColor] = useState<Color>("red");
-  const [auditStats, setAuditStats] = useState<{ wins: number; losses: number; pct: number; total: number }>({ wins: 0, losses: 0, pct: 0, total: 0 });
 
   useEffect(() => {
     const load = async () => {
@@ -139,12 +67,15 @@ export default function SinaisSection() {
           if (Number.isNaN(entryTime)) return s;
 
           if (s.outcome && s.outcome !== "pending") {
+            // Regra C: Descarte automático após 3 minutos
             if (s.completedAt && now - s.completedAt > 3 * 60_000) return null;
             return s;
           }
 
+          // Regra A: Delay da Auditoria (Horário Alvo + 2 minutos)
           if (now < entryTime + 2 * 60_000) return { ...s, outcome: "pending" as const };
 
+          // Regra B: Janela de ±1 minuto (Anterior -1, Exato 0, Posterior +1)
           const rangeStart = entryTime - 60_000;
           const rangeEnd = entryTime + 60_000;
 
@@ -158,6 +89,7 @@ export default function SinaisSection() {
             return { ...s, outcome: "green" as const, resultTime: fmtTime(matchedResult.createdAt), label: "WIN", completedAt: now };
           }
 
+          // Se passou da janela e não deu WIN, marca RED
           if (now > rangeEnd + 60_000) {
             return { ...s, outcome: "red" as const, label: "LOSS", completedAt: now };
           }
@@ -236,23 +168,9 @@ export default function SinaisSection() {
             <div className="text-[#9CA3AF] font-bold tracking-widest text-[9px] uppercase">ROBÔ · SINAIS</div>
             <div className="font-black text-emerald-400 text-lg font-outfit">{robotOn ? "ACTIVE" : "STANDBY"}</div>
           </div>
-          <Switch checked={robotOn} onCheckedChange={setRobotOn} />
+          <Switch checked={robotOn} onCheckedChange={(v) => { setRobotOn(v); setRobotEnabled(v); }} />
         </div>
       </div>
     </div>
-  );
-}
-
-function MenuAction({ icon, title, desc, onClick }: { icon: React.ReactNode; title: string; desc: string; onClick?: () => void }) {
-  return (
-    <button onClick={onClick} className="w-full flex items-center gap-3 px-2 py-2.5 rounded-lg hover:bg-white/5 text-left transition-colors">
-      <div className="grid h-10 w-10 place-items-center rounded-lg bg-white/5 border border-white/10 shrink-0">
-        {icon}
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="text-xs font-bold text-white uppercase tracking-tight">{title}</div>
-        <div className="text-[10px] text-muted-foreground truncate">{desc}</div>
-      </div>
-    </button>
   );
 }
