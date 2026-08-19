@@ -497,6 +497,7 @@ export default function SinaisSection() {
             void supabase.from(table).insert({
               analise: s.confluence || "Analise",
               tipo_sinal: isGreenSeal ? "Confirmação" : (s.label === "Confluência" ? "Confluência" : "Top 1 Isolado"),
+              status: "WIN",
               nivel: s.medal || 'Top 1 Isolado',
               predicao_horario: s.time,
               status: status,
