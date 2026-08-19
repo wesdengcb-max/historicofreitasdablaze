@@ -46,7 +46,7 @@ export const ResultCircle = memo(function ResultCircle({ color, n, size = "md", 
     ? color === "red"
       ? { boxShadow: "var(--shadow-red-glow), var(--shadow-tile)" }
       : color === "white"
-        ? { boxShadow: "0 0 28px oklch(1 0 0 / 0.35), var(--shadow-tile)" }
+        ? { boxShadow: "none" }
         : { boxShadow: "var(--shadow-tile)" }
     : {};
 
