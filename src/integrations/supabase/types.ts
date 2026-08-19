@@ -103,7 +103,7 @@ export type Database = {
           minuto_alvo: string
           nivel: string
           predicao_horario: string
-          status: string
+          status?: string
           tipo_sinal: string
         }
         Update: {
@@ -125,6 +125,16 @@ export type Database = {
     }
     Functions: {
       cleanup_audit_24h: { Args: never; Returns: undefined }
+      get_strategy_stats: {
+        Args: { lookback_hours?: number }
+        Returns: {
+          analise: string
+          assertividade: number
+          losses: number
+          total: number
+          wins: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
