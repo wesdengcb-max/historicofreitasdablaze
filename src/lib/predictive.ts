@@ -275,7 +275,7 @@ export function buildSeloVerde(rows: Row[]): Cycle[] {
     if (pAnt < 2) continue;
     
     const soma = pA + pB;
-    if (![17, 19, 21].includes(soma)) continue;
+    if (![17, 18, 19, 21].includes(soma)) continue;
     
     const dt = parseUtcDate(rows[i].created_at);
     if (Number.isNaN(dt.getTime())) continue;

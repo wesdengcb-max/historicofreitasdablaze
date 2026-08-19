@@ -168,6 +168,7 @@ export function PredictiveSignals() {
       8: (buildA8 as any)(rows),
       9: (buildA9 as any)(rows),
       217: buildSeloVerde(rows).filter(c => c.value === 17),
+      218: buildSeloVerde(rows).filter(c => c.value === 18),
       219: buildSeloVerde(rows).filter(c => c.value === 19),
       221: buildSeloVerde(rows).filter(c => c.value === 21),
     };
@@ -181,7 +182,7 @@ export function PredictiveSignals() {
   /** Ciclos em aberto (status < MAX_ZEROS) por análise + valor. */
   const active = useMemo(() => {
     const out: Array<{ analysis: number; value: number; open: Cycle }> = [];
-    const mainIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 217, 219, 221];
+    const mainIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 217, 218, 219, 221];
     mainIds.forEach((a) => {
       const latest = latestByValue(engine[a]);
       latest.forEach((cycle, value) => {
@@ -243,7 +244,7 @@ export function PredictiveSignals() {
         if (isGreenSeal) {
           // Selo Verde: Pula item.open.gaps[0] (Pedra_Anterior) casas.
           // Aproximamos 30s por casa = 0.5 min.
-          targetMinutes = Math.ceil(item.open.gaps[0] * 0.5);
+          targetMinutes = Math.ceil(item.open.gaps[0] * 0.5) + 1;
         } else {
           targetMinutes = item.open.gaps[0] || 0;
         }
