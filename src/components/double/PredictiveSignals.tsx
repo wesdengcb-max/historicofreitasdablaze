@@ -666,7 +666,11 @@ export function PredictiveSignals() {
                               💎 RARO
                             </span>
                           )}
-
+                          {(s as any).isRecAlert && (
+                            <span className="flex items-center gap-0.5 rounded-full bg-amber-500/20 px-1.5 py-0.5 text-[8px] font-black text-amber-400 border border-amber-500/30">
+                              🙌 possível rec
+                            </span>
+                          )}
                         </div>
                         {medal && (
                           <span className={`rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-widest ${medal.badge}`}>
