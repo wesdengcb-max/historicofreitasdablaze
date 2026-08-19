@@ -14,6 +14,11 @@ import {
   buildA8,
   buildA9,
   buildSeloVerde,
+  buildA8_11,
+  buildA11_11,
+  buildA4_11,
+  buildA4_14,
+  buildA7_11,
   buildSecondary,
 
   computeTop,
@@ -171,6 +176,11 @@ export function PredictiveSignals() {
       218: buildSeloVerde(rows).filter(c => c.value === 18),
       219: buildSeloVerde(rows).filter(c => c.value === 19),
       221: buildSeloVerde(rows).filter(c => c.value === 21),
+      10: buildA8_11(rows),
+      11: buildA11_11(rows),
+      12: buildA4_11(rows),
+      13: buildA4_14(rows),
+      20711: buildA7_11(rows),
     };
     const secondary: Record<number, Cycle[]> = {};
     for (let i = 1; i <= 9; i++) {
@@ -182,7 +192,7 @@ export function PredictiveSignals() {
   /** Ciclos em aberto (status < MAX_ZEROS) por análise + valor. */
   const active = useMemo(() => {
     const out: Array<{ analysis: number; value: number; open: Cycle }> = [];
-    const mainIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 217, 218, 219, 221];
+    const mainIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 217, 218, 219, 221, 20711];
     mainIds.forEach((a) => {
       const latest = latestByValue(engine[a]);
       latest.forEach((cycle, value) => {
@@ -230,8 +240,8 @@ export function PredictiveSignals() {
       { values: number[]; analyses: Set<number>; pct: number; label: string; sources: Array<{ analysis: number; value: number }>; isHighTendency: boolean }
     >();
     for (const item of active) {
-      const isA8A9 = item.analysis === 8 || item.analysis === 9;
-      const isGreenSeal = item.analysis >= 217 && item.analysis <= 221;
+      const isA8A9 = [8, 9, 10, 11, 12, 13].includes(item.analysis);
+      const isGreenSeal = (item.analysis >= 217 && item.analysis <= 221) || item.analysis === 20711;
       
       // Janela de Histórico Recente: Últimos 6 gatilhos (exceto A8/A9 que são projeções diretas)
       const hist = engine[item.analysis].filter(c => c.value === item.value).slice(-6);
@@ -241,7 +251,7 @@ export function PredictiveSignals() {
       let displayLabel = "";
 
       if (isA8A9 || isGreenSeal) {
-        if (isGreenSeal) {
+        if (isGreenSeal && item.analysis !== 20711) {
           // Selo Verde: Pula item.open.gaps[0] (Pedra_Anterior) casas.
           // Aproximamos 30s por casa = 0.5 min.
           targetMinutes = Math.ceil(item.open.gaps[0] * 0.5) + 1;
@@ -297,7 +307,7 @@ export function PredictiveSignals() {
         const values = info.values.slice().sort((a, b) => a - b);
         return {
           key: `m1-${t}`,
-          title: info.analyses.has(217) || info.analyses.has(218) || info.analyses.has(219) || info.analyses.has(221) ? `Confirmação · SOMA ${info.values[0]}` : `Análise ${values.join(" + ")}`,
+          title: info.analyses.has(217) || info.analyses.has(218) || info.analyses.has(219) || info.analyses.has(221) || info.analyses.has(20711) ? `Confirmação · SOMA ${info.values[0]}` : `Análise ${values.join(" + ")}`,
           at: new Date(t),
           pct: info.pct,
           label: info.label,
@@ -475,7 +485,7 @@ export function PredictiveSignals() {
       let isGreenSeal = false;
       let greenSealAssertivity = 0;
       
-      const greenSource = s.sources.find(src => src.analysis >= 217 && src.analysis <= 221);
+      const greenSource = s.sources.find(src => (src.analysis >= 217 && src.analysis <= 221) || src.analysis === 20711);
       if (greenSource) {
         const tag = `SOMA_${greenSource.value}`;
         const { data } = await supabase.from('historico_sinais_audit')
@@ -506,7 +516,30 @@ export function PredictiveSignals() {
     setMode1(finalM1);
 
 
-  }, [active, engine]);
+  }, [active, engine, rows]);
+
+  // Alertas de Recuperação "possível rec"
+  const activeRecAlerts = useMemo(() => {
+    const alerts: Array<{ type: string; start: number; end: number }> = [];
+    const now = new Date().getTime();
+
+    // Procurar gatilhos no histórico recente (últimas 20 pedras para garantir cobertura da janela)
+    const recent = rows.slice(-20);
+    for (let i = 1; i < recent.length; i++) {
+      const p1 = Number(recent[i - 1].roll);
+      const p2 = Number(recent[i].roll);
+      const dt = parseUtcDate(recent[i].created_at).getTime();
+
+      // Gatilho 7-14: 14 min
+      if (p1 === 7 && p2 === 14) alerts.push({ type: "7-14", start: dt, end: dt + 14 * 60000 });
+      // Gatilho 4-7: 9 min
+      if (p1 === 4 && p2 === 7) alerts.push({ type: "4-7", start: dt, end: dt + 9 * 60000 });
+      // Gatilho 5-14: 14 min
+      if (p1 === 5 && p2 === 14) alerts.push({ type: "5-14", start: dt, end: dt + 14 * 60000 });
+    }
+    return alerts.filter(a => a.end > now);
+  }, [rows]);
+
 
   // Auto-generate triggers
   useEffect(() => {
@@ -532,7 +565,8 @@ export function PredictiveSignals() {
           isVerified: s.isVerified,
           isRare: s.isRare,
           isGreenSeal: s.isGreenSeal,
-          greenSealAssertivity: s.greenSealAssertivity
+          greenSealAssertivity: s.greenSealAssertivity,
+          isRecAlert: activeRecAlerts.some(a => s.at.getTime() >= a.start && s.at.getTime() <= a.end)
         })),
         ...mode2.map(s => ({
           key: s.key,
@@ -543,9 +577,11 @@ export function PredictiveSignals() {
           medal: getMedalStyles(s.analysisCount)?.label,
           entryDate: s.times[0],
           outcome: "pending",
-          isHighTendency: s.isHighTendency
+          isHighTendency: s.isHighTendency,
+          isRecAlert: activeRecAlerts.some(a => s.times[0].getTime() >= a.start && s.times[0].getTime() <= a.end)
         }))
       ].sort((a, b) => a.entryDate.getTime() - b.entryDate.getTime());
+
 
       setPredictiveSignals(syncSignals);
     }
