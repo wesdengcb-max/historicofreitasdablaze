@@ -297,7 +297,7 @@ export function PredictiveSignals() {
         const values = info.values.slice().sort((a, b) => a - b);
         return {
           key: `m1-${t}`,
-          title: info.analyses.has(217) || info.analyses.has(219) || info.analyses.has(221) ? `Confirmação · SOMA ${info.values[0]}` : `Análise ${values.join(" + ")}`,
+          title: info.analyses.has(217) || info.analyses.has(218) || info.analyses.has(219) || info.analyses.has(221) ? `Confirmação · SOMA ${info.values[0]}` : `Análise ${values.join(" + ")}`,
           at: new Date(t),
           pct: info.pct,
           label: info.label,
