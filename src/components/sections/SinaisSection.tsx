@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { setPredictiveSignals, getRobotEnabled, setRobotEnabled, subscribeRobot, getPredictiveSignals, subscribePredictive, type PredictiveSignal } from "@/lib/signalsStore";
+import { useSignalStatsStore } from "@/lib/signalStatsStore";
 import { Radio, Power, Trash2, FileDown, Clock, Cpu } from "lucide-react";
 import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
 import { ResultCircle } from "@/components/double/ResultCircle";
@@ -42,6 +43,8 @@ export default function SinaisSection() {
   const [resultsForValidation, setResultsForValidation] = useState<Result[]>([]);
   const [robotOn, setRobotOn] = useState(getRobotEnabled());
   const [predictiveList, setPredictiveList] = useState<PredictiveSignal[]>(getPredictiveSignals());
+  const updateStats = useSignalStatsStore(state => state.updateStats);
+  const getAssertivity = useSignalStatsStore(state => state.getAssertivity);
 
   useEffect(() => {
     const load = async () => {
@@ -86,11 +89,13 @@ export default function SinaisSection() {
           });
 
           if (matchedResult) {
+            if (s.strategyKey) updateStats(s.strategyKey, "green");
             return { ...s, outcome: "green" as const, resultTime: fmtTime(matchedResult.createdAt), label: "WIN", completedAt: now };
           }
-
+ 
           // Se passou da janela e não deu WIN, marca RED
           if (now > rangeEnd + 60_000) {
+            if (s.strategyKey) updateStats(s.strategyKey, "red");
             return { ...s, outcome: "red" as const, label: "LOSS", completedAt: now };
           }
 
@@ -142,7 +147,7 @@ export default function SinaisSection() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-lg font-black text-primary font-outfit">{s.pct.toFixed(0)}%</div>
+                  <div className="text-lg font-black text-primary font-outfit">{(s.strategyKey ? getAssertivity(s.strategyKey) : s.pct).toFixed(0)}%</div>
                   <div className="text-[9px] text-muted-foreground uppercase tracking-tighter font-bold">Assertividade</div>
                 </div>
               </div>

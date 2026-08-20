@@ -196,7 +196,7 @@ export function PredictiveSignals() {
   /** Ciclos em aberto (status < MAX_ZEROS) por análise + valor. */
   const active = useMemo(() => {
     const out: Array<{ analysis: number; value: number; open: Cycle }> = [];
-    const mainIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 217, 218, 219, 221, 20711];
+    const mainIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
     mainIds.forEach((a) => {
       const latest = latestByValue(engine[a]);
       latest.forEach((cycle, value) => {
@@ -247,12 +247,22 @@ export function PredictiveSignals() {
 
     const byTime = new Map<
       number,
-      { values: number[]; analyses: Set<number>; pct: number; label: string; sources: Array<{ analysis: number; value: number }>; isHighTendency: boolean; isPossibleRec: boolean }
+      { 
+        values: number[]; 
+        analyses: Set<number>; 
+        pct: number; 
+        label: string; 
+        sources: Array<{ analysis: number; value: number }>; 
+        isHighTendency: boolean; 
+        isPossibleRec: boolean;
+        isGreenSeal?: boolean;
+      }
     >();
+
+    const greenSealIds = [217, 218, 219, 221, 20711];
 
     for (const item of active) {
       const isA8A9 = [8, 9, 10, 11, 12, 13].includes(item.analysis);
-      const isGreenSeal = (item.analysis >= 217 && item.analysis <= 221) || item.analysis === 20711;
       
       const hist = engine[item.analysis].filter(c => c.value === item.value).slice(-6);
       
@@ -260,13 +270,8 @@ export function PredictiveSignals() {
       let displayPct = 0;
       let displayLabel = "";
 
-      if (isA8A9 || isGreenSeal) {
-        if (isGreenSeal && item.analysis !== 20711) {
-          targetMinutes = Math.ceil(item.open.gaps[0] * 0.5) + 1;
-        } else {
-          targetMinutes = item.open.gaps[0] || 0;
-        }
-        
+      if (isA8A9) {
+        targetMinutes = item.open.gaps[0] || 0;
         displayPct = 100;
         displayLabel = targetMinutes.toString();
       } else {
@@ -276,7 +281,6 @@ export function PredictiveSignals() {
         if (top1.pct < MIN_ASSERTIVIDADE_TOP1) continue;
         
         targetMinutes = top1.m;
-        // Ajuste de Calibragem (Estratégias 17, 18 e 19)
         if ([17, 18, 19].includes(item.analysis)) {
           targetMinutes += 1;
         }
@@ -289,7 +293,25 @@ export function PredictiveSignals() {
       if (at.getTime() <= now.getTime()) continue; 
       const t = at.getTime();
 
-      const isTendency = (isA8A9 || isGreenSeal) ? true : checkHighTendency(engine[item.analysis], item.value);
+      // Logic for detection if a Green Seal applies
+      const hasGreenSeal = greenSealIds.some(gsId => {
+        const gsCycles = engine[gsId];
+        if (!gsCycles || gsCycles.length === 0) return false;
+        const lastGs = gsCycles[gsCycles.length - 1];
+        if (!lastGs || lastGs.gaps.length === 0) return false;
+        
+        let gsMinutes = 0;
+        if (gsId === 20711) {
+           gsMinutes = lastGs.gaps[0];
+        } else {
+           gsMinutes = Math.ceil(lastGs.gaps[0] * 0.5) + 1;
+        }
+        
+        const gsAt = addMinutes(lastGs.triggerAt, gsMinutes);
+        return Math.abs(gsAt.getTime() - t) <= 60000;
+      });
+
+      const isTendency = isA8A9 ? true : checkHighTendency(engine[item.analysis], item.value);
       const isPossibleRec = activeAlerts.some((alert: RecAlert) => {
         const signalTime = at.getTime();
         const alertStart = alert.triggerAt.getTime();
@@ -307,7 +329,8 @@ export function PredictiveSignals() {
           label: displayLabel,
           sources: [{ analysis: item.analysis, value: item.value }],
           isHighTendency: isTendency,
-          isPossibleRec
+          isPossibleRec,
+          isGreenSeal: hasGreenSeal
         });
       } else {
         if (!cur.values.includes(item.value)) cur.values.push(item.value);
@@ -315,6 +338,7 @@ export function PredictiveSignals() {
         cur.sources.push({ analysis: item.analysis, value: item.value });
         if (isTendency) cur.isHighTendency = true;
         if (isPossibleRec) cur.isPossibleRec = true;
+        if (hasGreenSeal) cur.isGreenSeal = true;
         if (displayPct > cur.pct) {
           cur.pct = displayPct;
           cur.label = displayLabel;
@@ -322,12 +346,12 @@ export function PredictiveSignals() {
       }
     }
     const m1: Mode1Signal[] = Array.from(byTime.entries())
-      .sort((a, b) => a[0] - b[0])
-      .map(([t, info]) => {
-        const values = info.values.slice().sort((a, b) => a - b);
+      .sort((a: [number, any], b: [number, any]) => a[0] - b[0])
+      .map(([t, info]: [number, any]) => {
+        const values = info.values.slice().sort((a: number, b: number) => a - b);
         return {
           key: `m1-${t}`,
-          title: info.analyses.has(217) || info.analyses.has(218) || info.analyses.has(219) || info.analyses.has(221) || info.analyses.has(20711) ? `Confirmação · SOMA ${info.values[0]}` : `Análise ${values.join(" + ")}`,
+          title: `Análise ${values.join(" + ")}`,
           at: new Date(t),
           pct: info.pct,
           label: info.label,
@@ -335,7 +359,7 @@ export function PredictiveSignals() {
           sources: info.sources,
           isHighTendency: info.isHighTendency,
           isPossibleRec: info.isPossibleRec,
-          isGreenSeal: info.analyses.has(20711)
+          isGreenSeal: info.isGreenSeal
         };
       });
     setMode1(m1);
@@ -409,12 +433,12 @@ export function PredictiveSignals() {
     m2.sort((a, b) => a.times[0].getTime() - b.times[0].getTime());
     setMode2(m2);
 
-    // ---- Level Elevation and Unification Logic ----
-    const unifiedM1: Mode1Signal[] = [];
-    const sortedM1 = Array.from(byTime.entries()).sort((a, b) => a[0] - b[0]);
+    // ---- Level Elevation, Unification and Proximity Filtering ----
+    const rawUnifiedM1: Mode1Signal[] = [];
+    const sortedM1 = Array.from(byTime.entries()).sort((a: [number, any], b: [number, any]) => a[0] - b[0]);
     
     for (let i = 0; i < sortedM1.length; i++) {
-      const [t, info] = sortedM1[i];
+      const [t, info]: [number, any] = sortedM1[i];
       const next1 = sortedM1[i + 1];
       const next2 = sortedM1[i + 2];
       
@@ -426,44 +450,44 @@ export function PredictiveSignals() {
         Math.abs(next1[0] - t) <= 60000;
 
       if (isConsecutive3) {
-        // Use Middle Time, elevate level
         const middleTime = next1[0];
         const combinedSources = [...info.sources, ...next1[1].sources, ...next2[1].sources];
         const combinedAnalyses = new Set([...info.analyses, ...next1[1].analyses, ...next2[1].analyses]);
         const maxPct = Math.max(info.pct, next1[1].pct, next2[1].pct);
         
-        unifiedM1.push({
+        rawUnifiedM1.push({
           key: `m1-c3-${middleTime}`,
           title: `Supremo · ${info.values.join("+")}`,
           at: new Date(middleTime),
           pct: maxPct,
           label: info.label,
-          analysisCount: combinedAnalyses.size + 4, // level elevation
+          analysisCount: combinedAnalyses.size + 4,
           sources: combinedSources,
           isHighTendency: info.isHighTendency || next1[1].isHighTendency || next2[1].isHighTendency,
-          isVerified: false // will be checked below
+          isVerified: false,
+          isGreenSeal: info.isGreenSeal || next1[1].isGreenSeal || next2[1].isGreenSeal
         });
-        i += 2; // skip next two
+        i += 2;
       } else if (isConsecutive2) {
-        // Use highest pct time, elevate level
         const best = info.pct >= next1[1].pct ? { t, info } : { t: next1[0], info: next1[1] };
         const combinedSources = [...info.sources, ...next1[1].sources];
         const combinedAnalyses = new Set([...info.analyses, ...next1[1].analyses]);
         
-        unifiedM1.push({
+        rawUnifiedM1.push({
           key: `m1-c2-${best.t}`,
           title: `Confluência · ${best.info.values.join("+")}`,
           at: new Date(best.t),
           pct: best.info.pct,
           label: best.info.label,
-          analysisCount: combinedAnalyses.size + 1, // level elevation
+          analysisCount: combinedAnalyses.size + 1,
           sources: combinedSources,
           isHighTendency: info.isHighTendency || next1[1].isHighTendency,
-          isVerified: false
+          isVerified: false,
+          isGreenSeal: info.isGreenSeal || next1[1].isGreenSeal
         });
         i += 1;
       } else {
-        unifiedM1.push({
+        rawUnifiedM1.push({
           key: `m1-${t}`,
           title: `Análise ${info.values.join(" + ")}`,
           at: new Date(t),
@@ -472,8 +496,32 @@ export function PredictiveSignals() {
           analysisCount: info.analyses.size,
           sources: info.sources,
           isHighTendency: info.isHighTendency,
-          isVerified: false
+          isVerified: false,
+          isGreenSeal: info.isGreenSeal
         });
+      }
+    }
+
+    // TRAVA DE VIZINHANÇA PARA MINUTOS SEGUIDOS
+    const unifiedM1: Mode1Signal[] = [];
+    for (let i = 0; i < rawUnifiedM1.length; i++) {
+      const current = rawUnifiedM1[i];
+      const next = rawUnifiedM1[i + 1];
+      
+      const isCurrentTop1Confluence = current.analysisCount >= 2;
+      const isNextTop1Confluence = next && next.analysisCount >= 2;
+      
+      if (isCurrentTop1Confluence && isNextTop1Confluence && Math.abs(next.at.getTime() - current.at.getTime()) <= 60000) {
+        if (current.analysisCount > next.analysisCount) {
+          unifiedM1.push(current);
+        } else if (next.analysisCount > current.analysisCount) {
+          unifiedM1.push(next);
+        } else {
+          unifiedM1.push(next);
+        }
+        i++;
+      } else {
+        unifiedM1.push(current);
       }
     }
 
@@ -489,14 +537,9 @@ export function PredictiveSignals() {
       secondaryProjections.get(at)!.add(item.value);
     }
 
-    // Regra Incremental: Badge "Sinal RARO"
-    // Gatilho: 2 ou mais análises TOP 1 no mesmo minuto ou vizinhos
+    // Regra: Badge "Sinal RARO" reservada para Top 1 + Confluência filtrados
     const isRareTime = (time: number) => {
-      let top1Count = 0;
-      for (const [t] of byTime) {
-        if (Math.abs(t - time) <= 60000) top1Count++;
-      }
-      return top1Count >= 2;
+      return unifiedM1.some(s => s.at.getTime() === time && s.analysisCount >= 2);
     };
 
     const finalM1 = await Promise.all(unifiedM1.map(async s => {
