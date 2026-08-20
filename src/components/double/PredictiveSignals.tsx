@@ -14,7 +14,7 @@ import {
   buildA7,
   buildA8,
   buildA9,
-  buildSeloVerde,
+  buildSomas,
   buildA8_11,
   buildA11_11,
   buildA4_11,
@@ -45,11 +45,7 @@ type Mode1Signal = {
   analysisCount: number; 
   sources: Array<{ analysis: number; value: number }>;
   isHighTendency: boolean;
-  isVerified?: boolean;
   isRare?: boolean;
-  isGreenSeal?: boolean;
-  greenSealAssertivity?: number;
-
   outcome?: "pending" | "green" | "red";
   resultTime?: string;
 };
@@ -62,7 +58,6 @@ type Mode2Signal = {
   confluence: string;
   analysisCount: number;
   isHighTendency: boolean;
-  isVerified?: boolean;
   isRare?: boolean;
 
   outcome?: "pending" | "green" | "red";
@@ -176,10 +171,10 @@ export function PredictiveSignals() {
       7: buildA7(rows),
       8: (buildA8 as any)(rows),
       9: (buildA9 as any)(rows),
-      217: buildSeloVerde(rows).filter(c => c.value === 17),
-      218: buildSeloVerde(rows).filter(c => c.value === 18),
-      219: buildSeloVerde(rows).filter(c => c.value === 19),
-      221: buildSeloVerde(rows).filter(c => c.value === 21),
+      217: buildSomas(rows).filter((c: Cycle) => c.value === 17),
+      218: buildSomas(rows).filter((c: Cycle) => c.value === 18),
+      219: buildSomas(rows).filter((c: Cycle) => c.value === 19),
+      221: buildSomas(rows).filter((c: Cycle) => c.value === 21),
       10: buildA8_11(rows),
       11: buildA11_11(rows),
       12: buildA4_11(rows),
