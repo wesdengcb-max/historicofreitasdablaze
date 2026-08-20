@@ -348,7 +348,7 @@ export function PredictiveSignals() {
     const m1: Mode1Signal[] = Array.from(byTime.entries())
       .sort((a: [number, any], b: [number, any]) => a[0] - b[0])
       .map(([t, info]: [number, any]) => {
-        const values = info.values.slice().sort((a, b) => a - b);
+        const values = info.values.slice().sort((a: number, b: number) => a - b);
         return {
           key: `m1-${t}`,
           title: `Análise ${values.join(" + ")}`,
