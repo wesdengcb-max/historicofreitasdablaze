@@ -112,6 +112,7 @@ export type PredictiveSignal = {
   isGreenSeal?: boolean;
   greenSealAssertivity?: number;
   completedAt?: number;
+  strategyKey?: string;
 };
 
 export function setPredictiveSignals(signals: PredictiveSignal[]) {

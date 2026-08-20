@@ -196,7 +196,7 @@ export function PredictiveSignals() {
   /** Ciclos em aberto (status < MAX_ZEROS) por análise + valor. */
   const active = useMemo(() => {
     const out: Array<{ analysis: number; value: number; open: Cycle }> = [];
-    const mainIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 217, 218, 219, 221, 20711];
+    const mainIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
     mainIds.forEach((a) => {
       const latest = latestByValue(engine[a]);
       latest.forEach((cycle, value) => {
@@ -307,7 +307,8 @@ export function PredictiveSignals() {
           label: displayLabel,
           sources: [{ analysis: item.analysis, value: item.value }],
           isHighTendency: isTendency,
-          isPossibleRec
+          isPossibleRec,
+          isGreenSeal: hasGreenSeal
         });
       } else {
         if (!cur.values.includes(item.value)) cur.values.push(item.value);
@@ -315,6 +316,7 @@ export function PredictiveSignals() {
         cur.sources.push({ analysis: item.analysis, value: item.value });
         if (isTendency) cur.isHighTendency = true;
         if (isPossibleRec) cur.isPossibleRec = true;
+        if (hasGreenSeal) cur.isGreenSeal = true;
         if (displayPct > cur.pct) {
           cur.pct = displayPct;
           cur.label = displayLabel;
@@ -323,11 +325,11 @@ export function PredictiveSignals() {
     }
     const m1: Mode1Signal[] = Array.from(byTime.entries())
       .sort((a, b) => a[0] - b[0])
-      .map(([t, info]) => {
+      .map(([t, info]: [number, any]) => {
         const values = info.values.slice().sort((a, b) => a - b);
         return {
           key: `m1-${t}`,
-          title: info.analyses.has(217) || info.analyses.has(218) || info.analyses.has(219) || info.analyses.has(221) || info.analyses.has(20711) ? `Confirmação · SOMA ${info.values[0]}` : `Análise ${values.join(" + ")}`,
+          title: `Análise ${values.join(" + ")}`,
           at: new Date(t),
           pct: info.pct,
           label: info.label,
@@ -335,7 +337,7 @@ export function PredictiveSignals() {
           sources: info.sources,
           isHighTendency: info.isHighTendency,
           isPossibleRec: info.isPossibleRec,
-          isGreenSeal: info.analyses.has(20711)
+          isGreenSeal: info.isGreenSeal
         };
       });
     setMode1(m1);
@@ -489,14 +491,9 @@ export function PredictiveSignals() {
       secondaryProjections.get(at)!.add(item.value);
     }
 
-    // Regra Incremental: Badge "Sinal RARO"
-    // Gatilho: 2 ou mais análises TOP 1 no mesmo minuto ou vizinhos
+    // Regra: Badge "Sinal RARO" reservada para Top 1 + Confluência filtrados
     const isRareTime = (time: number) => {
-      let top1Count = 0;
-      for (const [t] of byTime) {
-        if (Math.abs(t - time) <= 60000) top1Count++;
-      }
-      return top1Count >= 2;
+      return unifiedM1.some(s => s.at.getTime() === time && s.analysisCount >= 2);
     };
 
     const finalM1 = await Promise.all(unifiedM1.map(async s => {

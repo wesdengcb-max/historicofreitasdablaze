@@ -402,8 +402,8 @@ export function buildSeloVerde(rows: Row[]): Cycle[] {
     
     if (!Number.isFinite(pAnt) || !Number.isFinite(pA) || !Number.isFinite(pB)) continue;
     
-    // Filtro de Segurança
-    if (pAnt < 2) continue;
+    // Filtro de Segurança removido conforme solicitação
+    // if (pAnt < 2) continue;
     
     const soma = pA + pB;
     if (![17, 18, 19, 21].includes(soma)) continue;
