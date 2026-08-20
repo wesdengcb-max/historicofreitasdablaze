@@ -435,7 +435,7 @@ export function PredictiveSignals() {
 
     // ---- Level Elevation, Unification and Proximity Filtering ----
     const rawUnifiedM1: Mode1Signal[] = [];
-    const sortedM1 = Array.from(byTime.entries()).sort((a, b) => a[0] - b[0]);
+    const sortedM1 = Array.from(byTime.entries()).sort((a: [number, any], b: [number, any]) => a[0] - b[0]);
     
     for (let i = 0; i < sortedM1.length; i++) {
       const [t, info]: [number, any] = sortedM1[i];
