@@ -674,7 +674,7 @@ export function PredictiveSignals() {
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
                           <div className="text-xs font-semibold text-muted-foreground opacity-80 flex items-center gap-1.5">
-                            {s.title}
+                            {s.analysisCount >= 4 ? "Super Sinal" : s.title}
                             <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-white/40">
                               {s.sources[0]?.analysis ? `A${s.sources[0].analysis}` : "AUTO"}
                             </span>
