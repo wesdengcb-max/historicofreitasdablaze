@@ -130,8 +130,6 @@ export default function SinaisSection() {
               title={s.medal || "Sinal Preditivo"}
               subtitle={s.time}
               isRare={s.isRare}
-              isGreenSeal={s.isGreenSeal}
-              greenSealAssertivity={s.greenSealAssertivity}
               outcome={s.outcome}
               delay={idx * 0.05}
               className="group relative transition-all duration-500 hover:scale-[1.02]"
