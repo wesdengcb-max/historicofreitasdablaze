@@ -48,6 +48,9 @@ type Mode1Signal = {
   isRare?: boolean;
   outcome?: "pending" | "green" | "red";
   resultTime?: string;
+  isSuperSignal?: boolean;
+  isTop1?: boolean;
+  isTop5Confluence?: boolean;
 };
 type Mode2Signal = {
   key: string;
@@ -324,16 +327,24 @@ export function PredictiveSignals() {
       .sort((a: [number, any], b: [number, any]) => a[0] - b[0])
       .map(([t, info]: [number, any]) => {
         const values = info.values.slice().sort((a: number, b: number) => a - b);
+        const isTop1 = info.analyses.has(1);
+        const top5Analyses = [2, 3, 4, 5];
+        const hasTop5 = top5Analyses.some(a => info.analyses.has(a));
+        const confluenceCount = info.analyses.size;
+
         return {
           key: `m1-${t}`,
           title: `Análise ${values.join(" + ")}`,
           at: new Date(t),
           pct: info.pct,
           label: info.label,
-          analysisCount: info.analyses.size,
+          analysisCount: confluenceCount,
           sources: info.sources,
           isHighTendency: info.isHighTendency,
           isPossibleRec: info.isPossibleRec,
+          isTop1,
+          isTop5Confluence: hasTop5,
+          isSuperSignal: confluenceCount >= 4
         };
       });
     setMode1(m1);
@@ -437,7 +448,9 @@ export function PredictiveSignals() {
           label: info.label,
           analysisCount: combinedAnalyses.size + 4,
           sources: combinedSources,
-          isHighTendency: info.isHighTendency || next1[1].isHighTendency || next2[1].isHighTendency
+          isHighTendency: info.isHighTendency || next1[1].isHighTendency || next2[1].isHighTendency,
+          isTop1: combinedAnalyses.has(1),
+          isSuperSignal: true
         });
         i += 2;
       } else if (isConsecutive2) {
@@ -454,6 +467,8 @@ export function PredictiveSignals() {
           analysisCount: combinedAnalyses.size + 1,
           sources: combinedSources,
           isHighTendency: info.isHighTendency || next1[1].isHighTendency,
+          isTop1: combinedAnalyses.has(1),
+          isSuperSignal: (combinedAnalyses.size + 1) >= 4
         });
         i += 1;
       } else {
