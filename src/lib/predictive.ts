@@ -404,7 +404,7 @@ export function buildSeloVerde(rows: Row[]): Cycle[] {
   const pB = Number(last2[1].roll);
   const soma = pA + pB;
   
-  console.log(`[DEBUG SELO VERDE] Últimas 2 pedras: [${pA}, ${pB}] | Soma: ${soma}`);
+  console.log(`[SELO VERDE DEBUG] Últimas 2 pedras: [${pA}, ${pB}] | Soma: ${soma}`);
 
   for (let i = 1; i < rows.length; i++) {
     const rA = Number(rows[i - 1].roll);
@@ -423,12 +423,12 @@ export function buildSeloVerde(rows: Row[]): Cycle[] {
 
     // Log para confirmação de gatilho
     if (i === rows.length - 1) {
-      console.log(`[DEBUG SELO VERDE] Gatilho ativado: ${isSomaMatch ? 'SOMA ' + currentSoma : 'SEQUÊNCIA 7-11'}`);
+      console.log(`[SELO VERDE] Soma ${currentSoma} detectada no minuto ${fmtClock(dt)} -> Aplicando como validador`);
     }
 
     out.push({ 
-      value: currentSoma, 
-      analysis: 200 + currentSoma,
+      value: isSequence ? 711 : currentSoma, 
+      analysis: 200 + (isSequence ? 711 : currentSoma),
       triggerAt: dt, 
       gaps: [1], // Offset padrão
       isSecondary: false 

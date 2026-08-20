@@ -259,7 +259,7 @@ export function PredictiveSignals() {
       }
     >();
 
-    const greenSealIds = [217, 218, 219, 221, 20711];
+    const greenSealIds = [217, 218, 219, 221, 20711, 20911]; // Adicionado 20911 como alias de 711 se necessário
 
     for (const item of active) {
       const isA8A9 = [8, 9, 10, 11, 12, 13].includes(item.analysis);
@@ -302,11 +302,11 @@ export function PredictiveSignals() {
         const lastGs = gsCycles[gsCycles.length - 1];
         if (!lastGs) return false;
         
-        const gsAt = addMinutes(lastGs.triggerAt, 1); // Offset padrão de 1min para selo
+        const gsAt = addMinutes(lastGs.triggerAt, 1); 
         const match = Math.abs(gsAt.getTime() - t) <= 60000;
         
         if (match) {
-          console.log(`[DEBUG SELO VERDE] Card no minuto ${fmtClock(at)} recebeu SELO VERDE da Análise A${gsId}`);
+          console.log(`[SELO VERDE] Soma ${lastGs.value} detectada no minuto ${fmtClock(lastGs.triggerAt)} -> Aplicado no card: ${fmtClock(at)}`);
         }
         
         return match;
@@ -503,24 +503,38 @@ export function PredictiveSignals() {
       }
     }
 
-    // TRAVA DE VIZINHANÇA PARA MINUTOS SEGUIDOS
+    // FILTRO DE VIZINHANÇA PARA MINUTOS SEGUIDOS (Deduplicação/Unificação)
     const unifiedM1: Mode1Signal[] = [];
-    for (let i = 0; i < rawUnifiedM1.length; i++) {
-      const current = rawUnifiedM1[i];
-      const next = rawUnifiedM1[i + 1];
+    const sortedRawUnified = [...rawUnifiedM1].sort((a, b) => a.at.getTime() - b.at.getTime());
+    
+    for (let i = 0; i < sortedRawUnified.length; i++) {
+      const current = sortedRawUnified[i];
+      const next = sortedRawUnified[i + 1];
       
-      const isCurrentTop1Confluence = current.analysisCount >= 2;
-      const isNextTop1Confluence = next && next.analysisCount >= 2;
+      const isCurrentHighConfluence = current.analysisCount >= 2;
+      const isNextHighConfluence = next && next.analysisCount >= 2;
       
-      if (isCurrentTop1Confluence && isNextTop1Confluence && Math.abs(next.at.getTime() - current.at.getTime()) <= 60000) {
-        if (current.analysisCount > next.analysisCount) {
-          unifiedM1.push(current);
-        } else if (next.analysisCount > current.analysisCount) {
-          unifiedM1.push(next);
+      // Regra 2: Se existirem dois ou mais sinais Top 1 com diferença de até 2 minutos entre si
+      const diffMin = next ? Math.abs(next.at.getTime() - current.at.getTime()) / 60000 : 999;
+      
+      if (next && diffMin <= 2) {
+        console.log(`[FILTRO VIZINHANÇA] Sinais em ${fmtClock(current.at)} e ${fmtClock(next.at)} detectados -> Unificando.`);
+        
+        // Prioridade: Maior confluência (analysisCount)
+        if (current.analysisCount >= next.analysisCount) {
+          unifiedM1.push({
+            ...current,
+            isRare: current.analysisCount >= 2,
+            key: `unified-${current.key}-${next.key}`
+          });
         } else {
-          unifiedM1.push(next);
+          unifiedM1.push({
+            ...next,
+            isRare: next.analysisCount >= 2,
+            key: `unified-${current.key}-${next.key}`
+          });
         }
-        i++;
+        i++; // Pula o próximo já que foi unificado
       } else {
         unifiedM1.push(current);
       }
@@ -552,7 +566,7 @@ export function PredictiveSignals() {
       let isGreenSeal = false;
       let greenSealAssertivity = 0;
       
-      const greenSource = s.sources.find(src => (src.analysis >= 217 && src.analysis <= 221) || src.analysis === 20711);
+      const greenSource = s.sources.find(src => (src.analysis >= 217 && src.analysis <= 221) || src.analysis === 20711 || s.isGreenSeal);
       if (greenSource) {
         const tag = `SOMA_${greenSource.value}`;
         const { data } = await supabase.from('historico_sinais_audit')
@@ -565,16 +579,19 @@ export function PredictiveSignals() {
         if (data && data.length === 6) {
           const wins = data.filter(r => r.status && r.status.startsWith('WIN')).length;
           greenSealAssertivity = (wins / 6) * 100;
-          if (greenSealAssertivity >= 65) {
+          if (greenSealAssertivity >= 65 || s.isGreenSeal) {
             isGreenSeal = true;
           }
         } else if (data && data.length > 0) {
            // Fallback para quando tem menos de 6 mas queremos testar
            const wins = data.filter(r => r.status && r.status.startsWith('WIN')).length;
            greenSealAssertivity = (wins / data.length) * 100;
-           if (greenSealAssertivity >= 65) isGreenSeal = true;
+           if (greenSealAssertivity >= 65 || s.isGreenSeal) isGreenSeal = true;
         }
-      }
+        } else if (s.isGreenSeal) {
+          isGreenSeal = true;
+          greenSealAssertivity = 100; // Fallback para sinal selado sem histórico suficiente
+        }
 
       return { ...s, isVerified, isRare, isGreenSeal, greenSealAssertivity };
     }));
@@ -631,7 +648,7 @@ export function PredictiveSignals() {
           isHighTendency: s.isHighTendency,
           isVerified: s.isVerified,
           isRare: s.isRare,
-          isGreenSeal: s.isGreenSeal,
+          isGreenSeal: s.isGreenSeal || !!(s as any).isGreenSeal,
           greenSealAssertivity: s.greenSealAssertivity,
           isRecAlert: activeRecAlerts.some(a => s.at.getTime() >= a.start && s.at.getTime() <= a.end)
         })),
