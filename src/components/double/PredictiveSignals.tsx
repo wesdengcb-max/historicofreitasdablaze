@@ -140,6 +140,71 @@ export function PredictiveSignals() {
   });
   const [generatedAt, setGeneratedAt] = useState<Date | null>(null);
 
+  const renderSignalCard = (s: Mode1Signal) => {
+    const medal = getMedalStyles(s.analysisCount);
+    return (
+      <div
+        key={s.key}
+        className={`rounded-2xl border px-5 py-4 backdrop-blur-sm transition-all duration-300 ${
+          medal 
+            ? medal.classes 
+            : "border-white/[0.05] bg-white/[0.02]"
+        }`}
+      >
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <div className="text-xs font-semibold text-muted-foreground opacity-80 flex items-center gap-1.5">
+              {s.isSuperSignal ? "Super Sinal" : s.title}
+              <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-white/40">
+                {s.sources[0]?.analysis ? `A${s.sources[0].analysis}` : "AUTO"}
+              </span>
+            </div>
+            {s.isRare && (
+              <span className="flex items-center gap-0.5 rounded-full bg-cyan-500/20 px-1.5 py-0.5 text-[8px] font-black text-cyan-300 border border-cyan-500/30 shadow-[0_0_10px_rgba(6,182,212,0.2)]">
+                💎 RARO
+              </span>
+            )}
+            {(s as any).isRecAlert && (
+              <span className="flex items-center gap-0.5 rounded-full bg-amber-500/20 px-1.5 py-0.5 text-[8px] font-black text-amber-400 border border-amber-500/30">
+                🙌 possível rec
+              </span>
+            )}
+          </div>
+          {medal && (
+            <span className={`rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-widest ${medal.badge}`}>
+              {medal.label}
+            </span>
+          )}
+        </div>
+
+        <div className="mt-1 flex items-center justify-between">
+          <div className="text-3xl font-black tabular-nums text-white font-outfit">
+            {fmtClock(s.at)}
+          </div>
+          {s.isHighTendency && (
+            <span className="flex items-center gap-1 rounded-md bg-red-500/20 px-1.5 py-0.5 text-[9px] font-black text-red-400 animate-pulse border border-red-500/30">
+              🔥 Alta Tendência
+            </span>
+          )}
+        </div>
+        <div className="mt-1 text-[11px] tabular-nums font-bold flex items-center gap-1.5">
+          <span className={medal ? "text-inherit" : "text-primary"}>
+            {s.pct.toFixed(1)}%
+          </span>
+          <span className="opacity-50 text-[10px]">·</span>
+        </div>
+        <div className="mt-2 flex flex-wrap gap-1">
+          {s.sources.map((src, idx) => (
+            <span key={idx} className="rounded-full border border-white/10 bg-white/[0.05] px-1.5 py-0.5 text-[9px] font-black text-white/70">
+              A{src.analysis}·{src.value}
+            </span>
+          ))}
+        </div>
+      </div>
+    );
+  };
+  const [generatedAt, setGeneratedAt] = useState<Date | null>(null);
+
 
   useEffect(() => {
     let alive = true;
