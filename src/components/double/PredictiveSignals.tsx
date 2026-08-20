@@ -479,8 +479,8 @@ export function PredictiveSignals() {
       const current = sortedRawUnified[i];
       const next = sortedRawUnified[i + 1];
       
-      const isCurrentHighConfluence = current.analysisCount >= 2;
-      const isNextHighConfluence = next && next.analysisCount >= 2;
+      const isCurrentHighConfluence = current.analysisCount >= 4;
+      const isNextHighConfluence = next && next.analysisCount >= 4;
       
       // Regra 2: Se existirem dois ou mais sinais Top 1 com diferença de até 2 minutos entre si
       const diffMin = next ? Math.abs(next.at.getTime() - current.at.getTime()) / 60000 : 999;
