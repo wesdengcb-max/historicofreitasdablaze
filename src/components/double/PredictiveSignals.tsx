@@ -127,6 +127,17 @@ export function PredictiveSignals() {
   const [err, setErr] = useState<string | null>(null);
   const [mode1, setMode1] = useState<Mode1Signal[] | null>(null);
   const [mode2, setMode2] = useState<Mode2Signal[] | null>(null);
+  const [sections, setSections] = useState<{
+    top1Confluence: Mode1Signal[];
+    top1Isolated: Mode1Signal[];
+    top1Top5: Mode1Signal[];
+    top5Only: Mode1Signal[];
+  }>({
+    top1Confluence: [],
+    top1Isolated: [],
+    top1Top5: [],
+    top5Only: [],
+  });
   const [generatedAt, setGeneratedAt] = useState<Date | null>(null);
 
 
@@ -558,6 +569,30 @@ export function PredictiveSignals() {
     setMode1(filteredM1);
 
 
+    // Organizar nas 4 Seções Hierárquicas
+    const top1Confluence: Mode1Signal[] = [];
+    const top1Isolated: Mode1Signal[] = [];
+    const top1Top5: Mode1Signal[] = [];
+    const top5Only: Mode1Signal[] = [];
+
+    filteredM1.forEach(s => {
+      const hasTop1 = s.isTop1;
+      const confluenceCount = s.analysisCount;
+      const hasTop5 = s.isTop5Confluence;
+
+      if (hasTop1 && (s.isRare || confluenceCount >= 4)) {
+        top1Confluence.push(s);
+      } else if (hasTop1 && hasTop5) {
+        top1Top5.push(s);
+      } else if (hasTop1) {
+        top1Isolated.push(s);
+      } else if (confluenceCount >= 2) {
+        top5Only.push(s);
+      }
+    });
+
+    setSections({ top1Confluence, top1Isolated, top1Top5, top5Only });
+
   }, [active, engine, rows]);
 
   // Alertas de Recuperação "possível rec"
@@ -660,87 +695,93 @@ export function PredictiveSignals() {
 
         {!err && mode1 && (
 
-          <section className="space-y-3">
-            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              <Target className="h-3.5 w-3.5" /> Projeção Top 1
-              {generatedAt && (
-                <span className="normal-case tracking-normal opacity-60">
-                  · base {fmtClock(generatedAt)}
-                </span>
-              )}
-            </div>
-            {mode1.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                Sem horários futuros projetados no momento.
-              </p>
-            ) : (
-              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                {mode1.map((s) => {
-                  const medal = getMedalStyles(s.analysisCount);
-                  return (
-                    <div
-                      key={s.key}
-                      className={`rounded-2xl border px-5 py-4 backdrop-blur-sm transition-all duration-300 ${
-                        medal 
-                          ? medal.classes 
-                          : "border-white/[0.05] bg-white/[0.02]"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          <div className="text-xs font-semibold text-muted-foreground opacity-80 flex items-center gap-1.5">
-                            {s.analysisCount >= 4 ? "Super Sinal" : s.title}
-                            <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-white/40">
-                              {s.sources[0]?.analysis ? `A${s.sources[0].analysis}` : "AUTO"}
-                            </span>
-                          </div>
-                          {s.isRare && (
-                            <span className="flex items-center gap-0.5 rounded-full bg-cyan-500/20 px-1.5 py-0.5 text-[8px] font-black text-cyan-300 border border-cyan-500/30 shadow-[0_0_10px_rgba(6,182,212,0.2)]">
-                              💎 RARO
-                            </span>
-                          )}
-                          {(s as any).isRecAlert && (
-                            <span className="flex items-center gap-0.5 rounded-full bg-amber-500/20 px-1.5 py-0.5 text-[8px] font-black text-amber-400 border border-amber-500/30">
-                              🙌 possível rec
-                            </span>
-                          )}
-                        </div>
-                        {medal && (
-                          <span className={`rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-widest ${medal.badge}`}>
-                            {medal.label}
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="mt-1 flex items-center justify-between">
-                        <div className="text-3xl font-black tabular-nums text-white font-outfit">
-                          {fmtClock(s.at)}
-                        </div>
-                        {s.isHighTendency && (
-                          <span className="flex items-center gap-1 rounded-md bg-red-500/20 px-1.5 py-0.5 text-[9px] font-black text-red-400 animate-pulse border border-red-500/30">
-                            🔥 Alta Tendência
-                          </span>
-                        )}
-                      </div>
-                      <div className="mt-1 text-[11px] tabular-nums font-bold flex items-center gap-1.5">
-                        <span className={medal ? "text-inherit" : "text-primary"}>
-                          {s.pct.toFixed(1)}%
-                        </span>
-                        <span className="opacity-50 text-[10px]">·</span>
-                      </div>
-                      <div className="mt-2 flex flex-wrap gap-1">
-                        {s.sources.map((src, idx) => (
-                          <span key={idx} className="rounded-full border border-white/10 bg-white/[0.05] px-1.5 py-0.5 text-[9px] font-black text-white/70">
-                            A{src.analysis}·{src.value}
-                          </span>
-                        ))}
-                      </div>
+            {/* SEÇÃO 1: 💎 TOP 1 + CONFLUÊNCIA (SINAIS RAROS) */}
+            {sections.top1Confluence.length > 0 && (
+              <section className="space-y-4">
+                <div className="flex items-center gap-3 border-l-4 border-cyan-400 pl-4 py-1">
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2 text-sm font-black uppercase tracking-[0.2em] text-cyan-400 font-outfit">
+                      <Sparkles className="h-4 w-4" /> 💎 TOP 1 + CONFLUÊNCIA (SINAIS RAROS)
                     </div>
-                  );
-                })}
+                    <div className="text-[9px] font-bold text-cyan-400/50 uppercase tracking-widest mt-0.5">
+                      Prioridade Máxima · Base {generatedAt && fmtClock(generatedAt)}
+                    </div>
+                  </div>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {sections.top1Confluence.map(s => renderSignalCard(s))}
+                </div>
+              </section>
+            )}
+
+            {/* SEÇÃO 2: 🎯 TOP 1 ISOLADO */}
+            {sections.top1Isolated.length > 0 && (
+              <section className="space-y-4 pt-4 border-t border-white/5">
+                <div className="flex items-center gap-3 border-l-4 border-white/20 pl-4 py-1">
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-white/80 font-outfit">
+                      <Target className="h-4 w-4" /> 🎯 TOP 1 ISOLADO
+                    </div>
+                    <div className="text-[9px] font-bold text-white/30 uppercase tracking-widest mt-0.5">
+                      Peso Alto · Análise Principal
+                    </div>
+                  </div>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {sections.top1Isolated.map(s => renderSignalCard(s))}
+                </div>
+              </section>
+            )}
+
+            {/* SEÇÃO 3: ⚡ TOP 1 + CONFLUÊNCIA TOP 5 */}
+            {sections.top1Top5.length > 0 && (
+              <section className="space-y-4 pt-4 border-t border-white/5">
+                <div className="flex items-center gap-3 border-l-4 border-amber-500/50 pl-4 py-1">
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-amber-400 font-outfit">
+                      <Cpu className="h-4 w-4" /> ⚡ TOP 1 + CONFLUÊNCIA TOP 5
+                    </div>
+                    <div className="text-[9px] font-bold text-amber-500/40 uppercase tracking-widest mt-0.5">
+                      Peso Médio · Reforço Secundário
+                    </div>
+                  </div>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {sections.top1Top5.map(s => renderSignalCard(s))}
+                </div>
+              </section>
+            )}
+
+            {/* SEÇÃO 4: 📊 CONFLUÊNCIA TOP 5 */}
+            {sections.top5Only.length > 0 && (
+              <section className="space-y-4 pt-4 border-t border-white/5">
+                <div className="flex items-center gap-3 border-l-4 border-blue-500/30 pl-4 py-1">
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-blue-400/80 font-outfit">
+                      <Layers className="h-4 w-4" /> 📊 CONFLUÊNCIA TOP 5
+                    </div>
+                    <div className="text-[9px] font-bold text-blue-500/30 uppercase tracking-widest mt-0.5">
+                      Base do Feed · Cruzamentos Secundários
+                    </div>
+                  </div>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {sections.top5Only.map(s => renderSignalCard(s))}
+                </div>
+              </section>
+            )}
+
+            {sections.top1Confluence.length === 0 && 
+             sections.top1Isolated.length === 0 && 
+             sections.top1Top5.length === 0 && 
+             sections.top5Only.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-12 text-center opacity-40">
+                <Target className="h-8 w-8 mb-3 text-muted-foreground" />
+                <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
+                  Buscando oportunidades em tempo real...
+                </p>
               </div>
             )}
-          </section>
         )}
 
         {mode2 && (
