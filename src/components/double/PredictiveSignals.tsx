@@ -588,7 +588,10 @@ export function PredictiveSignals() {
            greenSealAssertivity = (wins / data.length) * 100;
            if (greenSealAssertivity >= 65 || s.isGreenSeal) isGreenSeal = true;
         }
-      }
+        } else if (s.isGreenSeal) {
+          isGreenSeal = true;
+          greenSealAssertivity = 100; // Fallback para sinal selado sem histórico suficiente
+        }
 
       return { ...s, isVerified, isRare, isGreenSeal, greenSealAssertivity };
     }));
@@ -645,7 +648,7 @@ export function PredictiveSignals() {
           isHighTendency: s.isHighTendency,
           isVerified: s.isVerified,
           isRare: s.isRare,
-          isGreenSeal: s.isGreenSeal,
+          isGreenSeal: s.isGreenSeal || !!(s as any).isGreenSeal,
           greenSealAssertivity: s.greenSealAssertivity,
           isRecAlert: activeRecAlerts.some(a => s.at.getTime() >= a.start && s.at.getTime() <= a.end)
         })),
