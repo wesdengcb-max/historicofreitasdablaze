@@ -259,7 +259,7 @@ export function PredictiveSignals() {
       }
     >();
 
-    const greenSealIds = [217, 218, 219, 221, 20711];
+    const greenSealIds = [217, 218, 219, 221, 20711, 20911]; // Adicionado 20911 como alias de 711 se necessário
 
     for (const item of active) {
       const isA8A9 = [8, 9, 10, 11, 12, 13].includes(item.analysis);
@@ -566,7 +566,7 @@ export function PredictiveSignals() {
       let isGreenSeal = false;
       let greenSealAssertivity = 0;
       
-      const greenSource = s.sources.find(src => (src.analysis >= 217 && src.analysis <= 221) || src.analysis === 20711);
+      const greenSource = s.sources.find(src => (src.analysis >= 217 && src.analysis <= 221) || src.analysis === 20711 || s.isGreenSeal);
       if (greenSource) {
         const tag = `SOMA_${greenSource.value}`;
         const { data } = await supabase.from('historico_sinais_audit')
@@ -579,14 +579,14 @@ export function PredictiveSignals() {
         if (data && data.length === 6) {
           const wins = data.filter(r => r.status && r.status.startsWith('WIN')).length;
           greenSealAssertivity = (wins / 6) * 100;
-          if (greenSealAssertivity >= 65) {
+          if (greenSealAssertivity >= 65 || s.isGreenSeal) {
             isGreenSeal = true;
           }
         } else if (data && data.length > 0) {
            // Fallback para quando tem menos de 6 mas queremos testar
            const wins = data.filter(r => r.status && r.status.startsWith('WIN')).length;
            greenSealAssertivity = (wins / data.length) * 100;
-           if (greenSealAssertivity >= 65) isGreenSeal = true;
+           if (greenSealAssertivity >= 65 || s.isGreenSeal) isGreenSeal = true;
         }
       }
 
