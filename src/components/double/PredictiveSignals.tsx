@@ -525,6 +525,7 @@ export function PredictiveSignals() {
           sources: combinedSources,
           isHighTendency: info.isHighTendency || next1[1].isHighTendency || next2[1].isHighTendency,
           isTop1: combinedAnalyses.has(1),
+          isTop5Confluence: [2, 3, 4, 5].some(a => combinedAnalyses.has(a)),
           isSuperSignal: true
         });
         i += 2;
@@ -543,6 +544,7 @@ export function PredictiveSignals() {
           sources: combinedSources,
           isHighTendency: info.isHighTendency || next1[1].isHighTendency,
           isTop1: combinedAnalyses.has(1),
+          isTop5Confluence: [2, 3, 4, 5].some(a => combinedAnalyses.has(a)),
           isSuperSignal: (combinedAnalyses.size + 1) >= 4
         });
         i += 1;
