@@ -254,67 +254,50 @@ export function PredictiveSignals() {
       }
     >();
 
-    const greenSealIds = [217, 218, 219, 221, 20711, 20911]; // Adicionado 20911 como alias de 711 se necessário
+    const confluenciaIds = [8, 9, 10, 11, 12, 13, 217, 218, 219, 221, 20711];
 
     for (const item of active) {
-      const isA8A9 = [8, 9, 10, 11, 12, 13].includes(item.analysis);
-      
-      const hist = engine[item.analysis].filter(c => c.value === item.value).slice(-6);
-      
+      const isConfluenceGatilho = confluenciaIds.includes(item.analysis);
+      const isMainAnalysis = [1, 2, 3, 4, 5, 6, 7].includes(item.analysis);
+
       let targetMinutes = 0;
       let displayPct = 0;
       let displayLabel = "";
 
-      if (isA8A9) {
-        targetMinutes = item.open.gaps[0] || 0;
-        displayPct = 100;
+      if (isConfluenceGatilho) {
+        if ([8, 9, 10, 11, 12, 13].includes(item.analysis)) {
+          targetMinutes = item.open.gaps[0] || 0;
+          displayPct = 100;
+        } else {
+          targetMinutes = 1;
+          displayPct = 100;
+        }
         displayLabel = targetMinutes.toString();
-      } else {
+      } else if (isMainAnalysis) {
+        const hist = engine[item.analysis].filter(c => c.value === item.value).slice(-6);
         if (hist.length < MIN_GATILHOS) continue;
         const top1 = computeTop(hist, 1)[0];
         if (!top1) continue;
         if (top1.pct < MIN_ASSERTIVIDADE_TOP1) continue;
         
         targetMinutes = top1.m;
-        if ([17, 18, 19].includes(item.analysis)) {
-          targetMinutes += 1;
-        }
-        
         displayPct = top1.pct;
         displayLabel = targetMinutes.toString();
+      } else {
+        continue;
       }
 
       const at = addMinutes(item.open.triggerAt, targetMinutes);
       if (at.getTime() <= now.getTime()) continue; 
       const t = at.getTime();
 
-      // Logic for detection if a Green Seal applies
-      const hasGreenSeal = greenSealIds.some(gsId => {
-        const gsCycles = engine[gsId];
-        if (!gsCycles || gsCycles.length === 0) return false;
-        
-        // Selo Verde atua sobre o resultado MAIS RECENTE do motor de gatilhos
-        const lastGs = gsCycles[gsCycles.length - 1];
-        if (!lastGs) return false;
-        
-        const gsAt = addMinutes(lastGs.triggerAt, 1); 
-        const match = Math.abs(gsAt.getTime() - t) <= 60000;
-        
-        if (match) {
-          console.log(`[SELO VERDE] Soma ${lastGs.value} detectada no minuto ${fmtClock(lastGs.triggerAt)} -> Aplicado no card: ${fmtClock(at)}`);
-        }
-        
-        return match;
-      });
-
-      const isTendency = isA8A9 ? true : checkHighTendency(engine[item.analysis], item.value);
+      const isTendency = isConfluenceGatilho ? true : checkHighTendency(engine[item.analysis], item.value);
       const isPossibleRec = activeAlerts.some((alert: RecAlert) => {
         const signalTime = at.getTime();
         const alertStart = alert.triggerAt.getTime();
         const alertEnd = alertStart + alert.duration * 60000;
         return signalTime >= alertStart && signalTime <= alertEnd;
       });
-
 
       const cur = byTime.get(t);
       if (!cur) {
@@ -326,7 +309,6 @@ export function PredictiveSignals() {
           sources: [{ analysis: item.analysis, value: item.value }],
           isHighTendency: isTendency,
           isPossibleRec,
-          isGreenSeal: hasGreenSeal
         });
       } else {
         if (!cur.values.includes(item.value)) cur.values.push(item.value);
@@ -334,7 +316,6 @@ export function PredictiveSignals() {
         cur.sources.push({ analysis: item.analysis, value: item.value });
         if (isTendency) cur.isHighTendency = true;
         if (isPossibleRec) cur.isPossibleRec = true;
-        if (hasGreenSeal) cur.isGreenSeal = true;
         if (displayPct > cur.pct) {
           cur.pct = displayPct;
           cur.label = displayLabel;
@@ -355,7 +336,6 @@ export function PredictiveSignals() {
           sources: info.sources,
           isHighTendency: info.isHighTendency,
           isPossibleRec: info.isPossibleRec,
-          isGreenSeal: info.isGreenSeal
         };
       });
     setMode1(m1);
@@ -479,7 +459,6 @@ export function PredictiveSignals() {
           sources: combinedSources,
           isHighTendency: info.isHighTendency || next1[1].isHighTendency,
           isVerified: false,
-          isGreenSeal: info.isGreenSeal || next1[1].isGreenSeal
         });
         i += 1;
       } else {
@@ -493,7 +472,6 @@ export function PredictiveSignals() {
           sources: info.sources,
           isHighTendency: info.isHighTendency,
           isVerified: false,
-          isGreenSeal: info.isGreenSeal
         });
       }
     }
