@@ -759,7 +759,7 @@ export function PredictiveSignals() {
         )}
 
         {!err && mode1 && (
-
+          <>
             {/* SEÇÃO 1: 💎 TOP 1 + CONFLUÊNCIA (SINAIS RAROS) */}
             {sections.top1Confluence.length > 0 && (
               <section className="space-y-4">
@@ -847,6 +847,7 @@ export function PredictiveSignals() {
                 </p>
               </div>
             )}
+          </>
         )}
 
         {mode2 && (
