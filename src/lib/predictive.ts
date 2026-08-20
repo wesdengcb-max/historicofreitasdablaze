@@ -391,32 +391,46 @@ export function buildA9(rows: Row[]): Cycle[] {
 
 /** 
  * ESTRATÉGIA DE CONFIRMAÇÃO - SELO VERDE
- * Gatilho: Pedra_Anterior >= 2 E Soma(Pedra_A + Pedra_B) in [17, 19, 21]
+ * Gatilho: Soma(Pedra_A + Pedra_B) in [17, 18, 19, 21] ou Sequência 7-11/11-7
  */
 export function buildSeloVerde(rows: Row[]): Cycle[] {
   const out: Cycle[] = [];
-  for (let i = 2; i < rows.length; i++) {
-    const pAnt = Number(rows[i - 2].roll);
-    const pA = Number(rows[i - 1].roll);
-    const pB = Number(rows[i].roll);
+  
+  if (rows.length < 2) return out;
+
+  // Debug: Log das últimas pedras para auditoria do Selo Verde
+  const last2 = rows.slice(-2);
+  const pA = Number(last2[0].roll);
+  const pB = Number(last2[1].roll);
+  const soma = pA + pB;
+  
+  console.log(`[DEBUG SELO VERDE] Últimas 2 pedras: [${pA}, ${pB}] | Soma: ${soma}`);
+
+  for (let i = 1; i < rows.length; i++) {
+    const rA = Number(rows[i - 1].roll);
+    const rB = Number(rows[i].roll);
     
-    if (!Number.isFinite(pAnt) || !Number.isFinite(pA) || !Number.isFinite(pB)) continue;
+    if (!Number.isFinite(rA) || !Number.isFinite(rB)) continue;
     
-    // Filtro de Segurança removido conforme solicitação
-    // if (pAnt < 2) continue;
-    
-    const soma = pA + pB;
-    if (![17, 18, 19, 21].includes(soma)) continue;
+    const currentSoma = rA + rB;
+    const isSequence = (rA === 7 && rB === 11) || (rA === 11 && rB === 7);
+    const isSomaMatch = [17, 18, 19, 21].includes(currentSoma);
+
+    if (!isSomaMatch && !isSequence) continue;
     
     const dt = parseUtcDate(rows[i].created_at);
     if (Number.isNaN(dt.getTime())) continue;
 
-    // Selo Verde usa gaps[0] para pular casas (Pedra_Anterior)
+    // Log para confirmação de gatilho
+    if (i === rows.length - 1) {
+      console.log(`[DEBUG SELO VERDE] Gatilho ativado: ${isSomaMatch ? 'SOMA ' + currentSoma : 'SEQUÊNCIA 7-11'}`);
+    }
+
     out.push({ 
-      value: soma, 
-      analysis: 200 + soma, // Tag única: 217, 219, 221
+      value: currentSoma, 
+      analysis: 200 + currentSoma,
       triggerAt: dt, 
-      gaps: [pAnt], // casas a pular
+      gaps: [1], // Offset padrão
       isSecondary: false 
     });
   }

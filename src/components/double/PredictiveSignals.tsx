@@ -297,18 +297,19 @@ export function PredictiveSignals() {
       const hasGreenSeal = greenSealIds.some(gsId => {
         const gsCycles = engine[gsId];
         if (!gsCycles || gsCycles.length === 0) return false;
-        const lastGs = gsCycles[gsCycles.length - 1];
-        if (!lastGs || lastGs.gaps.length === 0) return false;
         
-        let gsMinutes = 0;
-        if (gsId === 20711) {
-           gsMinutes = lastGs.gaps[0];
-        } else {
-           gsMinutes = Math.ceil(lastGs.gaps[0] * 0.5) + 1;
+        // Selo Verde atua sobre o resultado MAIS RECENTE do motor de gatilhos
+        const lastGs = gsCycles[gsCycles.length - 1];
+        if (!lastGs) return false;
+        
+        const gsAt = addMinutes(lastGs.triggerAt, 1); // Offset padrão de 1min para selo
+        const match = Math.abs(gsAt.getTime() - t) <= 60000;
+        
+        if (match) {
+          console.log(`[DEBUG SELO VERDE] Card no minuto ${fmtClock(at)} recebeu SELO VERDE da Análise A${gsId}`);
         }
         
-        const gsAt = addMinutes(lastGs.triggerAt, gsMinutes);
-        return Math.abs(gsAt.getTime() - t) <= 60000;
+        return match;
       });
 
       const isTendency = isA8A9 ? true : checkHighTendency(engine[item.analysis], item.value);
