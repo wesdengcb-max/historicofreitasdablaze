@@ -164,11 +164,6 @@ export function PredictiveSignals() {
                 💎 RARO
               </span>
             )}
-            {(s as any).isRecAlert && (
-              <span className="flex items-center gap-0.5 rounded-full bg-amber-500/20 px-1.5 py-0.5 text-[8px] font-black text-amber-400 border border-amber-500/30">
-                🙌 possível rec
-              </span>
-            )}
           </div>
           {medal && (
             <span className={`rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-widest ${medal.badge}`}>
@@ -706,22 +701,20 @@ export function PredictiveSignals() {
           medal: getMedalStyles(s.analysisCount)?.label,
           entryDate: s.at,
           outcome: "pending",
-          isHighTendency: s.isHighTendency,
-          isRare: s.isRare,
-          isRecAlert: activeRecAlerts.some(a => s.at.getTime() >= a.start && s.at.getTime() <= a.end)
-        })),
-        ...mode2.map(s => ({
-          key: s.key,
-          time: s.times.map(t => fmtClock(t)).join(" / "),
-          pct: s.pct,
-          label: "Confluência",
-          confluence: s.confluence,
-          medal: getMedalStyles(s.analysisCount)?.label,
-          entryDate: s.times[0],
-          outcome: "pending",
-          isHighTendency: s.isHighTendency,
-          isRecAlert: activeRecAlerts.some(a => s.times[0].getTime() >= a.start && s.times[0].getTime() <= a.end)
-        }))
+           isHighTendency: s.isHighTendency,
+           isRare: s.isRare
+         })),
+         ...mode2.map(s => ({
+           key: s.key,
+           time: s.times.map(t => fmtClock(t)).join(" / "),
+           pct: s.pct,
+           label: "Confluência",
+           confluence: s.confluence,
+           medal: getMedalStyles(s.analysisCount)?.label,
+           entryDate: s.times[0],
+           outcome: "pending",
+           isHighTendency: s.isHighTendency
+         }))
       ].sort((a, b) => a.entryDate.getTime() - b.entryDate.getTime());
 
 
@@ -771,9 +764,15 @@ export function PredictiveSignals() {
                     <div className="flex items-center gap-2 text-sm font-black uppercase tracking-[0.2em] text-cyan-400 font-outfit">
                       <Sparkles className="h-4 w-4" /> 💎 TOP 1 + CONFLUÊNCIA (SINAIS RAROS)
                     </div>
-                    <div className="text-[9px] font-bold text-cyan-400/50 uppercase tracking-widest mt-0.5">
-                      Prioridade Máxima · Base {generatedAt && fmtClock(generatedAt)}
-                    </div>
+                    {activeRecAlerts.length > 0 ? (
+                      <div className="text-[10px] font-bold text-amber-400 uppercase tracking-widest mt-1 animate-pulse">
+                        ⚠️ possível rec ativo até às {fmtClock(new Date(Math.max(...activeRecAlerts.map(a => a.end))))}
+                      </div>
+                    ) : (
+                      <div className="text-[9px] font-bold text-cyan-400/50 uppercase tracking-widest mt-0.5">
+                        Prioridade Máxima · Base {generatedAt && fmtClock(generatedAt)}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -790,9 +789,15 @@ export function PredictiveSignals() {
                     <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-white/80 font-outfit">
                       <Target className="h-4 w-4" /> 🎯 TOP 1 ISOLADO
                     </div>
-                    <div className="text-[9px] font-bold text-white/30 uppercase tracking-widest mt-0.5">
-                      Peso Alto · Análise Principal
-                    </div>
+                    {activeRecAlerts.length > 0 ? (
+                      <div className="text-[10px] font-bold text-amber-400 uppercase tracking-widest mt-1 animate-pulse">
+                        ⚠️ possível rec ativo até às {fmtClock(new Date(Math.max(...activeRecAlerts.map(a => a.end))))}
+                      </div>
+                    ) : (
+                      <div className="text-[9px] font-bold text-white/30 uppercase tracking-widest mt-0.5">
+                        Peso Alto · Análise Principal
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -809,9 +814,15 @@ export function PredictiveSignals() {
                     <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-amber-400 font-outfit">
                       <Cpu className="h-4 w-4" /> ⚡ TOP 1 + CONFLUÊNCIA TOP 5
                     </div>
-                    <div className="text-[9px] font-bold text-amber-500/40 uppercase tracking-widest mt-0.5">
-                      Peso Médio · Reforço Secundário
-                    </div>
+                    {activeRecAlerts.length > 0 ? (
+                      <div className="text-[10px] font-bold text-amber-400 uppercase tracking-widest mt-1 animate-pulse">
+                        ⚠️ possível rec ativo até às {fmtClock(new Date(Math.max(...activeRecAlerts.map(a => a.end))))}
+                      </div>
+                    ) : (
+                      <div className="text-[9px] font-bold text-amber-500/40 uppercase tracking-widest mt-0.5">
+                        Peso Médio · Reforço Secundário
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -828,9 +839,15 @@ export function PredictiveSignals() {
                     <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-blue-400/80 font-outfit">
                       <Layers className="h-4 w-4" /> 📊 CONFLUÊNCIA TOP 5
                     </div>
-                    <div className="text-[9px] font-bold text-blue-500/30 uppercase tracking-widest mt-0.5">
-                      Base do Feed · Cruzamentos Secundários
-                    </div>
+                    {activeRecAlerts.length > 0 ? (
+                      <div className="text-[10px] font-bold text-amber-400 uppercase tracking-widest mt-1 animate-pulse">
+                        ⚠️ possível rec ativo até às {fmtClock(new Date(Math.max(...activeRecAlerts.map(a => a.end))))}
+                      </div>
+                    ) : (
+                      <div className="text-[9px] font-bold text-blue-500/30 uppercase tracking-widest mt-0.5">
+                        Base do Feed · Cruzamentos Secundários
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -881,11 +898,6 @@ export function PredictiveSignals() {
                           <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-white/40">
                             {s.sources[0]?.analysis ? `A${s.sources[0].analysis}` : "CONF"}
                           </span>
-                          {(s as any).isRecAlert && (
-                            <span className="flex items-center gap-0.5 rounded-full bg-amber-500/20 px-1.5 py-0.5 text-[8px] font-black text-amber-400 border border-amber-500/30">
-                              🙌 possível rec
-                            </span>
-                          )}
                         </div>
                         {medal ? (
                           <span className={`rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-widest ${medal.badge}`}>
