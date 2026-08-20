@@ -556,7 +556,9 @@ export function PredictiveSignals() {
           analysisCount: info.analyses.size,
           sources: info.sources,
           isHighTendency: info.isHighTendency,
-          
+          isTop1: info.analyses.has(1),
+          isTop5Confluence: [2, 3, 4, 5].some(a => info.analyses.has(a)),
+          isSuperSignal: info.analyses.size >= 4
         });
       }
     }
