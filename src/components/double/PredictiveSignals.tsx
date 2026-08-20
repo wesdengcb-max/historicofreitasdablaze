@@ -439,9 +439,7 @@ export function PredictiveSignals() {
           label: info.label,
           analysisCount: combinedAnalyses.size + 4,
           sources: combinedSources,
-          isHighTendency: info.isHighTendency || next1[1].isHighTendency || next2[1].isHighTendency,
-          isVerified: false,
-          isGreenSeal: info.isGreenSeal || next1[1].isGreenSeal || next2[1].isGreenSeal
+          isHighTendency: info.isHighTendency || next1[1].isHighTendency || next2[1].isHighTendency
         });
         i += 2;
       } else if (isConsecutive2) {
@@ -458,7 +456,6 @@ export function PredictiveSignals() {
           analysisCount: combinedAnalyses.size + 1,
           sources: combinedSources,
           isHighTendency: info.isHighTendency || next1[1].isHighTendency,
-          isVerified: false,
         });
         i += 1;
       } else {
@@ -471,7 +468,7 @@ export function PredictiveSignals() {
           analysisCount: info.analyses.size,
           sources: info.sources,
           isHighTendency: info.isHighTendency,
-          isVerified: false,
+          
         });
       }
     }
