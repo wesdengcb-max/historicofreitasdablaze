@@ -492,7 +492,7 @@ export function PredictiveSignals() {
         if (current.analysisCount >= next.analysisCount) {
           unifiedM1.push({
             ...current,
-            isRare: current.analysisCount >= 2,
+            isRare: current.analysisCount >= 4,
             key: `unified-${current.key}-${next.key}`
           });
         } else {
