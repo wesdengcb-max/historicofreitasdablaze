@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { setPredictiveSignals } from "@/lib/signalsStore";
-import { Loader2, Sparkles, Target, Layers } from "lucide-react";
+import { Loader2, Sparkles, Target, Layers, Cpu } from "lucide-react";
 import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
 import { parseUtcDate } from "@/lib/utils";
 import { Card } from "@/components/double/Card";
@@ -203,7 +203,6 @@ export function PredictiveSignals() {
       </div>
     );
   };
-  const [generatedAt, setGeneratedAt] = useState<Date | null>(null);
 
 
   useEffect(() => {
