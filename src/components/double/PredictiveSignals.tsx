@@ -513,8 +513,8 @@ export function PredictiveSignals() {
       }
     }
 
-    // Secondary Verification Selo Azul Logic
-    const secondaryProjections = new Map<number, Set<number>>(); // time -> values
+    // Secondary Verification Logic (Simplificado - sem selo azul/verde)
+    const secondaryProjections = new Map<number, Set<number>>();
     for (const item of (secondaryActive as any)) {
       const hist = engine[item.analysis].filter((c: any) => c.value === item.value).slice(-6);
       if (hist.length < 6) continue;
@@ -525,52 +525,27 @@ export function PredictiveSignals() {
       secondaryProjections.get(at)!.add(item.value);
     }
 
-    // Regra: Badge "Sinal RARO" reservada para Top 1 + Confluência filtrados
+    // Badge "Sinal RARO" reservada para analysisCount >= 4 (Super Sinal ou Confluência Suprema)
     const isRareTime = (time: number) => {
-      return unifiedM1.some(s => s.at.getTime() === time && s.analysisCount >= 2);
+      return unifiedM1.some(s => s.at.getTime() === time && s.analysisCount >= 4);
     };
 
-    const finalM1 = await Promise.all(unifiedM1.map(async s => {
+    const finalM1 = unifiedM1.map(s => {
       const t = s.at.getTime();
-      const secValues = secondaryProjections.get(t);
-      const isVerified = secValues && s.sources.some(src => secValues.has(src.value));
       const isRare = isRareTime(t);
-      
-      let isGreenSeal = false;
-      let greenSealAssertivity = 0;
-      
-      const greenSource = s.sources.find(src => (src.analysis >= 217 && src.analysis <= 221) || src.analysis === 20711 || s.isGreenSeal);
-      if (greenSource) {
-        const tag = `SOMA_${greenSource.value}`;
-        const { data } = await supabase.from('historico_sinais_audit')
-          .select('status')
-          .eq('tag', tag)
-          .neq('status', 'PENDENTE')
-          .order('created_at', { ascending: false })
-          .limit(6);
-        
-        if (data && data.length === 6) {
-          const wins = data.filter(r => r.status && r.status.startsWith('WIN')).length;
-          greenSealAssertivity = (wins / 6) * 100;
-          if (greenSealAssertivity >= 65 || s.isGreenSeal) {
-            isGreenSeal = true;
-          }
-        } else if (data && data.length > 0) {
-           // Fallback para quando tem menos de 6 mas queremos testar
-           const wins = data.filter(r => r.status && r.status.startsWith('WIN')).length;
-           greenSealAssertivity = (wins / data.length) * 100;
-           if (greenSealAssertivity >= 65 || s.isGreenSeal) isGreenSeal = true;
-        }
-        } else if (s.isGreenSeal) {
-          isGreenSeal = true;
-          greenSealAssertivity = 100; // Fallback para sinal selado sem histórico suficiente
-        }
+      return { ...s, isRare };
+    });
 
-      return { ...s, isVerified, isRare, isGreenSeal, greenSealAssertivity };
-    }));
+    // APLICAR REGRA DE FILTRO: 
+    // - Mostrar apenas se for Análise Principal (A1-A7) fortalecida (sources contêm 1-7)
+    // - OU se for Super Sinal (analysisCount >= 4)
+    const filteredM1 = finalM1.filter(s => {
+      const hasMainAnalysis = s.sources.some(src => src.analysis >= 1 && src.analysis <= 7);
+      const isSuperSignal = s.analysisCount >= 4;
+      return hasMainAnalysis || isSuperSignal;
+    });
 
-
-    setMode1(finalM1);
+    setMode1(filteredM1);
 
 
   }, [active, engine, rows]);
@@ -619,10 +594,7 @@ export function PredictiveSignals() {
           entryDate: s.at,
           outcome: "pending",
           isHighTendency: s.isHighTendency,
-          isVerified: s.isVerified,
           isRare: s.isRare,
-          isGreenSeal: s.isGreenSeal || !!(s as any).isGreenSeal,
-          greenSealAssertivity: s.greenSealAssertivity,
           isRecAlert: activeRecAlerts.some(a => s.at.getTime() >= a.start && s.at.getTime() <= a.end)
         })),
         ...mode2.map(s => ({
@@ -712,11 +684,6 @@ export function PredictiveSignals() {
                               {s.sources[0]?.analysis ? `A${s.sources[0].analysis}` : "AUTO"}
                             </span>
                           </div>
-                          {s.isVerified && (
-                            <span className="flex items-center gap-0.5 rounded-full bg-blue-500/20 px-1.5 py-0.5 text-[8px] font-black text-blue-400 border border-blue-500/30">
-                              ✓ SELO AZUL
-                            </span>
-                          )}
                           {s.isRare && (
                             <span className="flex items-center gap-0.5 rounded-full bg-cyan-500/20 px-1.5 py-0.5 text-[8px] font-black text-cyan-300 border border-cyan-500/30 shadow-[0_0_10px_rgba(6,182,212,0.2)]">
                               💎 RARO
@@ -747,13 +714,8 @@ export function PredictiveSignals() {
                       </div>
                       <div className="mt-1 text-[11px] tabular-nums font-bold flex items-center gap-1.5">
                         <span className={medal ? "text-inherit" : "text-primary"}>
-                          {s.isGreenSeal ? (s.greenSealAssertivity || 0).toFixed(1) : s.pct.toFixed(1)}%
+                          {s.pct.toFixed(1)}%
                         </span>
-                        {s.isGreenSeal && (
-                          <span className="flex items-center gap-1 rounded bg-emerald-500/20 px-1.5 py-0.5 text-[8px] font-black text-emerald-400 border border-emerald-500/30">
-                            ✓ SELADO
-                          </span>
-                        )}
                         <span className="opacity-50 text-[10px]">·</span>
                       </div>
                       <div className="mt-2 flex flex-wrap gap-1">
