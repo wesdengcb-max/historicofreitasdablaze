@@ -14,7 +14,7 @@ import {
   buildA7,
   buildA8,
   buildA9,
-  buildSeloVerde,
+  buildSomas,
   buildA8_11,
   buildA11_11,
   buildA4_11,
@@ -45,11 +45,7 @@ type Mode1Signal = {
   analysisCount: number; 
   sources: Array<{ analysis: number; value: number }>;
   isHighTendency: boolean;
-  isVerified?: boolean;
   isRare?: boolean;
-  isGreenSeal?: boolean;
-  greenSealAssertivity?: number;
-
   outcome?: "pending" | "green" | "red";
   resultTime?: string;
 };
@@ -62,7 +58,6 @@ type Mode2Signal = {
   confluence: string;
   analysisCount: number;
   isHighTendency: boolean;
-  isVerified?: boolean;
   isRare?: boolean;
 
   outcome?: "pending" | "green" | "red";
@@ -84,36 +79,34 @@ const CANDIDATE_DEPTH = 10;
 /** Somente as N primeiras contam como Top 5 validador. */
 const TOP5_DEPTH = 5;
 
-const getMedalStyles = (count: number, isConsecutive?: boolean, levelOffset: number = 0) => {
-  const totalLevel = count + levelOffset;
-  
-  if (totalLevel >= 7) return { 
+const getMedalStyles = (count: number) => {
+  if (count >= 7) return { 
     label: "👑 Supremo", 
     classes: "border-purple-400 bg-purple-950/50 text-purple-300 shadow-purple-500/20 animate-pulse",
     badge: "bg-purple-400/20 text-purple-300 border-purple-400/30"
   };
-  if (totalLevel === 6) return { 
+  if (count === 6) return { 
     label: "💎 Diamante", 
     classes: "border-blue-400 bg-blue-950/40 text-blue-200 shadow-blue-500/10",
     badge: "bg-blue-400/20 text-blue-200 border-blue-400/30"
   };
-  if (totalLevel === 5) return { 
+  if (count === 5) return { 
     label: "🥇 Ouro", 
     classes: "border-yellow-400 bg-yellow-950/50 text-yellow-300 shadow-yellow-500/20",
     badge: "bg-yellow-400/20 text-yellow-300 border-yellow-400/30"
   };
-  if (totalLevel === 4) return { 
+  if (count === 4) return { 
     label: "🥈 Prata", 
-    classes: "border-slate-300 bg-slate-800/40 text-slate-100",
+    classes: "border-slate-300 bg-slate-800/40 text-slate-100 shadow-slate-500/10",
     badge: "bg-slate-300/20 text-slate-100 border-slate-300/30"
   };
-  if (totalLevel === 3) return { 
+  if (count === 3) return { 
     label: "🥉 Bronze", 
     classes: "border-amber-700 bg-amber-950/30 text-amber-300",
     badge: "bg-amber-700/20 text-amber-300 border-amber-700/30"
   };
-  if (totalLevel === 2) return { 
-    label: "Top 1 + Confluência", 
+  if (count === 2) return { 
+    label: "Confluência", 
     classes: "border-cyan-400 bg-cyan-950/30 text-cyan-300 shadow-cyan-500/10",
     badge: "bg-cyan-400/20 text-cyan-300 border-cyan-400/30"
   };
@@ -176,10 +169,10 @@ export function PredictiveSignals() {
       7: buildA7(rows),
       8: (buildA8 as any)(rows),
       9: (buildA9 as any)(rows),
-      217: buildSeloVerde(rows).filter(c => c.value === 17),
-      218: buildSeloVerde(rows).filter(c => c.value === 18),
-      219: buildSeloVerde(rows).filter(c => c.value === 19),
-      221: buildSeloVerde(rows).filter(c => c.value === 21),
+      217: buildSomas(rows).filter((c: Cycle) => c.value === 17),
+      218: buildSomas(rows).filter((c: Cycle) => c.value === 18),
+      219: buildSomas(rows).filter((c: Cycle) => c.value === 19),
+      221: buildSomas(rows).filter((c: Cycle) => c.value === 21),
       10: buildA8_11(rows),
       11: buildA11_11(rows),
       12: buildA4_11(rows),
@@ -259,67 +252,50 @@ export function PredictiveSignals() {
       }
     >();
 
-    const greenSealIds = [217, 218, 219, 221, 20711, 20911]; // Adicionado 20911 como alias de 711 se necessário
+    const confluenciaIds = [8, 9, 10, 11, 12, 13, 217, 218, 219, 221, 20711];
 
     for (const item of active) {
-      const isA8A9 = [8, 9, 10, 11, 12, 13].includes(item.analysis);
-      
-      const hist = engine[item.analysis].filter(c => c.value === item.value).slice(-6);
-      
+      const isConfluenceGatilho = confluenciaIds.includes(item.analysis);
+      const isMainAnalysis = [1, 2, 3, 4, 5, 6, 7].includes(item.analysis);
+
       let targetMinutes = 0;
       let displayPct = 0;
       let displayLabel = "";
 
-      if (isA8A9) {
-        targetMinutes = item.open.gaps[0] || 0;
-        displayPct = 100;
+      if (isConfluenceGatilho) {
+        if ([8, 9, 10, 11, 12, 13].includes(item.analysis)) {
+          targetMinutes = item.open.gaps[0] || 0;
+          displayPct = 100;
+        } else {
+          targetMinutes = 1;
+          displayPct = 100;
+        }
         displayLabel = targetMinutes.toString();
-      } else {
+      } else if (isMainAnalysis) {
+        const hist = engine[item.analysis].filter(c => c.value === item.value).slice(-6);
         if (hist.length < MIN_GATILHOS) continue;
         const top1 = computeTop(hist, 1)[0];
         if (!top1) continue;
         if (top1.pct < MIN_ASSERTIVIDADE_TOP1) continue;
         
         targetMinutes = top1.m;
-        if ([17, 18, 19].includes(item.analysis)) {
-          targetMinutes += 1;
-        }
-        
         displayPct = top1.pct;
         displayLabel = targetMinutes.toString();
+      } else {
+        continue;
       }
 
       const at = addMinutes(item.open.triggerAt, targetMinutes);
       if (at.getTime() <= now.getTime()) continue; 
       const t = at.getTime();
 
-      // Logic for detection if a Green Seal applies
-      const hasGreenSeal = greenSealIds.some(gsId => {
-        const gsCycles = engine[gsId];
-        if (!gsCycles || gsCycles.length === 0) return false;
-        
-        // Selo Verde atua sobre o resultado MAIS RECENTE do motor de gatilhos
-        const lastGs = gsCycles[gsCycles.length - 1];
-        if (!lastGs) return false;
-        
-        const gsAt = addMinutes(lastGs.triggerAt, 1); 
-        const match = Math.abs(gsAt.getTime() - t) <= 60000;
-        
-        if (match) {
-          console.log(`[SELO VERDE] Soma ${lastGs.value} detectada no minuto ${fmtClock(lastGs.triggerAt)} -> Aplicado no card: ${fmtClock(at)}`);
-        }
-        
-        return match;
-      });
-
-      const isTendency = isA8A9 ? true : checkHighTendency(engine[item.analysis], item.value);
+      const isTendency = isConfluenceGatilho ? true : checkHighTendency(engine[item.analysis], item.value);
       const isPossibleRec = activeAlerts.some((alert: RecAlert) => {
         const signalTime = at.getTime();
         const alertStart = alert.triggerAt.getTime();
         const alertEnd = alertStart + alert.duration * 60000;
         return signalTime >= alertStart && signalTime <= alertEnd;
       });
-
 
       const cur = byTime.get(t);
       if (!cur) {
@@ -331,7 +307,6 @@ export function PredictiveSignals() {
           sources: [{ analysis: item.analysis, value: item.value }],
           isHighTendency: isTendency,
           isPossibleRec,
-          isGreenSeal: hasGreenSeal
         });
       } else {
         if (!cur.values.includes(item.value)) cur.values.push(item.value);
@@ -339,7 +314,6 @@ export function PredictiveSignals() {
         cur.sources.push({ analysis: item.analysis, value: item.value });
         if (isTendency) cur.isHighTendency = true;
         if (isPossibleRec) cur.isPossibleRec = true;
-        if (hasGreenSeal) cur.isGreenSeal = true;
         if (displayPct > cur.pct) {
           cur.pct = displayPct;
           cur.label = displayLabel;
@@ -360,7 +334,6 @@ export function PredictiveSignals() {
           sources: info.sources,
           isHighTendency: info.isHighTendency,
           isPossibleRec: info.isPossibleRec,
-          isGreenSeal: info.isGreenSeal
         };
       });
     setMode1(m1);
@@ -464,9 +437,7 @@ export function PredictiveSignals() {
           label: info.label,
           analysisCount: combinedAnalyses.size + 4,
           sources: combinedSources,
-          isHighTendency: info.isHighTendency || next1[1].isHighTendency || next2[1].isHighTendency,
-          isVerified: false,
-          isGreenSeal: info.isGreenSeal || next1[1].isGreenSeal || next2[1].isGreenSeal
+          isHighTendency: info.isHighTendency || next1[1].isHighTendency || next2[1].isHighTendency
         });
         i += 2;
       } else if (isConsecutive2) {
@@ -483,8 +454,6 @@ export function PredictiveSignals() {
           analysisCount: combinedAnalyses.size + 1,
           sources: combinedSources,
           isHighTendency: info.isHighTendency || next1[1].isHighTendency,
-          isVerified: false,
-          isGreenSeal: info.isGreenSeal || next1[1].isGreenSeal
         });
         i += 1;
       } else {
@@ -497,8 +466,7 @@ export function PredictiveSignals() {
           analysisCount: info.analyses.size,
           sources: info.sources,
           isHighTendency: info.isHighTendency,
-          isVerified: false,
-          isGreenSeal: info.isGreenSeal
+          
         });
       }
     }
@@ -511,8 +479,8 @@ export function PredictiveSignals() {
       const current = sortedRawUnified[i];
       const next = sortedRawUnified[i + 1];
       
-      const isCurrentHighConfluence = current.analysisCount >= 2;
-      const isNextHighConfluence = next && next.analysisCount >= 2;
+      const isCurrentHighConfluence = current.analysisCount >= 4;
+      const isNextHighConfluence = next && next.analysisCount >= 4;
       
       // Regra 2: Se existirem dois ou mais sinais Top 1 com diferença de até 2 minutos entre si
       const diffMin = next ? Math.abs(next.at.getTime() - current.at.getTime()) / 60000 : 999;
@@ -524,13 +492,13 @@ export function PredictiveSignals() {
         if (current.analysisCount >= next.analysisCount) {
           unifiedM1.push({
             ...current,
-            isRare: current.analysisCount >= 2,
+            isRare: current.analysisCount >= 4,
             key: `unified-${current.key}-${next.key}`
           });
         } else {
           unifiedM1.push({
             ...next,
-            isRare: next.analysisCount >= 2,
+            isRare: next.analysisCount >= 4,
             key: `unified-${current.key}-${next.key}`
           });
         }
@@ -540,8 +508,8 @@ export function PredictiveSignals() {
       }
     }
 
-    // Secondary Verification Selo Azul Logic
-    const secondaryProjections = new Map<number, Set<number>>(); // time -> values
+    // Secondary Verification Logic (Simplificado - sem selo azul/verde)
+    const secondaryProjections = new Map<number, Set<number>>();
     for (const item of (secondaryActive as any)) {
       const hist = engine[item.analysis].filter((c: any) => c.value === item.value).slice(-6);
       if (hist.length < 6) continue;
@@ -552,52 +520,27 @@ export function PredictiveSignals() {
       secondaryProjections.get(at)!.add(item.value);
     }
 
-    // Regra: Badge "Sinal RARO" reservada para Top 1 + Confluência filtrados
+    // Badge "Sinal RARO" reservada para analysisCount >= 4 (Super Sinal ou Confluência Suprema)
     const isRareTime = (time: number) => {
-      return unifiedM1.some(s => s.at.getTime() === time && s.analysisCount >= 2);
+      return unifiedM1.some(s => s.at.getTime() === time && s.analysisCount >= 4);
     };
 
-    const finalM1 = await Promise.all(unifiedM1.map(async s => {
+    const finalM1 = unifiedM1.map(s => {
       const t = s.at.getTime();
-      const secValues = secondaryProjections.get(t);
-      const isVerified = secValues && s.sources.some(src => secValues.has(src.value));
       const isRare = isRareTime(t);
-      
-      let isGreenSeal = false;
-      let greenSealAssertivity = 0;
-      
-      const greenSource = s.sources.find(src => (src.analysis >= 217 && src.analysis <= 221) || src.analysis === 20711 || s.isGreenSeal);
-      if (greenSource) {
-        const tag = `SOMA_${greenSource.value}`;
-        const { data } = await supabase.from('historico_sinais_audit')
-          .select('status')
-          .eq('tag', tag)
-          .neq('status', 'PENDENTE')
-          .order('created_at', { ascending: false })
-          .limit(6);
-        
-        if (data && data.length === 6) {
-          const wins = data.filter(r => r.status && r.status.startsWith('WIN')).length;
-          greenSealAssertivity = (wins / 6) * 100;
-          if (greenSealAssertivity >= 65 || s.isGreenSeal) {
-            isGreenSeal = true;
-          }
-        } else if (data && data.length > 0) {
-           // Fallback para quando tem menos de 6 mas queremos testar
-           const wins = data.filter(r => r.status && r.status.startsWith('WIN')).length;
-           greenSealAssertivity = (wins / data.length) * 100;
-           if (greenSealAssertivity >= 65 || s.isGreenSeal) isGreenSeal = true;
-        }
-        } else if (s.isGreenSeal) {
-          isGreenSeal = true;
-          greenSealAssertivity = 100; // Fallback para sinal selado sem histórico suficiente
-        }
+      return { ...s, isRare };
+    });
 
-      return { ...s, isVerified, isRare, isGreenSeal, greenSealAssertivity };
-    }));
+    // APLICAR REGRA DE FILTRO: 
+    // - Mostrar apenas se for Análise Principal (A1-A7) fortalecida (sources contêm 1-7)
+    // - OU se for Super Sinal (analysisCount >= 4)
+    const filteredM1 = finalM1.filter(s => {
+      const hasMainAnalysis = s.sources.some(src => src.analysis >= 1 && src.analysis <= 7);
+      const isSuperSignal = s.analysisCount >= 4;
+      return hasMainAnalysis || isSuperSignal;
+    });
 
-
-    setMode1(finalM1);
+    setMode1(filteredM1);
 
 
   }, [active, engine, rows]);
@@ -646,10 +589,7 @@ export function PredictiveSignals() {
           entryDate: s.at,
           outcome: "pending",
           isHighTendency: s.isHighTendency,
-          isVerified: s.isVerified,
           isRare: s.isRare,
-          isGreenSeal: s.isGreenSeal || !!(s as any).isGreenSeal,
-          greenSealAssertivity: s.greenSealAssertivity,
           isRecAlert: activeRecAlerts.some(a => s.at.getTime() >= a.start && s.at.getTime() <= a.end)
         })),
         ...mode2.map(s => ({
@@ -734,16 +674,11 @@ export function PredictiveSignals() {
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
                           <div className="text-xs font-semibold text-muted-foreground opacity-80 flex items-center gap-1.5">
-                            {s.title}
+                            {s.analysisCount >= 4 ? "Super Sinal" : s.title}
                             <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-white/40">
                               {s.sources[0]?.analysis ? `A${s.sources[0].analysis}` : "AUTO"}
                             </span>
                           </div>
-                          {s.isVerified && (
-                            <span className="flex items-center gap-0.5 rounded-full bg-blue-500/20 px-1.5 py-0.5 text-[8px] font-black text-blue-400 border border-blue-500/30">
-                              ✓ SELO AZUL
-                            </span>
-                          )}
                           {s.isRare && (
                             <span className="flex items-center gap-0.5 rounded-full bg-cyan-500/20 px-1.5 py-0.5 text-[8px] font-black text-cyan-300 border border-cyan-500/30 shadow-[0_0_10px_rgba(6,182,212,0.2)]">
                               💎 RARO
@@ -774,13 +709,8 @@ export function PredictiveSignals() {
                       </div>
                       <div className="mt-1 text-[11px] tabular-nums font-bold flex items-center gap-1.5">
                         <span className={medal ? "text-inherit" : "text-primary"}>
-                          {s.isGreenSeal ? (s.greenSealAssertivity || 0).toFixed(1) : s.pct.toFixed(1)}%
+                          {s.pct.toFixed(1)}%
                         </span>
-                        {s.isGreenSeal && (
-                          <span className="flex items-center gap-1 rounded bg-emerald-500/20 px-1.5 py-0.5 text-[8px] font-black text-emerald-400 border border-emerald-500/30">
-                            ✓ SELADO
-                          </span>
-                        )}
                         <span className="opacity-50 text-[10px]">·</span>
                       </div>
                       <div className="mt-2 flex flex-wrap gap-1">

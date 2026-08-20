@@ -383,59 +383,35 @@ export function buildA9(rows: Row[]): Cycle[] {
   return out;
 }
 
-/** 
- * Análises Secundárias (#1 ao #9)
- * Utilizam a mesma lógica da A1 (leitura de pedra vs unidade do minuto),
- * mas deslocadas no tempo conforme a posição no histórico.
- */
 
-/** 
- * ESTRATÉGIA DE CONFIRMAÇÃO - SELO VERDE
+/**
+ * ESTRATÉGIA DE CONFLUÊNCIA - SOMAS
  * Gatilho: Soma(Pedra_A + Pedra_B) in [17, 18, 19, 21] ou Sequência 7-11/11-7
  */
-export function buildSeloVerde(rows: Row[]): Cycle[] {
+export function buildSomas(rows: Row[]): Cycle[] {
   const out: Cycle[] = [];
-  
   if (rows.length < 2) return out;
-
-  // Debug: Log das últimas pedras para auditoria do Selo Verde
-  const last2 = rows.slice(-2);
-  const pA = Number(last2[0].roll);
-  const pB = Number(last2[1].roll);
-  const soma = pA + pB;
-  
-  console.log(`[SELO VERDE DEBUG] Últimas 2 pedras: [${pA}, ${pB}] | Soma: ${soma}`);
-
   for (let i = 1; i < rows.length; i++) {
     const rA = Number(rows[i - 1].roll);
     const rB = Number(rows[i].roll);
-    
     if (!Number.isFinite(rA) || !Number.isFinite(rB)) continue;
-    
     const currentSoma = rA + rB;
     const isSequence = (rA === 7 && rB === 11) || (rA === 11 && rB === 7);
     const isSomaMatch = [17, 18, 19, 21].includes(currentSoma);
-
     if (!isSomaMatch && !isSequence) continue;
-    
     const dt = parseUtcDate(rows[i].created_at);
     if (Number.isNaN(dt.getTime())) continue;
-
-    // Log para confirmação de gatilho
-    if (i === rows.length - 1) {
-      console.log(`[SELO VERDE] Soma ${currentSoma} detectada no minuto ${fmtClock(dt)} -> Aplicando como validador`);
-    }
-
     out.push({ 
       value: isSequence ? 711 : currentSoma, 
       analysis: 200 + (isSequence ? 711 : currentSoma),
       triggerAt: dt, 
-      gaps: [1], // Offset padrão
-      isSecondary: false 
+      gaps: [1]
     });
   }
   return out;
 }
+
+
 
 export function buildSecondary(rows: Row[], offset: number): Cycle[] {
   const out: Cycle[] = [];
