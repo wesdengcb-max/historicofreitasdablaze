@@ -42,6 +42,10 @@ function fmtClockLocal(d: Date) {
   return d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", hour12: false });
 }
 
+function fmtClockLocal(d: Date) {
+  return d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", hour12: false });
+}
+
 
 type Mode1Signal = { 
   key: string; 
