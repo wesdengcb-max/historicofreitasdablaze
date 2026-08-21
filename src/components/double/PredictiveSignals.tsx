@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { setPredictiveSignals } from "@/lib/signalsStore";
-import { Loader2, Sparkles, Target, Layers, Cpu } from "lucide-react";
+import { Radio, Power, Trash2, FileDown, Clock, Cpu, Sparkles, Target, Layers, Download } from "lucide-react";
+import { saveTriggerAudit, updateTriggerAuditResult, getBlockStats, getTriggerAuditsForExport } from "@/lib/triggerAudits.functions";
 import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
 import { parseUtcDate } from "@/lib/utils";
 import { Card } from "@/components/double/Card";
