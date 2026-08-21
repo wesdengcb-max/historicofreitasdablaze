@@ -1,4 +1,31 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+em sinais
+CORREÇÃO INTEGRAL DO MOTOR: FILTRAGEM DE SEÇÕES, PROMOÇÃO DE NÍVEL, AUDITORIA EM TEMPO REAL E EXPIRAÇÃO DE CARDS
+
+Detectamos falhas críticas no ciclo de vida dos sinais e na distribuição visual dos cards:
+
+1. CORREÇÃO DE VAZAMENTO NAS SEÇÕES (PredictiveSignals.tsx / SinaisSection.tsx):
+   - Aplique estritamente os filtros abaixo antes de renderizar cada bloco de seção no React:
+     • Seção 1 (Top 1 + Confluência): signals.filter(s => s.isRare || s.top1Count >= 2);
+     • Seção 2 (Top 1 Isolado): signals.filter(s => s.isTop1 && !s.isRare && (s.top1Count === 1) && !s.hasTop5Confluence);
+     • Seção 3 (Top 1 + Confluência Top 5): signals.filter(s => s.isTop1 && !s.isRare && s.hasTop5Confluence);
+     • Seção 4 (Confluência Top 5): signals.filter(s => !s.isTop1 && !s.isRare && (s.top1Count === 0));
+   - REGRA: Cards com 'isTop1 === true' estão PROIBIDOS de renderizar na Seção 4.
+
+2. ATUALIZAÇÃO AUTOMÁTICA EM TEMPO REAL (NOVOS SINAIS E PROMOÇÃO DE NÍVEL):
+   - A cada nova pedra/rodada recebida ou a cada ciclo de 30s:
+     a) Mínimo/Injeção: Adicione novos sinais gerados pelo motor instantaneamente no feed.
+     b) Promoção de Nível: Se um card existente receber novas confluências, ele deve subir de categoria/graduação imediatamente (ex: de Prata para Supremo) e travar no topo ('Peak Rank Lock').
+     c) Force o re-render do estado no React para que a tela nunca fique estagnada.
+
+3. AUDITORIA EM TEMPO REAL (CARIMBO DE WIN/RED):
+   - O relatório CSV e a tela mostram que os sinais permanecem eternamente como "PENDENTE", impedindo a exibição do carimbo.
+   - Ajuste o listener/polling das rodadas para comparar cada resultado da Blaze com a janela (Horário -1, Horário Alvo, Horário +1) dos sinais pendentes:
+     • Se a pedra 0 (Branco) sair na janela -> Atualize imediatamente para 'WIN' e exiba o carimbo no card.
+     • Se a janela expirar sem o 0 -> Atualize para 'RED' e exiba o carimbo.
+
+4. EXPIRAÇÃO E REMOÇÃO AUTOMÁTICA DOS CARDS DA TELA:
+   - Assim que um card for auditado como 'WIN' ou 'RED', inicie um timer de 4 minutos.
+   - Após esses 4 minutos da auditoria, remova o card do feed para impedir que sinais antigos acumulem na tela durante a live.
 import { Crown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Shield, Zap, TrendingUp, History, Target, Clock, Lock, BarChart3, Search, Activity, Sun, Moon, CheckCircle2 } from "lucide-react"
