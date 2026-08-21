@@ -503,8 +503,8 @@ export function PredictiveSignals() {
             const { data: res } = await saveTriggerAudit({ 
               data: {
                 gatilho: confluenceStr,
-                horario_base: fmtClockLocal(new Date(t - 60000)),
-                horario_alvo: fmtClockLocal(entryDate),
+                horario_base: fmtClock(new Date(t - 60000)),
+                horario_alvo: fmtClock(entryDate),
                 category,
                 analysis_count: newPeak,
                 confluences: confluenceStr
@@ -633,7 +633,7 @@ export function PredictiveSignals() {
     if (rows.length > 0 && !loading && mode1) {
       const syncSignals = mode1.map(s => ({
         key: s.key,
-        time: fmtClockLocal(s.at),
+        time: fmtClock(s.at),
         pct: s.pct,
         label: s.label,
         confluence: s.sources.map(src => `A${src.analysis}·${src.value}`).join(", "),
