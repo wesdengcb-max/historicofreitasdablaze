@@ -14,6 +14,7 @@ export type Cycle = {
 
   triggerAt: Date;
   gaps: number[];
+  peakAnalysisCount?: number; // Peak Rank Lock
 };
 
 
