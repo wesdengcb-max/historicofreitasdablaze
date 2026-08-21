@@ -365,17 +365,17 @@ export function PredictiveSignals() {
             fetchBlockStats();
           }
         });
-    }
+      }
 
-    // Alertas de Segurança ("possível rec")
-    const recAlerts = buildRecAlerts(rows);
-    const activeAlerts = recAlerts.filter((alert: RecAlert) => {
-      const diff = (now.getTime() - alert.triggerAt.getTime()) / 60000;
-      return diff >= 0 && diff <= alert.duration;
-    });
+      // Alertas de Segurança ("possível rec")
+      const recAlerts = buildRecAlerts(rows);
+      const activeAlerts = recAlerts.filter((alert: RecAlert) => {
+        const diff = (now.getTime() - alert.triggerAt.getTime()) / 60000;
+        return diff >= 0 && diff <= alert.duration;
+      });
 
-    // Dispara evento global para o SinaisSection alternar para "Rodadas Atuais"
-    window.dispatchEvent(new CustomEvent('switch-audit-filter', { detail: 'hoje' }));
+      // Dispara evento global para o SinaisSection alternar para "Rodadas Atuais"
+      window.dispatchEvent(new CustomEvent('switch-audit-filter', { detail: 'hoje' }));
 
     const byTime = new Map<
       number,
@@ -640,7 +640,7 @@ export function PredictiveSignals() {
 
     // O Modo Unificado agora é tratado no loop principal finalMode1
     setLoading(false);
-  }, [rows, engine, peakStates, auditIds, fetchBlockStats]);
+  }, [rows, engine, peakStates, auditIds, fetchBlockStats, mode1]);
 
   // Alertas de Recuperação "possível rec"
   const activeRecAlerts = useMemo(() => {
