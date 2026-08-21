@@ -605,239 +605,52 @@ export function PredictiveSignals() {
     m2.sort((a, b) => a.times[0].getTime() - b.times[0].getTime());
     setMode2(m2);
 
-    // ---- Level Elevation, Unification and Proximity Filtering ----
-    const rawUnifiedM1: Mode1Signal[] = [];
-    const sortedM1 = Array.from(byTime.entries()).sort((a: [number, any], b: [number, any]) => a[0] - b[0]);
-    
-    for (let i = 0; i < sortedM1.length; i++) {
-      const [t, info]: [number, any] = sortedM1[i];
-      const next1 = sortedM1[i + 1];
-      const next2 = sortedM1[i + 2];
-      
-      const isConsecutive3 = next1 && next2 && 
-        Math.abs(next1[0] - t) <= 60000 && 
-        Math.abs(next2[0] - next1[0]) <= 60000;
-      
-      const isConsecutive2 = !isConsecutive3 && next1 && 
-        Math.abs(next1[0] - t) <= 60000;
-
-      if (isConsecutive3) {
-        const middleTime = next1[0];
-        const combinedSources = [...info.sources, ...next1[1].sources, ...next2[1].sources];
-        const combinedAnalyses = new Set([...info.analyses, ...next1[1].analyses, ...next2[1].analyses]);
-        const maxPct = Math.max(info.pct, next1[1].pct, next2[1].pct);
-        
-        rawUnifiedM1.push({
-          key: `m1-c3-${middleTime}`,
-          title: `Supremo · ${info.values.join("+")}`,
-          at: new Date(middleTime),
-          pct: maxPct,
-          label: info.label,
-          analysisCount: combinedAnalyses.size + 4,
-          sources: combinedSources,
-          isHighTendency: info.isHighTendency || next1[1].isHighTendency || next2[1].isHighTendency,
-          isTop1: combinedAnalyses.has(1),
-          isTop5Confluence: [2, 3, 4, 5].some(a => combinedAnalyses.has(a)),
-          isSuperSignal: true
-        });
-        i += 2;
-      } else if (isConsecutive2) {
-        const best = info.pct >= next1[1].pct ? { t, info } : { t: next1[0], info: next1[1] };
-        const combinedSources = [...info.sources, ...next1[1].sources];
-        const combinedAnalyses = new Set([...info.analyses, ...next1[1].analyses]);
-        
-        rawUnifiedM1.push({
-          key: `m1-c2-${best.t}`,
-          title: `Confluência · ${best.info.values.join("+")}`,
-          at: new Date(best.t),
-          pct: best.info.pct,
-          label: best.info.label,
-          analysisCount: combinedAnalyses.size + 1,
-          sources: combinedSources,
-          isHighTendency: info.isHighTendency || next1[1].isHighTendency,
-          isTop1: combinedAnalyses.has(1),
-          isTop5Confluence: [2, 3, 4, 5].some(a => combinedAnalyses.has(a)),
-          isSuperSignal: (combinedAnalyses.size + 1) >= 4
-        });
-        i += 1;
-      } else {
-        rawUnifiedM1.push({
-          key: `m1-${t}`,
-          title: `Análise ${info.values.join(" + ")}`,
-          at: new Date(t),
-          pct: info.pct,
-          label: info.label,
-          analysisCount: info.analyses.size,
-          sources: info.sources,
-          isHighTendency: info.isHighTendency,
-          isTop1: info.analyses.has(1),
-          isTop5Confluence: [2, 3, 4, 5].some(a => info.analyses.has(a)),
-          isSuperSignal: info.analyses.size >= 4
-        });
-      }
-    }
-
-    // FILTRO DE VIZINHANÇA PARA MINUTOS SEGUIDOS (Deduplicação/Unificação)
-    const unifiedM1: Mode1Signal[] = [];
-    const sortedRawUnified = [...rawUnifiedM1].sort((a, b) => a.at.getTime() - b.at.getTime());
-    
-    for (let i = 0; i < sortedRawUnified.length; i++) {
-      const current = sortedRawUnified[i];
-      const next = sortedRawUnified[i + 1];
-      
-      const isCurrentHighConfluence = current.analysisCount >= 4;
-      const isNextHighConfluence = next && next.analysisCount >= 4;
-      
-      // Regra 2: Se existirem dois ou mais sinais Top 1 com diferença de até 2 minutos entre si
-      const diffMin = next ? Math.abs(next.at.getTime() - current.at.getTime()) / 60000 : 999;
-      
-      if (next && diffMin <= 2) {
-        console.log(`[FILTRO VIZINHANÇA] Sinais em ${fmtClock(current.at)} e ${fmtClock(next.at)} detectados -> Unificando.`);
-        
-        // Prioridade: Maior confluência (analysisCount)
-        if (current.analysisCount >= next.analysisCount) {
-          unifiedM1.push({
-            ...current,
-            isRare: current.analysisCount >= 4,
-            key: `unified-${current.key}-${next.key}`
-          });
-        } else {
-          unifiedM1.push({
-            ...next,
-            isRare: next.analysisCount >= 4,
-            key: `unified-${current.key}-${next.key}`
-          });
-        }
-        i++; // Pula o próximo já que foi unificado
-      } else {
-        unifiedM1.push(current);
-      }
-    }
-
-    // Secondary Verification Logic (Simplificado - sem selo azul/verde)
-    const secondaryProjections = new Map<number, Set<number>>();
-    for (const item of (secondaryActive as any)) {
-      const hist = engine[item.analysis].filter((c: any) => c.value === item.value).slice(-6);
-      if (hist.length < 6) continue;
-      const top1 = computeTop(hist, 1)[0];
-      if (!top1) continue;
-      const at = addMinutes(item.open.triggerAt, top1.m).getTime();
-      if (!secondaryProjections.has(at)) secondaryProjections.set(at, new Set());
-      secondaryProjections.get(at)!.add(item.value);
-    }
-
-    // Badge "Sinal RARO" reservada para analysisCount >= 4 (Super Sinal ou Confluência Suprema)
-    const isRareTime = (time: number) => {
-      return unifiedM1.some(s => s.at.getTime() === time && s.analysisCount >= 4);
-    };
-
-    const finalM1 = unifiedM1.map(s => {
-      const t = s.at.getTime();
-      const isRare = isRareTime(t);
-      return { ...s, isRare };
-    });
-
-    // APLICAR REGRA DE FILTRO: 
-    // - Mostrar apenas se for Análise Principal (A1-A7) fortalecida (sources contêm 1-7)
-    // - OU se for Super Sinal (analysisCount >= 4)
-    const filteredM1 = finalM1.filter(s => {
-      const hasMainAnalysis = s.sources.some(src => src.analysis >= 1 && src.analysis <= 7);
-      const isSuperSignal = s.analysisCount >= 4;
-      return hasMainAnalysis || isSuperSignal;
-    });
-
-    setMode1(filteredM1);
-
-
-    // Organizar nas 4 Seções Hierárquicas
-    const top1Confluence: Mode1Signal[] = [];
-    const top1Isolated: Mode1Signal[] = [];
-    const top1Top5: Mode1Signal[] = [];
-    const top5Only: Mode1Signal[] = [];
-
-    filteredM1.forEach(s => {
-      const hasTop1 = s.isTop1;
-      const confluenceCount = s.analysisCount;
-      const hasTop5 = s.isTop5Confluence;
-
-      if (hasTop1 && (s.isRare || confluenceCount >= 4)) {
-        top1Confluence.push(s);
-      } else if (hasTop1 && hasTop5) {
-        top1Top5.push(s);
-      } else if (hasTop1) {
-        top1Isolated.push(s);
-      } else if (confluenceCount >= 2) {
-        top5Only.push(s);
-      }
-    });
-
-    setSections({ top1Confluence, top1Isolated, top1Top5, top5Only });
-
-  }, [active, engine, rows]);
+    // O Modo Unificado agora é tratado no loop principal finalMode1
+    setLoading(false);
+  }, [rows, engine, peakStates, auditIds, fetchBlockStats]);
 
   // Alertas de Recuperação "possível rec"
   const activeRecAlerts = useMemo(() => {
     const alerts: Array<{ type: string; start: number; end: number }> = [];
     const now = new Date().getTime();
 
-    // Procurar gatilhos no histórico recente (últimas 20 pedras para garantir cobertura da janela)
     const recent = rows.slice(-20);
     for (let i = 1; i < recent.length; i++) {
       const p1 = Number(recent[i - 1].roll);
       const p2 = Number(recent[i].roll);
       const dt = parseUtcDate(recent[i].created_at).getTime();
 
-      // Gatilho 7-14: 14 min
       if (p1 === 7 && p2 === 14) alerts.push({ type: "7-14", start: dt, end: dt + 14 * 60000 });
-      // Gatilho 4-7: 9 min
       if (p1 === 4 && p2 === 7) alerts.push({ type: "4-7", start: dt, end: dt + 9 * 60000 });
-      // Gatilho 5-14: 14 min
       if (p1 === 5 && p2 === 14) alerts.push({ type: "5-14", start: dt, end: dt + 14 * 60000 });
     }
     return alerts.filter(a => a.end > now);
   }, [rows]);
 
-
-  // Auto-generate triggers
   useEffect(() => {
     if (active.length > 0 && !loading) {
       generate();
     }
   }, [active.length, loading, generate]);
 
-
   useEffect(() => {
-    if (rows.length > 0 && !loading && mode1 && mode2) {
-      const syncSignals: any[] = [
-        ...mode1.map(s => ({
-          key: s.key,
-          time: fmtClock(s.at),
-          pct: s.pct,
-          label: s.label,
-          confluence: s.sources.map(src => `A${src.analysis}·${src.value}`).join(", "),
-          medal: getMedalStyles(s.analysisCount)?.label,
-          entryDate: s.at,
-          outcome: "pending",
-           isHighTendency: s.isHighTendency,
-           isRare: s.isRare
-         })),
-         ...mode2.map(s => ({
-           key: s.key,
-           time: s.times.map(t => fmtClock(t)).join(" / "),
-           pct: s.pct,
-           label: "Confluência",
-           confluence: s.confluence,
-           medal: getMedalStyles(s.analysisCount)?.label,
-           entryDate: s.times[0],
-           outcome: "pending",
-           isHighTendency: s.isHighTendency
-         }))
-      ].sort((a, b) => a.entryDate.getTime() - b.entryDate.getTime());
-
+    if (rows.length > 0 && !loading && mode1) {
+      const syncSignals = mode1.map(s => ({
+        key: s.key,
+        time: fmtClockLocal(s.at),
+        pct: s.pct,
+        label: s.label,
+        confluence: s.sources.map(src => `A${src.analysis}·${src.value}`).join(", "),
+        medal: getMedalStyles(s.peakAnalysisCount).label,
+        entryDate: s.at,
+        outcome: s.outcome || "pending",
+        isHighTendency: s.isHighTendency,
+        isRare: s.isRare
+      })).sort((a, b) => a.entryDate.getTime() - b.entryDate.getTime());
 
       setPredictiveSignals(syncSignals);
     }
-  }, [rows, loading, mode1, mode2]);
+  }, [rows, loading, mode1]);
 
 
   const renderSignalCard = (s: Mode1Signal) => {
