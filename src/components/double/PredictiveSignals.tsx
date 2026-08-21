@@ -3,6 +3,8 @@ import { setPredictiveSignals } from "@/lib/signalsStore";
 import { Radio, Power, Trash2, FileDown, Clock, Cpu, Sparkles, Target, Layers, Download } from "lucide-react";
 import { saveTriggerAudit, updateTriggerAuditResult, getBlockStats, getTriggerAuditsForExport } from "@/lib/triggerAudits.functions";
 import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
+import { ResultCircle } from "@/components/double/ResultCircle";
+import { AnimatePresence, motion } from "framer-motion";
 import { parseUtcDate } from "@/lib/utils";
 import { Card } from "@/components/double/Card";
 import {
