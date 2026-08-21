@@ -90,29 +90,29 @@ const getMedalStyles = (count: number) => {
     badge: "bg-purple-400/20 text-purple-300 border-purple-400/30"
   };
   if (count === 6) return { 
-    label: "💎 Diamante", 
-    classes: "border-blue-400 bg-blue-950/40 text-blue-200 shadow-blue-500/10",
-    badge: "bg-blue-400/20 text-blue-200 border-blue-400/30"
+    label: "👑 Rei", 
+    classes: "border-red-400 bg-red-950/40 text-red-200 shadow-red-500/10",
+    badge: "bg-red-400/20 text-red-200 border-red-400/30"
   };
   if (count === 5) return { 
-    label: "🥇 Ouro", 
+    label: "🏆 Mestre", 
     classes: "border-yellow-400 bg-yellow-950/50 text-yellow-300 shadow-yellow-500/20",
     badge: "bg-yellow-400/20 text-yellow-300 border-yellow-400/30"
   };
   if (count === 4) return { 
+    label: "🥇 Ouro", 
+    classes: "border-yellow-600/50 bg-yellow-900/20 text-yellow-200 shadow-yellow-500/10",
+    badge: "bg-yellow-600/20 text-yellow-200 border-yellow-600/30"
+  };
+  if (count === 3) return { 
     label: "🥈 Prata", 
     classes: "border-slate-300 bg-slate-800/40 text-slate-100 shadow-slate-500/10",
     badge: "bg-slate-300/20 text-slate-100 border-slate-300/30"
   };
-  if (count === 3) return { 
+  if (count === 2) return { 
     label: "🥉 Bronze", 
     classes: "border-amber-700 bg-amber-950/30 text-amber-300",
     badge: "bg-amber-700/20 text-amber-300 border-amber-700/30"
-  };
-  if (count === 2) return { 
-    label: "Confluência", 
-    classes: "border-cyan-400 bg-cyan-950/30 text-cyan-300 shadow-cyan-500/10",
-    badge: "bg-cyan-400/20 text-cyan-300 border-cyan-400/30"
   };
   return {
     label: "Top 1 Isolado",
@@ -128,6 +128,7 @@ export function PredictiveSignals() {
   const [err, setErr] = useState<string | null>(null);
   const [mode1, setMode1] = useState<Mode1Signal[] | null>(null);
   const [mode2, setMode2] = useState<Mode2Signal[] | null>(null);
+  const [peakStates, setPeakStates] = useState<Record<string, number>>({});
   const [sections, setSections] = useState<{
     top1Confluence: Mode1Signal[];
     top1Isolated: Mode1Signal[];
@@ -140,9 +141,10 @@ export function PredictiveSignals() {
     top5Only: [],
   });
   const [generatedAt, setGeneratedAt] = useState<Date | null>(null);
+  const [blockStats, setBlockStats] = useState<Record<string, { signals: number, wins: number, reds: number }>>({});
 
   const renderSignalCard = (s: Mode1Signal) => {
-    const medal = getMedalStyles(s.analysisCount);
+    const medal = getMedalStyles(s.peakAnalysisCount ?? s.analysisCount);
     return (
       <div
         key={s.key}
@@ -402,14 +404,23 @@ export function PredictiveSignals() {
         const top5Analyses = [2, 3, 4, 5];
         const hasTop5 = top5Analyses.some(a => info.analyses.has(a));
         const confluenceCount = info.analyses.size;
+        
+        // Peak Rank Lock
+        const signalKey = `m1-${t}`;
+        const currentPeak = peakStates[signalKey] || 0;
+        const newPeak = Math.max(currentPeak, confluenceCount);
+        if (newPeak > currentPeak) {
+          setPeakStates(prev => ({ ...prev, [signalKey]: newPeak }));
+        }
 
         return {
-          key: `m1-${t}`,
+          key: signalKey,
           title: `Análise ${values.join(" + ")}`,
           at: new Date(t),
           pct: info.pct,
           label: info.label,
           analysisCount: confluenceCount,
+          peakAnalysisCount: newPeak,
           sources: info.sources,
           isHighTendency: info.isHighTendency,
           isPossibleRec: info.isPossibleRec,
