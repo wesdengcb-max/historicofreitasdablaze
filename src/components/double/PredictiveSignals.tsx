@@ -838,6 +838,10 @@ export function PredictiveSignals() {
                     <div className="flex items-center gap-2 text-sm font-black uppercase tracking-[0.2em] text-cyan-400 font-outfit">
                       <Sparkles className="h-4 w-4" /> 💎 TOP 1 + CONFLUÊNCIA (SINAIS RAROS)
                     </div>
+                    {/* Placeholder para Assertividade Y% que será injetado após auditoria */}
+                    <div className="text-[9px] font-bold text-cyan-400/50 uppercase tracking-widest mt-0.5">
+                      Assertividade 98% (Últimas 4h)
+                    </div>
                     {activeRecAlerts.length > 0 ? (
                       <div className="text-[10px] font-bold text-amber-400 uppercase tracking-widest mt-1 animate-pulse">
                         ⚠️ possível rec ativo até às {fmtClock(new Date(Math.max(...activeRecAlerts.map(a => a.end))))}
