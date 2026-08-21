@@ -51,6 +51,7 @@ type Mode1Signal = {
   isSuperSignal?: boolean;
   isTop1?: boolean;
   isTop5Confluence?: boolean;
+  peakAnalysisCount?: number;
 };
 type Mode2Signal = {
   key: string;
