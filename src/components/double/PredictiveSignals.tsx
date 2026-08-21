@@ -46,13 +46,14 @@ type Mode1Signal = {
   analysisCount: number; 
   sources: Array<{ analysis: number; value: number }>;
   isHighTendency: boolean;
+  isPossibleRec?: boolean;
   isRare?: boolean;
   outcome?: "pending" | "green" | "red";
   resultTime?: string;
   isSuperSignal?: boolean;
   isTop1?: boolean;
   isTop5Confluence?: boolean;
-  peakAnalysisCount?: number;
+  peakAnalysisCount: number;
 };
 type Mode2Signal = {
   key: string;
