@@ -27,7 +27,7 @@ import {
 
   computeTop,
   cyclesOf,
-  fmtClock as fmtClockLib,
+  fmtClock,
   latestByValue,
   MAX_ZEROS,
   TIMEOUT_MINUTES,
@@ -36,7 +36,6 @@ import {
   type Row,
   type RecAlert,
   buildRecAlerts,
-  fmtClock,
 } from "@/lib/predictive";
 
 type Mode1Signal = { 
