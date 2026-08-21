@@ -27,7 +27,7 @@ import {
 
   computeTop,
   cyclesOf,
-  fmtClock,
+  fmtClock as fmtClockLib,
   latestByValue,
   MAX_ZEROS,
   TIMEOUT_MINUTES,
