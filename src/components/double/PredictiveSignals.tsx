@@ -128,6 +128,7 @@ export function PredictiveSignals() {
   const [err, setErr] = useState<string | null>(null);
   const [mode1, setMode1] = useState<Mode1Signal[] | null>(null);
   const [mode2, setMode2] = useState<Mode2Signal[] | null>(null);
+  const peakRanksRef = useRef<Record<string, number>>({});
   const [sections, setSections] = useState<{
     top1Confluence: Mode1Signal[];
     top1Isolated: Mode1Signal[];
@@ -140,6 +141,55 @@ export function PredictiveSignals() {
     top5Only: [],
   });
   const [generatedAt, setGeneratedAt] = useState<Date | null>(null);
+
+  const getBlocoAtual = () => {
+    const now = new Date();
+    const hour = now.getHours();
+    if (hour < 4) return { label: "00:00 - 04:00", start: 0, end: 4 };
+    if (hour < 8) return { label: "04:00 - 08:00", start: 4, end: 8 };
+    if (hour < 12) return { label: "08:00 - 12:00", start: 8, end: 12 };
+    if (hour < 16) return { label: "12:00 - 16:00", start: 12, end: 16 };
+    if (hour < 20) return { label: "16:00 - 20:00", start: 16, end: 20 };
+    return { label: "20:00 - 00:00", start: 20, end: 0 };
+  };
+
+  const handleDownloadCSV = async () => {
+    const { data } = await supabase
+      .from("trigger_audits")
+      .select("*")
+      .order("created_at", { ascending: false });
+    
+    if (!data || data.length === 0) return;
+
+    const headers = ["Gatilho", "Horário -1", "Horário Alvo", "Horário +1", "Win", "Categoria", "Confluências"];
+    const csvContent = [
+      headers.join(","),
+      ...data.map(row => {
+        const at = new Date(row.horario_alvo);
+        const tMinus = fmtClock(new Date(at.getTime() - 60000));
+        const tAlvo = fmtClock(at);
+        const tPlus = fmtClock(new Date(at.getTime() + 60000));
+        return [
+          row.gatilho,
+          tMinus,
+          tAlvo,
+          tPlus,
+          row.win === null ? "PENDENTE" : (row.win ? "SIM" : "NÃO"),
+          row.category,
+          `"${row.confluences}"`
+        ].join(",");
+      })
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `relatorio-sinais-${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const renderSignalCard = (s: Mode1Signal) => {
     const medal = getMedalStyles(s.analysisCount);
