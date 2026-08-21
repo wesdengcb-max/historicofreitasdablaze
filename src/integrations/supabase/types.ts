@@ -119,12 +119,49 @@ export type Database = {
         }
         Relationships: []
       }
+      trigger_audits: {
+        Row: {
+          analysis_count: number | null
+          category: string
+          confluences: string | null
+          created_at: string | null
+          gatilho: string
+          horario_alvo: string
+          horario_base: string
+          id: string
+          win: boolean | null
+        }
+        Insert: {
+          analysis_count?: number | null
+          category: string
+          confluences?: string | null
+          created_at?: string | null
+          gatilho: string
+          horario_alvo: string
+          horario_base: string
+          id?: string
+          win?: boolean | null
+        }
+        Update: {
+          analysis_count?: number | null
+          category?: string
+          confluences?: string | null
+          created_at?: string | null
+          gatilho?: string
+          horario_alvo?: string
+          horario_base?: string
+          id?: string
+          win?: boolean | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
       cleanup_audit_24h: { Args: never; Returns: undefined }
+      cleanup_trigger_audits_24h: { Args: never; Returns: undefined }
       get_strategy_stats: {
         Args: { lookback_hours?: number }
         Returns: {
