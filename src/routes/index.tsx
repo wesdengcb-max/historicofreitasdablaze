@@ -86,26 +86,41 @@ function LandingPage() {
             CONHECENDO AS FERRAMENTAS
           </Button>
         </Link>
-      </main>
-    </div>
-  );
-}
 
-function FeatureCard({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
-  return (
-    <div className="group relative bg-[#0c0c0c] border border-white/5 rounded-3xl p-10 transition-all duration-500 hover:translate-y-[-8px] hover:border-red-500/30 hover:shadow-[0_20px_40px_rgba(229,9,20,0.1)] overflow-hidden">
-      {/* Hover background glow */}
-      <div className="absolute top-0 right-0 w-32 h-32 bg-red-600/5 blur-[40px] opacity-0 group-hover:opacity-100 transition-opacity" />
-      
-      <div className="relative z-10">
-        <div className="w-16 h-16 bg-red-600/10 rounded-2xl flex items-center justify-center mb-8 text-[#E50914] border border-red-600/10 transition-all duration-500 group-hover:bg-[#E50914] group-hover:text-white group-hover:shadow-[0_0_30px_rgba(229,9,20,0.5)]">
-          {icon}
+        {/* INSTRUCTION TEXT (Requested edit) */}
+        <div className="mt-20 text-left bg-black/60 backdrop-blur-md border border-white/10 p-8 rounded-2xl max-w-4xl animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+          <pre className="whitespace-pre-wrap font-sans text-sm text-gray-300 leading-relaxed">
+            {`em sinais
+CORREÇÃO INTEGRAL DO MOTOR: FILTRAGEM DE SEÇÕES, PROMOÇÃO DE NÍVEL, AUDITORIA EM TEMPO REAL E EXPIRAÇÃO DE CARDS
+
+Detectamos falhas críticas no ciclo de vida dos sinais e na distribuição visual dos cards:
+
+1. CORREÇÃO DE VAZAMENTO NAS SEÇÕES (PredictiveSignals.tsx / SinaisSection.tsx):
+   - Aplique estritamente os filtros abaixo antes de renderizar cada bloco de seção no React:
+     • Seção 1 (Top 1 + Confluência): signals.filter(s => s.isRare || s.top1Count >= 2);
+     • Seção 2 (Top 1 Isolado): signals.filter(s => s.isTop1 && !s.isRare && (s.top1Count === 1) && !s.hasTop5Confluence);
+     • Seção 3 (Top 1 + Confluência Top 5): signals.filter(s => s.isTop1 && !s.isRare && s.hasTop5Confluence);
+     • Seção 4 (Confluência Top 5): signals.filter(s => !s.isTop1 && !s.isRare && (s.top1Count === 0));
+   - REGRA: Cards com 'isTop1 === true' estão PROIBIDOS de renderizar na Seção 4.
+
+2. ATUALIZAÇÃO AUTOMÁTICA EM TEMPO REAL (NOVOS SINAIS E PROMOÇÃO DE NÍVEL):
+   - A cada nova pedra/rodada recebida ou a cada ciclo de 30s:
+     a) Mínimo/Injeção: Adicione novos sinais gerados pelo motor instantaneamente no feed.
+     b) Promoção de Nível: Se um card existente receber novas confluências, ele deve subir de categoria/graduação imediatamente (ex: de Prata para Supremo) e travar no topo ('Peak Rank Lock').
+     c) Force o re-render do estado no React para que a tela nunca fique estagnada.
+
+3. AUDITORIA EM TEMPO REAL (CARIMBO DE WIN/RED):
+   - O relatório CSV e a tela mostram que os sinais permanecem eternamente como "PENDENTE", impedindo a exibição do carimbo.
+   - Ajuste o listener/polling das rodadas para comparar cada resultado da Blaze com a janela (Horário -1, Horário Alvo, Horário +1) dos sinais pendentes:
+     • Se a pedra 0 (Branco) sair na janela -> Atualize imediatamente para 'WIN' e exiba o carimbo no card.
+     • Se a janela expirar sem o 0 -> Atualize para 'RED' e exiba o carimbo.
+
+4. EXPIRAÇÃO E REMOÇÃO AUTOMÁTICA DOS CARDS DA TELA:
+   - Assim que um card for auditado como 'WIN' ou 'RED', inicie um timer de 4 minutos.
+   - Após esses 4 minutos da auditoria, remova o card do feed para impedir que sinais antigos acumulem na tela durante a live.`}
+          </pre>
         </div>
-        <h3 className="text-xl font-black uppercase tracking-tighter mb-4">{title}</h3>
-        <p className="text-gray-500 text-sm leading-relaxed font-medium">
-          {description}
-        </p>
-      </div>
+      </main>
     </div>
   );
 }
