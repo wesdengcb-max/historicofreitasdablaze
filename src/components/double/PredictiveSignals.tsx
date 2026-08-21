@@ -891,6 +891,50 @@ export function PredictiveSignals() {
   }, [rows, loading, mode1, mode2]);
 
 
+  const renderSignalCard = (s: Mode1Signal) => {
+    const medal = getMedalStyles(s.peakAnalysisCount);
+    return (
+      <motion.div
+        key={s.key}
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+      >
+        <Card
+          title={medal.label}
+          subtitle={fmtClock(s.at)}
+          isRare={s.isRare}
+          outcome={s.outcome}
+          className={cn("group relative border-2 transition-all duration-500 hover:scale-[1.02]", medal.classes)}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <ResultCircle color="white" pulse={!s.outcome || s.outcome === "pending"} />
+              </div>
+              <div>
+                <div className="text-2xl font-black text-white font-outfit leading-none">{fmtClock(s.at)}</div>
+                <div className="text-[10px] text-muted-foreground uppercase tracking-widest mt-1 font-bold">Horário Alvo</div>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-lg font-black text-primary font-outfit">{s.pct.toFixed(0)}%</div>
+              <div className="text-[9px] text-muted-foreground uppercase tracking-tighter font-bold">Assertividade</div>
+            </div>
+          </div>
+          
+          <div className="mt-4 flex flex-wrap gap-1 border-t border-white/5 pt-4">
+            {s.sources.map((src, i) => (
+              <span key={i} className={cn("rounded-full px-2 py-0.5 text-[8px] font-black border uppercase tracking-widest", medal.badge)}>
+                A{src.analysis}·{src.value}
+              </span>
+            ))}
+          </div>
+        </Card>
+      </motion.div>
+    );
+  };
+
   return (
     <Card className="glass-card !p-0 overflow-hidden">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.05] bg-white/[0.02] px-6 py-5">
@@ -899,227 +943,142 @@ export function PredictiveSignals() {
             <Sparkles className="h-5 w-5" />
           </div>
           <div>
-            <div className="text-[10px] font-black uppercase tracking-[0.4em] text-primary font-outfit">
-              Gerador preditivo
-            </div>
-            <h2 className="text-xl font-black text-white font-outfit uppercase tracking-tight">Próximos Sinais</h2>
+            <h2 className="text-xl font-black text-white font-outfit uppercase tracking-tight">Painel de Inteligência</h2>
+            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-0.5">Motor Preditivo · {currentBlockLabel}</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-           <span className="relative flex h-2 w-2">
-             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-           </span>
-           <span className="text-[10px] font-bold text-emerald-500/80 uppercase tracking-widest">Tempo Real</span>
-        </div>
+        <button 
+          onClick={handleDownloadReport}
+          className="flex items-center gap-2 rounded-lg bg-white/5 px-3 py-1.5 text-[10px] font-bold text-white transition-all hover:bg-white/10 active:scale-95 border border-white/10"
+        >
+          <Download className="h-3.5 w-3.5" />
+          RELATÓRIO 24H
+        </button>
       </div>
 
-
-      <div className="space-y-5 px-5 py-5">
-        {err && (
-          <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
-            {err}
+      <div className="p-6 space-y-12">
+        {/* SEÇÃO 1 */}
+        <div className="space-y-6">
+          <SectionHeader 
+            icon={<Sparkles className="h-5 w-5 text-purple-400" />}
+            title="💎 TOP 1 + CONFLUÊNCIA (SINAIS RAROS)"
+            subtitle="2+ projeções TOP 1 convergindo ou confluência suprema."
+            stats={blockStats['raro']}
+            recAlerts={activeRecAlerts}
+          />
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <AnimatePresence mode="popLayout">
+              {sections.top1Confluence.map(s => renderSignalCard(s))}
+            </AnimatePresence>
+            {sections.top1Confluence.length === 0 && <EmptyState />}
           </div>
-        )}
+        </div>
 
-        {!err && mode1 && (
-          <>
-            {/* SEÇÃO 1: 💎 TOP 1 + CONFLUÊNCIA (SINAIS RAROS) */}
-            {sections.top1Confluence.length > 0 && (
-              <section className="space-y-4">
-                <div className="flex items-center gap-3 border-l-4 border-cyan-400 pl-4 py-1">
-                  <div className="flex flex-col">
-                    <div className="flex items-center gap-2 text-sm font-black uppercase tracking-[0.2em] text-cyan-400 font-outfit">
-                      <Sparkles className="h-4 w-4" /> 💎 TOP 1 + CONFLUÊNCIA (SINAIS RAROS)
-                    </div>
-                    {activeRecAlerts.length > 0 ? (
-                      <div className="text-[10px] font-bold text-amber-400 uppercase tracking-widest mt-1 animate-pulse">
-                        ⚠️ possível rec ativo até às {fmtClock(new Date(Math.max(...activeRecAlerts.map(a => a.end))))}
-                      </div>
-                    ) : (
-                      <div className="text-[9px] font-bold text-cyan-400/50 uppercase tracking-widest mt-0.5">
-                        Prioridade Máxima · Base {generatedAt && fmtClock(generatedAt)}
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {sections.top1Confluence.map(s => renderSignalCard(s))}
-                </div>
-              </section>
-            )}
+        {/* SEÇÃO 2 */}
+        <div className="space-y-6">
+          <SectionHeader 
+            icon={<Target className="h-5 w-5 text-red-500" />}
+            title="🎯 TOP 1 ISOLADO"
+            subtitle="Análises individuais de alta precisão sem confluência externa."
+            stats={blockStats['isolado']}
+            recAlerts={activeRecAlerts}
+          />
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <AnimatePresence mode="popLayout">
+              {sections.top1Isolated.map(s => renderSignalCard(s))}
+            </AnimatePresence>
+            {sections.top1Isolated.length === 0 && <EmptyState />}
+          </div>
+        </div>
 
-            {/* SEÇÃO 2: 🎯 TOP 1 ISOLADO */}
-            {sections.top1Isolated.length > 0 && (
-              <section className="space-y-4 pt-4 border-t border-white/5">
-                <div className="flex items-center gap-3 border-l-4 border-white/20 pl-4 py-1">
-                  <div className="flex flex-col">
-                    <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-white/80 font-outfit">
-                      <Target className="h-4 w-4" /> 🎯 TOP 1 ISOLADO
-                    </div>
-                    {activeRecAlerts.length > 0 ? (
-                      <div className="text-[10px] font-bold text-amber-400 uppercase tracking-widest mt-1 animate-pulse">
-                        ⚠️ possível rec ativo até às {fmtClock(new Date(Math.max(...activeRecAlerts.map(a => a.end))))}
-                      </div>
-                    ) : (
-                      <div className="text-[9px] font-bold text-white/30 uppercase tracking-widest mt-0.5">
-                        Peso Alto · Análise Principal
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {sections.top1Isolated.map(s => renderSignalCard(s))}
-                </div>
-              </section>
-            )}
+        {/* SEÇÃO 3 */}
+        <div className="space-y-6">
+          <SectionHeader 
+            icon={<Layers className="h-5 w-5 text-yellow-500" />}
+            title="⚡️ TOP 1 + CONFLUÊNCIA TOP 5"
+            subtitle="Ponto de convergência entre Análise Principal e Secundárias."
+            stats={blockStats['top1_top5']}
+            recAlerts={activeRecAlerts}
+          />
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <AnimatePresence mode="popLayout">
+              {sections.top1Top5.map(s => renderSignalCard(s))}
+            </AnimatePresence>
+            {sections.top1Top5.length === 0 && <EmptyState />}
+          </div>
+        </div>
 
-            {/* SEÇÃO 3: ⚡ TOP 1 + CONFLUÊNCIA TOP 5 */}
-            {sections.top1Top5.length > 0 && (
-              <section className="space-y-4 pt-4 border-t border-white/5">
-                <div className="flex items-center gap-3 border-l-4 border-amber-500/50 pl-4 py-1">
-                  <div className="flex flex-col">
-                    <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-amber-400 font-outfit">
-                      <Cpu className="h-4 w-4" /> ⚡ TOP 1 + CONFLUÊNCIA TOP 5
-                    </div>
-                    {activeRecAlerts.length > 0 ? (
-                      <div className="text-[10px] font-bold text-amber-400 uppercase tracking-widest mt-1 animate-pulse">
-                        ⚠️ possível rec ativo até às {fmtClock(new Date(Math.max(...activeRecAlerts.map(a => a.end))))}
-                      </div>
-                    ) : (
-                      <div className="text-[9px] font-bold text-amber-500/40 uppercase tracking-widest mt-0.5">
-                        Peso Médio · Reforço Secundário
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {sections.top1Top5.map(s => renderSignalCard(s))}
-                </div>
-              </section>
-            )}
-
-            {/* SEÇÃO 4: 📊 CONFLUÊNCIA TOP 5 */}
-            {sections.top5Only.length > 0 && (
-              <section className="space-y-4 pt-4 border-t border-white/5">
-                <div className="flex items-center gap-3 border-l-4 border-blue-500/30 pl-4 py-1">
-                  <div className="flex flex-col">
-                    <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-blue-400/80 font-outfit">
-                      <Layers className="h-4 w-4" /> 📊 CONFLUÊNCIA TOP 5
-                    </div>
-                    {activeRecAlerts.length > 0 ? (
-                      <div className="text-[10px] font-bold text-amber-400 uppercase tracking-widest mt-1 animate-pulse">
-                        ⚠️ possível rec ativo até às {fmtClock(new Date(Math.max(...activeRecAlerts.map(a => a.end))))}
-                      </div>
-                    ) : (
-                      <div className="text-[9px] font-bold text-blue-500/30 uppercase tracking-widest mt-0.5">
-                        Base do Feed · Cruzamentos Secundários
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {sections.top5Only.map(s => renderSignalCard(s))}
-                </div>
-              </section>
-            )}
-
-            {sections.top1Confluence.length === 0 && 
-             sections.top1Isolated.length === 0 && 
-             sections.top1Top5.length === 0 && 
-             sections.top5Only.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-12 text-center opacity-40">
-                <Target className="h-8 w-8 mb-3 text-muted-foreground" />
-                <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
-                  Buscando oportunidades em tempo real...
-                </p>
-              </div>
-            )}
-          </>
-        )}
-
-        {mode2 && (
-          <section className="space-y-3">
-            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              <Layers className="h-3.5 w-3.5" /> Coincidências · validadas pelo Top 5
-            </div>
-            {mode2.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                Sem coincidências validadas (mín. 2 análises no mesmo minuto + presença no Top 5)
-              </p>
-            ) : (
-              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                {mode2.map((s) => {
-                  const medal = getMedalStyles(s.analysisCount);
-                  return (
-                    <div
-                      key={s.key}
-                      className={`rounded-2xl border px-5 py-4 backdrop-blur-sm transition-all duration-300 ${
-                        medal 
-                          ? medal.classes 
-                          : "border-primary/20 bg-primary/5 shadow-[0_0_25px_rgba(59,130,246,0.1)]"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-white uppercase tracking-tighter">{s.title}</span>
-                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-white/40">
-                            {s.sources[0]?.analysis ? `A${s.sources[0].analysis}` : "CONF"}
-                          </span>
-                        </div>
-                        {medal ? (
-                          <span className={`rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-widest ${medal.badge}`}>
-                            {medal.label}
-                          </span>
-                        ) : (
-                          <span className="rounded-full border border-primary/30 bg-primary/20 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest text-white">
-                            Alta assertividade
-                          </span>
-                        )}
-                      </div>
-                      <div className="mt-1 flex items-center justify-between">
-                        <div className="text-3xl font-black tabular-nums text-white font-outfit">
-                          {s.times.map((t) => fmtClock(t)).join(" / ")}
-                        </div>
-                        {s.isHighTendency && (
-                          <span className="flex items-center gap-1 rounded-md bg-red-500/20 px-1.5 py-0.5 text-[9px] font-black text-red-400 animate-pulse border border-red-500/30">
-                            🔥 Alta Tendência
-                          </span>
-                        )}
-                      </div>
-                      <div className="mt-1 text-[11px] tabular-nums font-black flex items-center gap-1.5">
-                        <span className={medal ? "text-inherit" : "text-primary"}>
-                          {s.pct.toFixed(1)}%
-                        </span>
-                      </div>
-                      <div className="mt-2 text-[10px] leading-relaxed text-muted-foreground opacity-80">
-                        Origem:{" "}
-                        <span className={`font-bold ${medal ? "text-inherit" : "text-primary"}`}>{s.confluence}</span> (limite 120m/14t)
-                      </div>
-                      <div className="mt-1 flex flex-wrap gap-1">
-                        {s.sources.map((p) => (
-                          <span
-                            key={`${p.analysis}-${p.value}`}
-                            className={
-                              p.top5
-                                ? `rounded-full border px-2 py-0.5 text-[9px] font-black tabular-nums ${
-                                    medal ? "border-current/30 bg-current/10 text-inherit" : "border-primary/30 bg-primary/20 text-white"
-                                  }`
-                                : "rounded-full border border-white/10 bg-white/[0.03] px-2 py-0.5 text-[9px] font-bold tabular-nums text-[#9CA3AF]"
-                            }
-                          >
-                            A{p.analysis}·{p.value} {p.pct.toFixed(0)}%
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </section>
-        )}
+        {/* SEÇÃO 4 */}
+        <div className="space-y-6">
+          <SectionHeader 
+            icon={<Cpu className="h-5 w-5 text-blue-400" />}
+            title="📊 CONFLUÊNCIA TOP 5"
+            subtitle="Cruzamento técnico apenas entre análises secundárias (Top 2-5)."
+            stats={blockStats['top5']}
+            recAlerts={activeRecAlerts}
+          />
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <AnimatePresence mode="popLayout">
+              {sections.top5Only.map(s => renderSignalCard(s))}
+            </AnimatePresence>
+            {sections.top5Only.length === 0 && <EmptyState />}
+          </div>
+        </div>
       </div>
     </Card>
   );
 }
+
+function SectionHeader({ icon, title, subtitle, stats, recAlerts }: { 
+  icon: React.ReactNode; 
+  title: string; 
+  subtitle: string; 
+  stats?: { signals: number, wins: number, reds: number, pct: number };
+  recAlerts: any[];
+}) {
+  const activeRec = recAlerts.length > 0 ? recAlerts[0] : null;
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          {icon}
+          <h3 className="text-sm font-black text-white font-outfit uppercase tracking-wider">{title}</h3>
+        </div>
+        {stats && (
+          <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest bg-white/5 px-2 py-1 rounded">
+            {stats.signals} SINAIS | ASSERTIVIDADE: <span className="text-emerald-400">{stats.pct.toFixed(0)}%</span> ({stats.wins}W/{stats.reds}R)
+          </div>
+        )}
+      </div>
+      <p className="text-[10px] text-muted-foreground font-medium">{subtitle}</p>
+      
+      {activeRec && (
+        <motion.div 
+          initial={{ opacity: 0, y: -5 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-[10px] font-black text-yellow-400 uppercase tracking-[0.2em] flex items-center gap-2 mt-1 animate-pulse"
+        >
+          <span>⚠️ Possível REC ativo até às {fmtClock(new Date(activeRec.end))}</span>
+        </motion.div>
+      )}
+    </div>
+  );
+}
+
+function EmptyState() {
+  return (
+    <div className="col-span-full py-8 text-center border border-dashed border-white/5 rounded-2xl bg-white/[0.01]">
+      <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">Aguardando Projeção...</div>
+    </div>
+  );
+}
+
+function fmtClock(d: Date) {
+  return d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", hour12: false });
+}
+
+function cn(...classes: any[]) {
+  return classes.filter(Boolean).join(" ");
+}
+
