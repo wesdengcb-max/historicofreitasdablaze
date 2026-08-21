@@ -376,14 +376,12 @@ export function PredictiveSignals() {
       // Se saiu um Branco (0) recentemente
       if (Number(lastRow.roll) === 0) {
         Object.entries(auditIds).forEach(async ([key, id]) => {
-          // Extrair tempo do sinal da key (m1-timestamp)
           const signalTime = parseInt(key.split('-')[1]);
           if (!signalTime) return;
 
-          // Janela de ±1 minuto
           if (Math.abs(lastResultTime - signalTime) <= 60000) {
             console.log(`[AUDITORIA] WIN detectado para sinal em ${fmtClock(new Date(signalTime))}`);
-            await updateTriggerAuditResult({ id, win: true });
+            await updateTriggerAuditResult({ data: { id, win: true } });
             setAuditIds(prev => {
               const next = { ...prev };
               delete next[key];
@@ -399,7 +397,7 @@ export function PredictiveSignals() {
         const signalTime = parseInt(key.split('-')[1]);
         if (nowMs > signalTime + 120000) {
           console.log(`[AUDITORIA] LOSS detectado para sinal em ${fmtClock(new Date(signalTime))}`);
-          await updateTriggerAuditResult({ id, win: false });
+          await updateTriggerAuditResult({ data: { id, win: false } });
           setAuditIds(prev => {
             const next = { ...prev };
             delete next[key];
