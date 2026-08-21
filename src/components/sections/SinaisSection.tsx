@@ -57,28 +57,29 @@ export default function SinaisSection() {
   }, []);
 
   useEffect(() => {
-    const update = () => {
+    const update = async () => {
       const raw = getPredictiveSignals();
       if (!Array.isArray(raw)) return;
       const now = Date.now();
       
-      const validated = raw.map(s => {
+      const updatedSignals = await Promise.all(raw.map(async (s) => {
         try {
           if (!s.entryDate) return s;
           const entryTime = typeof s.entryDate === 'string' ? new Date(s.entryDate).getTime() : (s.entryDate instanceof Date ? s.entryDate.getTime() : new Date(s.entryDate).getTime());
           
           if (Number.isNaN(entryTime)) return s;
 
+          // Se já foi validado (WIN/LOSS)
           if (s.outcome && s.outcome !== "pending") {
             // Regra C: Descarte automático após 3 minutos
             if (s.completedAt && now - s.completedAt > 3 * 60_000) return null;
             return s;
           }
 
-          // Regra A: Delay da Auditoria (Horário Alvo + 2 minutos)
+          // Regra A: Delay da Auditoria (Horário Alvo + 2 minutos para garantir fechamento da janela +1)
           if (now < entryTime + 2 * 60_000) return { ...s, outcome: "pending" as const };
 
-          // Regra B: Janela de ±1 minuto (Anterior -1, Exato 0, Posterior +1)
+          // Regra B: Janela de ±1 minuto
           const rangeStart = entryTime - 60_000;
           const rangeEnd = entryTime + 60_000;
 
@@ -88,28 +89,32 @@ export default function SinaisSection() {
             return rt >= rangeStart && rt <= rangeEnd;
           });
 
-          if (matchedResult) {
+          const outcome = matchedResult ? "green" : "red";
+          
+          // Sincronizar com a tabela trigger_audits
+          await supabase
+            .from("trigger_audits")
+            .update({ win: outcome === "green" })
+            .eq("horario_alvo", new Date(entryTime).toISOString());
+
+          if (outcome === "green") {
             if (s.strategyKey) updateStats(s.strategyKey, "green");
-            return { ...s, outcome: "green" as const, resultTime: fmtTime(matchedResult.createdAt), label: "WIN", completedAt: now };
-          }
- 
-          // Se passou da janela e não deu WIN, marca RED
-          if (now > rangeEnd + 60_000) {
+            return { ...s, outcome: "green" as const, resultTime: fmtTime(matchedResult!.createdAt), label: "WIN", completedAt: now };
+          } else {
             if (s.strategyKey) updateStats(s.strategyKey, "red");
             return { ...s, outcome: "red" as const, label: "LOSS", completedAt: now };
           }
-
-          return s;
         } catch (e) { return s; }
-      }).filter((s): s is PredictiveSignal => s !== null);
-      
-      setPredictiveList(validated);
-      setPredictiveSignals(validated);
+      }));
+
+      const filtered = updatedSignals.filter((s): s is PredictiveSignal => s !== null);
+      setPredictiveList(filtered);
+      setPredictiveSignals(filtered);
     };
 
     update();
     const sub = subscribePredictive(update);
-    const interval = setInterval(update, 5000);
+    const interval = setInterval(update, 15000); // Auditoria a cada 15s
     return () => { sub(); clearInterval(interval); };
   }, [resultsForValidation]);
 
