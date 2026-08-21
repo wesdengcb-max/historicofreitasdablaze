@@ -655,32 +655,22 @@ export function PredictiveSignals() {
       }
     }
 
-    // Secondary Verification Logic (Simplificado - sem selo azul/verde)
-    const secondaryProjections = new Map<number, Set<number>>();
-    for (const item of (secondaryActive as any)) {
-      const hist = engine[item.analysis].filter((c: any) => c.value === item.value).slice(-6);
-      if (hist.length < 6) continue;
-      const top1 = computeTop(hist, 1)[0];
-      if (!top1) continue;
-      const at = addMinutes(item.open.triggerAt, top1.m).getTime();
-      if (!secondaryProjections.has(at)) secondaryProjections.set(at, new Set());
-      secondaryProjections.get(at)!.add(item.value);
-    }
-
-    // Badge "Sinal RARO" reservada para analysisCount >= 4 (Super Sinal ou Confluência Suprema)
+    // REESTRUTURAÇÃO DO FEED DE SINAIS EM 4 CATEGORIAS HIERÁRQUICAS
+    // SEÇÃO 1: 💎 TOP 1 + CONFLUÊNCIA (SINAIS RAROS) (2+ Top 1 vizinhos ±1 min)
     const isRareTime = (time: number) => {
-      return unifiedM1.some(s => s.at.getTime() === time && s.analysisCount >= 4);
+      const top1Signals = m1.filter(s => s.isTop1);
+      return top1Signals.some(s => {
+        const diff = Math.abs(s.at.getTime() - time);
+        return diff > 0 && diff <= 60000;
+      });
     };
 
-    const finalM1 = unifiedM1.map(s => {
+    const finalM1 = m1.map(s => {
       const t = s.at.getTime();
-      const isRare = isRareTime(t);
+      const isRare = s.isTop1 && isRareTime(t);
       return { ...s, isRare };
     });
 
-    // APLICAR REGRA DE FILTRO: 
-    // - Mostrar apenas se for Análise Principal (A1-A7) fortalecida (sources contêm 1-7)
-    // - OU se for Super Sinal (analysisCount >= 4)
     const filteredM1 = finalM1.filter(s => {
       const hasMainAnalysis = s.sources.some(src => src.analysis >= 1 && src.analysis <= 7);
       const isSuperSignal = s.analysisCount >= 4;
@@ -689,30 +679,48 @@ export function PredictiveSignals() {
 
     setMode1(filteredM1);
 
-
-    // Organizar nas 4 Seções Hierárquicas
+    // Organizar nas 4 Seções Hierárquicas - EXCLUSIVIDADE TOTAL
     const top1Confluence: Mode1Signal[] = [];
     const top1Isolated: Mode1Signal[] = [];
     const top1Top5: Mode1Signal[] = [];
     const top5Only: Mode1Signal[] = [];
 
     filteredM1.forEach(s => {
-      const hasTop1 = s.isTop1;
-      const confluenceCount = s.analysisCount;
-      const hasTop5 = s.isTop5Confluence;
-
-      if (hasTop1 && (s.isRare || confluenceCount >= 4)) {
+      if (s.isRare) {
         top1Confluence.push(s);
-      } else if (hasTop1 && hasTop5) {
+      } else if (s.isTop1 && s.isTop5Confluence) {
         top1Top5.push(s);
-      } else if (hasTop1) {
+      } else if (s.isTop1) {
         top1Isolated.push(s);
-      } else if (confluenceCount >= 2) {
+      } else if (s.analysisCount >= 2) {
         top5Only.push(s);
       }
     });
 
     setSections({ top1Confluence, top1Isolated, top1Top5, top5Only });
+
+    // Register triggers for audit
+    filteredM1.forEach(async (s) => {
+      if (s.at.getTime() > Date.now()) {
+        const { data: existing } = await supabase
+          .from("trigger_audits")
+          .select("id")
+          .eq("horario_alvo", s.at.toISOString())
+          .eq("gatilho", s.title)
+          .maybeSingle();
+
+        if (!existing) {
+          await supabase.from("trigger_audits").insert({
+            gatilho: s.title,
+            horario_alvo: s.at.toISOString(),
+            horario_base: new Date().toISOString(),
+            analysis_count: s.analysisCount,
+            category: s.isRare ? "RARO" : (s.isTop1 ? "TOP 1" : "CONFLUENCIA"),
+            confluences: s.sources.map(src => `A${src.analysis}·${src.value}`).join(", ")
+          });
+        }
+      }
+    });
 
   }, [active, engine, rows]);
 
