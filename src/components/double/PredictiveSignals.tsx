@@ -798,17 +798,25 @@ export function PredictiveSignals() {
           </div>
           <div>
             <div className="text-[10px] font-black uppercase tracking-[0.4em] text-primary font-outfit">
-              Gerador preditivo
+              Motor Preditivo · {getBlocoAtual().label}
             </div>
             <h2 className="text-xl font-black text-white font-outfit uppercase tracking-tight">Próximos Sinais</h2>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-           <span className="relative flex h-2 w-2">
-             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-           </span>
-           <span className="text-[10px] font-bold text-emerald-500/80 uppercase tracking-widest">Tempo Real</span>
+        <div className="flex items-center gap-3">
+           <button 
+             onClick={handleDownloadCSV}
+             className="flex items-center gap-2 rounded-lg bg-white/5 px-3 py-1.5 text-[10px] font-bold text-white/60 hover:bg-white/10 transition-colors border border-white/10"
+           >
+             <FileDown className="h-3.5 w-3.5" /> CSV
+           </button>
+           <div className="flex items-center gap-2">
+             <span className="relative flex h-2 w-2">
+               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+             </span>
+             <span className="text-[10px] font-bold text-emerald-500/80 uppercase tracking-widest">Tempo Real</span>
+           </div>
         </div>
       </div>
 
