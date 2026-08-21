@@ -321,7 +321,8 @@ export function PredictiveSignals() {
       // Se saiu um Branco (0) recentemente
       if (Number(lastRow.roll) === 0) {
         Object.entries(auditIds).forEach(async ([key, id]) => {
-          const signalTime = parseInt(key.split('-')[1]);
+          const signalTimeStr = key.split('-')[1];
+          const signalTime = parseInt(signalTimeStr);
           if (!signalTime) return;
 
           if (Math.abs(lastResultTime - signalTime) <= 60000) {
@@ -339,8 +340,11 @@ export function PredictiveSignals() {
 
       // Marcar LOSS se passou da janela (horário alvo + 2 min)
       Object.entries(auditIds).forEach(async ([key, id]) => {
-        const signalTime = parseInt(key.split('-')[1]);
-        if (nowMs > signalTime + 120000) {
+        const signalTimeStr = key.split('-')[1];
+        const signalTime = parseInt(signalTimeStr);
+        if (!signalTime) return;
+        
+        if (nowMs > signalTime + 90000) {
           console.log(`[AUDITORIA] LOSS detectado para sinal em ${fmtClock(new Date(signalTime))}`);
           await updateTriggerAuditResult({ data: { id, win: false } });
           setAuditIds(prev => {
@@ -502,8 +506,8 @@ export function PredictiveSignals() {
             const { data: res } = await saveTriggerAudit({ 
               data: {
                 gatilho: confluenceStr,
-                horario_base: fmtClock(new Date(t - 60000)),
-                horario_alvo: fmtClock(entryDate),
+                horario_base: new Date(t - 60000).toISOString(),
+                horario_alvo: entryDate.toISOString(),
                 category,
                 analysis_count: newPeak,
                 confluences: confluenceStr

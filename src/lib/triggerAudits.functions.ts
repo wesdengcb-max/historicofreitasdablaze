@@ -9,7 +9,7 @@ export const saveTriggerAudit = createServerFn({ method: "POST" })
     category: z.string(),
     analysis_count: z.number().optional(),
     confluences: z.string().optional(),
-    win: z.boolean().optional()
+    win: z.boolean().nullable().optional()
   }).parse(data))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
