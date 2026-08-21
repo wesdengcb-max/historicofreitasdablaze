@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { setPredictiveSignals } from "@/lib/signalsStore";
-import { Loader2, Sparkles, Target, Layers, Cpu } from "lucide-react";
+import { Loader2, Sparkles, Target, Layers, Cpu, FileDown } from "lucide-react";
 import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
 import { parseUtcDate } from "@/lib/utils";
 import { Card } from "@/components/double/Card";
@@ -51,6 +51,7 @@ type Mode1Signal = {
   isSuperSignal?: boolean;
   isTop1?: boolean;
   isTop5Confluence?: boolean;
+  peakRank?: number;
 };
 type Mode2Signal = {
   key: string;
