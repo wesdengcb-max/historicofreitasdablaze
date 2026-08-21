@@ -11,8 +11,8 @@ export const saveTriggerAudit = createServerFn({ method: "POST" })
     is_win: z.boolean().optional()
   }).parse(data))
   .handler(async ({ data }) => {
-    const { blazeSupabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await blazeSupabaseAdmin
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
       .from("trigger_audits")
       .insert([data]);
     
@@ -29,8 +29,8 @@ export const updateTriggerAuditResult = createServerFn({ method: "POST" })
     is_win: z.boolean()
   }).parse(data))
   .handler(async ({ data }) => {
-    const { blazeSupabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await blazeSupabaseAdmin
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
       .from("trigger_audits")
       .update({ is_win: data.is_win })
       .eq("id", data.id);
@@ -44,10 +44,10 @@ export const updateTriggerAuditResult = createServerFn({ method: "POST" })
 
 export const getTriggerAuditsForExport = createServerFn({ method: "GET" })
   .handler(async () => {
-    const { blazeSupabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     
-    const { data, error } = await blazeSupabaseAdmin
+    const { data, error } = await supabaseAdmin
       .from("trigger_audits")
       .select("*")
       .gte("created_at", twentyFourHoursAgo)
@@ -62,9 +62,8 @@ export const getTriggerAuditsForExport = createServerFn({ method: "GET" })
 
 export const getBlockStats = createServerFn({ method: "GET" })
   .handler(async () => {
-    const { blazeSupabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     
-    // Divide o dia em 6 blocos fixos a partir das 00:00 (00-04h, 04-08h, 08-12h, 12-16h, 16-20h, 20-00h)
     const now = new Date();
     const currentHour = now.getHours();
     const blockStartHour = Math.floor(currentHour / 4) * 4;
@@ -74,7 +73,7 @@ export const getBlockStats = createServerFn({ method: "GET" })
     const end = new Date(start);
     end.setHours(blockStartHour + 4, 0, 0, 0);
 
-    const { data, error } = await blazeSupabaseAdmin
+    const { data, error } = await supabaseAdmin
       .from("trigger_audits")
       .select("is_win, section_category")
       .gte("created_at", start.toISOString())
@@ -88,3 +87,4 @@ export const getBlockStats = createServerFn({ method: "GET" })
       stats: data
     };
   });
+
