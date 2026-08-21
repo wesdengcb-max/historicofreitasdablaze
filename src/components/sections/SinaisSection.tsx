@@ -8,7 +8,7 @@ export default function SinaisSection() {
   const [robotOn, setRobotOn] = useState(getRobotEnabled());
 
   useEffect(() => {
-    const sub = subscribeRobot((v) => setRobotOn(v));
+    const sub = subscribeRobot(() => setRobotOn(getRobotEnabled()));
     return () => sub();
   }, []);
 
