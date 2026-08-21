@@ -342,40 +342,42 @@ export function PredictiveSignals() {
             fetchBlockStats();
           }
         });
-
-        // 2. Verificar LOSS (Janela expirou sem WIN)
-        // Aumentamos para 90s (Alvo + 1.5 min) para dar margem à auditoria ±1 min
-        Object.entries(auditIds).forEach(async ([key, id]) => {
-          const signalTimeStr = key.split('-')[1];
-          const signalTime = parseInt(signalTimeStr);
-          if (!signalTime) return;
-          
-          if (nowMs > signalTime + 90000) {
-            console.log(`[AUDITORIA] LOSS detectado para sinal em ${fmtClock(new Date(signalTime))}`);
-            await updateTriggerAuditResult({ data: { id, win: false } });
-            
-            // Atualizar estado local para refletir o LOSS imediatamente
-            setMode1(prev => prev?.map(s => s.key === key ? { ...s, outcome: "red", completedAt: Date.now() } : s) || null);
-
-            setAuditIds(prev => {
-              const next = { ...prev };
-              delete next[key];
-              return next;
-            });
-            fetchBlockStats();
-          }
-        });
       }
 
-      // Alertas de Segurança ("possível rec")
-      const recAlerts = buildRecAlerts(rows);
-      const activeAlerts = recAlerts.filter((alert: RecAlert) => {
-        const diff = (now.getTime() - alert.triggerAt.getTime()) / 60000;
-        return diff >= 0 && diff <= alert.duration;
-      });
+      // 2. Verificar LOSS (Janela expirou sem WIN)
+      // Aumentamos para 90s (Alvo + 1.5 min) para dar margem à auditoria ±1 min
+      Object.entries(auditIds).forEach(async ([key, id]) => {
+        const signalTimeStr = key.split('-')[1];
+        const signalTime = parseInt(signalTimeStr);
+        if (!signalTime) return;
+        
+        const nowMs = now.getTime();
+        if (nowMs > signalTime + 90000) {
+          console.log(`[AUDITORIA] LOSS detectado para sinal em ${fmtClock(new Date(signalTime))}`);
+          await updateTriggerAuditResult({ data: { id, win: false } });
+          
+          // Atualizar estado local para refletir o LOSS imediatamente
+          setMode1(prev => prev?.map(s => s.key === key ? { ...s, outcome: "red", completedAt: Date.now() } : s) || null);
 
-      // Dispara evento global para o SinaisSection alternar para "Rodadas Atuais"
-      window.dispatchEvent(new CustomEvent('switch-audit-filter', { detail: 'hoje' }));
+          setAuditIds(prev => {
+            const next = { ...prev };
+            delete next[key];
+            return next;
+          });
+          fetchBlockStats();
+        }
+      });
+    }
+
+    // Alertas de Segurança ("possível rec")
+    const recAlerts = buildRecAlerts(rows);
+    const activeAlerts = recAlerts.filter((alert: RecAlert) => {
+      const diff = (now.getTime() - alert.triggerAt.getTime()) / 60000;
+      return diff >= 0 && diff <= alert.duration;
+    });
+
+    // Dispara evento global para o SinaisSection alternar para "Rodadas Atuais"
+    window.dispatchEvent(new CustomEvent('switch-audit-filter', { detail: 'hoje' }));
 
     const byTime = new Map<
       number,
