@@ -84,32 +84,32 @@ const TOP5_DEPTH = 5;
 
 const getMedalStyles = (count: number) => {
   if (count >= 7) return { 
-    label: "👑 Supremo", 
+    label: "Supremo", 
     classes: "border-purple-400 bg-purple-950/50 text-purple-300 shadow-purple-500/20 animate-pulse",
     badge: "bg-purple-400/20 text-purple-300 border-purple-400/30"
   };
   if (count === 6) return { 
-    label: "💎 Diamante", 
+    label: "Rei", 
     classes: "border-blue-400 bg-blue-950/40 text-blue-200 shadow-blue-500/10",
     badge: "bg-blue-400/20 text-blue-200 border-blue-400/30"
   };
   if (count === 5) return { 
-    label: "🥇 Ouro", 
+    label: "Mestre", 
     classes: "border-yellow-400 bg-yellow-950/50 text-yellow-300 shadow-yellow-500/20",
     badge: "bg-yellow-400/20 text-yellow-300 border-yellow-400/30"
   };
   if (count === 4) return { 
-    label: "🥈 Prata", 
+    label: "Ouro", 
     classes: "border-slate-300 bg-slate-800/40 text-slate-100 shadow-slate-500/10",
     badge: "bg-slate-300/20 text-slate-100 border-slate-300/30"
   };
   if (count === 3) return { 
-    label: "🥉 Bronze", 
+    label: "Prata", 
     classes: "border-amber-700 bg-amber-950/30 text-amber-300",
     badge: "bg-amber-700/20 text-amber-300 border-amber-700/30"
   };
   if (count === 2) return { 
-    label: "Confluência", 
+    label: "Bronze", 
     classes: "border-cyan-400 bg-cyan-950/30 text-cyan-300 shadow-cyan-500/10",
     badge: "bg-cyan-400/20 text-cyan-300 border-cyan-400/30"
   };
