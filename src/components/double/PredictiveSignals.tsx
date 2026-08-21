@@ -507,8 +507,8 @@ export function PredictiveSignals() {
             const { data: res } = await saveTriggerAudit({ 
               data: {
                 gatilho: confluenceStr,
-                horario_base: fmtClock(new Date(t - 60000)),
-                horario_alvo: fmtClock(entryDate),
+                horario_base: fmtClockLocal(new Date(t - 60000)),
+                horario_alvo: fmtClockLocal(entryDate),
                 category,
                 analysis_count: newPeak,
                 confluences: confluenceStr
