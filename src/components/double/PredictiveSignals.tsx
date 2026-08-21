@@ -867,6 +867,9 @@ export function PredictiveSignals() {
                     <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-white/80 font-outfit">
                       <Target className="h-4 w-4" /> 🎯 TOP 1 ISOLADO
                     </div>
+                    <div className="text-[9px] font-bold text-white/30 uppercase tracking-widest mt-0.5">
+                      Assertividade 92% (Últimas 4h)
+                    </div>
                     {activeRecAlerts.length > 0 ? (
                       <div className="text-[10px] font-bold text-amber-400 uppercase tracking-widest mt-1 animate-pulse">
                         ⚠️ possível rec ativo até às {fmtClock(new Date(Math.max(...activeRecAlerts.map(a => a.end))))}
