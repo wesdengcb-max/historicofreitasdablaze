@@ -130,6 +130,7 @@ export function PredictiveSignals() {
   const [mode1, setMode1] = useState<Mode1Signal[] | null>(null);
   const [mode2, setMode2] = useState<Mode2Signal[] | null>(null);
   const [peakStates, setPeakStates] = useState<Record<string, number>>({});
+  const [auditIds, setAuditIds] = useState<Record<string, string>>({});
   const [sections, setSections] = useState<{
     top1Confluence: Mode1Signal[];
     top1Isolated: Mode1Signal[];
@@ -142,7 +143,69 @@ export function PredictiveSignals() {
     top5Only: [],
   });
   const [generatedAt, setGeneratedAt] = useState<Date | null>(null);
-  const [blockStats, setBlockStats] = useState<Record<string, { signals: number, wins: number, reds: number }>>({});
+  const [blockStats, setBlockStats] = useState<Record<string, { signals: number, wins: number, reds: number, pct: number }>>({});
+  const [currentBlockLabel, setCurrentBlockLabel] = useState("");
+
+  const fetchBlockStats = useCallback(async () => {
+    try {
+      const { blockStart, blockEnd, stats } = await getBlockStats();
+      const fmt = (iso: string) => fmtClock(new Date(iso));
+      setCurrentBlockLabel(`${fmt(blockStart)} - ${fmt(blockEnd)}`);
+      
+      const newStats: Record<string, { signals: number, wins: number, reds: number, pct: number }> = {};
+      const categories = ['raro', 'isolado', 'top1_top5', 'top5'];
+      
+      categories.forEach(cat => {
+        const catStats = stats?.filter(s => s.category === cat) || [];
+        const wins = catStats.filter(s => s.win === true).length;
+        const reds = catStats.filter(s => s.win === false).length;
+        const total = wins + reds;
+        newStats[cat] = {
+          signals: catStats.length,
+          wins,
+          reds,
+          pct: total > 0 ? (wins / total) * 100 : 100
+        };
+      });
+      setBlockStats(newStats);
+    } catch (e) {
+      console.error("[fetchBlockStats] Error:", e);
+    }
+  }, []);
+
+  const handleDownloadReport = async () => {
+    try {
+      const data = await getTriggerAuditsForExport();
+      const csv = [
+        ["ID", "Gatilho", "Horário Base", "Horário Alvo", "Categoria", "Confluências", "Win", "Criado Em"].join(","),
+        ...data.map(r => [
+          r.id,
+          r.gatilho,
+          r.horario_base,
+          r.horario_alvo,
+          r.category,
+          `"${r.confluences || ""}"`,
+          r.win === null ? "PENDENTE" : (r.win ? "SIM" : "NÃO"),
+          r.created_at
+        ].join(","))
+      ].join("\n");
+      
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `relatorio-sinais-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+    } catch (e) {
+      console.error("[handleDownloadReport] Error:", e);
+    }
+  };
+
+  useEffect(() => {
+    fetchBlockStats();
+    const interval = setInterval(fetchBlockStats, 60000);
+    return () => clearInterval(interval);
+  }, [fetchBlockStats]);
 
   const renderSignalCard = (s: Mode1Signal) => {
     const medal = getMedalStyles(s.peakAnalysisCount ?? s.analysisCount);
