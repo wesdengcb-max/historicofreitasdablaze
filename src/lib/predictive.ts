@@ -20,10 +20,6 @@ export type Cycle = {
 };
 
 
-export const MAX_ZEROS = 14;
-export const MAX_CYCLES = 6;
-export const TIMEOUT_MINUTES = 120;
-
 function diffMinutes(a: Date, b: Date) {
   return Math.max(0, Math.round((b.getTime() - a.getTime()) / 60000));
 }
