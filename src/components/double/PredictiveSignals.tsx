@@ -588,7 +588,7 @@ export function PredictiveSignals() {
     });
 
 
-    const usedTimes = new Set<number>(m1.map((s) => s.at.getTime()));
+    const usedTimes = new Set<number>(finalMode1.map((s: Mode1Signal) => s.at.getTime()));
 
     // ---- Modo 2: Estratégia de Coincidência ----
     type Proj = { analysis: number; value: number; pct: number; top5: boolean };
