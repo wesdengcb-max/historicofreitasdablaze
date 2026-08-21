@@ -452,20 +452,27 @@ export function PredictiveSignals() {
         const top5Analyses = [2, 3, 4, 5];
         const hasTop5 = top5Analyses.some(a => info.analyses.has(a));
         const confluenceCount = info.analyses.size;
+        
+        const signalKey = `m1-${t}`;
+        // Peak Rank Lock logic
+        const prevPeak = peakRanksRef.current[signalKey] || 0;
+        const currentPeak = Math.max(prevPeak, confluenceCount);
+        peakRanksRef.current[signalKey] = currentPeak;
 
         return {
-          key: `m1-${t}`,
+          key: signalKey,
           title: `Análise ${values.join(" + ")}`,
           at: new Date(t),
           pct: info.pct,
           label: info.label,
-          analysisCount: confluenceCount,
+          analysisCount: currentPeak,
           sources: info.sources,
           isHighTendency: info.isHighTendency,
           isPossibleRec: info.isPossibleRec,
           isTop1,
           isTop5Confluence: hasTop5,
-          isSuperSignal: confluenceCount >= 4
+          isSuperSignal: currentPeak >= 4,
+          peakRank: currentPeak
         };
       });
     setMode1(m1);
