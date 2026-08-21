@@ -72,15 +72,11 @@ function LandingPage() {
 
         {/* WELCOME TEXT */}
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mb-8 text-white animate-fade-in-up">
-          IMPLEMENTAÇÃO DO NOVO MOTOR PREDITIVO: HIERARQUIA DE 4 SEÇÕES, GRADUAÇÃO PADRONIZADA, AUDITORIA DE GATILHOS E MÉTRICAS DE 4H COM DOWNLOAD...
+          Bem-vindo, Jogador!
         </h1>
 
         <p className="text-base md:text-lg text-[#d1d5db] mb-12 max-w-[700px] leading-relaxed font-medium animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-          - SEÇÃO 1: "💎 TOP 1 + CONFLUÊNCIA (SINAIS RAROS)" (2+ Top 1 vizinhos ±1 min).
-          - Graduação: Bronze (2), Prata (3), Ouro (4), Mestre (5), Rei (6), Supremo (7+).
-          - Auditoria: Tabela `trigger_audits` (Horário -1, Alvo, +1), Win se Branco em qualquer um.
-          - Métricas: 6 blocos fixos de 4h (00-04h, etc.), exibição de Assertividade Y% (WIN/RED) no cabeçalho e download CSV (24h).
-          - Regra 'Peak Rank Lock': Card congela no maior nível atingido.
+          Com a nossa plataforma de resultados, o mercado de apostas pode ser mais lucrativo. Tendo acesso à milhares de resultados catalogados e que podem ser manipulados através de filtros. Em conjunto com bons estudos, você pode ser mais acertivo.
         </p>
 
         {/* CTA BUTTON */}

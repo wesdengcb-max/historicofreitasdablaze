@@ -1,11 +1,8 @@
-import { addMinutes, subMinutes } from "date-fns";
-import { parseUtcDate } from "./utils";
-
-export const MAX_ZEROS = 15;
-export const TIMEOUT_MINUTES = 120;
-export const MAX_CYCLES = 50;
-export const AUDIT_WINDOW_MIN = 1;
-
+/** 
+ * Motor Preditivo FreitasWhite
+ * Arquitetura Unificada: 7 Análises, Limites de 14 tempos, 120 min timeout, Janela de 6 Gatilhos.
+ */
+import { parseUtcDate } from "@/lib/utils";
 export type Row = { id: number; roll: string; color: string; created_at: string };
 
 export type RecAlert = { type: string; triggerAt: Date; duration: number };
@@ -19,6 +16,10 @@ export type Cycle = {
   gaps: number[];
 };
 
+
+export const MAX_ZEROS = 14;
+export const MAX_CYCLES = 6;
+export const TIMEOUT_MINUTES = 120;
 
 function diffMinutes(a: Date, b: Date) {
   return Math.max(0, Math.round((b.getTime() - a.getTime()) / 60000));
