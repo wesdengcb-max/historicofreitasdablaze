@@ -502,40 +502,89 @@ export function PredictiveSignals() {
         }
       }
     }
-    const m1: Mode1Signal[] = Array.from(byTime.entries())
-      .sort((a: [number, any], b: [number, any]) => a[0] - b[0])
-      .map(([t, info]: [number, any]) => {
-        const values = info.values.slice().sort((a: number, b: number) => a - b);
-        const isTop1 = info.analyses.has(1);
-        const top5Analyses = [2, 3, 4, 5];
-        const hasTop5 = top5Analyses.some(a => info.analyses.has(a));
-        const confluenceCount = info.analyses.size;
-        
-        // Peak Rank Lock
-        const signalKey = `m1-${t}`;
-        const currentPeak = peakStates[signalKey] || 0;
-        const newPeak = Math.max(currentPeak, confluenceCount);
-        if (newPeak > currentPeak) {
-          setPeakStates(prev => ({ ...prev, [signalKey]: newPeak }));
-        }
+    const finalMode1: Mode1Signal[] = [];
 
-        return {
-          key: signalKey,
-          title: `Análise ${values.join(" + ")}`,
-          at: new Date(t),
-          pct: info.pct,
-          label: info.label,
-          analysisCount: confluenceCount,
-          peakAnalysisCount: newPeak,
-          sources: info.sources,
-          isHighTendency: info.isHighTendency,
-          isPossibleRec: info.isPossibleRec,
-          isTop1,
-          isTop5Confluence: hasTop5,
-          isSuperSignal: confluenceCount >= 4
-        };
-      });
-    setMode1(m1);
+    for (const [t, info] of Array.from(byTime.entries()).sort((a: [number, any], b: [number, any]) => a[0] - b[0])) {
+      const entryDate = new Date(t);
+      const values = info.values.slice().sort((a: number, b: number) => a - b);
+      const isTop1 = info.analyses.has(1);
+      const top5Analyses = [2, 3, 4, 5];
+      const hasTop5 = top5Analyses.some(a => info.analyses.has(a));
+      const confluenceCount = info.analyses.size;
+
+      const isRare = isTop1 && Array.from(byTime.keys()).some(otherT => 
+        otherT !== t && 
+        Math.abs(otherT - t) <= 60000 && 
+        byTime.get(otherT)?.analyses.has(1)
+      );
+
+      const signalKey = `m1-${t}`;
+      const currentPeak = peakStates[signalKey] || 0;
+      const newPeak = Math.max(currentPeak, confluenceCount);
+      
+      if (newPeak > currentPeak) {
+        setPeakStates(prev => ({ ...prev, [signalKey]: newPeak }));
+      }
+
+      const signal: Mode1Signal = {
+        key: signalKey,
+        title: `Análise ${values.join(" + ")}`,
+        at: entryDate,
+        pct: info.pct,
+        label: info.label,
+        analysisCount: confluenceCount,
+        peakAnalysisCount: newPeak,
+        sources: info.sources,
+        isHighTendency: info.isHighTendency,
+        isPossibleRec: info.isPossibleRec,
+        isTop1,
+        isTop5Confluence: hasTop5,
+        isSuperSignal: confluenceCount >= 4,
+        isRare
+      };
+
+      // Auditoria: Salvar se for novo
+      if (!auditIds[signalKey]) {
+        (async () => {
+          try {
+            let category = 'top5';
+            if (isRare) category = 'raro';
+            else if (isTop1 && !hasTop5) category = 'isolado';
+            else if (isTop1 && hasTop5) category = 'top1_top5';
+
+            const confluenceStr = Array.from(info.analyses).map(a => `A${a}`).join(', ');
+
+            const { data: res } = await saveTriggerAudit({ 
+              data: {
+                gatilho: confluenceStr,
+                horario_base: fmtClock(new Date(t - 60000)),
+                horario_alvo: fmtClock(entryDate),
+                category,
+                analysis_count: newPeak,
+                confluences: confluenceStr
+              }
+            }) as any;
+            
+            if (res?.id) {
+              setAuditIds(prev => ({ ...prev, [signalKey]: res.id }));
+            }
+          } catch (e) {
+            console.error("Erro ao salvar auditoria:", e);
+          }
+        })();
+      }
+
+      finalMode1.push(signal);
+    }
+
+    setMode1(finalMode1);
+    
+    setSections({
+      top1Confluence: finalMode1.filter(s => s.isRare),
+      top1Isolated: finalMode1.filter(s => s.isTop1 && !s.isTop5Confluence && !s.isRare),
+      top1Top5: finalMode1.filter(s => s.isTop1 && s.isTop5Confluence && !s.isRare),
+      top5Only: finalMode1.filter(s => !s.isTop1 && s.isTop5Confluence)
+    });
 
 
     const usedTimes = new Set<number>(m1.map((s) => s.at.getTime()));
