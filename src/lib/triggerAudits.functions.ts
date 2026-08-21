@@ -15,10 +15,7 @@ export const saveTriggerAudit = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin
       .from("trigger_audits")
-      .insert([{
-        ...data,
-        horario_extra: data.horario_alvo
-      }]);
+      .insert([data]);
     
     if (error) {
       console.error("[saveTriggerAudit] Error:", error);
