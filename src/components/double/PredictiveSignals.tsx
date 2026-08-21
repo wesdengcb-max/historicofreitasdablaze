@@ -367,13 +367,55 @@ export function PredictiveSignals() {
     now.setSeconds(0, 0);
     setGeneratedAt(now);
 
+    // Monitorar resultados para auditoria
+    const lastRow = rows[rows.length - 1];
+    if (lastRow) {
+      const nowMs = now.getTime();
+      const lastResultTime = parseUtcDate(lastRow.created_at).getTime();
+      
+      // Se saiu um Branco (0) recentemente
+      if (Number(lastRow.roll) === 0) {
+        Object.entries(auditIds).forEach(async ([key, id]) => {
+          // Extrair tempo do sinal da key (m1-timestamp)
+          const signalTime = parseInt(key.split('-')[1]);
+          if (!signalTime) return;
+
+          // Janela de ±1 minuto
+          if (Math.abs(lastResultTime - signalTime) <= 60000) {
+            console.log(`[AUDITORIA] WIN detectado para sinal em ${fmtClock(new Date(signalTime))}`);
+            await updateTriggerAuditResult({ id, win: true });
+            setAuditIds(prev => {
+              const next = { ...prev };
+              delete next[key];
+              return next;
+            });
+            fetchBlockStats();
+          }
+        });
+      }
+
+      // Marcar LOSS se passou da janela (horário alvo + 2 min)
+      Object.entries(auditIds).forEach(async ([key, id]) => {
+        const signalTime = parseInt(key.split('-')[1]);
+        if (nowMs > signalTime + 120000) {
+          console.log(`[AUDITORIA] LOSS detectado para sinal em ${fmtClock(new Date(signalTime))}`);
+          await updateTriggerAuditResult({ id, win: false });
+          setAuditIds(prev => {
+            const next = { ...prev };
+            delete next[key];
+            return next;
+          });
+          fetchBlockStats();
+        }
+      });
+    }
+
     // Alertas de Segurança ("possível rec")
     const recAlerts = buildRecAlerts(rows);
     const activeAlerts = recAlerts.filter((alert: RecAlert) => {
       const diff = (now.getTime() - alert.triggerAt.getTime()) / 60000;
       return diff >= 0 && diff <= alert.duration;
     });
-
 
     // Dispara evento global para o SinaisSection alternar para "Rodadas Atuais"
     window.dispatchEvent(new CustomEvent('switch-audit-filter', { detail: 'hoje' }));
@@ -389,6 +431,7 @@ export function PredictiveSignals() {
         isHighTendency: boolean; 
         isPossibleRec: boolean;
         isGreenSeal?: boolean;
+        triggerAt: Date;
       }
     >();
 
