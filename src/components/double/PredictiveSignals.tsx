@@ -319,9 +319,8 @@ export function PredictiveSignals() {
       const nowMs = now.getTime();
       const lastResultTime = parseUtcDate(lastRow.created_at).getTime();
       
-      // Se saiu um Branco (0) recentemente
+      // 1. Verificar WIN (Pedra 0 saiu)
       if (Number(lastRow.roll) === 0) {
-        // 1. Verificar WIN
         Object.entries(auditIds).forEach(async ([key, id]) => {
           const signalTimeStr = key.split('-')[1];
           const signalTime = parseInt(signalTimeStr);
@@ -332,7 +331,6 @@ export function PredictiveSignals() {
             console.log(`[AUDITORIA] WIN detectado para sinal em ${fmtClock(new Date(signalTime))}`);
             await updateTriggerAuditResult({ data: { id, win: true } });
             
-            // Atualizar estado local para refletir o WIN imediatamente
             setMode1(prev => prev?.map(s => s.key === key ? { ...s, outcome: "green", completedAt: Date.now() } : s) || null);
             
             setAuditIds(prev => {
@@ -537,11 +535,13 @@ export function PredictiveSignals() {
         })();
       }
 
-      // Preservar estado de auditoria se já existir no mode1 atual
+      // Preservar estado de auditoria e peak count se já existir no mode1 atual
       const existing = mode1?.find(m => m.key === signalKey);
       if (existing) {
         signal.outcome = existing.outcome;
         signal.completedAt = existing.completedAt;
+        // Peak Rank Lock: Manter o maior número de confluências alcançado
+        signal.peakAnalysisCount = Math.max(existing.peakAnalysisCount, newPeak);
       }
 
       finalMode1.push(signal);
@@ -557,18 +557,17 @@ export function PredictiveSignals() {
     });
 
     setSections({
-      // Seção 1 (Top 1 + Confluência): signals.filter(s => s.isRare || s.top1Count >= 2)
-      // Nota: peakAnalysisCount representa o volume de confluências (A1-A7, etc)
+      // Seção 1 (Top 1 + Confluência): signals.filter(s => s.isRare || s.peakAnalysisCount >= 2)
       top1Confluence: activeSignals.filter(s => s.isRare || (s.isTop1 && s.peakAnalysisCount >= 2)),
       
-      // Seção 2 (Top 1 Isolado): signals.filter(s => s.isTop1 && !s.isRare && (s.top1Count === 1) && !s.hasTop5Confluence)
+      // Seção 2 (Top 1 Isolado): signals.filter(s => s.isTop1 && !s.isRare && (s.peakAnalysisCount === 1) && !s.isTop5Confluence)
       top1Isolated: activeSignals.filter(s => s.isTop1 && !s.isRare && s.peakAnalysisCount === 1 && !s.isTop5Confluence),
       
-      // Seção 3 (Top 1 + Confluência Top 5): signals.filter(s => s.isTop1 && !s.isRare && s.hasTop5Confluence)
+      // Seção 3 (Top 1 + Confluência Top 5): signals.filter(s => s.isTop1 && !s.isRare && s.isTop5Confluence)
       top1Top5: activeSignals.filter(s => s.isTop1 && !s.isRare && s.isTop5Confluence),
       
-      // Seção 4 (Confluência Top 5): signals.filter(s => !s.isTop1 && !s.isRare && (s.top1Count === 0))
-      // REGRA: Cards com 'isTop1 === true' estão PROIBIDOS de renderizar na Seção 4.
+      // Seção 4 (Confluência Top 5): signals.filter(s => !s.isTop1 && !s.isRare && s.peakAnalysisCount >= 1)
+      // REGRA: Cards com 'isTop1 === true' ou 'isRare === true' estão PROIBIDOS de renderizar na Seção 4.
       top5Only: activeSignals.filter(s => !s.isTop1 && !s.isRare)
     });
 
