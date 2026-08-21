@@ -13,15 +13,17 @@ export const saveTriggerAudit = createServerFn({ method: "POST" })
   }).parse(data))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin
+    const { data: res, error } = await supabaseAdmin
       .from("trigger_audits")
-      .insert([data]);
+      .insert([data])
+      .select("id")
+      .single();
     
     if (error) {
       console.error("[saveTriggerAudit] Error:", error);
       throw error;
     }
-    return { success: true };
+    return { success: true, id: res?.id };
   });
 
 export const updateTriggerAuditResult = createServerFn({ method: "POST" })

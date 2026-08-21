@@ -320,14 +320,20 @@ export function PredictiveSignals() {
       
       // Se saiu um Branco (0) recentemente
       if (Number(lastRow.roll) === 0) {
+        // 1. Verificar WIN
         Object.entries(auditIds).forEach(async ([key, id]) => {
           const signalTimeStr = key.split('-')[1];
           const signalTime = parseInt(signalTimeStr);
           if (!signalTime) return;
 
+          // Janela ±1 min (60000ms)
           if (Math.abs(lastResultTime - signalTime) <= 60000) {
             console.log(`[AUDITORIA] WIN detectado para sinal em ${fmtClock(new Date(signalTime))}`);
             await updateTriggerAuditResult({ data: { id, win: true } });
+            
+            // Atualizar estado local para refletir o WIN imediatamente
+            setMode1(prev => prev?.map(s => s.key === key ? { ...s, outcome: "green", completedAt: Date.now() } : s) || null);
+            
             setAuditIds(prev => {
               const next = { ...prev };
               delete next[key];
@@ -336,25 +342,29 @@ export function PredictiveSignals() {
             fetchBlockStats();
           }
         });
-      }
 
-      // Marcar LOSS se passou da janela (horário alvo + 2 min)
-      Object.entries(auditIds).forEach(async ([key, id]) => {
-        const signalTimeStr = key.split('-')[1];
-        const signalTime = parseInt(signalTimeStr);
-        if (!signalTime) return;
-        
-        if (nowMs > signalTime + 90000) {
-          console.log(`[AUDITORIA] LOSS detectado para sinal em ${fmtClock(new Date(signalTime))}`);
-          await updateTriggerAuditResult({ data: { id, win: false } });
-          setAuditIds(prev => {
-            const next = { ...prev };
-            delete next[key];
-            return next;
-          });
-          fetchBlockStats();
-        }
-      });
+        // 2. Verificar LOSS (Janela expirou sem WIN)
+        // Aumentamos para 90s (Alvo + 1.5 min) para dar margem à auditoria ±1 min
+        Object.entries(auditIds).forEach(async ([key, id]) => {
+          const signalTimeStr = key.split('-')[1];
+          const signalTime = parseInt(signalTimeStr);
+          if (!signalTime) return;
+          
+          if (nowMs > signalTime + 90000) {
+            console.log(`[AUDITORIA] LOSS detectado para sinal em ${fmtClock(new Date(signalTime))}`);
+            await updateTriggerAuditResult({ data: { id, win: false } });
+            
+            // Atualizar estado local para refletir o LOSS imediatamente
+            setMode1(prev => prev?.map(s => s.key === key ? { ...s, outcome: "red", completedAt: Date.now() } : s) || null);
+
+            setAuditIds(prev => {
+              const next = { ...prev };
+              delete next[key];
+              return next;
+            });
+            fetchBlockStats();
+          }
+        });
     }
 
     // Alertas de Segurança ("possível rec")
@@ -489,7 +499,8 @@ export function PredictiveSignals() {
         isTop1,
         isTop5Confluence: hasTop5,
         isSuperSignal: confluenceCount >= 4,
-        isRare
+        isRare,
+        outcome: "pending"
       };
 
       // Auditoria: Salvar se for novo
@@ -523,16 +534,39 @@ export function PredictiveSignals() {
         })();
       }
 
+      // Preservar estado de auditoria se já existir no mode1 atual
+      const existing = mode1?.find(m => m.key === signalKey);
+      if (existing) {
+        signal.outcome = existing.outcome;
+        signal.completedAt = existing.completedAt;
+      }
+
       finalMode1.push(signal);
     }
 
     setMode1(finalMode1);
     
+    // A cada 30s ou nova pedra, recalculamos o feed filtrado e expirado
+    const fourMinutesMs = 4 * 60 * 1000;
+    const activeSignals = finalMode1.filter(s => {
+      if (!s.completedAt) return true;
+      return (Date.now() - s.completedAt) < fourMinutesMs;
+    });
+
     setSections({
-      top1Confluence: finalMode1.filter(s => s.isRare),
-      top1Isolated: finalMode1.filter(s => s.isTop1 && !s.isTop5Confluence && !s.isRare),
-      top1Top5: finalMode1.filter(s => s.isTop1 && s.isTop5Confluence && !s.isRare),
-      top5Only: finalMode1.filter(s => !s.isTop1 && !s.isRare)
+      // Seção 1 (Top 1 + Confluência): signals.filter(s => s.isRare || s.top1Count >= 2)
+      // Nota: peakAnalysisCount representa o volume de confluências (A1-A7, etc)
+      top1Confluence: activeSignals.filter(s => s.isRare || (s.isTop1 && s.peakAnalysisCount >= 2)),
+      
+      // Seção 2 (Top 1 Isolado): signals.filter(s => s.isTop1 && !s.isRare && (s.top1Count === 1) && !s.hasTop5Confluence)
+      top1Isolated: activeSignals.filter(s => s.isTop1 && !s.isRare && s.peakAnalysisCount === 1 && !s.isTop5Confluence),
+      
+      // Seção 3 (Top 1 + Confluência Top 5): signals.filter(s => s.isTop1 && !s.isRare && s.hasTop5Confluence)
+      top1Top5: activeSignals.filter(s => s.isTop1 && !s.isRare && s.isTop5Confluence),
+      
+      // Seção 4 (Confluência Top 5): signals.filter(s => !s.isTop1 && !s.isRare && (s.top1Count === 0))
+      // REGRA: Cards com 'isTop1 === true' estão PROIBIDOS de renderizar na Seção 4.
+      top5Only: activeSignals.filter(s => !s.isTop1 && !s.isRare)
     });
 
 
