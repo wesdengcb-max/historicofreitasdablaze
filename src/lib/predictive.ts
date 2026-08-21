@@ -508,11 +508,10 @@ export function cyclesOf(cycles: Cycle[], value: number, analysis?: number): Cyc
 export function fmtClock(d: Date) {
   if (Number.isNaN(d.getTime())) return "--:--";
   return d.toLocaleTimeString("pt-BR", {
-    timeZone: "America/Sao_Paulo",
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
-});
+  });
 }
 
 /** 
