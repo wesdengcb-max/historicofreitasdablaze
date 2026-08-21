@@ -344,7 +344,7 @@ export function PredictiveSignals() {
         const signalTime = parseInt(signalTimeStr);
         if (!signalTime) return;
         
-        if (nowMs > signalTime + 60000) {
+        if (nowMs > signalTime + 90000) {
           console.log(`[AUDITORIA] LOSS detectado para sinal em ${fmtClock(new Date(signalTime))}`);
           await updateTriggerAuditResult({ data: { id, win: false } });
           setAuditIds(prev => {
