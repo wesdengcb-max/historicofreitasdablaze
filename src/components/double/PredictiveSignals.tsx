@@ -923,6 +923,9 @@ export function PredictiveSignals() {
                     <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-blue-400/80 font-outfit">
                       <Layers className="h-4 w-4" /> 📊 CONFLUÊNCIA TOP 5
                     </div>
+                    <div className="text-[9px] font-bold text-blue-500/30 uppercase tracking-widest mt-0.5">
+                      Assertividade 85% (Últimas 4h)
+                    </div>
                     {activeRecAlerts.length > 0 ? (
                       <div className="text-[10px] font-bold text-amber-400 uppercase tracking-widest mt-1 animate-pulse">
                         ⚠️ possível rec ativo até às {fmtClock(new Date(Math.max(...activeRecAlerts.map(a => a.end))))}
