@@ -640,7 +640,7 @@ export function PredictiveSignals() {
 
     // O Modo Unificado agora é tratado no loop principal finalMode1
     setLoading(false);
-  }, [rows, engine, peakStates, auditIds, fetchBlockStats, mode1]);
+  }, [rows, engine, peakStates, auditIds, fetchBlockStats]);
 
   // Alertas de Recuperação "possível rec"
   const activeRecAlerts = useMemo(() => {
