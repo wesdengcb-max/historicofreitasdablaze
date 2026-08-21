@@ -831,9 +831,6 @@ function EmptyState() {
   );
 }
 
-function fmtClock(d: Date) {
-  return d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", hour12: false });
-}
 
 function cn(...classes: any[]) {
   return classes.filter(Boolean).join(" ");
