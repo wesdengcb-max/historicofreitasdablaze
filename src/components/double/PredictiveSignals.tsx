@@ -488,6 +488,7 @@ export function PredictiveSignals() {
           sources: [{ analysis: item.analysis, value: item.value }],
           isHighTendency: isTendency,
           isPossibleRec,
+          triggerAt: item.open.triggerAt
         });
       } else {
         if (!cur.values.includes(item.value)) cur.values.push(item.value);
