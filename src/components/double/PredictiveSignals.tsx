@@ -528,7 +528,7 @@ export function PredictiveSignals() {
       top1Confluence: finalMode1.filter(s => s.isRare),
       top1Isolated: finalMode1.filter(s => s.isTop1 && !s.isTop5Confluence && !s.isRare),
       top1Top5: finalMode1.filter(s => s.isTop1 && s.isTop5Confluence && !s.isRare),
-      top5Only: finalMode1.filter(s => !s.isTop1 && s.isTop5Confluence)
+      top5Only: finalMode1.filter(s => !s.isTop1 && !s.isRare)
     });
 
 
