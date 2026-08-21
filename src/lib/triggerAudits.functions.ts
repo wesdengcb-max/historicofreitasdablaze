@@ -3,12 +3,13 @@ import { z } from "zod";
 
 export const saveTriggerAudit = createServerFn({ method: "POST" })
   .inputValidator((data) => z.object({
-    trigger_name: z.string(),
-    time_minus_1: z.string(),
-    time_target: z.string(),
-    time_plus_1: z.string(),
-    section_category: z.string(),
-    is_win: z.boolean().optional()
+    gatilho: z.string(),
+    horario_base: z.string(),
+    horario_alvo: z.string(),
+    category: z.string(),
+    analysis_count: z.number().optional(),
+    confluences: z.string().optional(),
+    win: z.boolean().optional()
   }).parse(data))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -26,13 +27,13 @@ export const saveTriggerAudit = createServerFn({ method: "POST" })
 export const updateTriggerAuditResult = createServerFn({ method: "POST" })
   .inputValidator((data) => z.object({
     id: z.string(),
-    is_win: z.boolean()
+    win: z.boolean()
   }).parse(data))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin
       .from("trigger_audits")
-      .update({ is_win: data.is_win })
+      .update({ win: data.win })
       .eq("id", data.id);
     
     if (error) {
@@ -75,7 +76,7 @@ export const getBlockStats = createServerFn({ method: "GET" })
 
     const { data, error } = await supabaseAdmin
       .from("trigger_audits")
-      .select("is_win, section_category")
+      .select("win, category")
       .gte("created_at", start.toISOString())
       .lt("created_at", end.toISOString());
       
@@ -87,4 +88,5 @@ export const getBlockStats = createServerFn({ method: "GET" })
       stats: data
     };
   });
+
 
