@@ -73,8 +73,8 @@ export const Card = memo(function Card({
               </span>
             )}
             <div className="min-w-0">
-              {title && <h2 className="truncate text-[14px] font-medium tracking-tight text-[#eaeaea]">{title}</h2>}
-              {subtitle && <p className="truncate text-[11px] text-muted-foreground">{subtitle}</p>}
+              {title && <h2 className="truncate text-[14px] font-medium tracking-tight text-[#eaeaea] light:text-[#0f172a]">{title}</h2>}
+              {subtitle && <p className="truncate text-[11px] text-muted-foreground light:text-gray-500">{subtitle}</p>}
             </div>
           </div>
           {action}

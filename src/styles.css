@@ -140,8 +140,25 @@
 }
 
 .light .text-muted-foreground,
-.light .text-foreground {
+.light .text-foreground,
+.light .text-white {
   color: #0f172a !important;
+}
+
+.light .bg-black\/40 {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.light .border-white\/5,
+.light .border-white\/10 {
+  border-color: #E6EAF1 !important;
+}
+
+.light .bg-white\/5,
+.light .bg-white\/10,
+.light .bg-white\/\[0\.03\],
+.light .bg-\[\#1A1A1A\] {
+  background-color: #f8fafc !important;
 }
 
 /* Ensure inner components maintain their layout/colors */
