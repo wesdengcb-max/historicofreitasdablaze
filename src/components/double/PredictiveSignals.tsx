@@ -321,41 +321,39 @@ export function PredictiveSignals() {
       
       // 1. Verificar WIN (Pedra 0 saiu)
       if (Number(lastRow.roll) === 0) {
-        Object.entries(auditIds).forEach(async ([key, id]) => {
-          const signalTimeStr = key.split('-')[1];
-          const signalTime = parseInt(signalTimeStr);
-          if (!signalTime) return;
-
-          // Janela ±1 min (60000ms)
-          if (Math.abs(lastResultTime - signalTime) <= 60000) {
-            console.log(`[AUDITORIA] WIN detectado para sinal em ${fmtClock(new Date(signalTime))}`);
-            await updateTriggerAuditResult({ data: { id, win: true } });
-            
-            setMode1(prev => prev?.map(s => s.key === key ? { ...s, outcome: "green", completedAt: Date.now() } : s) || null);
-            
-            setAuditIds(prev => {
-              const next = { ...prev };
-              delete next[key];
-              return next;
-            });
-            fetchBlockStats();
-          }
-        });
-      }
-
-      // 2. Verificar LOSS (Janela expirou sem WIN)
-      // Aumentamos para 90s (Alvo + 1.5 min) para dar margem à auditoria ±1 min
       Object.entries(auditIds).forEach(async ([key, id]) => {
         const signalTimeStr = key.split('-')[1];
         const signalTime = parseInt(signalTimeStr);
         if (!signalTime) return;
-        
-        const nowMs = now.getTime();
-        if (nowMs > signalTime + 90000) {
+
+        // Janela de auditoria: [Horário -1 min, Horário Alvo, Horário +1 min]
+        // Precisamos verificar se o 0 saiu em qualquer ponto dessa janela
+        // O histórico rows contém os últimos 5000 resultados.
+        const windowStart = signalTime - 60000;
+        const windowEnd = signalTime + 60000;
+
+        const hasWhiteInWindow = rows.some(r => {
+          const rTime = parseUtcDate(r.created_at).getTime();
+          return rTime >= windowStart && rTime <= windowEnd && Number(r.roll) === 0;
+        });
+
+        if (hasWhiteInWindow) {
+          console.log(`[AUDITORIA] WIN detectado (Branco na janela ±1m) para sinal em ${fmtClock(new Date(signalTime))}`);
+          await updateTriggerAuditResult({ data: { id, win: true } });
+          
+          setMode1(prev => prev?.map(s => s.key === key ? { ...s, outcome: "green", completedAt: Date.now() } : s) || null);
+          
+          setAuditIds(prev => {
+            const next = { ...prev };
+            delete next[key];
+            return next;
+          });
+          fetchBlockStats();
+        } else if (now.getTime() > windowEnd + 30000) {
+          // Se a janela (Alvo + 1 min) expirou totalmente (com margem de 30s para sync) sem o 0
           console.log(`[AUDITORIA] LOSS detectado para sinal em ${fmtClock(new Date(signalTime))}`);
           await updateTriggerAuditResult({ data: { id, win: false } });
           
-          // Atualizar estado local para refletir o LOSS imediatamente
           setMode1(prev => prev?.map(s => s.key === key ? { ...s, outcome: "red", completedAt: Date.now() } : s) || null);
 
           setAuditIds(prev => {
@@ -505,7 +503,7 @@ export function PredictiveSignals() {
       };
 
       // Auditoria: Salvar se for novo
-      if (!auditIds[signalKey]) {
+      if (!auditIds[signalKey] && !existing) {
         (async () => {
           try {
             let category = 'top5';
@@ -522,7 +520,8 @@ export function PredictiveSignals() {
                 horario_alvo: entryDate.toISOString(),
                 category,
                 analysis_count: newPeak,
-                confluences: confluenceStr
+                confluences: confluenceStr,
+                win: null // Nasce pendente
               }
             }) as any;
             
@@ -549,26 +548,27 @@ export function PredictiveSignals() {
 
     setMode1(finalMode1);
     
-    // A cada 30s ou nova pedra, recalculamos o feed filtrado e expirado
-    const fourMinutesMs = 4 * 60 * 1000;
+    // A cada nova pedra ou ciclo, recalculamos o feed filtrado e expirado
+    // REGRA: Após auditoria (WIN/RED), o card permanece 3 minutos antes de sumir
+    const threeMinutesMs = 3 * 60 * 1000;
     const activeSignals = finalMode1.filter(s => {
       if (!s.completedAt) return true;
-      return (Date.now() - s.completedAt) < fourMinutesMs;
+      return (Date.now() - s.completedAt) < threeMinutesMs;
     });
 
     setSections({
       // Seção 1 (Top 1 + Confluência): signals.filter(s => s.isRare || s.peakAnalysisCount >= 2)
-      top1Confluence: activeSignals.filter(s => s.isRare || (s.isTop1 && s.peakAnalysisCount >= 2)),
+      top1Confluence: activeSignals.filter(s => s.isRare || s.top1Count >= 2),
       
-      // Seção 2 (Top 1 Isolado): signals.filter(s => s.isTop1 && !s.isRare && (s.peakAnalysisCount === 1) && !s.isTop5Confluence)
-      top1Isolated: activeSignals.filter(s => s.isTop1 && !s.isRare && s.peakAnalysisCount === 1 && !s.isTop5Confluence),
+      // Seção 2 (Top 1 Isolado): signals.filter(s => s.isTop1 && !s.isRare && s.top1Count === 1 && !s.hasTop5Confluence)
+      top1Isolated: activeSignals.filter(s => s.isTop1 && !s.isRare && s.top1Count === 1 && !s.isTop5Confluence),
       
       // Seção 3 (Top 1 + Confluência Top 5): signals.filter(s => s.isTop1 && !s.isRare && s.isTop5Confluence)
       top1Top5: activeSignals.filter(s => s.isTop1 && !s.isRare && s.isTop5Confluence),
       
-      // Seção 4 (Confluência Top 5): signals.filter(s => !s.isTop1 && !s.isRare && s.peakAnalysisCount >= 1)
-      // REGRA: Cards com 'isTop1 === true' ou 'isRare === true' estão PROIBIDOS de renderizar na Seção 4.
-      top5Only: activeSignals.filter(s => !s.isTop1 && !s.isRare)
+      // Seção 4 (Confluência Top 5): signals.filter(s => !s.isTop1 && !s.isRare && s.top1Count === 0)
+      // GARANTIA: Proíba terminantemente a renderização de qualquer sinal com 'isTop1 === true' dentro do array da Seção 4.
+      top5Only: activeSignals.filter(s => !s.isTop1 && !s.isRare && s.top1Count === 0)
     });
 
 
@@ -662,11 +662,12 @@ export function PredictiveSignals() {
     return alerts.filter(a => a.end > now);
   }, [rows]);
 
+  // Conexão direta com novas pedras (WebSocket/useBlazeData via rows)
   useEffect(() => {
-    if (active.length > 0 && !loading) {
+    if (rows.length > 0 && !loading) {
       generate();
     }
-  }, [active.length, loading, generate]);
+  }, [rows.length, loading, generate]);
 
   useEffect(() => {
     if (rows.length > 0 && !loading && mode1) {
