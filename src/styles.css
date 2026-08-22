@@ -176,25 +176,29 @@
 .light .stone-icon,
 .light button[class*="bg-red"],
 .light span[class*="bg-red"],
-.light div[class*="bg-red"] {
-  background-color: inherit;
-  border-radius: inherit;
-  box-shadow: inherit;
+.light div[class*="bg-red"],
+.light .bg-red-500,
+.light .bg-emerald-500,
+.light .bg-white-tile,
+.light .bg-black-tile {
+  background-color: inherit !important;
+  border-radius: inherit !important;
+  box-shadow: inherit !important;
+  border: inherit !important;
 }
 
-.light .sidebar-active-item,
+.sidebar-item-active {
+  background-color: rgba(229, 9, 20, 0.1);
+  color: #E50914;
+  box-shadow: inset 0 0 0 1px rgba(229, 9, 20, 0.2);
+}
+
 .light .sidebar-item-active {
   background-color: #E0E7FF !important;
   border-left: 4px solid #ef4444 !important;
   color: #ef4444 !important;
   border-radius: 0 18px 18px 0 !important;
-}
-
-/* Sidebar active item in Light Mode */
-.light .sidebar-active-item {
-  background-color: #E0E7FF; /* Light blue */
-  border-left: 3px solid #3B82F6; /* Blue indicator */
-  color: #1E40AF;
+  box-shadow: none !important;
 }
 
 @layer base {
