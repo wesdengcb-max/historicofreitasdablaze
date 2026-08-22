@@ -564,6 +564,7 @@ export function PredictiveSignals() {
       const secValues = secondaryProjections.get(t);
       const isVerified = secValues && s.sources.some(src => secValues.has(src.value));
       const isRare = isRareTime(t);
+      const strategyKey = s.strategyKey;
       
       let isGreenSeal = false;
       let greenSealAssertivity = 0;
