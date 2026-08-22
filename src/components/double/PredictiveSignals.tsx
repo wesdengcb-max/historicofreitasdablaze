@@ -65,6 +65,7 @@ type Mode2Signal = {
   isHighTendency: boolean;
   isVerified?: boolean;
   isRare?: boolean;
+  strategyKey?: string;
 
   outcome?: "pending" | "green" | "red";
   resultTime?: string;
