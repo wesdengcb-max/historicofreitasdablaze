@@ -60,7 +60,7 @@ export default function HostmanSection() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const [isInverse, setIsInverse] = useState(false);
+  const [isInverse, setIsInverse] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
 
   // Atualiza relógio interno para expiração de sinais
