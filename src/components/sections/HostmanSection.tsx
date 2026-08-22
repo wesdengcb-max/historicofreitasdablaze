@@ -157,16 +157,14 @@ export default function HostmanSection() {
   }, [spins, currentTime]);
 
   const rows = useMemo(() => {
-    let sortedSpins = [...spins];
-    
-    // Inversão visual das pedras na tela (da esquerda para a direita)
-    if (isInverse) {
-      sortedSpins = sortedSpins.reverse();
-    }
-
     const res = [];
-    for (let i = 0; i < sortedSpins.length; i += 12) {
-      res.push(sortedSpins.slice(i, i + 12));
+    for (let i = 0; i < spins.length; i += 12) {
+      let chunk = spins.slice(i, i + 12);
+      // Inversão visual da ordem das pedras na linha (direita para esquerda)
+      if (isInverse) {
+        chunk = [...chunk].reverse();
+      }
+      res.push(chunk);
     }
     return res;
   }, [spins, isInverse]);
