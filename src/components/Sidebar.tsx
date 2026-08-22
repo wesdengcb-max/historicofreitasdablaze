@@ -1,3 +1,5 @@
+"use client";
+
 import { memo, useRef } from "react";
 import { 
   LayoutDashboard, 
@@ -84,7 +86,7 @@ export const Sidebar = memo(function Sidebar() {
        return;
     }
 
-    if (item.id !== "dashboard" && item.id !== "videos" && item.id !== "hostman" && !isVip) {
+    if (item.id !== "dashboard" && item.id !== "videos" && !isVip) {
       toast.error("Área Exclusiva", {
         description: "Você precisa ser Membro VIP para acessar esta aba.",
       });
@@ -224,7 +226,7 @@ export const Sidebar = memo(function Sidebar() {
 
 function SidebarItem({ item, active, isVip, isCollapsed, onClick }: { item: MenuItem; active: boolean; isVip: boolean; isCollapsed: boolean; onClick: () => void }) {
   const Icon = item.icon;
-  const isLocked = !item.isTool && item.id !== "dashboard" && item.id !== "videos" && !isVip;
+  const isLocked = !item.isTool && item.id !== "dashboard" && item.id !== "videos" && item.id !== "hostman" && !isVip;
 
   return (
     <button

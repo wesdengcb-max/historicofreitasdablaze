@@ -1,3 +1,5 @@
+"use client";
+
 import { memo, useState, useEffect } from "react";
 import { ChevronLeft, Menu, Clock, Crown, PanelLeftOpen, PanelLeftClose, BarChart3, Sun, Moon } from "lucide-react";
 import { useVipStatus, setVipStatus } from "@/lib/auth/vipStore";

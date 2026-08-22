@@ -1,8 +1,10 @@
-import { memo, useMemo, useState, useEffect } from "react";
+"use client";
+
+import { memo, useMemo, useState, useEffect, useRef } from "react";
 import { Card } from "@/components/double/Card";
 import { BlazeResultCard } from "@/components/double/BlazeResultCard";
 import { useVipStatus } from "@/lib/auth/vipStore";
-import { Clock, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import { Clock, Calendar, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
 import { fmtTime, colorOf, type Spin } from "@/components/double/types";
 
@@ -17,7 +19,7 @@ function normalizeColor(v: string): Spin["color"] | null {
   const s = (v ?? "").toString().trim().toLowerCase();
   if (["red", "vermelho", "vermelha", "r"].includes(s)) return "red";
   if (["black", "preto", "preta", "b"].includes(s)) return "black";
-  if (["white", "branco", "branca", "w"].includes(s)) return "white";
+  if (["white", "branco", "branca", "w", "0"].includes(s)) return "white";
   return null;
 }
 
@@ -37,6 +39,15 @@ function rowToSpin(r: Row): Spin {
   };
 }
 
+function dedupeById<T extends { id: string }>(items: T[]): T[] {
+  const byId = new Map<string, T>();
+  for (const item of items) {
+    if (!item.id || item.id === "undefined") continue;
+    if (!byId.has(item.id)) byId.set(item.id, item);
+  }
+  return Array.from(byId.values());
+}
+
 const PAGE_SIZE = 36; // 3 rows of 12
 
 export default function HostmanSection() {
@@ -54,9 +65,13 @@ export default function HostmanSection() {
     year: "numeric",
   }).format(new Date());
 
+  const isFirstLoad = useRef(true);
+
   useEffect(() => {
+    let alive = true;
     async function loadData() {
-      setLoading(true);
+      if (isFirstLoad.current) setLoading(true);
+      
       const from = (page - 1) * PAGE_SIZE;
       const to = from + PAGE_SIZE - 1;
 
@@ -66,13 +81,45 @@ export default function HostmanSection() {
         .order("id", { ascending: false })
         .range(from, to);
 
-      if (!error && data) {
-        setSpins(data.map(rowToSpin));
+      if (alive && !error && data) {
+        setSpins(dedupeById(data.map(rowToSpin)));
         if (count !== null) setTotalCount(count);
       }
-      setLoading(false);
+      if (alive) {
+        setLoading(false);
+        isFirstLoad.current = false;
+      }
     }
+
     loadData();
+
+    // Inscrição em tempo real para sincronização com o histórico global
+    // Somente na primeira página para evitar saltos em páginas antigas
+    let subscription: any = null;
+    if (page === 1) {
+      subscription = supabase
+        .channel('hostman-realtime')
+        .on(
+          'postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'blaze_results' },
+          (payload) => {
+            if (alive) {
+              const newSpin = rowToSpin(payload.new as Row);
+              setSpins(current => {
+                const next = [newSpin, ...current].slice(0, PAGE_SIZE);
+                return dedupeById(next);
+              });
+              setTotalCount(c => c + 1);
+            }
+          }
+        )
+        .subscribe();
+    }
+
+    return () => {
+      alive = false;
+      if (subscription) supabase.removeChannel(subscription);
+    };
   }, [page]);
 
   const rows = useMemo(() => {
@@ -149,7 +196,7 @@ export default function HostmanSection() {
                   {rowSpins.map((spin) => (
                     <div key={spin.id} className="flex flex-col items-center">
                       <div
-                        className="relative flex h-[72px] w-[72px] items-center justify-center rounded-lg shadow-lg overflow-hidden border border-white/5"
+                        className="relative flex h-[72px] w-[72px] items-center justify-center rounded-lg shadow-lg overflow-hidden border border-white/5 transition-transform duration-300 hover:scale-110"
                         style={{
                           backgroundColor: spin.color === "red" ? "#f12c4c" : spin.color === "black" ? "#1e2330" : "#ffffff",
                         }}
