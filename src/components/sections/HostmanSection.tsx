@@ -1,3 +1,5 @@
+"use client";
+
 import { memo, useMemo, useState, useEffect, useRef } from "react";
 import { Card } from "@/components/double/Card";
 import { BlazeResultCard } from "@/components/double/BlazeResultCard";
