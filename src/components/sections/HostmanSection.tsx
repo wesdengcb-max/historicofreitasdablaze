@@ -4,7 +4,7 @@ import { memo, useMemo, useState, useEffect, useRef } from "react";
 import { Card } from "@/components/double/Card";
 import { BlazeResultCard } from "@/components/double/BlazeResultCard";
 import { useVipStatus } from "@/lib/auth/vipStore";
-import { Clock, Calendar, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { Clock, Calendar, ChevronLeft, ChevronRight, Loader2, ArrowUpDown, History } from "lucide-react";
 import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
 import { fmtTime, colorOf, type Spin } from "@/components/double/types";
 
@@ -60,6 +60,14 @@ export default function HostmanSection() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const [isInverse, setIsInverse] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Atualiza relógio interno para expiração de sinais
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 10000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Fuso horário SP para as datas
   const today = new Intl.DateTimeFormat("pt-BR", {
@@ -83,7 +91,7 @@ export default function HostmanSection() {
       const { data, error, count } = await supabase
         .from("blaze_results")
         .select("id, roll, color, created_at", { count: "exact" })
-        .order("id", { ascending: false })
+        .order("id", { ascending: isInverse })
         .range(from, to);
 
       if (alive && !error && data) {
@@ -124,7 +132,35 @@ export default function HostmanSection() {
       if (interval) clearInterval(interval);
       if (subscription) supabase.removeChannel(subscription);
     };
-  }, [page]);
+  }, [page, isInverse]);
+
+  // Cálculo de sinais de possíveis brancos (Branco + 22 minutos)
+  const whiteSignals = useMemo(() => {
+    const futureSignals = [];
+    const whites = spins.filter(s => s.color === 'white');
+    
+    for (const w of whites) {
+      const whiteTime = new Date(w.createdAt);
+      const targetTime = new Date(whiteTime.getTime() + 22 * 60000);
+      
+      // Apenas sinais futuros ou que acabaram de acontecer (tolerância de 30s)
+      if (targetTime.getTime() > (currentTime.getTime() - 30000)) {
+        futureSignals.push({
+          id: w.id,
+          targetTime,
+          displayTime: new Intl.DateTimeFormat("pt-BR", {
+            timeZone: "America/Sao_Paulo",
+            hour: "2-digit",
+            minute: "2-digit",
+          }).format(targetTime)
+        });
+      }
+    }
+    
+    // Remove duplicatas de horário e ordena
+    const unique = Array.from(new Map(futureSignals.map(s => [s.displayTime, s])).values());
+    return unique.sort((a, b) => a.targetTime.getTime() - b.targetTime.getTime());
+  }, [spins, currentTime]);
 
   const rows = useMemo(() => {
     const res = [];
@@ -172,6 +208,40 @@ export default function HostmanSection() {
   return (
     <main className="mx-auto w-full max-w-[1400px] px-4 py-6">
       <Card className="flex flex-col border-none bg-[#11141a] p-0 shadow-2xl overflow-hidden">
+        {/* Signals Bar */}
+        <div className="flex items-center justify-between border-b border-white/5 bg-[#050608] px-6 py-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2 mr-2">
+              <History className="h-3.5 w-3.5 text-white/40" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Possíveis Brancos</span>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {whiteSignals.length > 0 ? (
+                whiteSignals.map(s => (
+                  <div key={s.id} className="group relative flex items-center gap-2 rounded-md bg-[#ffffff08] hover:bg-[#ffffff0d] px-3 py-1.5 border border-white/5 transition-all duration-300">
+                    <div className="h-2 w-2 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.6)] animate-pulse" />
+                    <span className="text-[12px] font-black text-white tracking-tight">{s.displayTime}</span>
+                  </div>
+                ))
+              ) : (
+                <span className="text-[11px] font-medium text-white/20 italic">Aguardando novos sinais...</span>
+              )}
+            </div>
+          </div>
+          
+          <button 
+            onClick={() => setIsInverse(!isInverse)}
+            className={`flex items-center gap-2 rounded-md px-3 py-1.5 text-[11px] font-black uppercase tracking-tighter transition-all duration-300 border ${
+              isInverse 
+                ? 'bg-red-500/10 border-red-500/50 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.2)]' 
+                : 'bg-[#1c222d] border-white/5 text-muted-foreground hover:text-white hover:border-white/20'
+            }`}
+          >
+            <ArrowUpDown className={`h-3.5 w-3.5 transition-transform duration-500 ${isInverse ? 'rotate-180' : ''}`} />
+            <span>Sentido Inverso</span>
+          </button>
+        </div>
+
         {/* Header Tabs */}
         <div className="flex items-center justify-between border-b border-white/5 bg-[#090b0d] px-6 py-4">
           <div className="flex gap-6">
