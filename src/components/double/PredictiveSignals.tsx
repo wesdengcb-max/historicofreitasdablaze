@@ -346,7 +346,7 @@ export function PredictiveSignals() {
             return next;
           });
           fetchBlockStats();
-        } else if (now.getTime() > windowEnd + 30000) {
+        } else if (Date.now() > windowEnd + 60000) { // Janela expirou (Alvo + 1 min + buffer)
           console.log(`[AUDITORIA] LOSS detectado para sinal em ${fmtClock(new Date(signalTime))}`);
           await updateTriggerAuditResult({ data: { id, win: false } });
           
