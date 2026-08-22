@@ -343,7 +343,7 @@ function Index() {
 
   // Protect current section if VIP is lost
   useEffect(() => {
-    if (section !== "dashboard" && section !== "videos" && !isVip) {
+    if (section !== "dashboard" && section !== "videos" && section !== "hostman" && !isVip) {
       setSection("dashboard");
       toast.error("Membro VIP Expirado", {
         description: "Você foi redirecionado para o Histórico pois não possui acesso VIP.",
