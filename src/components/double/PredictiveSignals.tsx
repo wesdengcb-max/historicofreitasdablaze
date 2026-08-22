@@ -650,6 +650,7 @@ export function PredictiveSignals() {
           isRare: s.isRare,
           isGreenSeal: s.isGreenSeal,
           greenSealAssertivity: s.greenSealAssertivity,
+          strategyKey: s.strategyKey,
           isRecAlert: activeRecAlerts.some(a => s.at.getTime() >= a.start && s.at.getTime() <= a.end)
         })),
         ...mode2.map(s => ({
@@ -662,6 +663,7 @@ export function PredictiveSignals() {
           entryDate: s.times[0],
           outcome: "pending",
           isHighTendency: s.isHighTendency,
+          strategyKey: s.strategyKey,
           isRecAlert: activeRecAlerts.some(a => s.times[0].getTime() >= a.start && s.times[0].getTime() <= a.end)
         }))
       ].sort((a, b) => a.entryDate.getTime() - b.entryDate.getTime());
