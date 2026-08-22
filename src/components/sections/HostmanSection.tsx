@@ -63,9 +63,13 @@ export default function HostmanSection() {
     year: "numeric",
   }).format(new Date());
 
+  const isFirstLoad = useRef(true);
+
   useEffect(() => {
+    let alive = true;
     async function loadData() {
-      setLoading(true);
+      if (isFirstLoad.current) setLoading(true);
+      
       const from = (page - 1) * PAGE_SIZE;
       const to = from + PAGE_SIZE - 1;
 
@@ -75,13 +79,45 @@ export default function HostmanSection() {
         .order("id", { ascending: false })
         .range(from, to);
 
-      if (!error && data) {
-        setSpins(data.map(rowToSpin));
+      if (alive && !error && data) {
+        setSpins(dedupeById(data.map(rowToSpin)));
         if (count !== null) setTotalCount(count);
       }
-      setLoading(false);
+      if (alive) {
+        setLoading(false);
+        isFirstLoad.current = false;
+      }
     }
+
     loadData();
+
+    // Inscrição em tempo real para sincronização com o histórico global
+    // Somente na primeira página para evitar saltos em páginas antigas
+    let subscription: any = null;
+    if (page === 1) {
+      subscription = supabase
+        .channel('hostman-realtime')
+        .on(
+          'postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'blaze_results' },
+          (payload) => {
+            if (alive) {
+              const newSpin = rowToSpin(payload.new as Row);
+              setSpins(current => {
+                const next = [newSpin, ...current].slice(0, PAGE_SIZE);
+                return dedupeById(next);
+              });
+              setTotalCount(c => c + 1);
+            }
+          }
+        )
+        .subscribe();
+    }
+
+    return () => {
+      alive = false;
+      if (subscription) supabase.removeChannel(subscription);
+    };
   }, [page]);
 
   const rows = useMemo(() => {
