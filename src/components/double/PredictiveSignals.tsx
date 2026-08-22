@@ -555,18 +555,24 @@ export function PredictiveSignals() {
     });
 
     setSections({
-      // Seção 1 (Top 1 + Confluência): signals.filter(s => s.isRare || s.peakAnalysisCount >= 2)
+      // Seção 1 (Top 1 + Confluência): signals.filter(s => s.isRare || s.top1Count >= 2)
       top1Confluence: activeSignals.filter(s => s.isRare || s.top1Count >= 2),
       
-      // Seção 2 (Top 1 Isolado): signals.filter(s => s.isTop1 && !s.isRare && s.top1Count === 1 && !s.hasTop5Confluence)
-      top1Isolated: activeSignals.filter(s => s.isTop1 && !s.isRare && s.top1Count === 1 && !s.hasTop5Confluence),
+      // Seção 2 (Top 1 Isolado): signals.filter(s => (s.isTop1 || s.title.includes('Isolado')) && !s.isRare && !s.hasTop5Confluence)
+      top1Isolated: activeSignals.filter(s => 
+        (s.isTop1 || s.title.includes('Isolado')) && !s.isRare && !s.hasTop5Confluence
+      ),
       
-      // Seção 3 (Top 1 + Confluência Top 5): signals.filter(s => s.isTop1 && !s.isRare && s.isTop5Confluence)
-      top1Top5: activeSignals.filter(s => s.isTop1 && !s.isRare && s.hasTop5Confluence),
+      // Seção 3 (Top 1 + Confluência Top 5): signals.filter(s => (s.isTop1 || s.title.includes('Isolado')) && !s.isRare && s.hasTop5Confluence)
+      top1Top5: activeSignals.filter(s => 
+        (s.isTop1 || s.title.includes('Isolado')) && !s.isRare && s.hasTop5Confluence
+      ),
       
-      // Seção 4 (Confluência Top 5): signals.filter(s => !s.isTop1 && !s.isRare && s.top1Count === 0)
-      // GARANTIA: Proíba terminantemente a renderização de qualquer sinal com 'isTop1 === true' dentro do array da Seção 4.
-      top5Only: activeSignals.filter(s => !s.isTop1 && !s.isRare && s.top1Count === 0)
+      // Seção 4 (Confluência Top 5): signals.filter(s => !s.isTop1 && !s.title.includes('Isolado') && !s.isRare && s.top1Count === 0)
+      // GARANTIA: Proíba terminantemente a renderização de qualquer sinal com 'isTop1 === true' ou 'Isolado' no título dentro da Seção 4.
+      top5Only: activeSignals.filter(s => 
+        !s.isTop1 && !s.title.includes('Isolado') && !s.isRare && s.top1Count === 0
+      )
     });
 
 
