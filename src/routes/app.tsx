@@ -59,6 +59,7 @@ import { cn } from "@/lib/utils";
 const SinaisPage = lazy(() => import("@/components/sections/SinaisSection"));
 const AnaliseSection = lazy(() => import("@/components/sections/AnaliseSection"));
 const EstrategiasSection = lazy(() => import("@/components/sections/EstrategiasSection"));
+const HostmanSection = lazy(() => import("@/components/sections/HostmanSection"));
 
 function SectionFallback() {
   return (
@@ -342,7 +343,7 @@ function Index() {
 
   // Protect current section if VIP is lost
   useEffect(() => {
-    if (section !== "dashboard" && section !== "videos" && !isVip) {
+    if (section !== "dashboard" && section !== "videos" && section !== "hostman" && !isVip) {
       setSection("dashboard");
       toast.error("Membro VIP Expirado", {
         description: "Você foi redirecionado para o Histórico pois não possui acesso VIP.",
@@ -927,6 +928,8 @@ function Index() {
             <Suspense fallback={<SectionFallback />}><AnaliseSection /></Suspense>
           ) : section === "estrategias" ? (
             <Suspense fallback={<SectionFallback />}><EstrategiasSection /></Suspense>
+          ) : section === "hostman" ? (
+            <Suspense fallback={<SectionFallback />}><HostmanSection /></Suspense>
           ) : section !== "dashboard" ? (
             <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-5 px-4 py-10 sm:gap-6 sm:px-6 sm:py-16">
               <Card delay={0.05}>

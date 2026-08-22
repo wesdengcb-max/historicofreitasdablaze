@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
+/* __LK_NOOP_eabb5bd3-7fd1-48db-8dd9-25f5213934bd__ */
 import { Crown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Shield, Zap, TrendingUp, History, Target, Clock, Lock, BarChart3, Search, Activity, Sun, Moon, CheckCircle2 } from "lucide-react"
