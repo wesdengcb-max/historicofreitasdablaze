@@ -90,3 +90,22 @@ function LandingPage() {
     </div>
   );
 }
+
+function FeatureCard({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
+  return (
+    <div className="group relative bg-[#0c0c0c] border border-white/5 rounded-3xl p-10 transition-all duration-500 hover:translate-y-[-8px] hover:border-red-500/30 hover:shadow-[0_20px_40px_rgba(229,9,20,0.1)] overflow-hidden">
+      {/* Hover background glow */}
+      <div className="absolute top-0 right-0 w-32 h-32 bg-red-600/5 blur-[40px] opacity-0 group-hover:opacity-100 transition-opacity" />
+      
+      <div className="relative z-10">
+        <div className="w-16 h-16 bg-red-600/10 rounded-2xl flex items-center justify-center mb-8 text-[#E50914] border border-red-600/10 transition-all duration-500 group-hover:bg-[#E50914] group-hover:text-white group-hover:shadow-[0_0_30px_rgba(229,9,20,0.5)]">
+          {icon}
+        </div>
+        <h3 className="text-xl font-black uppercase tracking-tighter mb-4">{title}</h3>
+        <p className="text-gray-500 text-sm leading-relaxed font-medium">
+          {description}
+        </p>
+      </div>
+    </div>
+  );
+}

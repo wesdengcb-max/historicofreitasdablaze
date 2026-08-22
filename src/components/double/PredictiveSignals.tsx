@@ -1,10 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { setPredictiveSignals } from "@/lib/signalsStore";
-import { Radio, Power, Trash2, FileDown, Clock, Cpu, Sparkles, Target, Layers, Download } from "lucide-react";
-import { saveTriggerAudit, updateTriggerAuditResult, getBlockStats, getTriggerAuditsForExport } from "@/lib/triggerAudits.functions";
+import { Loader2, Sparkles, Target, Layers } from "lucide-react";
 import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
-import { ResultCircle } from "@/components/double/ResultCircle";
-import { AnimatePresence, motion } from "framer-motion";
 import { parseUtcDate } from "@/lib/utils";
 import { Card } from "@/components/double/Card";
 import {
@@ -17,7 +14,7 @@ import {
   buildA7,
   buildA8,
   buildA9,
-  buildSomas,
+  buildSeloVerde,
   buildA8_11,
   buildA11_11,
   buildA4_11,
@@ -38,6 +35,7 @@ import {
   buildRecAlerts,
 } from "@/lib/predictive";
 
+
 type Mode1Signal = { 
   key: string; 
   title: string; 
@@ -47,16 +45,13 @@ type Mode1Signal = {
   analysisCount: number; 
   sources: Array<{ analysis: number; value: number }>;
   isHighTendency: boolean;
-  isPossibleRec?: boolean;
+  isVerified?: boolean;
   isRare?: boolean;
+  isGreenSeal?: boolean;
+  greenSealAssertivity?: number;
+
   outcome?: "pending" | "green" | "red";
   resultTime?: string;
-  isSuperSignal?: boolean;
-  isTop1?: boolean;
-  top1Count: number;
-  hasTop5Confluence?: boolean;
-  peakAnalysisCount: number;
-  completedAt?: number;
 };
 type Mode2Signal = {
   key: string;
@@ -67,6 +62,7 @@ type Mode2Signal = {
   confluence: string;
   analysisCount: number;
   isHighTendency: boolean;
+  isVerified?: boolean;
   isRare?: boolean;
 
   outcome?: "pending" | "green" | "red";
@@ -88,36 +84,38 @@ const CANDIDATE_DEPTH = 10;
 /** Somente as N primeiras contam como Top 5 validador. */
 const TOP5_DEPTH = 5;
 
-const getMedalStyles = (count: number) => {
-  if (count >= 7) return { 
+const getMedalStyles = (count: number, isConsecutive?: boolean, levelOffset: number = 0) => {
+  const totalLevel = count + levelOffset;
+  
+  if (totalLevel >= 7) return { 
     label: "👑 Supremo", 
     classes: "border-purple-400 bg-purple-950/50 text-purple-300 shadow-purple-500/20 animate-pulse",
     badge: "bg-purple-400/20 text-purple-300 border-purple-400/30"
   };
-  if (count === 6) return { 
-    label: "👑 Rei", 
-    classes: "border-red-400 bg-red-950/40 text-red-200 shadow-red-500/10",
-    badge: "bg-red-400/20 text-red-200 border-red-400/30"
+  if (totalLevel === 6) return { 
+    label: "💎 Diamante", 
+    classes: "border-blue-400 bg-blue-950/40 text-blue-200 shadow-blue-500/10",
+    badge: "bg-blue-400/20 text-blue-200 border-blue-400/30"
   };
-  if (count === 5) return { 
-    label: "🏆 Mestre", 
+  if (totalLevel === 5) return { 
+    label: "🥇 Ouro", 
     classes: "border-yellow-400 bg-yellow-950/50 text-yellow-300 shadow-yellow-500/20",
     badge: "bg-yellow-400/20 text-yellow-300 border-yellow-400/30"
   };
-  if (count === 4) return { 
-    label: "🥇 Ouro", 
-    classes: "border-yellow-600/50 bg-yellow-900/20 text-yellow-200 shadow-yellow-500/10",
-    badge: "bg-yellow-600/20 text-yellow-200 border-yellow-600/30"
-  };
-  if (count === 3) return { 
+  if (totalLevel === 4) return { 
     label: "🥈 Prata", 
-    classes: "border-slate-300 bg-slate-800/40 text-slate-100 shadow-slate-500/10",
+    classes: "border-slate-300 bg-slate-800/40 text-slate-100",
     badge: "bg-slate-300/20 text-slate-100 border-slate-300/30"
   };
-  if (count === 2) return { 
+  if (totalLevel === 3) return { 
     label: "🥉 Bronze", 
     classes: "border-amber-700 bg-amber-950/30 text-amber-300",
     badge: "bg-amber-700/20 text-amber-300 border-amber-700/30"
+  };
+  if (totalLevel === 2) return { 
+    label: "Top 1 + Confluência", 
+    classes: "border-cyan-400 bg-cyan-950/30 text-cyan-300 shadow-cyan-500/10",
+    badge: "bg-cyan-400/20 text-cyan-300 border-cyan-400/30"
   };
   return {
     label: "Top 1 Isolado",
@@ -133,85 +131,7 @@ export function PredictiveSignals() {
   const [err, setErr] = useState<string | null>(null);
   const [mode1, setMode1] = useState<Mode1Signal[] | null>(null);
   const [mode2, setMode2] = useState<Mode2Signal[] | null>(null);
-  const [peakStates, setPeakStates] = useState<Record<string, number>>({});
-  const [auditIds, setAuditIds] = useState<Record<string, string>>({});
-  const [sections, setSections] = useState<{
-    top1Confluence: Mode1Signal[];
-    top1Isolated: Mode1Signal[];
-    top1Top5: Mode1Signal[];
-    top5Only: Mode1Signal[];
-  }>({
-    top1Confluence: [],
-    top1Isolated: [],
-    top1Top5: [],
-    top5Only: [],
-  });
   const [generatedAt, setGeneratedAt] = useState<Date | null>(null);
-  const [blockStats, setBlockStats] = useState<Record<string, { signals: number, wins: number, reds: number, pct: number }>>({});
-  const [currentBlockLabel, setCurrentBlockLabel] = useState("");
-
-  const fetchBlockStats = useCallback(async () => {
-    try {
-      const { blockStart, blockEnd, stats } = await getBlockStats();
-      const fmt = (iso: string) => fmtClock(new Date(iso));
-      setCurrentBlockLabel(`${fmt(blockStart)} - ${fmt(blockEnd)}`);
-      
-      const newStats: Record<string, { signals: number, wins: number, reds: number, pct: number }> = {};
-      const categories = ['raro', 'isolado', 'top1_top5', 'top5'];
-      
-      categories.forEach(cat => {
-        const catStats = stats?.filter(s => s.category === cat) || [];
-        const wins = catStats.filter(s => s.win === true).length;
-        const reds = catStats.filter(s => s.win === false).length;
-        const total = wins + reds;
-        newStats[cat] = {
-          signals: catStats.length,
-          wins,
-          reds,
-          pct: total > 0 ? (wins / total) * 100 : 100
-        };
-      });
-      setBlockStats(newStats);
-    } catch (e) {
-      console.error("[fetchBlockStats] Error:", e);
-    }
-  }, []);
-
-  const handleDownloadReport = async () => {
-    try {
-      const data = await getTriggerAuditsForExport();
-      const csv = [
-        ["ID", "Gatilho", "Horário Base", "Horário Alvo", "Categoria", "Confluências", "Win", "Criado Em"].join(","),
-        ...data.map(r => [
-          r.id,
-          r.gatilho,
-          r.horario_base,
-          r.horario_alvo,
-          r.category,
-          `"${r.confluences || ""}"`,
-          r.win === null ? "PENDENTE" : (r.win ? "SIM" : "NÃO"),
-          r.created_at
-        ].join(","))
-      ].join("\n");
-      
-      const blob = new Blob([csv], { type: "text/csv" });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `relatorio-sinais-${new Date().toISOString().split('T')[0]}.csv`;
-      a.click();
-    } catch (e) {
-      console.error("[handleDownloadReport] Error:", e);
-    }
-  };
-
-  useEffect(() => {
-    fetchBlockStats();
-    const interval = setInterval(fetchBlockStats, 60000);
-    return () => clearInterval(interval);
-  }, [fetchBlockStats]);
-
-  // O renderSignalCard foi definido no final do arquivo
 
 
   useEffect(() => {
@@ -256,10 +176,10 @@ export function PredictiveSignals() {
       7: buildA7(rows),
       8: (buildA8 as any)(rows),
       9: (buildA9 as any)(rows),
-      217: buildSomas(rows).filter((c: Cycle) => c.value === 17),
-      218: buildSomas(rows).filter((c: Cycle) => c.value === 18),
-      219: buildSomas(rows).filter((c: Cycle) => c.value === 19),
-      221: buildSomas(rows).filter((c: Cycle) => c.value === 21),
+      217: buildSeloVerde(rows).filter(c => c.value === 17),
+      218: buildSeloVerde(rows).filter(c => c.value === 18),
+      219: buildSeloVerde(rows).filter(c => c.value === 19),
+      221: buildSeloVerde(rows).filter(c => c.value === 21),
       10: buildA8_11(rows),
       11: buildA11_11(rows),
       12: buildA4_11(rows),
@@ -314,60 +234,13 @@ export function PredictiveSignals() {
     now.setSeconds(0, 0);
     setGeneratedAt(now);
 
-    // Monitorar resultados para auditoria
-    const lastRow = rows[rows.length - 1];
-    if (lastRow) {
-      const nowMs = now.getTime();
-      const lastResultTime = parseUtcDate(lastRow.created_at).getTime();
-      
-      // 1. Verificar WIN (Pedra 0 saiu)
-      Object.entries(auditIds).forEach(async ([key, id]) => {
-        const signalTimeStr = key.split('-')[1];
-        const signalTime = parseInt(signalTimeStr);
-        if (!signalTime) return;
-
-        const windowStart = signalTime - 60000;
-        const windowEnd = signalTime + 60000;
-
-        const hasWhiteInWindow = rows.some(r => {
-          const rTime = parseUtcDate(r.created_at).getTime();
-          return rTime >= windowStart && rTime <= windowEnd && Number(r.roll) === 0;
-        });
-
-        if (hasWhiteInWindow) {
-          console.log(`[AUDITORIA] WIN detectado (Branco na janela ±1m) para sinal em ${fmtClock(new Date(signalTime))}`);
-          await updateTriggerAuditResult({ data: { id, win: true } });
-          
-          setMode1(prev => prev?.map(s => s.key === key ? { ...s, outcome: "green", completedAt: Date.now() } : s) || null);
-          
-          setAuditIds(prev => {
-            const next = { ...prev };
-            delete next[key];
-            return next;
-          });
-          fetchBlockStats();
-        } else if (Date.now() > windowEnd + 60000) { // Janela expirou (Alvo + 1 min + buffer)
-          console.log(`[AUDITORIA] LOSS detectado para sinal em ${fmtClock(new Date(signalTime))}`);
-          await updateTriggerAuditResult({ data: { id, win: false } });
-          
-          setMode1(prev => prev?.map(s => s.key === key ? { ...s, outcome: "red", completedAt: Date.now() } : s) || null);
-
-          setAuditIds(prev => {
-            const next = { ...prev };
-            delete next[key];
-            return next;
-          });
-          fetchBlockStats();
-        }
-      });
-    }
-
     // Alertas de Segurança ("possível rec")
     const recAlerts = buildRecAlerts(rows);
     const activeAlerts = recAlerts.filter((alert: RecAlert) => {
       const diff = (now.getTime() - alert.triggerAt.getTime()) / 60000;
       return diff >= 0 && diff <= alert.duration;
     });
+
 
     // Dispara evento global para o SinaisSection alternar para "Rodadas Atuais"
     window.dispatchEvent(new CustomEvent('switch-audit-filter', { detail: 'hoje' }));
@@ -383,54 +256,69 @@ export function PredictiveSignals() {
         isHighTendency: boolean; 
         isPossibleRec: boolean;
         isGreenSeal?: boolean;
-        triggerAt: Date;
       }
     >();
 
-    const confluenciaIds = [8, 9, 10, 11, 12, 13, 217, 218, 219, 221, 20711];
+    const greenSealIds = [217, 218, 219, 221, 20711];
 
     for (const item of active) {
-      const isConfluenceGatilho = confluenciaIds.includes(item.analysis);
-      const isMainAnalysis = [1, 2, 3, 4, 5, 6, 7].includes(item.analysis);
-
+      const isA8A9 = [8, 9, 10, 11, 12, 13].includes(item.analysis);
+      
+      const hist = engine[item.analysis].filter(c => c.value === item.value).slice(-6);
+      
       let targetMinutes = 0;
       let displayPct = 0;
       let displayLabel = "";
 
-      if (isConfluenceGatilho) {
-        if ([8, 9, 10, 11, 12, 13].includes(item.analysis)) {
-          targetMinutes = item.open.gaps[0] || 0;
-          displayPct = 100;
-        } else {
-          targetMinutes = 1;
-          displayPct = 100;
-        }
+      if (isA8A9) {
+        targetMinutes = item.open.gaps[0] || 0;
+        displayPct = 100;
         displayLabel = targetMinutes.toString();
-      } else if (isMainAnalysis) {
-        const hist = engine[item.analysis].filter(c => c.value === item.value).slice(-6);
+      } else {
         if (hist.length < MIN_GATILHOS) continue;
         const top1 = computeTop(hist, 1)[0];
         if (!top1) continue;
         if (top1.pct < MIN_ASSERTIVIDADE_TOP1) continue;
         
         targetMinutes = top1.m;
+        if ([17, 18, 19].includes(item.analysis)) {
+          targetMinutes += 1;
+        }
+        
         displayPct = top1.pct;
         displayLabel = targetMinutes.toString();
-      } else {
-        continue;
       }
 
       const at = addMinutes(item.open.triggerAt, targetMinutes);
       if (at.getTime() <= now.getTime()) continue; 
       const t = at.getTime();
 
-      const isTendency = isConfluenceGatilho ? true : checkHighTendency(engine[item.analysis], item.value);
+      // Logic for detection if a Green Seal applies
+      const hasGreenSeal = greenSealIds.some(gsId => {
+        const gsCycles = engine[gsId];
+        if (!gsCycles || gsCycles.length === 0) return false;
+        const lastGs = gsCycles[gsCycles.length - 1];
+        if (!lastGs || lastGs.gaps.length === 0) return false;
+        
+        let gsMinutes = 0;
+        if (gsId === 20711) {
+           gsMinutes = lastGs.gaps[0];
+        } else {
+           gsMinutes = Math.ceil(lastGs.gaps[0] * 0.5) + 1;
+        }
+        
+        const gsAt = addMinutes(lastGs.triggerAt, gsMinutes);
+        return Math.abs(gsAt.getTime() - t) <= 60000;
+      });
+
+      const isTendency = isA8A9 ? true : checkHighTendency(engine[item.analysis], item.value);
       const isPossibleRec = activeAlerts.some((alert: RecAlert) => {
         const signalTime = at.getTime();
         const alertStart = alert.triggerAt.getTime();
         const alertEnd = alertStart + alert.duration * 60000;
         return signalTime >= alertStart && signalTime <= alertEnd;
       });
+
 
       const cur = byTime.get(t);
       if (!cur) {
@@ -442,7 +330,7 @@ export function PredictiveSignals() {
           sources: [{ analysis: item.analysis, value: item.value }],
           isHighTendency: isTendency,
           isPossibleRec,
-          triggerAt: item.open.triggerAt
+          isGreenSeal: hasGreenSeal
         });
       } else {
         if (!cur.values.includes(item.value)) cur.values.push(item.value);
@@ -450,133 +338,34 @@ export function PredictiveSignals() {
         cur.sources.push({ analysis: item.analysis, value: item.value });
         if (isTendency) cur.isHighTendency = true;
         if (isPossibleRec) cur.isPossibleRec = true;
+        if (hasGreenSeal) cur.isGreenSeal = true;
         if (displayPct > cur.pct) {
           cur.pct = displayPct;
           cur.label = displayLabel;
         }
       }
     }
-    const finalMode1: Mode1Signal[] = [];
-
-    for (const [t, info] of Array.from(byTime.entries()).sort((a: [number, any], b: [number, any]) => a[0] - b[0])) {
-      const entryDate = new Date(t);
-      const values = info.values.slice().sort((a: number, b: number) => a - b);
-      const isTop1 = info.analyses.has(1);
-      const top5Analyses = [2, 3, 4, 5];
-      const hasTop5 = top5Analyses.some(a => info.analyses.has(a));
-      const confluenceCount = info.analyses.size;
-
-      const isRare = isTop1 && Array.from(byTime.keys()).some(otherT => 
-        otherT !== t && 
-        Math.abs(otherT - t) <= 60000 && 
-        byTime.get(otherT)?.analyses.has(1)
-      );
-
-      const signalKey = `m1-${t}`;
-      const currentPeak = peakStates[signalKey] || 0;
-      const newPeak = Math.max(currentPeak, confluenceCount);
-      
-      if (newPeak > currentPeak) {
-        setPeakStates(prev => ({ ...prev, [signalKey]: newPeak }));
-      }
-
-      // Preservar estado de auditoria e peak count se já existir no mode1 atual
-      const existing = mode1?.find(m => m.key === signalKey);
-      const signal: Mode1Signal = {
-        key: signalKey,
-        title: `Análise ${values.join(" + ")}`,
-        at: entryDate,
-        pct: info.pct,
-        label: info.label,
-        analysisCount: confluenceCount,
-        peakAnalysisCount: newPeak,
-        sources: info.sources,
-        isHighTendency: info.isHighTendency,
-        isPossibleRec: info.isPossibleRec,
-        isTop1,
-        top1Count: info.analyses.has(1) ? 1 : 0, // Simplificado, pode ser ajustado se top1Count for a soma de A1-A7
-        hasTop5Confluence: hasTop5,
-        isSuperSignal: confluenceCount >= 4,
-        isRare,
-        outcome: existing?.outcome || "pending",
-        completedAt: existing?.completedAt
-      };
-      
-      // Peak Rank Lock: Manter o maior número de confluências alcançado
-      if (existing) {
-        signal.peakAnalysisCount = Math.max(existing.peakAnalysisCount, newPeak);
-      }
-
-      // Auditoria: Salvar se for novo
-      if (!auditIds[signalKey] && !existing) {
-        (async () => {
-          try {
-            let category = 'top5';
-            if (isRare) category = 'raro';
-            else if (isTop1 && !hasTop5) category = 'isolado';
-            else if (isTop1 && hasTop5) category = 'top1_top5';
-
-            const confluenceStr = Array.from(info.analyses).map(a => `A${a}`).join(', ');
-
-            const { data: res } = await saveTriggerAudit({ 
-              data: {
-                gatilho: confluenceStr,
-                horario_base: new Date(t - 60000).toISOString(),
-                horario_alvo: entryDate.toISOString(),
-                category,
-                analysis_count: newPeak,
-                confluences: confluenceStr,
-                win: null // Nasce pendente
-              }
-            }) as any;
-            
-            if (res?.id) {
-              setAuditIds(prev => ({ ...prev, [signalKey]: res.id }));
-            }
-          } catch (e) {
-            console.error("Erro ao salvar auditoria:", e);
-          }
-        })();
-      }
-
-      // A preservação já foi feita acima na criação do objeto signal
-
-      finalMode1.push(signal);
-    }
-
-    setMode1(finalMode1);
-    
-    // A cada nova pedra ou ciclo, recalculamos o feed filtrado e expirado
-    // REGRA: Após auditoria (WIN/RED), o card permanece 3 minutos antes de sumir
-    const threeMinutesMs = 3 * 60 * 1000;
-    const activeSignals = (finalMode1 || []).filter(s => {
-      if (!s.completedAt) return true;
-      return (Date.now() - s.completedAt) < threeMinutesMs;
-    });
-
-    setSections({
-      // Seção 1 (Top 1 + Confluência): signals.filter(s => s.isRare || s.top1Count >= 2)
-      top1Confluence: activeSignals.filter(s => s.isRare || s.top1Count >= 2),
-      
-      // Seção 2 (Top 1 Isolado): signals.filter(s => (s.isTop1 || s.title.includes('Isolado')) && !s.isRare && !s.hasTop5Confluence)
-      top1Isolated: activeSignals.filter(s => 
-        (s.isTop1 || s.title.includes('Isolado')) && !s.isRare && !s.hasTop5Confluence
-      ),
-      
-      // Seção 3 (Top 1 + Confluência Top 5): signals.filter(s => (s.isTop1 || s.title.includes('Isolado')) && !s.isRare && s.hasTop5Confluence)
-      top1Top5: activeSignals.filter(s => 
-        (s.isTop1 || s.title.includes('Isolado')) && !s.isRare && s.hasTop5Confluence
-      ),
-      
-      // Seção 4 (Confluência Top 5): signals.filter(s => !s.isTop1 && !s.title.includes('Isolado') && !s.isRare && s.top1Count === 0)
-      // GARANTIA: Proíba terminantemente a renderização de qualquer sinal com 'isTop1 === true' ou 'Isolado' no título dentro da Seção 4.
-      top5Only: activeSignals.filter(s => 
-        !s.isTop1 && !s.title.includes('Isolado') && !s.isRare && s.top1Count === 0
-      )
-    });
+    const m1: Mode1Signal[] = Array.from(byTime.entries())
+      .sort((a: [number, any], b: [number, any]) => a[0] - b[0])
+      .map(([t, info]: [number, any]) => {
+        const values = info.values.slice().sort((a: number, b: number) => a - b);
+        return {
+          key: `m1-${t}`,
+          title: `Análise ${values.join(" + ")}`,
+          at: new Date(t),
+          pct: info.pct,
+          label: info.label,
+          analysisCount: info.analyses.size,
+          sources: info.sources,
+          isHighTendency: info.isHighTendency,
+          isPossibleRec: info.isPossibleRec,
+          isGreenSeal: info.isGreenSeal
+        };
+      });
+    setMode1(m1);
 
 
-    const usedTimes = new Set<number>(finalMode1.map((s: Mode1Signal) => s.at.getTime()));
+    const usedTimes = new Set<number>(m1.map((s) => s.at.getTime()));
 
     // ---- Modo 2: Estratégia de Coincidência ----
     type Proj = { analysis: number; value: number; pct: number; top5: boolean };
@@ -644,98 +433,226 @@ export function PredictiveSignals() {
     m2.sort((a, b) => a.times[0].getTime() - b.times[0].getTime());
     setMode2(m2);
 
-    // O Modo Unificado agora é tratado no loop principal finalMode1
-    setLoading(false);
-  }, [rows, engine, peakStates, auditIds, fetchBlockStats]);
+    // ---- Level Elevation, Unification and Proximity Filtering ----
+    const rawUnifiedM1: Mode1Signal[] = [];
+    const sortedM1 = Array.from(byTime.entries()).sort((a: [number, any], b: [number, any]) => a[0] - b[0]);
+    
+    for (let i = 0; i < sortedM1.length; i++) {
+      const [t, info]: [number, any] = sortedM1[i];
+      const next1 = sortedM1[i + 1];
+      const next2 = sortedM1[i + 2];
+      
+      const isConsecutive3 = next1 && next2 && 
+        Math.abs(next1[0] - t) <= 60000 && 
+        Math.abs(next2[0] - next1[0]) <= 60000;
+      
+      const isConsecutive2 = !isConsecutive3 && next1 && 
+        Math.abs(next1[0] - t) <= 60000;
+
+      if (isConsecutive3) {
+        const middleTime = next1[0];
+        const combinedSources = [...info.sources, ...next1[1].sources, ...next2[1].sources];
+        const combinedAnalyses = new Set([...info.analyses, ...next1[1].analyses, ...next2[1].analyses]);
+        const maxPct = Math.max(info.pct, next1[1].pct, next2[1].pct);
+        
+        rawUnifiedM1.push({
+          key: `m1-c3-${middleTime}`,
+          title: `Supremo · ${info.values.join("+")}`,
+          at: new Date(middleTime),
+          pct: maxPct,
+          label: info.label,
+          analysisCount: combinedAnalyses.size + 4,
+          sources: combinedSources,
+          isHighTendency: info.isHighTendency || next1[1].isHighTendency || next2[1].isHighTendency,
+          isVerified: false,
+          isGreenSeal: info.isGreenSeal || next1[1].isGreenSeal || next2[1].isGreenSeal
+        });
+        i += 2;
+      } else if (isConsecutive2) {
+        const best = info.pct >= next1[1].pct ? { t, info } : { t: next1[0], info: next1[1] };
+        const combinedSources = [...info.sources, ...next1[1].sources];
+        const combinedAnalyses = new Set([...info.analyses, ...next1[1].analyses]);
+        
+        rawUnifiedM1.push({
+          key: `m1-c2-${best.t}`,
+          title: `Confluência · ${best.info.values.join("+")}`,
+          at: new Date(best.t),
+          pct: best.info.pct,
+          label: best.info.label,
+          analysisCount: combinedAnalyses.size + 1,
+          sources: combinedSources,
+          isHighTendency: info.isHighTendency || next1[1].isHighTendency,
+          isVerified: false,
+          isGreenSeal: info.isGreenSeal || next1[1].isGreenSeal
+        });
+        i += 1;
+      } else {
+        rawUnifiedM1.push({
+          key: `m1-${t}`,
+          title: `Análise ${info.values.join(" + ")}`,
+          at: new Date(t),
+          pct: info.pct,
+          label: info.label,
+          analysisCount: info.analyses.size,
+          sources: info.sources,
+          isHighTendency: info.isHighTendency,
+          isVerified: false,
+          isGreenSeal: info.isGreenSeal
+        });
+      }
+    }
+
+    // TRAVA DE VIZINHANÇA PARA MINUTOS SEGUIDOS
+    const unifiedM1: Mode1Signal[] = [];
+    for (let i = 0; i < rawUnifiedM1.length; i++) {
+      const current = rawUnifiedM1[i];
+      const next = rawUnifiedM1[i + 1];
+      
+      const isCurrentTop1Confluence = current.analysisCount >= 2;
+      const isNextTop1Confluence = next && next.analysisCount >= 2;
+      
+      if (isCurrentTop1Confluence && isNextTop1Confluence && Math.abs(next.at.getTime() - current.at.getTime()) <= 60000) {
+        if (current.analysisCount > next.analysisCount) {
+          unifiedM1.push(current);
+        } else if (next.analysisCount > current.analysisCount) {
+          unifiedM1.push(next);
+        } else {
+          unifiedM1.push(next);
+        }
+        i++;
+      } else {
+        unifiedM1.push(current);
+      }
+    }
+
+    // Secondary Verification Selo Azul Logic
+    const secondaryProjections = new Map<number, Set<number>>(); // time -> values
+    for (const item of (secondaryActive as any)) {
+      const hist = engine[item.analysis].filter((c: any) => c.value === item.value).slice(-6);
+      if (hist.length < 6) continue;
+      const top1 = computeTop(hist, 1)[0];
+      if (!top1) continue;
+      const at = addMinutes(item.open.triggerAt, top1.m).getTime();
+      if (!secondaryProjections.has(at)) secondaryProjections.set(at, new Set());
+      secondaryProjections.get(at)!.add(item.value);
+    }
+
+    // Regra: Badge "Sinal RARO" reservada para Top 1 + Confluência filtrados
+    const isRareTime = (time: number) => {
+      return unifiedM1.some(s => s.at.getTime() === time && s.analysisCount >= 2);
+    };
+
+    const finalM1 = await Promise.all(unifiedM1.map(async s => {
+      const t = s.at.getTime();
+      const secValues = secondaryProjections.get(t);
+      const isVerified = secValues && s.sources.some(src => secValues.has(src.value));
+      const isRare = isRareTime(t);
+      
+      let isGreenSeal = false;
+      let greenSealAssertivity = 0;
+      
+      const greenSource = s.sources.find(src => (src.analysis >= 217 && src.analysis <= 221) || src.analysis === 20711);
+      if (greenSource) {
+        const tag = `SOMA_${greenSource.value}`;
+        const { data } = await supabase.from('historico_sinais_audit')
+          .select('status')
+          .eq('tag', tag)
+          .neq('status', 'PENDENTE')
+          .order('created_at', { ascending: false })
+          .limit(6);
+        
+        if (data && data.length === 6) {
+          const wins = data.filter(r => r.status && r.status.startsWith('WIN')).length;
+          greenSealAssertivity = (wins / 6) * 100;
+          if (greenSealAssertivity >= 65) {
+            isGreenSeal = true;
+          }
+        } else if (data && data.length > 0) {
+           // Fallback para quando tem menos de 6 mas queremos testar
+           const wins = data.filter(r => r.status && r.status.startsWith('WIN')).length;
+           greenSealAssertivity = (wins / data.length) * 100;
+           if (greenSealAssertivity >= 65) isGreenSeal = true;
+        }
+      }
+
+      return { ...s, isVerified, isRare, isGreenSeal, greenSealAssertivity };
+    }));
+
+
+    setMode1(finalM1);
+
+
+  }, [active, engine, rows]);
 
   // Alertas de Recuperação "possível rec"
   const activeRecAlerts = useMemo(() => {
     const alerts: Array<{ type: string; start: number; end: number }> = [];
     const now = new Date().getTime();
 
+    // Procurar gatilhos no histórico recente (últimas 20 pedras para garantir cobertura da janela)
     const recent = rows.slice(-20);
     for (let i = 1; i < recent.length; i++) {
       const p1 = Number(recent[i - 1].roll);
       const p2 = Number(recent[i].roll);
       const dt = parseUtcDate(recent[i].created_at).getTime();
 
+      // Gatilho 7-14: 14 min
       if (p1 === 7 && p2 === 14) alerts.push({ type: "7-14", start: dt, end: dt + 14 * 60000 });
+      // Gatilho 4-7: 9 min
       if (p1 === 4 && p2 === 7) alerts.push({ type: "4-7", start: dt, end: dt + 9 * 60000 });
+      // Gatilho 5-14: 14 min
       if (p1 === 5 && p2 === 14) alerts.push({ type: "5-14", start: dt, end: dt + 14 * 60000 });
     }
     return alerts.filter(a => a.end > now);
   }, [rows]);
 
-  // Conexão direta com novas pedras (WebSocket/useBlazeData via rows)
+
+  // Auto-generate triggers
   useEffect(() => {
-    if (rows.length > 0 && !loading) {
+    if (active.length > 0 && !loading) {
       generate();
     }
-  }, [rows.length, loading, generate]);
+  }, [active.length, loading, generate]);
+
 
   useEffect(() => {
-    if (rows.length > 0 && !loading && mode1) {
-      const syncSignals = mode1.map(s => ({
-        key: s.key,
-        time: fmtClock(s.at),
-        pct: s.pct,
-        label: s.label,
-        confluence: s.sources.map(src => `A${src.analysis}·${src.value}`).join(", "),
-        medal: getMedalStyles(s.peakAnalysisCount).label,
-        entryDate: s.at,
-        outcome: s.outcome || "pending",
-        isHighTendency: s.isHighTendency,
-        isRare: s.isRare
-      })).sort((a, b) => a.entryDate.getTime() - b.entryDate.getTime());
+    if (rows.length > 0 && !loading && mode1 && mode2) {
+      const syncSignals: any[] = [
+        ...mode1.map(s => ({
+          key: s.key,
+          time: fmtClock(s.at),
+          pct: s.pct,
+          label: s.label,
+          confluence: s.sources.map(src => `A${src.analysis}·${src.value}`).join(", "),
+          medal: getMedalStyles(s.analysisCount)?.label,
+          entryDate: s.at,
+          outcome: "pending",
+          isHighTendency: s.isHighTendency,
+          isVerified: s.isVerified,
+          isRare: s.isRare,
+          isGreenSeal: s.isGreenSeal,
+          greenSealAssertivity: s.greenSealAssertivity,
+          isRecAlert: activeRecAlerts.some(a => s.at.getTime() >= a.start && s.at.getTime() <= a.end)
+        })),
+        ...mode2.map(s => ({
+          key: s.key,
+          time: s.times.map(t => fmtClock(t)).join(" / "),
+          pct: s.pct,
+          label: "Confluência",
+          confluence: s.confluence,
+          medal: getMedalStyles(s.analysisCount)?.label,
+          entryDate: s.times[0],
+          outcome: "pending",
+          isHighTendency: s.isHighTendency,
+          isRecAlert: activeRecAlerts.some(a => s.times[0].getTime() >= a.start && s.times[0].getTime() <= a.end)
+        }))
+      ].sort((a, b) => a.entryDate.getTime() - b.entryDate.getTime());
+
 
       setPredictiveSignals(syncSignals);
     }
-  }, [rows, loading, mode1]);
+  }, [rows, loading, mode1, mode2]);
 
-
-  const renderSignalCard = (s: Mode1Signal) => {
-    const medal = getMedalStyles(s.peakAnalysisCount);
-    return (
-      <motion.div
-        key={s.key}
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-      >
-        <Card
-          title={medal.label}
-          subtitle={fmtClock(s.at)}
-          isRare={s.isRare}
-          outcome={s.outcome}
-          className={cn("group relative border-2 transition-all duration-500 hover:scale-[1.02]", medal.classes)}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <ResultCircle color="white" pulse={!s.outcome || s.outcome === "pending"} />
-              </div>
-              <div>
-                <div className="text-2xl font-black text-white font-outfit leading-none">{fmtClock(s.at)}</div>
-                <div className="text-[10px] text-muted-foreground uppercase tracking-widest mt-1 font-bold">Horário Alvo</div>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="text-lg font-black text-primary font-outfit">{s.pct.toFixed(0)}%</div>
-              <div className="text-[9px] text-muted-foreground uppercase tracking-tighter font-bold">Assertividade</div>
-            </div>
-          </div>
-          
-          <div className="mt-4 flex flex-wrap gap-1 border-t border-white/5 pt-4">
-            {s.sources.map((src, i) => (
-              <span key={i} className={cn("rounded-full px-2 py-0.5 text-[8px] font-black border uppercase tracking-widest", medal.badge)}>
-                A{src.analysis}·{src.value}
-              </span>
-            ))}
-          </div>
-        </Card>
-      </motion.div>
-    );
-  };
 
   return (
     <Card className="glass-card !p-0 overflow-hidden">
@@ -745,141 +662,211 @@ export function PredictiveSignals() {
             <Sparkles className="h-5 w-5" />
           </div>
           <div>
-            <h2 className="text-xl font-black text-white font-outfit uppercase tracking-tight">Painel de Inteligência</h2>
-            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-0.5">Motor Preditivo · {currentBlockLabel}</p>
+            <div className="text-[10px] font-black uppercase tracking-[0.4em] text-primary font-outfit">
+              Gerador preditivo
+            </div>
+            <h2 className="text-xl font-black text-white font-outfit uppercase tracking-tight">Próximos Sinais</h2>
           </div>
         </div>
-        <button 
-          onClick={handleDownloadReport}
-          className="flex items-center gap-2 rounded-lg bg-white/5 px-3 py-1.5 text-[10px] font-bold text-white transition-all hover:bg-white/10 active:scale-95 border border-white/10"
-        >
-          <Download className="h-3.5 w-3.5" />
-          RELATÓRIO 24H
-        </button>
+        <div className="flex items-center gap-2">
+           <span className="relative flex h-2 w-2">
+             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+           </span>
+           <span className="text-[10px] font-bold text-emerald-500/80 uppercase tracking-widest">Tempo Real</span>
+        </div>
       </div>
 
-      <div className="p-6 space-y-12">
-        {/* SEÇÃO 1 */}
-        <div className="space-y-6">
-          <SectionHeader 
-            icon={<Sparkles className="h-5 w-5 text-purple-400" />}
-            title="💎 TOP 1 + CONFLUÊNCIA (SINAIS RAROS)"
-            subtitle="2+ projeções TOP 1 convergindo ou confluência suprema."
-            stats={blockStats['raro']}
-            recAlerts={activeRecAlerts}
-          />
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <AnimatePresence mode="popLayout">
-              {sections.top1Confluence.map(s => renderSignalCard(s))}
-            </AnimatePresence>
-            {sections.top1Confluence.length === 0 && <EmptyState />}
-          </div>
-        </div>
 
-        {/* SEÇÃO 2 */}
-        <div className="space-y-6">
-          <SectionHeader 
-            icon={<Target className="h-5 w-5 text-red-500" />}
-            title="🎯 TOP 1 ISOLADO"
-            subtitle="Análises individuais de alta precisão sem confluência externa."
-            stats={blockStats['isolado']}
-            recAlerts={activeRecAlerts}
-          />
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <AnimatePresence mode="popLayout">
-              {sections.top1Isolated.map(s => renderSignalCard(s))}
-            </AnimatePresence>
-            {sections.top1Isolated.length === 0 && <EmptyState />}
+      <div className="space-y-5 px-5 py-5">
+        {err && (
+          <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
+            {err}
           </div>
-        </div>
+        )}
 
-        {/* SEÇÃO 3 */}
-        <div className="space-y-6">
-          <SectionHeader 
-            icon={<Layers className="h-5 w-5 text-yellow-500" />}
-            title="⚡️ TOP 1 + CONFLUÊNCIA TOP 5"
-            subtitle="Ponto de convergência entre Análise Principal e Secundárias."
-            stats={blockStats['top1_top5']}
-            recAlerts={activeRecAlerts}
-          />
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <AnimatePresence mode="popLayout">
-              {sections.top1Top5.map(s => renderSignalCard(s))}
-            </AnimatePresence>
-            {sections.top1Top5.length === 0 && <EmptyState />}
-          </div>
-        </div>
+        {!err && mode1 && (
 
-        {/* SEÇÃO 4 */}
-        <div className="space-y-6">
-          <SectionHeader 
-            icon={<Cpu className="h-5 w-5 text-blue-400" />}
-            title="📊 CONFLUÊNCIA TOP 5"
-            subtitle="Cruzamento técnico apenas entre análises secundárias (Top 2-5)."
-            stats={blockStats['top5']}
-            recAlerts={activeRecAlerts}
-          />
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <AnimatePresence mode="popLayout">
-              {sections.top5Only
-                .filter(s => !s.isTop1 && !s.title?.includes('Isolado') && (s as any).category !== 'isolado')
-                .map(s => renderSignalCard(s))}
-            </AnimatePresence>
-            {sections.top5Only.length === 0 && <EmptyState />}
-          </div>
-        </div>
+          <section className="space-y-3">
+            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+              <Target className="h-3.5 w-3.5" /> Projeção Top 1
+              {generatedAt && (
+                <span className="normal-case tracking-normal opacity-60">
+                  · base {fmtClock(generatedAt)}
+                </span>
+              )}
+            </div>
+            {mode1.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                Sem horários futuros projetados no momento.
+              </p>
+            ) : (
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {mode1.map((s) => {
+                  const medal = getMedalStyles(s.analysisCount);
+                  return (
+                    <div
+                      key={s.key}
+                      className={`rounded-2xl border px-5 py-4 backdrop-blur-sm transition-all duration-300 ${
+                        medal 
+                          ? medal.classes 
+                          : "border-white/[0.05] bg-white/[0.02]"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <div className="text-xs font-semibold text-muted-foreground opacity-80 flex items-center gap-1.5">
+                            {s.title}
+                            <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-white/40">
+                              {s.sources[0]?.analysis ? `A${s.sources[0].analysis}` : "AUTO"}
+                            </span>
+                          </div>
+                          {s.isVerified && (
+                            <span className="flex items-center gap-0.5 rounded-full bg-blue-500/20 px-1.5 py-0.5 text-[8px] font-black text-blue-400 border border-blue-500/30">
+                              ✓ SELO AZUL
+                            </span>
+                          )}
+                          {s.isRare && (
+                            <span className="flex items-center gap-0.5 rounded-full bg-cyan-500/20 px-1.5 py-0.5 text-[8px] font-black text-cyan-300 border border-cyan-500/30 shadow-[0_0_10px_rgba(6,182,212,0.2)]">
+                              💎 RARO
+                            </span>
+                          )}
+                          {(s as any).isRecAlert && (
+                            <span className="flex items-center gap-0.5 rounded-full bg-amber-500/20 px-1.5 py-0.5 text-[8px] font-black text-amber-400 border border-amber-500/30">
+                              🙌 possível rec
+                            </span>
+                          )}
+                        </div>
+                        {medal && (
+                          <span className={`rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-widest ${medal.badge}`}>
+                            {medal.label}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="mt-1 flex items-center justify-between">
+                        <div className="text-3xl font-black tabular-nums text-white font-outfit">
+                          {fmtClock(s.at)}
+                        </div>
+                        {s.isHighTendency && (
+                          <span className="flex items-center gap-1 rounded-md bg-red-500/20 px-1.5 py-0.5 text-[9px] font-black text-red-400 animate-pulse border border-red-500/30">
+                            🔥 Alta Tendência
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-1 text-[11px] tabular-nums font-bold flex items-center gap-1.5">
+                        <span className={medal ? "text-inherit" : "text-primary"}>
+                          {s.isGreenSeal ? (s.greenSealAssertivity || 0).toFixed(1) : s.pct.toFixed(1)}%
+                        </span>
+                        {s.isGreenSeal && (
+                          <span className="flex items-center gap-1 rounded bg-emerald-500/20 px-1.5 py-0.5 text-[8px] font-black text-emerald-400 border border-emerald-500/30">
+                            ✓ SELADO
+                          </span>
+                        )}
+                        <span className="opacity-50 text-[10px]">·</span>
+                      </div>
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {s.sources.map((src, idx) => (
+                          <span key={idx} className="rounded-full border border-white/10 bg-white/[0.05] px-1.5 py-0.5 text-[9px] font-black text-white/70">
+                            A{src.analysis}·{src.value}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </section>
+        )}
+
+        {mode2 && (
+          <section className="space-y-3">
+            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+              <Layers className="h-3.5 w-3.5" /> Coincidências · validadas pelo Top 5
+            </div>
+            {mode2.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                Sem coincidências validadas (mín. 2 análises no mesmo minuto + presença no Top 5)
+              </p>
+            ) : (
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {mode2.map((s) => {
+                  const medal = getMedalStyles(s.analysisCount);
+                  return (
+                    <div
+                      key={s.key}
+                      className={`rounded-2xl border px-5 py-4 backdrop-blur-sm transition-all duration-300 ${
+                        medal 
+                          ? medal.classes 
+                          : "border-primary/20 bg-primary/5 shadow-[0_0_25px_rgba(59,130,246,0.1)]"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-white uppercase tracking-tighter">{s.title}</span>
+                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-white/40">
+                            {s.sources[0]?.analysis ? `A${s.sources[0].analysis}` : "CONF"}
+                          </span>
+                          {(s as any).isRecAlert && (
+                            <span className="flex items-center gap-0.5 rounded-full bg-amber-500/20 px-1.5 py-0.5 text-[8px] font-black text-amber-400 border border-amber-500/30">
+                              🙌 possível rec
+                            </span>
+                          )}
+                        </div>
+                        {medal ? (
+                          <span className={`rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-widest ${medal.badge}`}>
+                            {medal.label}
+                          </span>
+                        ) : (
+                          <span className="rounded-full border border-primary/30 bg-primary/20 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest text-white">
+                            Alta assertividade
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-1 flex items-center justify-between">
+                        <div className="text-3xl font-black tabular-nums text-white font-outfit">
+                          {s.times.map((t) => fmtClock(t)).join(" / ")}
+                        </div>
+                        {s.isHighTendency && (
+                          <span className="flex items-center gap-1 rounded-md bg-red-500/20 px-1.5 py-0.5 text-[9px] font-black text-red-400 animate-pulse border border-red-500/30">
+                            🔥 Alta Tendência
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-1 text-[11px] tabular-nums font-black flex items-center gap-1.5">
+                        <span className={medal ? "text-inherit" : "text-primary"}>
+                          {s.pct.toFixed(1)}%
+                        </span>
+                      </div>
+                      <div className="mt-2 text-[10px] leading-relaxed text-muted-foreground opacity-80">
+                        Origem:{" "}
+                        <span className={`font-bold ${medal ? "text-inherit" : "text-primary"}`}>{s.confluence}</span> (limite 120m/14t)
+                      </div>
+                      <div className="mt-1 flex flex-wrap gap-1">
+                        {s.sources.map((p) => (
+                          <span
+                            key={`${p.analysis}-${p.value}`}
+                            className={
+                              p.top5
+                                ? `rounded-full border px-2 py-0.5 text-[9px] font-black tabular-nums ${
+                                    medal ? "border-current/30 bg-current/10 text-inherit" : "border-primary/30 bg-primary/20 text-white"
+                                  }`
+                                : "rounded-full border border-white/10 bg-white/[0.03] px-2 py-0.5 text-[9px] font-bold tabular-nums text-[#9CA3AF]"
+                            }
+                          >
+                            A{p.analysis}·{p.value} {p.pct.toFixed(0)}%
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </section>
+        )}
       </div>
     </Card>
   );
 }
-
-function SectionHeader({ icon, title, subtitle, stats, recAlerts }: { 
-  icon: React.ReactNode; 
-  title: string; 
-  subtitle: string; 
-  stats?: { signals: number, wins: number, reds: number, pct: number };
-  recAlerts: any[];
-}) {
-  const activeRec = recAlerts.length > 0 ? recAlerts[0] : null;
-
-  return (
-    <div className="flex flex-col gap-2">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          {icon}
-          <h3 className="text-sm font-black text-white font-outfit uppercase tracking-wider">{title}</h3>
-        </div>
-        {stats && (
-          <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest bg-white/5 px-2 py-1 rounded">
-            {stats.signals} SINAIS | ASSERTIVIDADE: <span className="text-emerald-400">{stats.pct.toFixed(0)}%</span> ({stats.wins}W/{stats.reds}R)
-          </div>
-        )}
-      </div>
-      <p className="text-[10px] text-muted-foreground font-medium">{subtitle}</p>
-      
-      {activeRec && (
-        <motion.div 
-          initial={{ opacity: 0, y: -5 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-[10px] font-black text-yellow-400 uppercase tracking-[0.2em] flex items-center gap-2 mt-1 animate-pulse"
-        >
-          <span>⚠️ Possível REC ativo até às {fmtClock(new Date(activeRec.end))}</span>
-        </motion.div>
-      )}
-    </div>
-  );
-}
-
-function EmptyState() {
-  return (
-    <div className="col-span-full py-8 text-center border border-dashed border-white/5 rounded-2xl bg-white/[0.01]">
-      <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">Aguardando Projeção...</div>
-    </div>
-  );
-}
-
-
-function cn(...classes: any[]) {
-  return classes.filter(Boolean).join(" ");
-}
-

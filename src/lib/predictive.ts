@@ -14,7 +14,6 @@ export type Cycle = {
 
   triggerAt: Date;
   gaps: number[];
-  peakAnalysisCount?: number; // Peak Rank Lock
 };
 
 
@@ -384,35 +383,45 @@ export function buildA9(rows: Row[]): Cycle[] {
   return out;
 }
 
-
-/**
- * ESTRATÉGIA DE CONFLUÊNCIA - SOMAS
- * Gatilho: Soma(Pedra_A + Pedra_B) in [17, 18, 19, 21] ou Sequência 7-11/11-7
+/** 
+ * Análises Secundárias (#1 ao #9)
+ * Utilizam a mesma lógica da A1 (leitura de pedra vs unidade do minuto),
+ * mas deslocadas no tempo conforme a posição no histórico.
  */
-export function buildSomas(rows: Row[]): Cycle[] {
+
+/** 
+ * ESTRATÉGIA DE CONFIRMAÇÃO - SELO VERDE
+ * Gatilho: Pedra_Anterior >= 2 E Soma(Pedra_A + Pedra_B) in [17, 19, 21]
+ */
+export function buildSeloVerde(rows: Row[]): Cycle[] {
   const out: Cycle[] = [];
-  if (rows.length < 2) return out;
-  for (let i = 1; i < rows.length; i++) {
-    const rA = Number(rows[i - 1].roll);
-    const rB = Number(rows[i].roll);
-    if (!Number.isFinite(rA) || !Number.isFinite(rB)) continue;
-    const currentSoma = rA + rB;
-    const isSequence = (rA === 7 && rB === 11) || (rA === 11 && rB === 7);
-    const isSomaMatch = [17, 18, 19, 21].includes(currentSoma);
-    if (!isSomaMatch && !isSequence) continue;
+  for (let i = 2; i < rows.length; i++) {
+    const pAnt = Number(rows[i - 2].roll);
+    const pA = Number(rows[i - 1].roll);
+    const pB = Number(rows[i].roll);
+    
+    if (!Number.isFinite(pAnt) || !Number.isFinite(pA) || !Number.isFinite(pB)) continue;
+    
+    // Filtro de Segurança removido conforme solicitação
+    // if (pAnt < 2) continue;
+    
+    const soma = pA + pB;
+    if (![17, 18, 19, 21].includes(soma)) continue;
+    
     const dt = parseUtcDate(rows[i].created_at);
     if (Number.isNaN(dt.getTime())) continue;
+
+    // Selo Verde usa gaps[0] para pular casas (Pedra_Anterior)
     out.push({ 
-      value: isSequence ? 711 : currentSoma, 
-      analysis: 200 + (isSequence ? 711 : currentSoma),
+      value: soma, 
+      analysis: 200 + soma, // Tag única: 217, 219, 221
       triggerAt: dt, 
-      gaps: [1]
+      gaps: [pAnt], // casas a pular
+      isSecondary: false 
     });
   }
   return out;
 }
-
-
 
 export function buildSecondary(rows: Row[], offset: number): Cycle[] {
   const out: Cycle[] = [];
@@ -508,10 +517,11 @@ export function cyclesOf(cycles: Cycle[], value: number, analysis?: number): Cyc
 export function fmtClock(d: Date) {
   if (Number.isNaN(d.getTime())) return "--:--";
   return d.toLocaleTimeString("pt-BR", {
+    timeZone: "America/Sao_Paulo",
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
-  });
+});
 }
 
 /** 
