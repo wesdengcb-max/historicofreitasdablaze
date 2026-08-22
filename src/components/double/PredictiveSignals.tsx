@@ -49,6 +49,7 @@ type Mode1Signal = {
   isRare?: boolean;
   isGreenSeal?: boolean;
   greenSealAssertivity?: number;
+  strategyKey?: string;
 
   outcome?: "pending" | "green" | "red";
   resultTime?: string;
