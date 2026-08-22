@@ -194,7 +194,7 @@ export default function HostmanSection() {
                   {rowSpins.map((spin) => (
                     <div key={spin.id} className="flex flex-col items-center">
                       <div
-                        className="relative flex h-[72px] w-[72px] items-center justify-center rounded-lg shadow-lg overflow-hidden border border-white/5"
+                        className="relative flex h-[72px] w-[72px] items-center justify-center rounded-lg shadow-lg overflow-hidden border border-white/5 transition-transform duration-300 hover:scale-110"
                         style={{
                           backgroundColor: spin.color === "red" ? "#f12c4c" : spin.color === "black" ? "#1e2330" : "#ffffff",
                         }}
