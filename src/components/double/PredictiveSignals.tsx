@@ -346,7 +346,7 @@ export function PredictiveSignals() {
             return next;
           });
           fetchBlockStats();
-        } else if (now.getTime() > windowEnd + 30000) {
+        } else if (Date.now() > windowEnd + 60000) { // Janela expirou (Alvo + 1 min + buffer)
           console.log(`[AUDITORIA] LOSS detectado para sinal em ${fmtClock(new Date(signalTime))}`);
           await updateTriggerAuditResult({ data: { id, win: false } });
           
@@ -549,7 +549,7 @@ export function PredictiveSignals() {
     // A cada nova pedra ou ciclo, recalculamos o feed filtrado e expirado
     // REGRA: Após auditoria (WIN/RED), o card permanece 3 minutos antes de sumir
     const threeMinutesMs = 3 * 60 * 1000;
-    const activeSignals = finalMode1.filter(s => {
+    const activeSignals = (finalMode1 || []).filter(s => {
       if (!s.completedAt) return true;
       return (Date.now() - s.completedAt) < threeMinutesMs;
     });
@@ -821,7 +821,9 @@ export function PredictiveSignals() {
           />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <AnimatePresence mode="popLayout">
-              {sections.top5Only.map(s => renderSignalCard(s))}
+              {sections.top5Only
+                .filter(s => !s.isTop1 && !s.title?.includes('Isolado') && (s as any).category !== 'isolado')
+                .map(s => renderSignalCard(s))}
             </AnimatePresence>
             {sections.top5Only.length === 0 && <EmptyState />}
           </div>
