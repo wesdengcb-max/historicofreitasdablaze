@@ -513,7 +513,8 @@ export function PredictiveSignals() {
           sources: info.sources,
           isHighTendency: info.isHighTendency,
           isVerified: false,
-          isGreenSeal: info.isGreenSeal
+          isGreenSeal: info.isGreenSeal,
+          strategyKey: info.strategyKey
         });
       }
     }
