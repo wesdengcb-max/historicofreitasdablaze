@@ -261,6 +261,26 @@ export function PredictiveSignals() {
 
     const greenSealIds = [217, 218, 219, 221, 20711];
 
+    // Mapeamento de Green Seal para aplicação em outros cards
+    const activeGreenSeals = new Map<number, { id: number; at: number }>();
+    greenSealIds.forEach(gsId => {
+      const gsCycles = engine[gsId];
+      if (!gsCycles || gsCycles.length === 0) return;
+      const lastGs = gsCycles[gsCycles.length - 1];
+      if (!lastGs || lastGs.gaps.length === 0) return;
+      
+      let gsMinutes = 0;
+      if (gsId === 20711) {
+         gsMinutes = lastGs.gaps[0];
+      } else {
+         gsMinutes = Math.ceil(lastGs.gaps[0] * 0.5) + 1;
+      }
+      
+      const gsAt = addMinutes(lastGs.triggerAt, gsMinutes).getTime();
+      // Guardamos para conferência posterior
+      activeGreenSeals.set(gsAt, { id: gsId, at: gsAt });
+    });
+
     for (const item of active) {
       const isA8A9 = [8, 9, 10, 11, 12, 13].includes(item.analysis);
       
