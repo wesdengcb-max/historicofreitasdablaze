@@ -13,20 +13,20 @@ interface StatsCardProps {
 }
 
 const StatsCard = ({ title, titleSuffix, children, footer, className }: StatsCardProps) => (
-  <div className={cn("flex flex-col rounded-lg bg-[#0c0c0c] border border-white/5 overflow-hidden transition-all duration-300 light:bg-white light:border-[#E6EAF1] light:shadow-[0_8px_25px_rgba(30,50,90,0.06)]", className)}>
-    <div className="flex flex-col items-center pt-3 px-4 bg-[#141414]/30 light:bg-gray-50/50">
+  <div className={cn("flex flex-col rounded-lg bg-[#0c0c0c] border border-white/5 overflow-hidden", className)}>
+    <div className="flex flex-col items-center pt-3 px-4 bg-[#141414]/30">
       <div className="flex items-center gap-1.5 pb-2.5">
-        <span className="text-[12px] font-bold uppercase tracking-wider text-[#eaeaea] light:text-[#0f172a]">{title}</span>
+        <span className="text-[12px] font-bold uppercase tracking-wider text-[#eaeaea]">{title}</span>
         {titleSuffix}
       </div>
-      <div className="w-full border-t border-white/5 light:border-gray-100" />
+      <div className="w-full border-t border-white/5" />
     </div>
     <div className="flex-1 px-4 py-4">
       {children}
     </div>
     {footer && (
       <div className="px-4 pb-3">
-        <div className="mb-2.5 border-t border-white/5 light:border-gray-100" />
+        <div className="mb-2.5 border-t border-white/5" />
         {footer}
       </div>
     )}
@@ -57,7 +57,7 @@ export const LiveStats = memo(function LiveStats({
       {/* 1. Plataforma Atual */}
       <StatsCard title="Plataforma Atual">
         <div className="flex flex-col items-center justify-center gap-4 py-3">
-          <div className="flex items-center justify-center w-full light:bg-[#f8fafc] light:rounded-xl light:p-2">
+          <div className="flex items-center justify-center w-full">
              <img src={fwLogoAsset.url} alt="FW Logo" className="h-24 w-auto object-contain" />
           </div>
           <div className="flex justify-between w-full px-2 mt-2">
@@ -65,7 +65,7 @@ export const LiveStats = memo(function LiveStats({
               href="https://blaze.bet.br" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="flex h-7 items-center rounded border border-[#ef4444]/40 bg-black/40 px-4 text-[11px] font-bold text-white/90 transition-all hover:bg-[#ef4444]/10 hover:border-[#ef4444] active:scale-95 light:bg-[#ef4444] light:text-white light:border-none"
+              className="flex h-7 items-center rounded border border-[#ef4444]/40 bg-black/40 px-4 text-[11px] font-bold text-white/90 transition-all hover:bg-[#ef4444]/10 hover:border-[#ef4444] active:scale-95"
             >
               Blaze.com
             </a>
@@ -73,7 +73,7 @@ export const LiveStats = memo(function LiveStats({
               href="https://blaze.bet.br/pt/games/double" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="flex h-7 items-center rounded border border-[#ef4444]/40 bg-black/40 px-4 text-[11px] font-bold text-white/90 transition-all hover:bg-[#ef4444]/10 hover:border-[#ef4444] active:scale-95 light:bg-[#ef4444] light:text-white light:border-none"
+              className="flex h-7 items-center rounded border border-[#ef4444]/40 bg-black/40 px-4 text-[11px] font-bold text-white/90 transition-all hover:bg-[#ef4444]/10 hover:border-[#ef4444] active:scale-95"
             >
               Double
             </a>
@@ -109,11 +109,11 @@ export const LiveStats = memo(function LiveStats({
             { color: "black", count: 111, val: "R$ 1.112,80" }
           ].map((item, i) => (
             <div key={i} className="flex flex-col items-center gap-1.5">
-              <span className="text-[10px] font-bold text-white bg-[#1A1A1A] px-2 py-0.5 rounded min-w-[32px] text-center light:bg-gray-100 light:text-gray-900">{item.count}</span>
-              <div className="h-8 w-8 rounded-lg overflow-hidden border border-white/10 light:border-gray-100">
+              <span className="text-[10px] font-bold text-white bg-[#1A1A1A] px-2 py-0.5 rounded min-w-[32px] text-center">{item.count}</span>
+              <div className="h-8 w-8 rounded-lg overflow-hidden border border-white/10">
                 <ResultCircle color={item.color as any} size="fluid" animate={false} />
               </div>
-              <span className="text-[9px] font-medium text-[#888888] tabular-nums light:text-gray-500">{item.val}</span>
+              <span className="text-[9px] font-medium text-[#888888] tabular-nums">{item.val}</span>
             </div>
           ))}
         </div>
@@ -138,11 +138,11 @@ export const LiveStats = memo(function LiveStats({
             { color: "black", count: blacks, pct: blackPct }
           ].map((item, i) => (
             <div key={i} className="flex flex-col items-center gap-1.5">
-              <span className="text-[10px] font-bold text-white bg-[#1A1A1A] px-2 py-0.5 rounded min-w-[32px] text-center light:bg-gray-100 light:text-gray-900">{item.count} X</span>
-              <div className="h-8 w-8 rounded-lg overflow-hidden border border-white/10 light:border-gray-100">
+              <span className="text-[10px] font-bold text-white bg-[#1A1A1A] px-2 py-0.5 rounded min-w-[32px] text-center">{item.count} X</span>
+              <div className="h-8 w-8 rounded-lg overflow-hidden border border-white/10">
                 <ResultCircle color={item.color as any} size="fluid" animate={false} />
               </div>
-              <span className="text-[9px] font-bold text-white light:text-gray-900">{item.pct.toFixed(2)}%</span>
+              <span className="text-[9px] font-bold text-white">{item.pct.toFixed(2)}%</span>
             </div>
           ))}
         </div>
@@ -165,11 +165,11 @@ export const LiveStats = memo(function LiveStats({
             <div className="flex gap-4">
               <div className="flex flex-col items-center gap-1">
                 <ResultCircle color="red" size="xs" animate={false} />
-                <span className="text-[9px] font-bold text-white light:text-gray-900">3 X</span>
+                <span className="text-[9px] font-bold text-white">3 X</span>
               </div>
               <div className="flex flex-col items-center gap-1">
                 <ResultCircle color="black" size="xs" animate={false} />
-                <span className="text-[9px] font-bold text-white light:text-gray-900">3 X</span>
+                <span className="text-[9px] font-bold text-white">3 X</span>
               </div>
             </div>
           </div>

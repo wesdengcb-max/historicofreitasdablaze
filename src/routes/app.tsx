@@ -401,20 +401,11 @@ function Index() {
   }, []);
 
   const [countdown, setCountdown] = useState(15);
-  const [theme, setTheme] = useState<"dark" | "light">("light");
-
-  useEffect(() => {
-    const saved = localStorage.getItem("theme") as "dark" | "light" | null;
-    const initialTheme = saved || "light";
-    setTheme(initialTheme);
-    document.documentElement.classList.toggle("light", initialTheme === "light");
-    document.documentElement.classList.toggle("dark", initialTheme === "dark");
-  }, []);
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
 
   const toggleTheme = () => {
     const next = theme === "dark" ? "light" : "dark";
     setTheme(next);
-    localStorage.setItem("theme", next);
     document.documentElement.classList.toggle("light", next === "light");
     document.documentElement.classList.toggle("dark", next === "dark");
   };

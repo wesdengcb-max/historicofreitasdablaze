@@ -7,7 +7,7 @@ import { toast } from "sonner";
 export const AppHeader = memo(function AppHeader() {
   const isVip = useVipStatus();
   const { isCollapsed, toggle } = useSidebarStore();
-  const [theme, setTheme] = useState<"dark" | "light">("light");
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
 
   useEffect(() => {
     const saved = localStorage.getItem("theme") as "dark" | "light" | null;

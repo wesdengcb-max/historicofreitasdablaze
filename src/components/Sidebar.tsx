@@ -235,8 +235,8 @@ function SidebarItem({ item, active, isVip, isCollapsed, onClick }: { item: Menu
         "group flex items-center gap-3 rounded-xl py-3 text-sm font-bold transition-all duration-200",
         isCollapsed ? "justify-center px-0 w-full" : "px-4 w-full",
         active 
-          ? "sidebar-item-active"
-          : "text-muted-foreground hover:bg-white/[0.03] hover:text-white light:hover:bg-gray-100",
+          ? "bg-red-500/10 text-white shadow-[inset_0_0_0_1px_rgba(239,68,68,0.2)]" 
+          : "text-muted-foreground hover:bg-white/[0.03] hover:text-white",
         item.soon ? "opacity-40 cursor-not-allowed" : "",
         isLocked ? "opacity-60" : ""
       )}

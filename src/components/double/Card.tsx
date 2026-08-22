@@ -35,7 +35,7 @@ export const Card = memo(function Card({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
       transition={{ duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={`relative overflow-hidden rounded-xl border border-border bg-card p-5 shadow-sm transition-all duration-300 light:rounded-[20px] light:border-[#E6EAF1] light:shadow-[0_8px_25px_rgba(30,50,90,0.06)] ${className} ${
+      className={`relative overflow-hidden rounded-xl border border-border bg-card p-5 shadow-sm ${className} ${
         outcome === "green" ? "ring-1 ring-emerald-500/20" : outcome === "red" ? "ring-1 ring-red-500/20" : ""
       }`}
     >
@@ -73,8 +73,8 @@ export const Card = memo(function Card({
               </span>
             )}
             <div className="min-w-0">
-              {title && <h2 className="truncate text-[14px] font-medium tracking-tight text-[#eaeaea] light:text-[#0f172a]">{title}</h2>}
-              {subtitle && <p className="truncate text-[11px] text-muted-foreground light:text-gray-500">{subtitle}</p>}
+              {title && <h2 className="truncate text-[14px] font-medium tracking-tight text-[#eaeaea]">{title}</h2>}
+              {subtitle && <p className="truncate text-[11px] text-muted-foreground">{subtitle}</p>}
             </div>
           </div>
           {action}
