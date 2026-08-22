@@ -289,11 +289,13 @@ export function PredictiveSignals() {
       let targetMinutes = 0;
       let displayPct = 0;
       let displayLabel = "";
+      let strategyKey = `A${item.analysis}`;
 
       if (isA8A9) {
         targetMinutes = item.open.gaps[0] || 0;
         displayPct = 100;
         displayLabel = targetMinutes.toString();
+        // A8-A13 são gatilhos especiais
       } else {
         if (hist.length < MIN_GATILHOS) continue;
         const top1 = computeTop(hist, 1)[0];
@@ -313,23 +315,8 @@ export function PredictiveSignals() {
       if (at.getTime() <= now.getTime()) continue; 
       const t = at.getTime();
 
-      // Logic for detection if a Green Seal applies
-      const hasGreenSeal = greenSealIds.some(gsId => {
-        const gsCycles = engine[gsId];
-        if (!gsCycles || gsCycles.length === 0) return false;
-        const lastGs = gsCycles[gsCycles.length - 1];
-        if (!lastGs || lastGs.gaps.length === 0) return false;
-        
-        let gsMinutes = 0;
-        if (gsId === 20711) {
-           gsMinutes = lastGs.gaps[0];
-        } else {
-           gsMinutes = Math.ceil(lastGs.gaps[0] * 0.5) + 1;
-        }
-        
-        const gsAt = addMinutes(lastGs.triggerAt, gsMinutes);
-        return Math.abs(gsAt.getTime() - t) <= 60000;
-      });
+      // Detection if a Green Seal applies to this card
+      const hasGreenSeal = Array.from(activeGreenSeals.values()).some(gs => Math.abs(gs.at - t) <= 60000);
 
       const isTendency = isA8A9 ? true : checkHighTendency(engine[item.analysis], item.value);
       const isPossibleRec = activeAlerts.some((alert: RecAlert) => {
@@ -338,7 +325,6 @@ export function PredictiveSignals() {
         const alertEnd = alertStart + alert.duration * 60000;
         return signalTime >= alertStart && signalTime <= alertEnd;
       });
-
 
       const cur = byTime.get(t);
       if (!cur) {
@@ -350,7 +336,8 @@ export function PredictiveSignals() {
           sources: [{ analysis: item.analysis, value: item.value }],
           isHighTendency: isTendency,
           isPossibleRec,
-          isGreenSeal: hasGreenSeal
+          isGreenSeal: hasGreenSeal,
+          strategyKey
         });
       } else {
         if (!cur.values.includes(item.value)) cur.values.push(item.value);
@@ -359,9 +346,11 @@ export function PredictiveSignals() {
         if (isTendency) cur.isHighTendency = true;
         if (isPossibleRec) cur.isPossibleRec = true;
         if (hasGreenSeal) cur.isGreenSeal = true;
+        // Se este item tem mais confluência ou pct, atualiza a chave da estratégia principal
         if (displayPct > cur.pct) {
           cur.pct = displayPct;
           cur.label = displayLabel;
+          cur.strategyKey = strategyKey;
         }
       }
     }
