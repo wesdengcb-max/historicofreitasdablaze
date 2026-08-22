@@ -91,7 +91,7 @@ export default function HostmanSection() {
       const { data, error, count } = await supabase
         .from("blaze_results")
         .select("id, roll, color, created_at", { count: "exact" })
-        .order("id", { ascending: isInverse })
+        .order("created_at", { ascending: isInverse })
         .range(from, to);
 
       if (alive && !error && data) {
