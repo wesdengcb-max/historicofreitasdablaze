@@ -440,7 +440,8 @@ export function PredictiveSignals() {
         sources,
         confluence,
         analysisCount: distinctAnalyses.size,
-        isHighTendency
+        isHighTendency,
+        strategyKey: sources[0] ? `A${sources[0].analysis}` : undefined
       });
     }
     m2.sort((a, b) => a.times[0].getTime() - b.times[0].getTime());
