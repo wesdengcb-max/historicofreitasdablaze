@@ -16,6 +16,8 @@ const STORAGE_KEY = "freitas-white-active-section";
 // Get initial state from localStorage if available, otherwise default to dashboard
 let currentSection: SectionId = "dashboard";
 
+const listeners = new Set<() => void>();
+
 // Initialize currentSection from localStorage as soon as this module loads on the client
 if (typeof window !== "undefined") {
   const saved = localStorage.getItem(STORAGE_KEY);
@@ -23,8 +25,6 @@ if (typeof window !== "undefined") {
     currentSection = saved as SectionId;
   }
 }
-
-const listeners = new Set<() => void>();
 
 function subscribe(cb: () => void) {
   listeners.add(cb);
