@@ -256,6 +256,7 @@ export function PredictiveSignals() {
         isHighTendency: boolean; 
         isPossibleRec: boolean;
         isGreenSeal?: boolean;
+        strategyKey?: string;
       }
     >();
 
