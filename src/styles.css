@@ -129,11 +129,28 @@
   background-attachment: fixed;
 }
 
-.light .glass-card {
-  background: #ffffff;
-  border: 1px solid #E6EAF1;
-  border-radius: 20px;
-  box-shadow: 0 8px 25px rgba(30, 50, 90, 0.06);
+.light .glass-card,
+.light .bg-card,
+.light .bg-surface,
+.light .bg-surface-2 {
+  background-color: #ffffff !important;
+  border-color: #E6EAF1 !important;
+  border-radius: 20px !important;
+  box-shadow: 0 8px 25px rgba(30, 50, 90, 0.06) !important;
+}
+
+.light .text-muted-foreground,
+.light .text-foreground {
+  color: #0f172a !important;
+}
+
+/* Ensure inner components maintain their layout/colors */
+.light .blaze-result-card,
+.light .roulette-tile,
+.light .stone-icon {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
 }
 
 .light aside {
