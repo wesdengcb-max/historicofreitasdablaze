@@ -821,7 +821,9 @@ export function PredictiveSignals() {
           />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <AnimatePresence mode="popLayout">
-              {sections.top5Only.map(s => renderSignalCard(s))}
+              {sections.top5Only
+                .filter(s => !s.isTop1 && !s.title?.includes('Isolado') && (s as any).category !== 'isolado')
+                .map(s => renderSignalCard(s))}
             </AnimatePresence>
             {sections.top5Only.length === 0 && <EmptyState />}
           </div>
