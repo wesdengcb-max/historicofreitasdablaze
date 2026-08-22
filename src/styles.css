@@ -92,7 +92,7 @@
 }
 
 .light {
-  --background: #f1f5f9;
+  --background: #E0E5EF;
   --foreground: #0f172a;
   --surface: #ffffff;
   --surface-2: #f8fafc;
@@ -111,10 +111,51 @@
   --accent-foreground: #ffffff;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --border: #e2e8f0;
+  --border: #E6EAF1;
   --input: #ffffff;
   --ring: #ef4444;
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-elegant: 0 8px 25px rgba(30, 50, 90, 0.06);
+
+  /* Geometric background for Light Mode */
+  background-image: 
+    linear-gradient(30deg, #DFE4EE 12%, transparent 12.5%, transparent 87%, #DFE4EE 87.5%, #DFE4EE),
+    linear-gradient(150deg, #DFE4EE 12%, transparent 12.5%, transparent 87%, #DFE4EE 87.5%, #DFE4EE),
+    linear-gradient(30deg, #D8DEEB 25%, transparent 25.5%, transparent 75%, #D8DEEB 75.5%, #D8DEEB),
+    linear-gradient(150deg, #D8DEEB 25%, transparent 25.5%, transparent 75%, #D8DEEB 75.5%, #D8DEEB),
+    linear-gradient(60deg, #F2F4F8 37%, transparent 37.5%, transparent 62%, #F2F4F8 62.5%, #F2F4F8),
+    linear-gradient(120deg, #F2F4F8 37%, transparent 37.5%, transparent 62%, #F2F4F8 62.5%, #F2F4F8);
+  background-size: 80px 140px;
+  background-attachment: fixed;
+}
+
+.light .glass-card {
+  background: #ffffff;
+  border: 1px solid #E6EAF1;
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(30, 50, 90, 0.06);
+}
+
+.light aside {
+  background: #ffffff;
+  border-right: 1px solid #E6EAF1;
+  border-radius: 0 20px 20px 0;
+  box-shadow: 0 8px 25px rgba(30, 50, 90, 0.03);
+}
+
+.light header {
+  background: #ffffff;
+  border-bottom: 1px solid #E6EAF1;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 8px 25px rgba(30, 50, 90, 0.03);
+  margin-bottom: 1rem;
+}
+
+/* Sidebar active item in Light Mode */
+.light .sidebar-active-item {
+  background-color: #E0E7FF; /* Light blue */
+  border-left: 3px solid #3B82F6; /* Blue indicator */
+  color: #1E40AF;
 }
 
 @layer base {
