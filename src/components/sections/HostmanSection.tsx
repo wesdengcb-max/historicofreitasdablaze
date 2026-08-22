@@ -130,9 +130,19 @@ export default function HostmanSection() {
     return res;
   }, [spins]);
 
-  const formatDate = (iso: string | undefined) => {
+  const normalizeISO = (iso: string | undefined) => {
     if (!iso) return "";
-    const d = new Date(iso);
+    const raw = iso.trim();
+    // Se não tiver indicador de fuso (Z ou +-00:00), força Z (UTC)
+    const hasTz = /Z$|[+-]\d{2}:?\d{2}$/.test(raw);
+    return hasTz ? raw : `${raw.replace(" ", "T")}Z`;
+  };
+
+  const formatDate = (iso: string | undefined) => {
+    const normalized = normalizeISO(iso);
+    if (!normalized) return "";
+    const d = new Date(normalized);
+    if (isNaN(d.getTime())) return "";
     return new Intl.DateTimeFormat("pt-BR", {
       timeZone: "America/Sao_Paulo",
       day: "2-digit",
@@ -142,8 +152,10 @@ export default function HostmanSection() {
   };
 
   const formatFullTime = (iso: string | undefined) => {
-    if (!iso) return "";
-    const d = new Date(iso);
+    const normalized = normalizeISO(iso);
+    if (!normalized) return "";
+    const d = new Date(normalized);
+    if (isNaN(d.getTime())) return "";
     return new Intl.DateTimeFormat("pt-BR", {
       timeZone: "America/Sao_Paulo",
       hour: "2-digit",
