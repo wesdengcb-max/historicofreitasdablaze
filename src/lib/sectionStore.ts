@@ -49,5 +49,5 @@ export function setSection(s: SectionId) {
 }
 
 export function useSection() {
-  return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
