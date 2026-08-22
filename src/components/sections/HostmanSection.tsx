@@ -60,7 +60,7 @@ export default function HostmanSection() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const [isInverse, setIsInverse] = useState(false);
+  const [isInverse, setIsInverse] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
 
   // Atualiza relógio interno para expiração de sinais
@@ -88,10 +88,17 @@ export default function HostmanSection() {
       const from = (page - 1) * PAGE_SIZE;
       const to = from + PAGE_SIZE - 1;
 
+      // Histórico principal usa ascending: false (mais recente primeiro) por padrão.
+      // O usuário pediu "sentido inverso que nem o histórico principal".
+      // No histórico principal, "sentido inverso" (inverse: true) inverte a ordem de exibição,
+      // mas a busca no banco costuma ser a mesma. 
+      // Contudo, aqui estamos paginando no servidor.
+      // Para ser fiel: se isInverse=false, mais recentes primeiro (desc).
+      // Se isInverse=true, mais antigos primeiro (asc).
       const { data, error, count } = await supabase
         .from("blaze_results")
         .select("id, roll, color, created_at", { count: "exact" })
-        .order("id", { ascending: isInverse })
+        .order("created_at", { ascending: isInverse })
         .range(from, to);
 
       if (alive && !error && data) {
@@ -106,23 +113,20 @@ export default function HostmanSection() {
 
     loadData();
 
-    // Sincronização agressiva para a Página 1 (pedras atuais)
     let interval: any = null;
     let subscription: any = null;
 
-    if (page === 1) {
-      // Polling a cada 5s como fallback de segurança (igual ao SinaisSection)
+    // Se estivermos na página de "mais recentes", ouvimos mudanças
+    // No modo inverse=true (asc), a página 1 são os resultados mais antigos do banco.
+    // No modo inverse=false (desc), a página 1 são os resultados que estão caindo agora.
+    if (!isInverse && page === 1) {
       interval = setInterval(loadData, 5000);
-
-      // Inscrição em tempo real
       subscription = supabase
         .channel('hostman-realtime-sync')
         .on(
           'postgres_changes',
           { event: 'INSERT', schema: 'public', table: 'blaze_results' },
-          () => {
-            if (alive) loadData(); // Recarrega tudo para manter a ordem e paginação exata
-          }
+          () => { if (alive) loadData(); }
         )
         .subscribe();
     }
@@ -163,9 +167,13 @@ export default function HostmanSection() {
   }, [spins, currentTime]);
 
   const rows = useMemo(() => {
+    const sortedSpins = [...spins];
+    // Garantir que na exibição a lógica de colunas fixas seja respeitada
+    // No histórico principal a ordem é decrescente (mais recente primeiro)
+    // Se o usuário pedir inverso, ele quer ver a ordem cronológica
     const res = [];
-    for (let i = 0; i < spins.length; i += 12) {
-      res.push(spins.slice(i, i + 12));
+    for (let i = 0; i < sortedSpins.length; i += 12) {
+      res.push(sortedSpins.slice(i, i + 12));
     }
     return res;
   }, [spins]);
