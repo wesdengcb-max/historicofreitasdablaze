@@ -35,6 +35,10 @@ function getSnapshot() {
   return currentSection;
 }
 
+function getServerSnapshot() {
+  return "dashboard" as const;
+}
+
 export function setSection(s: SectionId) {
   if (s === currentSection) return;
   currentSection = s;
