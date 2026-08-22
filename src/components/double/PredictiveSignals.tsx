@@ -593,7 +593,7 @@ export function PredictiveSignals() {
         }
       }
 
-      return { ...s, isVerified, isRare, isGreenSeal, greenSealAssertivity };
+      return { ...s, isVerified, isRare, isGreenSeal, greenSealAssertivity, strategyKey };
     }));
 
 
