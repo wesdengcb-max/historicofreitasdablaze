@@ -53,7 +53,8 @@ type Mode1Signal = {
   resultTime?: string;
   isSuperSignal?: boolean;
   isTop1?: boolean;
-  isTop5Confluence?: boolean;
+  top1Count: number;
+  hasTop5Confluence?: boolean;
   peakAnalysisCount: number;
   completedAt?: number;
 };
@@ -479,6 +480,8 @@ export function PredictiveSignals() {
         setPeakStates(prev => ({ ...prev, [signalKey]: newPeak }));
       }
 
+      // Preservar estado de auditoria e peak count se já existir no mode1 atual
+      const existing = mode1?.find(m => m.key === signalKey);
       const signal: Mode1Signal = {
         key: signalKey,
         title: `Análise ${values.join(" + ")}`,
@@ -491,11 +494,18 @@ export function PredictiveSignals() {
         isHighTendency: info.isHighTendency,
         isPossibleRec: info.isPossibleRec,
         isTop1,
-        isTop5Confluence: hasTop5,
+        top1Count: info.analyses.has(1) ? 1 : 0, // Simplificado, pode ser ajustado se top1Count for a soma de A1-A7
+        hasTop5Confluence: hasTop5,
         isSuperSignal: confluenceCount >= 4,
         isRare,
-        outcome: "pending"
+        outcome: existing?.outcome || "pending",
+        completedAt: existing?.completedAt
       };
+      
+      // Peak Rank Lock: Manter o maior número de confluências alcançado
+      if (existing) {
+        signal.peakAnalysisCount = Math.max(existing.peakAnalysisCount, newPeak);
+      }
 
       // Auditoria: Salvar se for novo
       if (!auditIds[signalKey] && !existing) {
@@ -529,14 +539,7 @@ export function PredictiveSignals() {
         })();
       }
 
-      // Preservar estado de auditoria e peak count se já existir no mode1 atual
-      const existing = mode1?.find(m => m.key === signalKey);
-      if (existing) {
-        signal.outcome = existing.outcome;
-        signal.completedAt = existing.completedAt;
-        // Peak Rank Lock: Manter o maior número de confluências alcançado
-        signal.peakAnalysisCount = Math.max(existing.peakAnalysisCount, newPeak);
-      }
+      // A preservação já foi feita acima na criação do objeto signal
 
       finalMode1.push(signal);
     }
