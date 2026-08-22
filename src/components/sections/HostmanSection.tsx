@@ -163,9 +163,13 @@ export default function HostmanSection() {
   }, [spins, currentTime]);
 
   const rows = useMemo(() => {
+    const sortedSpins = [...spins];
+    // Garantir que na exibição a lógica de colunas fixas seja respeitada
+    // No histórico principal a ordem é decrescente (mais recente primeiro)
+    // Se o usuário pedir inverso, ele quer ver a ordem cronológica
     const res = [];
-    for (let i = 0; i < spins.length; i += 12) {
-      res.push(spins.slice(i, i + 12));
+    for (let i = 0; i < sortedSpins.length; i += 12) {
+      res.push(sortedSpins.slice(i, i + 12));
     }
     return res;
   }, [spins]);
