@@ -549,7 +549,7 @@ export function PredictiveSignals() {
     // A cada nova pedra ou ciclo, recalculamos o feed filtrado e expirado
     // REGRA: Após auditoria (WIN/RED), o card permanece 3 minutos antes de sumir
     const threeMinutesMs = 3 * 60 * 1000;
-    const activeSignals = finalMode1.filter(s => {
+    const activeSignals = (finalMode1 || []).filter(s => {
       if (!s.completedAt) return true;
       return (Date.now() - s.completedAt) < threeMinutesMs;
     });
