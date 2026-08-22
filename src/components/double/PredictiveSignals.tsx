@@ -498,7 +498,8 @@ export function PredictiveSignals() {
           sources: combinedSources,
           isHighTendency: info.isHighTendency || next1[1].isHighTendency,
           isVerified: false,
-          isGreenSeal: info.isGreenSeal || next1[1].isGreenSeal
+          isGreenSeal: info.isGreenSeal || next1[1].isGreenSeal,
+          strategyKey: info.strategyKey
         });
         i += 1;
       } else {
