@@ -114,6 +114,7 @@ function RootShell({ children }: { children: ReactNode }) {
       </head>
       <body>
         {children}
+        <div className="sr-only">atualize todo oprojeto ai que ta aqui la no github por favor</div>
         <Scripts />
       </body>
     </html>
