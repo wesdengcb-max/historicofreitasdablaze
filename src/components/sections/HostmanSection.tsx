@@ -4,7 +4,7 @@ import { memo, useMemo, useState, useEffect, useRef } from "react";
 import { Card } from "@/components/double/Card";
 import { BlazeResultCard } from "@/components/double/BlazeResultCard";
 import { useVipStatus } from "@/lib/auth/vipStore";
-import { Clock, Calendar, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { Clock, Calendar, ChevronLeft, ChevronRight, Loader2, ArrowUpDown, History } from "lucide-react";
 import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
 import { fmtTime, colorOf, type Spin } from "@/components/double/types";
 
