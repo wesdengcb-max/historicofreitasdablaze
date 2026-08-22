@@ -117,79 +117,88 @@
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-elegant: 0 8px 25px rgba(30, 50, 90, 0.06);
 
-  /* Geometric background for Light Mode */
+  /* Geometric background for Light Mode - EXACT MATCH TO REFERENCE CONCEPT */
+  background-color: #E0E5EF;
   background-image: 
     linear-gradient(30deg, #DFE4EE 12%, transparent 12.5%, transparent 87%, #DFE4EE 87.5%, #DFE4EE),
     linear-gradient(150deg, #DFE4EE 12%, transparent 12.5%, transparent 87%, #DFE4EE 87.5%, #DFE4EE),
     linear-gradient(30deg, #D8DEEB 25%, transparent 25.5%, transparent 75%, #D8DEEB 75.5%, #D8DEEB),
     linear-gradient(150deg, #D8DEEB 25%, transparent 25.5%, transparent 75%, #D8DEEB 75.5%, #D8DEEB),
     linear-gradient(60deg, #F2F4F8 37%, transparent 37.5%, transparent 62%, #F2F4F8 62.5%, #F2F4F8),
-    linear-gradient(120deg, #F2F4F8 37%, transparent 37.5%, transparent 62%, #F2F4F8 62.5%, #F2F4F8);
+    linear-gradient(120deg, #F2F4F8 37%, transparent 37.5%, transparent 62%, #F2F4F8 62.5%, #F2F4F8),
+    linear-gradient(0deg, #F7F8FB 50%, transparent 50%);
   background-size: 80px 140px;
   background-attachment: fixed;
 }
 
-.light .glass-card,
+/* UNIVERSAL BOX CORRECTION FOR LIGHT MODE - FORBIDDEN BLACK BOXES */
 .light .bg-card,
 .light .bg-surface,
-.light .bg-surface-2 {
+.light .bg-surface-2,
+.light .bg-surface-3,
+.light .bg-\[\#0c0c0c\],
+.light .bg-\[\#141414\],
+.light .bg-\[\#1A1A1A\],
+.light .bg-black\/40,
+.light .glass-card,
+.light aside,
+.light header,
+.light section,
+.light .rounded-lg,
+.light .rounded-xl,
+.light .rounded-2xl {
   background-color: #ffffff !important;
-  border-color: #E6EAF1 !important;
-  border-radius: 20px !important;
+  border: 1px solid #E6EAF1 !important;
+  border-radius: 18px !important;
   box-shadow: 0 8px 25px rgba(30, 50, 90, 0.06) !important;
 }
 
-.light .text-muted-foreground,
+/* Text and Icon corrections in Light Mode boxes */
+.light .text-white,
 .light .text-foreground,
-.light .text-white {
+.light .text-\[\#eaeaea\],
+.light .text-muted-foreground {
   color: #0f172a !important;
 }
 
-.light .bg-black\/40 {
-  background-color: rgba(0, 0, 0, 0.05) !important;
-}
-
 .light .border-white\/5,
-.light .border-white\/10 {
+.light .border-white\/10,
+.light .border-border {
   border-color: #E6EAF1 !important;
 }
 
-.light .bg-white\/5,
-.light .bg-white\/10,
-.light .bg-white\/\[0\.03\],
-.light .bg-\[\#1A1A1A\] {
-  background-color: #f8fafc !important;
-}
-
-/* Ensure inner components maintain their layout/colors */
+/* Internal elements that MUST remain as they are (pedras, etc) */
 .light .blaze-result-card,
+.light .blaze-result-card button,
+.light .blaze-result-card span,
+.light .result-circle,
 .light .roulette-tile,
-.light .stone-icon {
-  background-color: transparent !important;
+.light .stone-icon,
+.light button[class*="bg-red"],
+.light span[class*="bg-red"],
+.light div[class*="bg-red"],
+.light .bg-red-500,
+.light .bg-emerald-500,
+.light .bg-white-tile,
+.light .bg-black-tile {
+  background-color: inherit !important;
+  border-radius: inherit !important;
+  box-shadow: inherit !important;
+  border: inherit !important;
+}
+
+.sidebar-item-active {
+  background-color: rgba(229, 9, 20, 0.1);
+  color: #E50914;
+  box-shadow: inset 0 0 0 1px rgba(229, 9, 20, 0.2);
+}
+
+.light .sidebar-item-active {
+  background-color: #E0E7FF !important;
+  border-left: 4px solid #ef4444 !important;
+  color: #ef4444 !important;
+  border-radius: 0 18px 18px 0 !important;
   box-shadow: none !important;
-  border-radius: 0 !important;
-}
-
-.light aside {
-  background: #ffffff;
-  border-right: 1px solid #E6EAF1;
-  border-radius: 0 20px 20px 0;
-  box-shadow: 0 8px 25px rgba(30, 50, 90, 0.03);
-}
-
-.light header {
-  background: #ffffff;
-  border-bottom: 1px solid #E6EAF1;
-  border-radius: 0 0 20px 20px;
-  box-shadow: 0 8px 25px rgba(30, 50, 90, 0.03);
-  margin-bottom: 1rem;
-}
-
-/* Sidebar active item in Light Mode */
-.light .sidebar-active-item {
-  background-color: #E0E7FF; /* Light blue */
-  border-left: 3px solid #3B82F6; /* Blue indicator */
-  color: #1E40AF;
 }
 
 @layer base {
