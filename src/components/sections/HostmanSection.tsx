@@ -30,12 +30,16 @@ function rowToSpin(r: Row): Spin {
   const hasColorNumber = Number.isFinite(colorNumber);
   const n = hasRollNumber ? rollNumber : hasColorNumber ? colorNumber : 0;
   const color = normalizeColor(r.color) ?? normalizeColor(r.roll) ?? colorOf(n);
+  const raw = (r.created_at ?? "").trim();
+  const hasTz = /Z$|[+-]\d{2}:?\d{2}$/.test(raw);
+  const createdAt = hasTz ? raw : `${raw.replace(" ", "T")}Z`;
+
   return {
     id: String(r.id),
     n,
     color,
-    time: fmtTime(r.created_at),
-    createdAt: r.created_at,
+    time: fmtTime(createdAt),
+    createdAt,
   };
 }
 
