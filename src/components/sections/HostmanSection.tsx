@@ -67,6 +67,7 @@ export default function HostmanSection() {
 
   const isFirstLoad = useRef(true);
 
+  // Real-time poller para garantir que a página 1 esteja sempre atualizada com o "horário atual"
   useEffect(() => {
     let alive = true;
     async function loadData() {
@@ -93,24 +94,22 @@ export default function HostmanSection() {
 
     loadData();
 
-    // Inscrição em tempo real para sincronização com o histórico global
-    // Somente na primeira página para evitar saltos em páginas antigas
+    // Sincronização agressiva para a Página 1 (pedras atuais)
+    let interval: any = null;
     let subscription: any = null;
+
     if (page === 1) {
+      // Polling a cada 5s como fallback de segurança (igual ao SinaisSection)
+      interval = setInterval(loadData, 5000);
+
+      // Inscrição em tempo real
       subscription = supabase
-        .channel('hostman-realtime')
+        .channel('hostman-realtime-sync')
         .on(
           'postgres_changes',
           { event: 'INSERT', schema: 'public', table: 'blaze_results' },
-          (payload) => {
-            if (alive) {
-              const newSpin = rowToSpin(payload.new as Row);
-              setSpins(current => {
-                const next = [newSpin, ...current].slice(0, PAGE_SIZE);
-                return dedupeById(next);
-              });
-              setTotalCount(c => c + 1);
-            }
+          () => {
+            if (alive) loadData(); // Recarrega tudo para manter a ordem e paginação exata
           }
         )
         .subscribe();
@@ -118,6 +117,7 @@ export default function HostmanSection() {
 
     return () => {
       alive = false;
+      if (interval) clearInterval(interval);
       if (subscription) supabase.removeChannel(subscription);
     };
   }, [page]);
