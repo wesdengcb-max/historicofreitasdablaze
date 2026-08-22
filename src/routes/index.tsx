@@ -1,9 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { Crown } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Shield, Zap, TrendingUp, History, Target, Clock, Lock, BarChart3, Search, Activity, Sun, Moon, CheckCircle2 } from "lucide-react"
-import heroAsset from "@/assets/freitas-white-hero.png.asset.json";
-import logoTextWhite from "@/assets/logo-text-white.png.asset.json";
 import bgAsset from "@/assets/homepage-bg.png.asset.json";
 import fwLogoAsset from "@/assets/fw-logo-link.png.asset.json";
 import { useState, useEffect } from "react";
@@ -14,7 +10,6 @@ export const Route = createFileRoute('/')({
 
 function LandingPage() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -90,3 +85,4 @@ function LandingPage() {
     </div>
   );
 }
+
