@@ -59,6 +59,7 @@ import { cn } from "@/lib/utils";
 const SinaisPage = lazy(() => import("@/components/sections/SinaisSection"));
 const AnaliseSection = lazy(() => import("@/components/sections/AnaliseSection"));
 const EstrategiasSection = lazy(() => import("@/components/sections/EstrategiasSection"));
+const HostmanSection = lazy(() => import("@/components/sections/HostmanSection"));
 
 function SectionFallback() {
   return (
