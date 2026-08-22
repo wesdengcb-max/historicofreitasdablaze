@@ -1,8 +1,8 @@
-import { memo, useMemo, useState, useEffect } from "react";
+import { memo, useMemo, useState, useEffect, useRef } from "react";
 import { Card } from "@/components/double/Card";
 import { BlazeResultCard } from "@/components/double/BlazeResultCard";
 import { useVipStatus } from "@/lib/auth/vipStore";
-import { Clock, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import { Clock, Calendar, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { blazeSupabase as supabase } from "@/integrations/supabase/blaze-client";
 import { fmtTime, colorOf, type Spin } from "@/components/double/types";
 
@@ -17,7 +17,7 @@ function normalizeColor(v: string): Spin["color"] | null {
   const s = (v ?? "").toString().trim().toLowerCase();
   if (["red", "vermelho", "vermelha", "r"].includes(s)) return "red";
   if (["black", "preto", "preta", "b"].includes(s)) return "black";
-  if (["white", "branco", "branca", "w"].includes(s)) return "white";
+  if (["white", "branco", "branca", "w", "0"].includes(s)) return "white";
   return null;
 }
 
@@ -35,6 +35,15 @@ function rowToSpin(r: Row): Spin {
     time: fmtTime(r.created_at),
     createdAt: r.created_at,
   };
+}
+
+function dedupeById<T extends { id: string }>(items: T[]): T[] {
+  const byId = new Map<string, T>();
+  for (const item of items) {
+    if (!item.id || item.id === "undefined") continue;
+    if (!byId.has(item.id)) byId.set(item.id, item);
+  }
+  return Array.from(byId.values());
 }
 
 const PAGE_SIZE = 36; // 3 rows of 12
