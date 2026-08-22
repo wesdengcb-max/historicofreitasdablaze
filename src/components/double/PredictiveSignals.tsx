@@ -49,6 +49,7 @@ type Mode1Signal = {
   isRare?: boolean;
   isGreenSeal?: boolean;
   greenSealAssertivity?: number;
+  strategyKey?: string;
 
   outcome?: "pending" | "green" | "red";
   resultTime?: string;
@@ -64,6 +65,7 @@ type Mode2Signal = {
   isHighTendency: boolean;
   isVerified?: boolean;
   isRare?: boolean;
+  strategyKey?: string;
 
   outcome?: "pending" | "green" | "red";
   resultTime?: string;
@@ -256,10 +258,31 @@ export function PredictiveSignals() {
         isHighTendency: boolean; 
         isPossibleRec: boolean;
         isGreenSeal?: boolean;
+        strategyKey?: string;
       }
     >();
 
     const greenSealIds = [217, 218, 219, 221, 20711];
+
+    // Mapeamento de Green Seal para aplicação em outros cards
+    const activeGreenSeals = new Map<number, { id: number; at: number }>();
+    greenSealIds.forEach(gsId => {
+      const gsCycles = engine[gsId];
+      if (!gsCycles || gsCycles.length === 0) return;
+      const lastGs = gsCycles[gsCycles.length - 1];
+      if (!lastGs || lastGs.gaps.length === 0) return;
+      
+      let gsMinutes = 0;
+      if (gsId === 20711) {
+         gsMinutes = lastGs.gaps[0];
+      } else {
+         gsMinutes = Math.ceil(lastGs.gaps[0] * 0.5) + 1;
+      }
+      
+      const gsAt = addMinutes(lastGs.triggerAt, gsMinutes).getTime();
+      // Guardamos para conferência posterior
+      activeGreenSeals.set(gsAt, { id: gsId, at: gsAt });
+    });
 
     for (const item of active) {
       const isA8A9 = [8, 9, 10, 11, 12, 13].includes(item.analysis);
@@ -269,11 +292,13 @@ export function PredictiveSignals() {
       let targetMinutes = 0;
       let displayPct = 0;
       let displayLabel = "";
+      let strategyKey = `A${item.analysis}`;
 
       if (isA8A9) {
         targetMinutes = item.open.gaps[0] || 0;
         displayPct = 100;
         displayLabel = targetMinutes.toString();
+        // A8-A13 são gatilhos especiais
       } else {
         if (hist.length < MIN_GATILHOS) continue;
         const top1 = computeTop(hist, 1)[0];
@@ -293,23 +318,8 @@ export function PredictiveSignals() {
       if (at.getTime() <= now.getTime()) continue; 
       const t = at.getTime();
 
-      // Logic for detection if a Green Seal applies
-      const hasGreenSeal = greenSealIds.some(gsId => {
-        const gsCycles = engine[gsId];
-        if (!gsCycles || gsCycles.length === 0) return false;
-        const lastGs = gsCycles[gsCycles.length - 1];
-        if (!lastGs || lastGs.gaps.length === 0) return false;
-        
-        let gsMinutes = 0;
-        if (gsId === 20711) {
-           gsMinutes = lastGs.gaps[0];
-        } else {
-           gsMinutes = Math.ceil(lastGs.gaps[0] * 0.5) + 1;
-        }
-        
-        const gsAt = addMinutes(lastGs.triggerAt, gsMinutes);
-        return Math.abs(gsAt.getTime() - t) <= 60000;
-      });
+      // Detection if a Green Seal applies to this card
+      const hasGreenSeal = Array.from(activeGreenSeals.values()).some(gs => Math.abs(gs.at - t) <= 60000);
 
       const isTendency = isA8A9 ? true : checkHighTendency(engine[item.analysis], item.value);
       const isPossibleRec = activeAlerts.some((alert: RecAlert) => {
@@ -318,7 +328,6 @@ export function PredictiveSignals() {
         const alertEnd = alertStart + alert.duration * 60000;
         return signalTime >= alertStart && signalTime <= alertEnd;
       });
-
 
       const cur = byTime.get(t);
       if (!cur) {
@@ -330,7 +339,8 @@ export function PredictiveSignals() {
           sources: [{ analysis: item.analysis, value: item.value }],
           isHighTendency: isTendency,
           isPossibleRec,
-          isGreenSeal: hasGreenSeal
+          isGreenSeal: hasGreenSeal,
+          strategyKey
         });
       } else {
         if (!cur.values.includes(item.value)) cur.values.push(item.value);
@@ -339,9 +349,11 @@ export function PredictiveSignals() {
         if (isTendency) cur.isHighTendency = true;
         if (isPossibleRec) cur.isPossibleRec = true;
         if (hasGreenSeal) cur.isGreenSeal = true;
+        // Se este item tem mais confluência ou pct, atualiza a chave da estratégia principal
         if (displayPct > cur.pct) {
           cur.pct = displayPct;
           cur.label = displayLabel;
+          cur.strategyKey = strategyKey;
         }
       }
     }
@@ -359,7 +371,8 @@ export function PredictiveSignals() {
           sources: info.sources,
           isHighTendency: info.isHighTendency,
           isPossibleRec: info.isPossibleRec,
-          isGreenSeal: info.isGreenSeal
+          isGreenSeal: info.isGreenSeal,
+          strategyKey: info.strategyKey
         };
       });
     setMode1(m1);
@@ -427,7 +440,8 @@ export function PredictiveSignals() {
         sources,
         confluence,
         analysisCount: distinctAnalyses.size,
-        isHighTendency
+        isHighTendency,
+        strategyKey: sources[0] ? `A${sources[0].analysis}` : undefined
       });
     }
     m2.sort((a, b) => a.times[0].getTime() - b.times[0].getTime());
@@ -465,7 +479,8 @@ export function PredictiveSignals() {
           sources: combinedSources,
           isHighTendency: info.isHighTendency || next1[1].isHighTendency || next2[1].isHighTendency,
           isVerified: false,
-          isGreenSeal: info.isGreenSeal || next1[1].isGreenSeal || next2[1].isGreenSeal
+          isGreenSeal: info.isGreenSeal || next1[1].isGreenSeal || next2[1].isGreenSeal,
+          strategyKey: info.strategyKey
         });
         i += 2;
       } else if (isConsecutive2) {
@@ -483,7 +498,8 @@ export function PredictiveSignals() {
           sources: combinedSources,
           isHighTendency: info.isHighTendency || next1[1].isHighTendency,
           isVerified: false,
-          isGreenSeal: info.isGreenSeal || next1[1].isGreenSeal
+          isGreenSeal: info.isGreenSeal || next1[1].isGreenSeal,
+          strategyKey: info.strategyKey
         });
         i += 1;
       } else {
@@ -497,7 +513,8 @@ export function PredictiveSignals() {
           sources: info.sources,
           isHighTendency: info.isHighTendency,
           isVerified: false,
-          isGreenSeal: info.isGreenSeal
+          isGreenSeal: info.isGreenSeal,
+          strategyKey: info.strategyKey
         });
       }
     }
@@ -547,6 +564,7 @@ export function PredictiveSignals() {
       const secValues = secondaryProjections.get(t);
       const isVerified = secValues && s.sources.some(src => secValues.has(src.value));
       const isRare = isRareTime(t);
+      const strategyKey = s.strategyKey;
       
       let isGreenSeal = false;
       let greenSealAssertivity = 0;
@@ -575,7 +593,7 @@ export function PredictiveSignals() {
         }
       }
 
-      return { ...s, isVerified, isRare, isGreenSeal, greenSealAssertivity };
+      return { ...s, isVerified, isRare, isGreenSeal, greenSealAssertivity, strategyKey };
     }));
 
 
@@ -632,6 +650,7 @@ export function PredictiveSignals() {
           isRare: s.isRare,
           isGreenSeal: s.isGreenSeal,
           greenSealAssertivity: s.greenSealAssertivity,
+          strategyKey: s.strategyKey,
           isRecAlert: activeRecAlerts.some(a => s.at.getTime() >= a.start && s.at.getTime() <= a.end)
         })),
         ...mode2.map(s => ({
@@ -644,6 +663,7 @@ export function PredictiveSignals() {
           entryDate: s.times[0],
           outcome: "pending",
           isHighTendency: s.isHighTendency,
+          strategyKey: s.strategyKey,
           isRecAlert: activeRecAlerts.some(a => s.times[0].getTime() >= a.start && s.times[0].getTime() <= a.end)
         }))
       ].sort((a, b) => a.entryDate.getTime() - b.entryDate.getTime());
