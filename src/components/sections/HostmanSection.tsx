@@ -60,6 +60,14 @@ export default function HostmanSection() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const [isInverse, setIsInverse] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Atualiza relógio interno para expiração de sinais
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 10000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Fuso horário SP para as datas
   const today = new Intl.DateTimeFormat("pt-BR", {
@@ -83,7 +91,7 @@ export default function HostmanSection() {
       const { data, error, count } = await supabase
         .from("blaze_results")
         .select("id, roll, color, created_at", { count: "exact" })
-        .order("id", { ascending: false })
+        .order("id", { ascending: isInverse })
         .range(from, to);
 
       if (alive && !error && data) {
@@ -124,7 +132,35 @@ export default function HostmanSection() {
       if (interval) clearInterval(interval);
       if (subscription) supabase.removeChannel(subscription);
     };
-  }, [page]);
+  }, [page, isInverse]);
+
+  // Cálculo de sinais de possíveis brancos (Branco + 22 minutos)
+  const whiteSignals = useMemo(() => {
+    const futureSignals = [];
+    const whites = spins.filter(s => s.color === 'white');
+    
+    for (const w of whites) {
+      const whiteTime = new Date(w.createdAt);
+      const targetTime = new Date(whiteTime.getTime() + 22 * 60000);
+      
+      // Apenas sinais futuros ou que acabaram de acontecer (tolerância de 30s)
+      if (targetTime.getTime() > (currentTime.getTime() - 30000)) {
+        futureSignals.push({
+          id: w.id,
+          targetTime,
+          displayTime: new Intl.DateTimeFormat("pt-BR", {
+            timeZone: "America/Sao_Paulo",
+            hour: "2-digit",
+            minute: "2-digit",
+          }).format(targetTime)
+        });
+      }
+    }
+    
+    // Remove duplicatas de horário e ordena
+    const unique = Array.from(new Map(futureSignals.map(s => [s.displayTime, s])).values());
+    return unique.sort((a, b) => a.targetTime.getTime() - b.targetTime.getTime());
+  }, [spins, currentTime]);
 
   const rows = useMemo(() => {
     const res = [];
