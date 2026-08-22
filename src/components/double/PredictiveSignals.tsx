@@ -320,15 +320,11 @@ export function PredictiveSignals() {
       const lastResultTime = parseUtcDate(lastRow.created_at).getTime();
       
       // 1. Verificar WIN (Pedra 0 saiu)
-      if (Number(lastRow.roll) === 0) {
       Object.entries(auditIds).forEach(async ([key, id]) => {
         const signalTimeStr = key.split('-')[1];
         const signalTime = parseInt(signalTimeStr);
         if (!signalTime) return;
 
-        // Janela de auditoria: [Horário -1 min, Horário Alvo, Horário +1 min]
-        // Precisamos verificar se o 0 saiu em qualquer ponto dessa janela
-        // O histórico rows contém os últimos 5000 resultados.
         const windowStart = signalTime - 60000;
         const windowEnd = signalTime + 60000;
 
@@ -350,7 +346,6 @@ export function PredictiveSignals() {
           });
           fetchBlockStats();
         } else if (now.getTime() > windowEnd + 30000) {
-          // Se a janela (Alvo + 1 min) expirou totalmente (com margem de 30s para sync) sem o 0
           console.log(`[AUDITORIA] LOSS detectado para sinal em ${fmtClock(new Date(signalTime))}`);
           await updateTriggerAuditResult({ data: { id, win: false } });
           
