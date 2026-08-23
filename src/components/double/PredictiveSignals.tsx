@@ -50,6 +50,8 @@ type Mode1Signal = {
   isGreenSeal?: boolean;
   greenSealAssertivity?: number;
   strategyKey?: string;
+  isConsecutive?: boolean;
+  levelOffset?: number;
 
   outcome?: "pending" | "green" | "red";
   resultTime?: string;
@@ -125,8 +127,9 @@ const getMedalStyles = (count: number, isConsecutive?: boolean, levelOffset: num
     badge: "bg-white/10 text-white border-white/20"
   };
 };
+
 const SignalCard = ({ signal: s }: { signal: any }) => {
-  const medal = getMedalStyles(s.analysisCount);
+  const medal = getMedalStyles(s.analysisCount, s.isConsecutive, s.levelOffset);
   return (
     <div
       key={s.key}
@@ -343,7 +346,9 @@ export function PredictiveSignals() {
 
   const generate = useCallback(async () => {
     const now = new Date();
+    // round to nearest minute for comparison
     now.setSeconds(0, 0);
+    now.setMilliseconds(0);
     setGeneratedAt(now);
 
     // Alertas de Segurança ("possível rec")
@@ -585,7 +590,9 @@ export function PredictiveSignals() {
           at: new Date(middleTime),
           pct: maxPct,
           label: info.label,
-          analysisCount: combinedAnalyses.size + 4,
+          analysisCount: combinedAnalyses.size,
+          isConsecutive: true,
+          levelOffset: 4, // Eleva para Prata ou superior conforme análise base
           sources: combinedSources,
           isHighTendency: info.isHighTendency || next1[1].isHighTendency || next2[1].isHighTendency,
           isVerified: false,
@@ -604,7 +611,9 @@ export function PredictiveSignals() {
           at: new Date(best.t),
           pct: best.info.pct,
           label: best.info.label,
-          analysisCount: combinedAnalyses.size + 1,
+          analysisCount: combinedAnalyses.size,
+          isConsecutive: true,
+          levelOffset: 1, // Eleva 1 nível
           sources: combinedSources,
           isHighTendency: info.isHighTendency || next1[1].isHighTendency,
           isVerified: false,
