@@ -24,9 +24,15 @@ export const validateToken = createServerFn({ method: "POST" })
       .single();
 
     if (error || !tokenData) {
-      console.error("Token not found or inactive:", data.token);
+      console.error("Token lookup failed or no token found:", { token: data.token, error });
       throw new Error("Token inválido ou expirado");
     }
+
+    console.log("Token found:", { 
+      token: tokenData.token, 
+      status: tokenData.status, 
+      expires_at: tokenData.expires_at 
+    });
 
     // Check expiration - null expires_at means no expiration
     if (tokenData.expires_at && new Date(tokenData.expires_at) < new Date()) {
