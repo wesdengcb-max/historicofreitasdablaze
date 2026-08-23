@@ -14,16 +14,12 @@ export const validateToken = createServerFn({ method: "POST" })
     token: z.string().min(1)
   }).parse(data))
   .handler(async ({ data }: { data: { token: string } }) => {
-    // SECURITY: This function runs on the server.
-    // We check the token against the database using supabaseAdmin (which bypasses RLS).
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const inputToken = data.token.trim();
-    console.log("[VIP Auth] Validating token input:", inputToken);
 
-    // Hardcoded fallback for the requested Master Admin token
+    // Master Admin token recognized
     if (inputToken === 'admin87850424') {
-      console.log("[VIP Auth] Master Admin token recognized.");
       return { 
         success: true, 
         member_name: "Administrador Geral", 
@@ -41,23 +37,19 @@ export const validateToken = createServerFn({ method: "POST" })
       .maybeSingle();
 
     if (error) {
-      console.error("[VIP Auth] Database error:", error.message);
       throw new Error("Erro de conexão com o banco de dados");
     }
 
     if (!tokenData) {
-      console.warn("[VIP Auth] Token not found:", inputToken);
       throw new Error("Token inválido ou expirado");
     }
 
     if (tokenData.status !== 'active') {
-      console.warn("[VIP Auth] Token inactive:", tokenData.status);
       throw new Error("Este token está desativado");
     }
 
     // Check expiration
     if (tokenData.expires_at && new Date(tokenData.expires_at) < new Date()) {
-      console.warn("[VIP Auth] Token expired:", tokenData.expires_at);
       await supabaseAdmin
         .from("vip_tokens")
         .update({ status: "expired" })
@@ -65,7 +57,6 @@ export const validateToken = createServerFn({ method: "POST" })
       throw new Error("Este token expirou");
     }
 
-    console.log("[VIP Auth] Token validated for:", tokenData.member_name);
     return { 
       success: true, 
       member_name: tokenData.member_name, 
