@@ -89,9 +89,8 @@ export const Sidebar = memo(function Sidebar() {
     }
 
     if (item.id !== "dashboard" && item.id !== "videos" && !isVip) {
-      toast.error("Área Exclusiva", {
-        description: "Você precisa ser Membro VIP para acessar esta aba.",
-      });
+      const ev = new CustomEvent('open-vip-modal');
+      window.dispatchEvent(ev);
       return;
     }
     setSection(item.id as SectionId);
