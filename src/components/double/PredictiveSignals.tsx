@@ -125,8 +125,9 @@ const getMedalStyles = (count: number, isConsecutive?: boolean, levelOffset: num
     badge: "bg-white/10 text-white border-white/20"
   };
 };
+
 const SignalCard = ({ signal: s }: { signal: any }) => {
-  const medal = getMedalStyles(s.analysisCount);
+  const medal = getMedalStyles(s.analysisCount, s.isConsecutive, s.levelOffset);
   return (
     <div
       key={s.key}
