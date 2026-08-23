@@ -397,6 +397,7 @@ function AdminDashboard() {
                     className="w-full h-10 rounded-md border border-white/10 bg-black/50 px-3 text-sm text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-red-500"
                   >
                     <option value="member">Membro VIP</option>
+                    <option value="admin">Administrador</option>
                   </select>
                 </div>
                 <div className="flex justify-end gap-3 pt-2">
