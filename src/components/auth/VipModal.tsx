@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Key, Crown, LogOut, Loader2, ShieldCheck, ArrowRight, User, Lock } from "lucide-react";
-import { useVipStatus, setVipStatus, logoutVip, useMemberName } from "@/lib/auth/vipStore";
+import { useVipStatus, setVipStatus, logoutVip, useMemberName, useVipToken } from "@/lib/auth/vipStore";
 import { validateToken } from "@/lib/vip.functions";
 import { toast } from "sonner";
 
@@ -20,7 +20,7 @@ export function VipModal() {
   
   const isVip = useVipStatus();
   const memberName = useMemberName();
-  const activeToken = typeof window !== 'undefined' ? localStorage.getItem("freitas_white_vip_token") : "";
+  const activeToken = useVipToken();
 
   useEffect(() => {
     const handleOpen = () => setOpen(true);
@@ -36,10 +36,7 @@ export function VipModal() {
     try {
       const result = await validateToken({ data: { token: token.trim() } });
       if (result.success) {
-        setVipStatus(true, result.member_name, result.level);
-        if (typeof window !== 'undefined') {
-          localStorage.setItem("freitas_white_vip_token", token.trim());
-        }
+        setVipStatus(true, result.member_name, result.level, token.trim());
         toast.success(`Modo VIP Ativado: Bem-vindo, ${result.member_name}!`);
         setOpen(false);
         setToken('');
