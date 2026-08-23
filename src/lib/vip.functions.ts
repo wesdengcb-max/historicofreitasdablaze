@@ -18,7 +18,7 @@ export const validateToken = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const inputToken = data.token.trim();
-    console.log("[VIP Auth Server] START validation for:", inputToken);
+    console.log("[VIP Auth Server] Starting database lookup...");
 
     // Database lookup
     const { data: tokenData, error } = await supabaseAdmin
@@ -33,14 +33,11 @@ export const validateToken = createServerFn({ method: "POST" })
     }
 
     if (!tokenData) {
-      console.warn("[VIP Auth Server] Token not found:", inputToken);
-      // Let's check if it's a case sensitivity or whitespace issue in the DB
-      const { data: allTokens } = await supabaseAdmin.from("vip_tokens").select("token");
-      console.log("[VIP Auth Server] Available tokens in DB:", allTokens?.map(t => t.token).join(", "));
+      console.warn("[VIP Auth Server] Token not found in database.");
       throw new Error("Token inválido ou expirado");
     }
 
-    console.log("[VIP Auth Server] Record found:", JSON.stringify(tokenData));
+    console.log("[VIP Auth Server] Found valid record.");
 
     if (tokenData.status !== 'active') {
       console.warn("[VIP Auth Server] Status not active:", tokenData.status);
