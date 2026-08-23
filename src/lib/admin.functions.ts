@@ -17,15 +17,15 @@ export const listUsers = createServerFn({ method: "GET" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     
     // Check if current user is admin
-    const { data: { session } } = await ctx.supabase.auth.getSession();
-    if (!session) throw new Error("Unauthorized");
+    const userId = (context as any).userId;
+    if (!userId) throw new Error("Unauthorized: User not found in context");
     
     const { data: isAdmin } = await ctx.supabase.rpc("has_role", {
-      _user_id: session.user.id,
+      _user_id: userId,
       _role: "admin"
     });
     
-    if (!isAdmin) throw new Error("Forbidden");
+    if (!isAdmin) throw new Error("Forbidden: User does not have admin role");
 
     // Fetch users and their roles
     const { data: users, error: usersError } = await supabaseAdmin.auth.admin.listUsers();
