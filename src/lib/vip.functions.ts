@@ -13,7 +13,7 @@ export const validateToken = createServerFn({ method: "POST" })
   .validator((data: unknown) => z.object({
     token: z.string().min(1)
   }).parse(data))
-  .handler(async ({ data }) => {
+  .handler(async ({ data }: { data: { token: string } }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const { data: tokenData, error } = await supabaseAdmin
@@ -65,7 +65,7 @@ export const createVipToken = createServerFn({ method: "POST" })
     token: z.string().optional(),
     level: z.enum(["member", "admin"]).default("member")
   }).parse(data))
-  .handler(async ({ data }) => {
+  .handler(async ({ data }: { data: { member_name: string; expires_at?: string; token?: string; level: "member" | "admin" } }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const token = data.token || generateVipToken();
@@ -94,7 +94,7 @@ export const updateVipToken = createServerFn({ method: "POST" })
     expires_at: z.string().optional(),
     level: z.enum(["member", "admin"]).optional()
   }).parse(data))
-  .handler(async ({ data }) => {
+  .handler(async ({ data }: { data: { id: string; member_name?: string; status?: "active" | "inactive" | "expired"; expires_at?: string; level?: "member" | "admin" } }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const { data: updated, error } = await supabaseAdmin
@@ -112,7 +112,7 @@ export const deleteVipToken = createServerFn({ method: "POST" })
   .validator((data: unknown) => z.object({
     id: z.string().uuid()
   }).parse(data))
-  .handler(async ({ data }) => {
+  .handler(async ({ data }: { data: { id: string } }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const { error } = await supabaseAdmin
