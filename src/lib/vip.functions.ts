@@ -72,11 +72,10 @@ export const validateToken = createServerFn({ method: "POST" })
 
     const level = (tokenData.level === 'admin' ? 'admin' : 'member') as "member" | "admin";
     
-    // Return only necessary fields as requested
+    // Retorna apenas os campos necessários, omitindo o token e IDs internos
     return { 
       success: true, 
       member_name: tokenData.member_name, 
-      token: tokenData.token, // Return provided token for confirmation
       level: level,
       expires_at: tokenData.expires_at,
       days_remaining: daysRemaining
