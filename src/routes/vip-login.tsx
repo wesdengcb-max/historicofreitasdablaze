@@ -27,7 +27,8 @@ function VipLoginPage() {
     try {
       const result = await validateToken({ data: { token: token.trim() } })
       if (result.success) {
-        setVipStatus(true, result.member_name)
+        setVipStatus(true, result.member_name, result.level)
+
         toast.success(`Bem-vindo, ${result.member_name}!`)
         
         const redirectTo = search.redirect || '/app'

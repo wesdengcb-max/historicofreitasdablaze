@@ -57,6 +57,8 @@ function AdminDashboard() {
   const [newTokenName, setNewTokenName] = useState('')
   const [newTokenExpiry, setNewTokenExpiry] = useState('')
   const [newTokenManual, setNewTokenManual] = useState('')
+  const [newTokenLevel, setNewTokenLevel] = useState<'member' | 'admin'>('member')
+
 
   const { data: users, isLoading: usersLoading } = useQuery({
     queryKey: ['admin', 'users'],
@@ -78,6 +80,8 @@ function AdminDashboard() {
       setNewTokenName('')
       setNewTokenExpiry('')
       setNewTokenManual('')
+      setNewTokenLevel('member')
+
       toast.success('Token VIP gerado com sucesso')
     },
     onError: (err: any) => toast.error('Erro ao gerar token', { description: err.message })
@@ -338,8 +342,10 @@ function AdminDashboard() {
                   createTokenMutation.mutate({ 
                     member_name: newTokenName, 
                     expires_at: newTokenExpiry || undefined,
-                    token: newTokenManual || undefined
+                    token: newTokenManual || undefined,
+                    level: newTokenLevel
                   })
+
                 }}
                 className="space-y-4"
               >
