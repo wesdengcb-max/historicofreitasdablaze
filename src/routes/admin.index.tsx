@@ -21,6 +21,7 @@ import {
   User
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useVipToken } from '@/lib/auth/vipStore'
 
 export const Route = createFileRoute('/admin/')({
   component: AdminDashboard,
