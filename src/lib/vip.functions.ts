@@ -24,11 +24,13 @@ export const validateToken = createServerFn({ method: "POST" })
       .single();
 
     if (error || !tokenData) {
+      console.error("Token not found or inactive:", data.token);
       throw new Error("Token inválido ou expirado");
     }
 
-    // Check expiration
+    // Check expiration - null expires_at means no expiration
     if (tokenData.expires_at && new Date(tokenData.expires_at) < new Date()) {
+      console.log("Token expired:", data.token, "at", tokenData.expires_at);
       await supabaseAdmin
         .from("vip_tokens")
         .update({ status: "expired" })
