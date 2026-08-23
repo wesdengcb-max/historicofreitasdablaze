@@ -11,7 +11,7 @@ export const Route = createFileRoute('/_authenticated')({
       // Admin routes REQUIRE admin privileges
       if (location.pathname.startsWith('/admin')) {
         if (!isVip || vipLevel !== 'admin') {
-          console.log("[Route Gate] Access denied to admin route:", location.pathname);
+          console.warn("[Route Gate] Access denied to admin route:", location.pathname);
           throw redirect({
             to: '/' as any,
           });

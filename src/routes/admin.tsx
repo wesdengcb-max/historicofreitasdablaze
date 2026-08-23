@@ -5,13 +5,13 @@ export const Route = createFileRoute('/admin')({
     // Check VIP token access on the client
     if (typeof window !== 'undefined') {
       const isVip = localStorage.getItem("freitas_white_vip_status") === "true";
-      const vipLevel = localStorage.getItem("freitas_white_vip_level") as "member" | "admin" | null;
+      const vipLevel = localStorage.getItem("freitas_white_vip_level");
 
       if (!isVip || vipLevel !== 'admin') {
-        console.log("[Admin Gate] Access denied: Not an admin token.");
+        console.warn("[Admin Gate] Access denied: Not an admin token.");
         throw redirect({
           to: '/' as any,
-        })
+        });
       }
     }
     
