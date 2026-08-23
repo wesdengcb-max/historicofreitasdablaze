@@ -1,13 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { getEvent, setResponseHeader, parseCookies, serializeCookie } from "vinxi/http";
 
 interface ServerContext {
   supabase: SupabaseClient;
 }
-
-const VIP_ACCESS_COOKIE = "fw_vip_access";
 
 // Generate a random token in format FW-XXXX-XXXX
 export const generateVipToken = () => {
@@ -45,44 +42,12 @@ export const validateToken = createServerFn({ method: "POST" })
       throw new Error("Este token expirou");
     }
 
-    try {
-        const event = getEvent();
-        const cookieValue = encodeURIComponent(JSON.stringify({
-          token: tokenData.token,
-          member_name: tokenData.member_name,
-          expires_at: tokenData.expires_at
-        }));
-
-        const cookie = serializeCookie(VIP_ACCESS_COOKIE, cookieValue, {
-          maxAge: 60 * 60 * 24 * 7, // 1 week
-          path: "/",
-          httpOnly: true,
-          sameSite: "lax"
-        });
-
-        setResponseHeader(event, "Set-Cookie", cookie);
-    } catch (e) {
-        // Fallback for non-http environments or if vinxi/http fails
-        console.warn("Could not set VIP cookie:", e);
-    }
-
-    return { success: true, member_name: tokenData.member_name, token: tokenData.token };
-  });
-
-export const checkVipSession = createServerFn({ method: "GET" })
-  .handler(async () => {
-    try {
-        const event = getEvent();
-        const cookies = parseCookies(event);
-        const cookie = cookies[VIP_ACCESS_COOKIE];
-        
-        if (!cookie) return { isVip: false };
-        
-        const session = JSON.parse(decodeURIComponent(cookie));
-        return { isVip: true, member_name: session.member_name };
-    } catch {
-      return { isVip: false };
-    }
+    return { 
+      success: true, 
+      member_name: tokenData.member_name, 
+      token: tokenData.token,
+      expires_at: tokenData.expires_at
+    };
   });
 
 export const listVipTokens = createServerFn({ method: "GET" })
