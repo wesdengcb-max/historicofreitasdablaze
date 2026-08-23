@@ -20,7 +20,7 @@ import {
   Key
 } from 'lucide-react'
 
-export const Route = createFileRoute('/_admin/admin')({
+export const Route = createFileRoute('/admin/')({
   component: AdminDashboard,
 })
 
@@ -43,7 +43,7 @@ function AdminDashboard() {
   })
 
   const createMutation = useMutation({
-    mutationFn: (data: any) => doCreateUser(data),
+    mutationFn: (data: any) => doCreateUser({ data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'users'] })
       setIsAdding(false)
@@ -55,7 +55,7 @@ function AdminDashboard() {
   })
 
   const statusMutation = useMutation({
-    mutationFn: (data: any) => doUpdateStatus(data),
+    mutationFn: (data: any) => doUpdateStatus({ data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'users'] })
       toast.success('Status atualizado')
@@ -63,7 +63,7 @@ function AdminDashboard() {
   })
 
   const deleteMutation = useMutation({
-    mutationFn: (userId: string) => doDeleteUser({ userId }),
+    mutationFn: (userId: string) => doDeleteUser({ data: { userId } }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'users'] })
       toast.success('Usuário removido')
@@ -71,7 +71,7 @@ function AdminDashboard() {
   })
 
   const roleMutation = useMutation({
-    mutationFn: (data: any) => doUpdateRole(data),
+    mutationFn: (data: any) => doUpdateRole({ data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'users'] })
       toast.success('Permissão atualizada')
