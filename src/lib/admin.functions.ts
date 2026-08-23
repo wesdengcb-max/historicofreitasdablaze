@@ -1,12 +1,14 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 interface ServerContext {
   supabase: SupabaseClient;
 }
 
 export const listUsers = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const ctx = context as unknown as ServerContext;
     if (!ctx?.supabase) throw new Error("Internal Server Error: Missing context");
@@ -48,7 +50,8 @@ export const listUsers = createServerFn({ method: "GET" })
   });
 
 export const createUser = createServerFn({ method: "POST" })
-  .inputValidator((data) => z.object({
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => z.object({
     email: z.string().email(),
     password: z.string().min(6),
     role: z.enum(["admin", "user"])
@@ -90,7 +93,8 @@ export const createUser = createServerFn({ method: "POST" })
   });
 
 export const updateUserStatus = createServerFn({ method: "POST" })
-  .inputValidator((data) => z.object({
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => z.object({
     userId: z.string().uuid(),
     active: z.boolean()
   }).parse(data))
@@ -119,7 +123,8 @@ export const updateUserStatus = createServerFn({ method: "POST" })
   });
 
 export const deleteUser = createServerFn({ method: "POST" })
-  .inputValidator((data) => z.object({
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => z.object({
     userId: z.string().uuid()
   }).parse(data))
   .handler(async ({ data, context }) => {
@@ -145,7 +150,8 @@ export const deleteUser = createServerFn({ method: "POST" })
   });
 
 export const updateUserRole = createServerFn({ method: "POST" })
-  .inputValidator((data) => z.object({
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => z.object({
     userId: z.string().uuid(),
     role: z.enum(["admin", "user"])
   }).parse(data))
