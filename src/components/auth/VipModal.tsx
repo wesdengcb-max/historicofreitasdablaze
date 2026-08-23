@@ -30,30 +30,27 @@ export function VipModal() {
 
   const handleActivate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!token.trim()) return;
+    const inputToken = token.trim();
+    if (!inputToken) return;
 
     setIsLoading(true);
     try {
-      const inputToken = token.trim();
+      console.log("[VipModal] Activating token:", inputToken);
       
-      // Client-side quick check for master token to avoid server function serialization issues if any
-      if (inputToken === 'admin87850424') {
-        setVipStatus(true, "Administrador Geral", "admin", inputToken);
-        toast.success(`Modo VIP Ativado: Bem-vindo, Administrador!`);
-        setOpen(false);
-        setToken('');
-        setIsLoading(false);
-        return;
-      }
-
       const result = await validateToken({ data: { token: inputToken } });
-      if (result.success) {
+      
+      console.log("[VipModal] Validation result:", result);
+      
+      if (result && result.success) {
         setVipStatus(true, result.member_name, result.level, inputToken);
         toast.success(`Modo VIP Ativado: Bem-vindo, ${result.member_name}!`);
         setOpen(false);
         setToken('');
+      } else {
+        throw new Error("Resposta inválida do servidor");
       }
     } catch (error: any) {
+      console.error("[VipModal] Activation error:", error);
       toast.error(error.message || 'Token inválido');
     } finally {
       setIsLoading(false);
