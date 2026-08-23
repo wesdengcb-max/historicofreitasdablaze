@@ -93,6 +93,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | ''
+    | '/auth'
     | '/app'
     | '/estrategias'
     | '/sinais'
@@ -101,6 +103,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
     | '/app'
     | '/estrategias'
     | '/sinais'
@@ -109,6 +112,8 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
+    | '/auth'
     | '/app'
     | '/estrategias'
     | '/sinais'
@@ -118,9 +123,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AppRoute: typeof AppRoute
-  EstrategiasRoute: typeof EstrategiasRoute
-  SinaisRoute: typeof SinaisRoute
+  AuthenticatedRoute: typeof AuthenticatedRoute
+  AuthRoute: typeof AuthRoute
   ApiPublicCollectRoute: typeof ApiPublicCollectRoute
   ApiPublicRecentRoute: typeof ApiPublicRecentRoute
 }
