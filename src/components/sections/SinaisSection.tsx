@@ -61,7 +61,7 @@ export default function SinaisSection() {
   useEffect(() => {
     const loadStats = async () => {
       const { data, error } = await supabase.rpc('get_strategy_stats', { lookback_hours: 24 });
-      if (data) setStrategyStats(data.sort((a, b) => b.assertividade - a.assertividade).slice(0, 10));
+      if (data) setStrategyStats(data.sort((a: any, b: any) => b.assertividade - a.assertividade).slice(0, 10));
     };
     loadStats();
     const interval = setInterval(loadStats, 30000);
@@ -148,7 +148,70 @@ export default function SinaisSection() {
         <h1 className="text-4xl font-black tracking-tighter text-white font-outfit uppercase">Feed de Sinais</h1>
       </div>
       
-      <PredictiveSignals />
+      <div className="flex flex-col gap-6">
+        {/* Card de Auditoria */}
+        <div className="rounded-2xl border border-white/5 bg-[#0c0c0c] overflow-hidden shadow-2xl">
+          <div className="flex items-center justify-between border-b border-white/5 bg-white/[0.02] px-6 py-4">
+            <div className="flex items-center gap-3">
+              <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary/10 text-primary">
+                <Cpu className="h-4 w-4" />
+              </div>
+              <h3 className="text-sm font-black uppercase tracking-widest text-white font-outfit">Painel de Auditoria</h3>
+            </div>
+            <div className="flex bg-black/40 p-1 rounded-lg border border-white/5">
+              <button 
+                onClick={() => setAuditFilter('geral')}
+                className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-md transition-all ${auditFilter === 'geral' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-white/40 hover:text-white/60'}`}
+              >
+                Visão Geral
+              </button>
+              <button 
+                onClick={() => setAuditFilter('hoje')}
+                className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-md transition-all ${auditFilter === 'hoje' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-white/40 hover:text-white/60'}`}
+              >
+                Rodadas Atuais
+              </button>
+            </div>
+          </div>
+          
+          <div className="p-6">
+            {auditFilter === 'geral' ? (
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+                {strategyStats.length > 0 ? strategyStats.map((s, i) => (
+                  <div key={i} className="flex flex-col gap-1 p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                    <span className="text-[9px] font-black text-white/30 uppercase tracking-tighter truncate">{s.analise}</span>
+                    <span className="text-xl font-black text-white font-outfit">{s.assertividade.toFixed(0)}%</span>
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <span className="text-[9px] font-bold text-emerald-500">{s.wins}W</span>
+                      <span className="text-[9px] font-bold text-red-500">{s.losses}L</span>
+                    </div>
+                  </div>
+                )) : (
+                  <div className="col-span-full py-4 text-center text-xs text-white/20 italic">Carregando ranking global...</div>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center justify-around py-2">
+                <div className="text-center">
+                  <div className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-1">Assertividade Real</div>
+                  <div className="text-4xl font-black text-white font-outfit">{activeStats.pct.toFixed(1)}%</div>
+                </div>
+                <div className="h-12 w-px bg-white/5" />
+                <div className="text-center">
+                  <div className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-1">Placar (Hoje)</div>
+                  <div className="flex items-baseline gap-2 justify-center">
+                    <span className="text-3xl font-black text-emerald-500 font-outfit">{activeStats.wins}</span>
+                    <span className="text-lg font-black text-white/20">/</span>
+                    <span className="text-3xl font-black text-red-500 font-outfit">{activeStats.losses}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <PredictiveSignals />
+      </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <AnimatePresence mode="popLayout">
