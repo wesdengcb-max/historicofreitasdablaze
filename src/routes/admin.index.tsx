@@ -157,9 +157,9 @@ function AdminDashboard() {
                     <Input 
                       type="text" 
                       value={newTokenManual} 
-                      onChange={e => setNewTokenManual(e.target.value.toUpperCase())}
+                      onChange={e => setNewTokenManual(e.target.value)}
                       placeholder="Ex: FW-XXXX-XXXX"
-                      className="bg-white/5 border-white/10 uppercase font-mono"
+                      className="bg-white/5 border-white/10 font-mono"
                     />
                     <Button 
                       type="button" 
