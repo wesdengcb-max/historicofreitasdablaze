@@ -19,7 +19,7 @@ import {
   Camera
 } from "lucide-react";
 import { setSection, useSection, type SectionId } from "@/lib/sectionStore";
-import { useVipStatus } from "@/lib/auth/vipStore";
+import { useVipStatus, useMemberName } from "@/lib/auth/vipStore";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { useSidebarStore } from "@/lib/sidebarStore";
@@ -57,6 +57,8 @@ export const Sidebar = memo(function Sidebar() {
 
   const active = useSection();
   const isVip = useVipStatus();
+  const memberName = useMemberName();
+
   const { isCollapsed, toggle } = useSidebarStore();
   const avatar = useAvatar();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -137,7 +139,7 @@ export const Sidebar = memo(function Sidebar() {
         </div>
         {!isCollapsed && (
           <div className="text-center">
-            <h2 className="text-lg font-black tracking-tight text-foreground font-outfit">Freitas da Blaze</h2>
+            <h2 className="text-lg font-black tracking-tight text-foreground font-outfit">{isVip ? (memberName || "Membro VIP") : "Freitas da Blaze"}</h2>
             <div className="mt-1 flex items-center justify-center gap-2">
               <span className="rounded bg-red-500/10 px-2 py-0.5 text-[10px] font-bold text-red-500 uppercase tracking-widest">VIP</span>
               <span className="text-[11px] text-muted-foreground">Analista Premium</span>
@@ -226,7 +228,7 @@ export const Sidebar = memo(function Sidebar() {
 
 function SidebarItem({ item, active, isVip, isCollapsed, onClick }: { item: MenuItem; active: boolean; isVip: boolean; isCollapsed: boolean; onClick: () => void }) {
   const Icon = item.icon;
-  const isLocked = !item.isTool && item.id !== "dashboard" && item.id !== "videos" && item.id !== "hostman" && !isVip;
+  const isLocked = !item.isTool && item.id !== "dashboard" && item.id !== "videos" && !isVip;
 
   return (
     <button
