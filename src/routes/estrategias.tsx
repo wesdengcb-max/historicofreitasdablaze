@@ -28,7 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export const Route = createFileRoute("/estrategias")({
+export const Route = createFileRoute("/_authenticated/estrategias" as any)({
   head: () => ({
     meta: [
       { title: "Catalogador de Estratégias — Freitas da Blaze" },

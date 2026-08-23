@@ -1,7 +1,9 @@
 "use client";
 
 import { memo, useState, useEffect } from "react";
-import { ChevronLeft, Menu, Clock, Crown, PanelLeftOpen, PanelLeftClose, BarChart3, Sun, Moon } from "lucide-react";
+import { ChevronLeft, Menu, Clock, Crown, PanelLeftOpen, PanelLeftClose, BarChart3, Sun, Moon, LogOut } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "@tanstack/react-router";
 import { useVipStatus, setVipStatus } from "@/lib/auth/vipStore";
 import { useSidebarStore } from "@/lib/sidebarStore";
 import { toast } from "sonner";
@@ -10,6 +12,13 @@ export const AppHeader = memo(function AppHeader() {
   const isVip = useVipStatus();
   const { isCollapsed, toggle } = useSidebarStore();
   const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    toast.success("Sessão encerrada");
+    navigate({ to: "/" });
+  };
 
   useEffect(() => {
     const saved = localStorage.getItem("theme") as "dark" | "light" | null;
@@ -87,6 +96,14 @@ export const AppHeader = memo(function AppHeader() {
         >
           <Crown className="h-3.5 w-3.5" />
           <span>VIP</span>
+        </button>
+
+        <button
+          onClick={handleLogout}
+          className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-surface text-muted-foreground transition-all duration-300 hover:bg-red-500/10 hover:text-red-500 active:scale-90"
+          title="Sair"
+        >
+          <LogOut className="h-4 w-4" />
         </button>
       </div>
     </header>

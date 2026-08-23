@@ -74,7 +74,7 @@ function SectionFallback() {
 
 
 
-export const Route = createFileRoute("/app")({
+export const Route = createFileRoute("/_authenticated/app" as any)({
   head: () => ({
     meta: [
       { title: "Freitas da Blaze — Análise do Histórico da Blaze" },
