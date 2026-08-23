@@ -22,7 +22,8 @@ export const MAX_CYCLES = 6;
 export const TIMEOUT_MINUTES = 120;
 
 function diffMinutes(a: Date, b: Date) {
-  return Math.max(0, Math.round((b.getTime() - a.getTime()) / 60000));
+  const diffMs = b.getTime() - a.getTime();
+  return Math.max(0, Math.round(diffMs / 60000));
 }
 
 function collectGaps(rows: Row[], i: number, dt: Date): number[] {
