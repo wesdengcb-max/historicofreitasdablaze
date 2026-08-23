@@ -16,7 +16,11 @@ export const Route = createFileRoute('/_authenticated')({
         
         if (!hasAccess) {
           console.warn("[Route Gate] Acesso negado:", location.pathname);
-          throw redirect({ to: location.pathname as any });
+          // Only redirect to home if strictly necessary (e.g. trying to access admin without privileges)
+          // For /app, we allow the component to handle the "locked" state to avoid unwanted jumps
+          if (needsAdmin) {
+            throw redirect({ to: '/' as any });
+          }
         }
       }
       
