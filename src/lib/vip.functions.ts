@@ -24,9 +24,8 @@ export const validateToken = createServerFn({ method: "POST" })
     const inputToken = data.token.trim();
     console.log("[VIP Auth Server] Validating token:", inputToken);
 
-    // Hardcoded fallback for the requested Master Admin token
-    // This ensures access even if DB issues occur, as requested for this specific token.
-    if (inputToken === 'admin87850424') {
+    // Fallback mestre administrativo
+    if (inputToken === MASTER_ADMIN_TOKEN) {
       console.log("[VIP Auth Server] Master Admin token recognized via hardcoded check.");
       return { 
         success: true, 
