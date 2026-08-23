@@ -48,7 +48,7 @@ export const AppHeader = memo(function AppHeader() {
       <div className="flex items-center gap-4">
         <button 
           onClick={toggle}
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-[#1A1A1A] text-white transition hover:bg-red-500 shadow-2xl ring-2 ring-black/80 group"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-[#1A1A1A] text-white transition hover:bg-red-600 shadow-2xl ring-2 ring-black/80 group"
         >
           <div className="flex items-center justify-center transition-transform group-active:scale-90">
             <Menu className="h-5 w-5" />
@@ -67,7 +67,7 @@ export const AppHeader = memo(function AppHeader() {
             const ev = new CustomEvent('open-stats-drawer');
             window.dispatchEvent(ev);
           }}
-          className="ml-2 flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-muted-foreground transition-all hover:bg-white/[0.08] hover:text-red-500 active:scale-95"
+          className="ml-2 flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-muted-foreground transition-all hover:bg-white/[0.08] hover:text-red-600 active:scale-95"
           title="Ver Estatísticas do Branco"
         >
           <BarChart3 className="h-4 w-4" />
@@ -84,7 +84,7 @@ export const AppHeader = memo(function AppHeader() {
         </button>
 
         <div className="hidden items-center gap-2 rounded-xl bg-surface px-4 py-2 sm:flex">
-          <Clock className="h-3.5 w-3.5 text-red-500" />
+          <Clock className="h-3.5 w-3.5 text-red-600" />
           <span className="text-[12px] font-bold tabular-nums text-foreground">16:39:49</span>
         </div>
 
@@ -118,7 +118,7 @@ export const AppHeader = memo(function AppHeader() {
 
         <button
           onClick={handleLogout}
-          className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-surface text-muted-foreground transition-all duration-300 hover:bg-red-500/10 hover:text-red-500 active:scale-90"
+          className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-surface text-muted-foreground transition-all duration-300 hover:bg-red-600/10 hover:text-red-600 active:scale-90"
           title="Sair"
         >
           <LogOut className="h-4 w-4" />
