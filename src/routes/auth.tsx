@@ -33,8 +33,8 @@ function AuthPage() {
     }
 
     toast.success('Login realizado com sucesso!')
-    const redirectTo = search.redirect || '/app'
-    navigate({ to: redirectTo })
+    const redirectTo = (search as any).redirect || '/app'
+    navigate({ to: redirectTo as any })
   }
 
   return (
