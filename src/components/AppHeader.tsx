@@ -1,9 +1,9 @@
 "use client";
 
 import { memo, useState, useEffect } from "react";
-import { ChevronLeft, Menu, Clock, Crown, PanelLeftOpen, PanelLeftClose, BarChart3, Sun, Moon, LogOut } from "lucide-react";
+import { ChevronLeft, Menu, Clock, Crown, PanelLeftOpen, PanelLeftClose, BarChart3, Sun, Moon, LogOut, ShieldAlert } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, Link } from "@tanstack/react-router";
 import { useVipStatus, setVipStatus } from "@/lib/auth/vipStore";
 import { useSidebarStore } from "@/lib/sidebarStore";
 import { toast } from "sonner";
@@ -13,6 +13,21 @@ export const AppHeader = memo(function AppHeader() {
   const { isCollapsed, toggle } = useSidebarStore();
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const navigate = useNavigate();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        const { data } = await supabase.rpc('has_role', {
+          _user_id: session.user.id,
+          _role: 'admin'
+        });
+        setIsAdmin(!!data);
+      }
+    };
+    checkAdmin();
+  }, []);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -82,7 +97,17 @@ export const AppHeader = memo(function AppHeader() {
           <span className="text-[12px] font-bold tabular-nums text-foreground">16:39:49</span>
         </div>
 
-        <button 
+        {isAdmin && (
+          <Link
+            to="/admin"
+            className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-surface text-amber-500 transition-all duration-300 hover:bg-amber-500/10 active:scale-90"
+            title="Painel Administrativo"
+          >
+            <ShieldAlert className="h-4 w-4" />
+          </Link>
+        )}
+
+        <button
           onClick={() => {
             const next = !isVip;
             setVipStatus(next);

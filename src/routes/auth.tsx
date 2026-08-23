@@ -33,8 +33,14 @@ function AuthPage() {
     }
 
     toast.success('Login realizado com sucesso!')
-    const redirectTo = (search as any).redirect || '/app'
-    navigate({ to: redirectTo as any })
+    
+    // Se o login for o admin padrão, envia para /admin
+    if (email === 'admin@freitaswhite.com') {
+      navigate({ to: '/admin' })
+    } else {
+      const redirectTo = (search as any).redirect || '/app'
+      navigate({ to: redirectTo as any })
+    }
   }
 
   return (

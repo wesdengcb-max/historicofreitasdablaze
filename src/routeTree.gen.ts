@@ -10,8 +10,10 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AuthenticatedSinaisRouteImport } from './routes/_authenticated.sinais'
 import { Route as AuthenticatedEstrategiasRouteImport } from './routes/_authenticated.estrategias'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated.app'
@@ -23,6 +25,11 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -31,6 +38,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AuthenticatedSinaisRoute = AuthenticatedSinaisRouteImport.update({
   id: '/sinais',
@@ -61,10 +73,12 @@ const ApiPublicCollectRoute = ApiPublicCollectRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/app': typeof AuthenticatedAppRoute
   '/estrategias': typeof AuthenticatedEstrategiasRoute
   '/sinais': typeof AuthenticatedSinaisRoute
+  '/admin/': typeof AdminIndexRoute
   '/api/public/collect': typeof ApiPublicCollectRoute
   '/api/public/recent': typeof ApiPublicRecentRoute
 }
@@ -74,6 +88,7 @@ export interface FileRoutesByTo {
   '/app': typeof AuthenticatedAppRoute
   '/estrategias': typeof AuthenticatedEstrategiasRoute
   '/sinais': typeof AuthenticatedSinaisRoute
+  '/admin': typeof AdminIndexRoute
   '/api/public/collect': typeof ApiPublicCollectRoute
   '/api/public/recent': typeof ApiPublicRecentRoute
 }
@@ -81,10 +96,12 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/app': typeof AuthenticatedAppRoute
   '/_authenticated/estrategias': typeof AuthenticatedEstrategiasRoute
   '/_authenticated/sinais': typeof AuthenticatedSinaisRoute
+  '/admin/': typeof AdminIndexRoute
   '/api/public/collect': typeof ApiPublicCollectRoute
   '/api/public/recent': typeof ApiPublicRecentRoute
 }
@@ -92,10 +109,12 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/auth'
     | '/app'
     | '/estrategias'
     | '/sinais'
+    | '/admin/'
     | '/api/public/collect'
     | '/api/public/recent'
   fileRoutesByTo: FileRoutesByTo
@@ -105,16 +124,19 @@ export interface FileRouteTypes {
     | '/app'
     | '/estrategias'
     | '/sinais'
+    | '/admin'
     | '/api/public/collect'
     | '/api/public/recent'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/admin'
     | '/auth'
     | '/_authenticated/app'
     | '/_authenticated/estrategias'
     | '/_authenticated/sinais'
+    | '/admin/'
     | '/api/public/collect'
     | '/api/public/recent'
   fileRoutesById: FileRoutesById
@@ -122,6 +144,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
   ApiPublicCollectRoute: typeof ApiPublicCollectRoute
   ApiPublicRecentRoute: typeof ApiPublicRecentRoute
@@ -134,6 +157,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -149,6 +179,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/_authenticated/sinais': {
       id: '/_authenticated/sinais'
@@ -204,9 +241,20 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface AdminRouteChildren {
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
   ApiPublicCollectRoute: ApiPublicCollectRoute,
   ApiPublicRecentRoute: ApiPublicRecentRoute,
