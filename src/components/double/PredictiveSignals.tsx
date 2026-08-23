@@ -135,6 +135,43 @@ export function PredictiveSignals() {
   const [mode2, setMode2] = useState<Mode2Signal[] | null>(null);
   const [generatedAt, setGeneratedAt] = useState<Date | null>(null);
 
+  // 1. FILTRAGEM DOS ARRAYS NO ESTADO REACT
+  const activeSignals = useMemo(() => {
+    const combined = [
+      ...(mode1 || []).map(s => ({ ...s, isTop1: true, top1Count: s.analysisCount, hasTop5Confluence: false, rank: 1, category: 'isolado' })),
+      ...(mode2 || []).map(s => ({ ...s, isTop1: false, top1Count: 0, hasTop5Confluence: true, rank: s.sources[0]?.top5 ? 2 : 6, category: 'confluencia', at: s.times[0] }))
+    ];
+    return combined;
+  }, [mode1, mode2]);
+
+  const rareSignals = useMemo(() => activeSignals.filter(s => 
+    s.isRare || (s.top1Count && s.top1Count >= 2)
+  ), [activeSignals]);
+
+  const top1Top5Signals = useMemo(() => activeSignals.filter(s => 
+    (s.isTop1 || s.title?.includes('Top 1')) && 
+    s.hasTop5Confluence && 
+    (!s.top1Count || s.top1Count < 2) && 
+    !s.isRare
+  ), [activeSignals]);
+
+  const top1IsolatedSignals = useMemo(() => activeSignals.filter(s => 
+    (s.isTop1 || s.title?.includes('Isolado')) && 
+    !s.hasTop5Confluence && 
+    (!s.top1Count || s.top1Count < 2) && 
+    !s.isRare
+  ), [activeSignals]);
+
+  const top5OnlySignals = useMemo(() => activeSignals.filter(s => 
+    !s.isTop1 && 
+    !s.title?.includes('Isolado') && 
+    s.category !== 'isolado' && 
+    !s.isRare && 
+    (!s.top1Count || s.top1Count === 0) &&
+    (s.rank >= 2 && s.rank <= 5)
+  ), [activeSignals]);
+
+
 
   useEffect(() => {
     let alive = true;
