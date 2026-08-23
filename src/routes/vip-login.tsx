@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Key, ArrowRight, ShieldCheck, AlertCircle, Loader2 } from 'lucide-react'
 import { validateToken } from '@/lib/vip.functions'
-import { useVipStore } from '@/lib/vipStore'
+import { setVipStatus } from '@/lib/auth/vipStore'
 import { toast } from 'sonner'
 import fwLogoAsset from "@/assets/fw-logo-link.png.asset.json"
 
@@ -18,7 +18,6 @@ function VipLoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
   const search = useSearch({ from: '/vip-login' }) as any
-  const setVip = useVipStore(state => state.setVip)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -28,7 +27,7 @@ function VipLoginPage() {
     try {
       const result = await validateToken({ data: { token: token.trim() } })
       if (result.success) {
-        setVip(true, result.member_name)
+        setVipStatus(true, result.member_name)
         toast.success(`Bem-vindo, ${result.member_name}!`)
         
         const redirectTo = search.redirect || '/app'
@@ -40,6 +39,7 @@ function VipLoginPage() {
       setIsLoading(false)
     }
   }
+
 
   return (
     <div className="min-h-screen bg-[#020407] flex items-center justify-center p-4">

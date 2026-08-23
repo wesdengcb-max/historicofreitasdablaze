@@ -5,17 +5,15 @@ import { useVipStore } from '@/lib/vipStore'
 export const Route = createFileRoute('/_authenticated')({ 
   component: () => <Outlet />,
   beforeLoad: async ({ location }) => {
-    // 1. Check if user is logged in via Supabase (Admin flow)
+    // We check Supabase session first (for Admins)
     const { data: { session } } = await supabase.auth.getSession()
     
-    // 2. Check if user has a VIP token session (VIP flow)
-    // Note: Since beforeLoad is a static check, we'll try to get the state from the store
-    // On the server, this store will be empty, so we rely on the cookie-based session check
-    // In TanStack Start, we might need a server function to check the cookie securely
-    
-    const isVip = typeof window !== 'undefined' ? useVipStore.getState().isVip : false;
+    // In beforeLoad, we can check localStorage if in browser
+    const isVip = typeof window !== 'undefined' 
+      ? localStorage.getItem("freitas_white_vip_status") === "true"
+      : false;
 
-    // If it's an admin route, strict Supabase auth is required
+    // Admin routes REQUIRE Supabase session
     if (location.pathname.startsWith('/admin')) {
       if (!session) {
         throw redirect({
@@ -26,9 +24,8 @@ export const Route = createFileRoute('/_authenticated')({
       return { session, user: session.user, authType: 'admin' }
     }
 
-    // For other authenticated routes (VIP area), either session OR VIP token works
+    // VIP area (like /app, /sinais, etc) allows either Supabase session OR VIP token
     if (!session && !isVip) {
-      // If neither, redirect to the VIP login/token page
       throw redirect({
         to: '/vip-login' as any,
         search: { redirect: location.href } as any,
