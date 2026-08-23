@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Key, Crown, LogOut, Loader2, ShieldCheck, ArrowRight, User, Lock, Calendar, AlertCircle } from "lucide-react";
+import { Key, Crown, LogOut, Loader2, ShieldCheck, ArrowRight, User, Lock, Calendar, AlertCircle, Clock } from "lucide-react";
 import { useVipStatus, setVipStatus, logoutVip, useMemberName, useVipToken, useVipExpiresAt } from "@/lib/auth/vipStore";
 import { validateToken } from "@/lib/vip.functions";
 import { toast } from "sonner";
