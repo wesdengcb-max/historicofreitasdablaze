@@ -50,6 +50,8 @@ type Mode1Signal = {
   isGreenSeal?: boolean;
   greenSealAssertivity?: number;
   strategyKey?: string;
+  isConsecutive?: boolean;
+  levelOffset?: number;
 
   outcome?: "pending" | "green" | "red";
   resultTime?: string;
