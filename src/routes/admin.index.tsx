@@ -9,21 +9,16 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
 import { 
-  Users, 
-  UserPlus, 
   Trash2, 
-  Shield, 
   ShieldAlert, 
   CheckCircle, 
   XCircle, 
-  Mail, 
   Calendar,
   Key,
   Plus,
   RefreshCw,
   Clock,
-  User,
-  Hash
+  User
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -35,12 +30,6 @@ function AdminDashboard() {
   const queryClient = useQueryClient()
   const [activeTab, setActiveTab] = useState<'tokens'>('tokens')
   
-  // User Management Functions
-  const fetchUsers = useServerFn(listUsers)
-  const doCreateUser = useServerFn(createUser)
-  const doUpdateStatus = useServerFn(updateUserStatus)
-  const doDeleteUser = useServerFn(deleteUser)
-  const doUpdateRole = useServerFn(updateUserRole)
 
   // Token Management Functions
   const fetchTokens = useServerFn(listVipTokens)
@@ -48,10 +37,6 @@ function AdminDashboard() {
   const doUpdateToken = useServerFn(updateVipToken)
   const doDeleteToken = useServerFn(deleteVipToken)
 
-  const [isAdding, setIsAdding] = useState(false)
-  const [newEmail, setNewEmail] = useState('')
-  const [newPassword, setNewPassword] = useState('')
-  const [newRole, setNewRole] = useState<'admin' | 'user'>('user')
 
   const [isAddingToken, setIsAddingToken] = useState(false)
   const [newTokenName, setNewTokenName] = useState('')
@@ -60,11 +45,6 @@ function AdminDashboard() {
   const [newTokenLevel, setNewTokenLevel] = useState<'member' | 'admin'>('member')
 
 
-  const { data: users, isLoading: usersLoading } = useQuery({
-    queryKey: ['admin', 'users'],
-    queryFn: () => fetchUsers(),
-    enabled: activeTab === 'users'
-  })
 
   const { data: tokens, isLoading: tokensLoading } = useQuery({
     queryKey: ['admin', 'tokens'],
