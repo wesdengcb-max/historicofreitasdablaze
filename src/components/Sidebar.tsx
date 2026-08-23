@@ -93,6 +93,7 @@ export const Sidebar = memo(function Sidebar() {
        return;
     }
 
+    // Bloqueia acesso a seções restritas para usuários não-VIP
     if (item.id !== "dashboard" && item.id !== "videos" && item.id !== "hostman" && !isVip && vipLevel !== 'admin') {
       const ev = new CustomEvent('open-vip-modal');
       window.dispatchEvent(ev);
