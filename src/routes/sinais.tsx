@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import SinaisPage from "@/components/sections/SinaisSection";
 
-export const Route = createFileRoute("/sinais")({
+export const Route = createFileRoute("/_authenticated/sinais" as any)({
   head: () => ({
     meta: [
       { title: "Sinais — Freitas da Blaze" },
