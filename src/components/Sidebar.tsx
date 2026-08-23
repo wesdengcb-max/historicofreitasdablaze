@@ -52,11 +52,13 @@ const FERRAMENTAS: MenuItem[] = [
 ];
 
 import { useAvatar, setAvatar } from "@/lib/avatarStore";
+import { useVipLevel } from "@/lib/auth/vipStore";
 
 export const Sidebar = memo(function Sidebar() {
 
   const active = useSection();
   const isVip = useVipStatus();
+  const vipLevel = useVipLevel();
   const memberName = useMemberName();
 
   const { isCollapsed, toggle } = useSidebarStore();
@@ -130,7 +132,7 @@ export const Sidebar = memo(function Sidebar() {
             className="hidden"
             onChange={handleFile}
           />
-          {isVip && (
+          {(isVip || vipLevel === 'admin') && (
             <div className="pointer-events-none absolute -bottom-1 -right-1 rounded-full bg-red-500 p-1 shadow-[0_0_12px_rgba(239,68,68,0.7)] ring-2 ring-surface">
                <Crown className="h-3 w-3 text-white" />
             </div>
@@ -138,9 +140,9 @@ export const Sidebar = memo(function Sidebar() {
         </div>
         {!isCollapsed && (
           <div className="text-center">
-            <h2 className="text-lg font-black tracking-tight text-foreground font-outfit">{isVip ? (memberName || "Membro VIP") : "Freitas da Blaze"}</h2>
+            <h2 className="text-lg font-black tracking-tight text-foreground font-outfit">{(isVip || vipLevel === 'admin') ? (memberName || "Membro VIP") : "Freitas da Blaze"}</h2>
             <div className="mt-1 flex items-center justify-center gap-2">
-              <span className="rounded bg-red-500/10 px-2 py-0.5 text-[10px] font-bold text-red-500 uppercase tracking-widest">VIP</span>
+              <span className="rounded bg-red-500/10 px-2 py-0.5 text-[10px] font-bold text-red-500 uppercase tracking-widest">{vipLevel === 'admin' ? 'ADMIN' : 'VIP'}</span>
               <span className="text-[11px] text-muted-foreground">Analista Premium</span>
             </div>
           </div>
@@ -160,6 +162,7 @@ export const Sidebar = memo(function Sidebar() {
                 item={item} 
                 active={active === item.id} 
                 isVip={isVip} 
+                vipLevel={vipLevel}
                 isCollapsed={isCollapsed}
                 onClick={() => handleItemClick(item)} 
               />
@@ -179,6 +182,7 @@ export const Sidebar = memo(function Sidebar() {
                 item={item} 
                 active={false} 
                 isVip={isVip} 
+                vipLevel={vipLevel}
                 isCollapsed={isCollapsed}
                 onClick={() => handleItemClick(item)} 
               />
@@ -225,9 +229,9 @@ export const Sidebar = memo(function Sidebar() {
   );
 });
 
-function SidebarItem({ item, active, isVip, isCollapsed, onClick }: { item: MenuItem; active: boolean; isVip: boolean; isCollapsed: boolean; onClick: () => void }) {
+function SidebarItem({ item, active, isVip, vipLevel, isCollapsed, onClick }: { item: MenuItem; active: boolean; isVip: boolean; vipLevel: string | null; isCollapsed: boolean; onClick: () => void }) {
   const Icon = item.icon;
-  const isLocked = !item.isTool && item.id !== "dashboard" && item.id !== "videos" && !isVip;
+  const isLocked = !item.isTool && item.id !== "dashboard" && item.id !== "videos" && !isVip && vipLevel !== 'admin';
 
   return (
     <button
