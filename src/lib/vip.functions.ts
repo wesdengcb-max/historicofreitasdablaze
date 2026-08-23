@@ -16,37 +16,51 @@ export const validateToken = createServerFn({ method: "POST" })
   .handler(async ({ data }: { data: { token: string } }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
+    console.log("[VIP Auth] Validating token:", data.token);
+
+    // Look up token by string value
     const { data: tokenData, error } = await supabaseAdmin
       .from("vip_tokens")
       .select("*")
       .eq("token", data.token)
-      .single();
+      .maybeSingle();
 
-    if (error || !tokenData) {
-      console.error("Token lookup failed:", { token: data.token, error: error?.message, tokenData: !!tokenData });
+    if (error) {
+      console.error("[VIP Auth] Database error during lookup:", error.message);
+      throw new Error("Erro ao validar token no banco de dados");
+    }
+
+    if (!tokenData) {
+      console.warn("[VIP Auth] Token not found in database:", data.token);
       throw new Error("Token inválido ou expirado");
     }
 
+    console.log("[VIP Auth] Token found:", {
+      id: tokenData.id,
+      status: tokenData.status,
+      level: tokenData.level,
+      expires_at: tokenData.expires_at
+    });
+
     if (tokenData.status !== 'active') {
-      console.log("Token is not active:", { token: data.token, status: tokenData.status });
+      console.warn("[VIP Auth] Token is not active:", tokenData.status);
       throw new Error("Este token está desativado");
     }
 
-    console.log("Token record validated:", { 
-      token: tokenData.token, 
-      status: tokenData.status, 
-      level: tokenData.level
-    });
-
     // Check expiration - null expires_at means no expiration
     if (tokenData.expires_at && new Date(tokenData.expires_at) < new Date()) {
-      console.log("Token expired:", data.token, "at", tokenData.expires_at);
+      console.warn("[VIP Auth] Token expired at:", tokenData.expires_at);
+      
+      // Update status to expired
       await supabaseAdmin
         .from("vip_tokens")
         .update({ status: "expired" })
         .eq("id", tokenData.id);
+        
       throw new Error("Este token expirou");
     }
+
+    console.log("[VIP Auth] Token successfully validated for:", tokenData.member_name);
 
     return { 
       success: true, 
