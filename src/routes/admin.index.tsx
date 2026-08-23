@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useServerFn } from '@tanstack/react-start'
-import { listUsers, createUser, updateUserStatus, deleteUser, updateUserRole } from '@/lib/admin.functions'
+
 import { listVipTokens, createVipToken, updateVipToken, deleteVipToken, generateVipToken } from '@/lib/vip.functions'
 import { Card } from '@/components/double/Card'
 import { Button } from '@/components/ui/button'
@@ -83,41 +83,6 @@ function AdminDashboard() {
     }
   })
 
-  const createMutation = useMutation({
-    mutationFn: (data: any) => doCreateUser({ data }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin', 'users'] })
-      setIsAdding(false)
-      setNewEmail('')
-      setNewPassword('')
-      toast.success('Usuário criado com sucesso')
-    },
-    onError: (err: any) => toast.error('Erro ao criar usuário', { description: err.message })
-  })
-
-  const statusMutation = useMutation({
-    mutationFn: (data: any) => doUpdateStatus({ data }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin', 'users'] })
-      toast.success('Status atualizado')
-    }
-  })
-
-  const deleteMutation = useMutation({
-    mutationFn: (userId: string) => doDeleteUser({ data: { userId } }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin', 'users'] })
-      toast.success('Usuário removido')
-    }
-  })
-
-  const roleMutation = useMutation({
-    mutationFn: (data: any) => doUpdateRole({ data }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin', 'users'] })
-      toast.success('Permissão atualizada')
-    }
-  })
 
   return (
     <div className="min-h-screen bg-[#020407] p-4 sm:p-8 text-white space-y-8">
