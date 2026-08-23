@@ -586,7 +586,9 @@ export function PredictiveSignals() {
           at: new Date(middleTime),
           pct: maxPct,
           label: info.label,
-          analysisCount: combinedAnalyses.size + 4,
+          analysisCount: combinedAnalyses.size,
+          isConsecutive: true,
+          levelOffset: 4, // Eleva para Prata ou superior conforme análise base
           sources: combinedSources,
           isHighTendency: info.isHighTendency || next1[1].isHighTendency || next2[1].isHighTendency,
           isVerified: false,
@@ -605,7 +607,9 @@ export function PredictiveSignals() {
           at: new Date(best.t),
           pct: best.info.pct,
           label: best.info.label,
-          analysisCount: combinedAnalyses.size + 1,
+          analysisCount: combinedAnalyses.size,
+          isConsecutive: true,
+          levelOffset: 1, // Eleva 1 nível
           sources: combinedSources,
           isHighTendency: info.isHighTendency || next1[1].isHighTendency,
           isVerified: false,
