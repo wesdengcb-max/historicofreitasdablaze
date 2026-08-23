@@ -1,4 +1,3 @@
-import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister'
 import { QueryClient } from '@tanstack/react-query'
 import { createStart } from '@tanstack/react-start'
 import { attachSupabaseAuth } from '@/integrations/supabase/auth-attacher';
