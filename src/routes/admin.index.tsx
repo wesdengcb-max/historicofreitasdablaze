@@ -389,6 +389,17 @@ function AdminDashboard() {
                     className="bg-white/5 border-white/10"
                   />
                 </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Nível de Acesso</label>
+                  <select 
+                    value={newTokenLevel}
+                    onChange={(e) => setNewTokenLevel(e.target.value as any)}
+                    className="w-full h-10 rounded-md border border-white/10 bg-black/50 px-3 text-sm text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-red-500"
+                  >
+                    <option value="member">Membro VIP</option>
+                    <option value="admin">Administrador</option>
+                  </select>
+
                 <div className="flex justify-end gap-3 pt-2">
                   <Button type="button" variant="ghost" onClick={() => setIsAddingToken(false)}>Cancelar</Button>
                   <Button 
@@ -422,10 +433,27 @@ function AdminDashboard() {
                         )}>
                           {token.status === 'active' ? 'Ativo' : token.status === 'expired' ? 'Expirado' : 'Inativo'}
                         </span>
+                        <span className={cn(
+                          "text-[10px] px-2 py-0.5 rounded-full font-black uppercase",
+                          token.level === 'admin' ? "bg-amber-500/20 text-amber-500" : "bg-blue-500/20 text-blue-500"
+                        )}>
+                          {token.level === 'admin' ? 'ADMIN' : 'Membro'}
+                        </span>
                       </div>
+
                       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground mt-1">
                         <span className="flex items-center gap-1"><User className="w-3 h-3" /> {token.member_name}</span>
                         <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> Expira em: {token.expires_at ? new Date(token.expires_at).toLocaleDateString() : 'Nunca'}</span>
+                        {token.expires_at && (
+                          <span className={cn(
+                            "flex items-center gap-1 font-bold",
+                            Math.ceil((new Date(token.expires_at).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) <= 5 ? "text-red-500" : "text-emerald-500"
+                          )}>
+                            <Clock className="w-3 h-3" />
+                            {Math.ceil((new Date(token.expires_at).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} dias restantes
+                          </span>
+                        )}
+
                         <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> Criado em: {new Date(token.created_at).toLocaleDateString()}</span>
                       </div>
                     </div>
