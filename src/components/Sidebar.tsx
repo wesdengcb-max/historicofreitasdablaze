@@ -90,7 +90,7 @@ export const Sidebar = memo(function Sidebar() {
        return;
     }
 
-    if (item.id !== "dashboard" && item.id !== "videos" && !isVip) {
+    if (item.id !== "dashboard" && item.id !== "videos" && item.id !== "hostman" && !isVip && vipLevel !== 'admin') {
       const ev = new CustomEvent('open-vip-modal');
       window.dispatchEvent(ev);
       return;

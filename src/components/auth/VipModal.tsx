@@ -49,10 +49,13 @@ export function VipModal() {
   };
 
   const handleDeactivate = () => {
-    logoutVip();
     if (typeof window !== 'undefined') {
       localStorage.removeItem("freitas_white_vip_token");
+      localStorage.removeItem("freitas_white_vip_status");
+      localStorage.removeItem("freitas_white_member_name");
+      localStorage.removeItem("freitas_white_vip_level");
     }
+    logoutVip();
     toast.success("Modo VIP desativado");
     setOpen(false);
   };
