@@ -105,7 +105,7 @@ export const Sidebar = memo(function Sidebar() {
   const handleLogout = () => {
     logoutVip();
     toast.success("Sessão encerrada");
-    navigate({ to: "/" });
+    // navigate({ to: "/" }); // Removido conforme solicitado: não redireciona para a home ao sair
   };
 
   return (

@@ -9,12 +9,14 @@ export const Route = createFileRoute('/_authenticated')({
       const vipLevel = localStorage.getItem("freitas_white_vip_level") as "member" | "admin" | null;
 
       // Rotas administrativas exigem EXCLUSIVAMENTE privilégios de admin
-      if (location.pathname.startsWith('/admin')) {
-        if (!isVip || vipLevel !== 'admin') {
-          console.warn("[Route Gate] Acesso administrativo negado para usuário comum:", location.pathname);
-          throw redirect({
-            to: '/' as any,
-          });
+      // Rotas protegidas (VIP e Admin)
+      if (location.pathname.startsWith('/app') || location.pathname.startsWith('/admin')) {
+        const needsAdmin = location.pathname.startsWith('/admin');
+        const hasAccess = isVip && (!needsAdmin || vipLevel === 'admin');
+        
+        if (!hasAccess) {
+          console.warn("[Route Gate] Acesso negado:", location.pathname);
+          throw redirect({ to: '/' as any });
         }
       }
       
