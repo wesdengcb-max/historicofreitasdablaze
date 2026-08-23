@@ -346,7 +346,9 @@ export function PredictiveSignals() {
 
   const generate = useCallback(async () => {
     const now = new Date();
+    // round to nearest minute for comparison
     now.setSeconds(0, 0);
+    now.setMilliseconds(0);
     setGeneratedAt(now);
 
     // Alertas de Segurança ("possível rec")
