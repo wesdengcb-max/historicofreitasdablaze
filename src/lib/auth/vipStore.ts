@@ -50,8 +50,10 @@ export function setVipStatus(status: boolean, name: string | null = null, level:
 
     if (token) localStorage.setItem(TOKEN_KEY, token);
     else localStorage.removeItem(TOKEN_KEY);
+
+    // Force re-render of components using the store and triggers state hydration across tabs
+    listeners.forEach((l) => l());
   }
-  listeners.forEach((l) => l());
 }
 
 export function useVipStatus() {
