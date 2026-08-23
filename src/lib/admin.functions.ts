@@ -1,18 +1,24 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+interface ServerContext {
+  supabase: SupabaseClient;
+}
 
 export const listUsers = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
-    if (!context) throw new Error("Internal Server Error: Missing context");
+    const ctx = context as ServerContext;
+    if (!ctx?.supabase) throw new Error("Internal Server Error: Missing context");
     
     // Only admins can list users
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     
     // Check if current user is admin
-    const { data: { session } } = await context.supabase.auth.getSession();
+    const { data: { session } } = await ctx.supabase.auth.getSession();
     if (!session) throw new Error("Unauthorized");
     
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+    const { data: isAdmin } = await ctx.supabase.rpc("has_role", {
       _user_id: session.user.id,
       _role: "admin"
     });
@@ -29,7 +35,7 @@ export const listUsers = createServerFn({ method: "GET" })
     
     if (rolesError) throw rolesError;
 
-    const rolesMap = new Map(roles.map(r => [r.user_id, r.role]));
+    const rolesMap = new Map(roles.map((r: any) => [r.user_id, r.role]));
 
     return users.users.map(u => ({
       id: u.id,
@@ -48,14 +54,15 @@ export const createUser = createServerFn({ method: "POST" })
     role: z.enum(["admin", "user"])
   }).parse(data))
   .handler(async ({ data, context }) => {
-    if (!context) throw new Error("Internal Server Error: Missing context");
+    const ctx = context as ServerContext;
+    if (!ctx?.supabase) throw new Error("Internal Server Error: Missing context");
     
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     
-    const { data: { session } } = await context.supabase.auth.getSession();
+    const { data: { session } } = await ctx.supabase.auth.getSession();
     if (!session) throw new Error("Unauthorized");
     
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+    const { data: isAdmin } = await ctx.supabase.rpc("has_role", {
       _user_id: session.user.id,
       _role: "admin"
     });
@@ -70,6 +77,7 @@ export const createUser = createServerFn({ method: "POST" })
     });
 
     if (createError) throw createError;
+    if (!newUser?.user) throw new Error("Failed to create user");
 
     // Assign role
     const { error: roleError } = await supabaseAdmin
@@ -87,14 +95,15 @@ export const updateUserStatus = createServerFn({ method: "POST" })
     active: z.boolean()
   }).parse(data))
   .handler(async ({ data, context }) => {
-    if (!context) throw new Error("Internal Server Error: Missing context");
+    const ctx = context as ServerContext;
+    if (!ctx?.supabase) throw new Error("Internal Server Error: Missing context");
     
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     
-    const { data: { session } } = await context.supabase.auth.getSession();
+    const { data: { session } } = await ctx.supabase.auth.getSession();
     if (!session) throw new Error("Unauthorized");
     
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+    const { data: isAdmin } = await ctx.supabase.rpc("has_role", {
       _user_id: session.user.id,
       _role: "admin"
     });
@@ -114,14 +123,15 @@ export const deleteUser = createServerFn({ method: "POST" })
     userId: z.string().uuid()
   }).parse(data))
   .handler(async ({ data, context }) => {
-    if (!context) throw new Error("Internal Server Error: Missing context");
+    const ctx = context as ServerContext;
+    if (!ctx?.supabase) throw new Error("Internal Server Error: Missing context");
     
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     
-    const { data: { session } } = await context.supabase.auth.getSession();
+    const { data: { session } } = await ctx.supabase.auth.getSession();
     if (!session) throw new Error("Unauthorized");
     
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+    const { data: isAdmin } = await ctx.supabase.rpc("has_role", {
       _user_id: session.user.id,
       _role: "admin"
     });
@@ -140,14 +150,15 @@ export const updateUserRole = createServerFn({ method: "POST" })
     role: z.enum(["admin", "user"])
   }).parse(data))
   .handler(async ({ data, context }) => {
-    if (!context) throw new Error("Internal Server Error: Missing context");
+    const ctx = context as ServerContext;
+    if (!ctx?.supabase) throw new Error("Internal Server Error: Missing context");
     
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     
-    const { data: { session } } = await context.supabase.auth.getSession();
+    const { data: { session } } = await ctx.supabase.auth.getSession();
     if (!session) throw new Error("Unauthorized");
     
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+    const { data: isAdmin } = await ctx.supabase.rpc("has_role", {
       _user_id: session.user.id,
       _role: "admin"
     });
