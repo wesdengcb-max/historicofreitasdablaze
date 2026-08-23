@@ -54,8 +54,28 @@ export default function SinaisSection() {
       if (data) setResultsForValidation(data.map(rowToResult));
     };
     load();
-    const interval = setInterval(load, 5000);
-    return () => clearInterval(interval);
+    
+    // Inscrição em tempo real para re-render imediato
+    const channel = supabase
+      .channel('schema-db-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'blaze_results'
+        },
+        (payload) => {
+          setResultsForValidation(prev => [rowToResult(payload.new as any), ...prev].slice(0, 1000));
+        }
+      )
+      .subscribe();
+
+    const interval = setInterval(load, 15000); // Polling de segurança menos frequente
+    return () => {
+      clearInterval(interval);
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   useEffect(() => {
@@ -81,33 +101,36 @@ export default function SinaisSection() {
           
           if (Number.isNaN(entryTime)) return s;
 
+          // Se já está concluído, removemos da tela após 3 minutos
           if (s.outcome && s.outcome !== "pending") {
             if (s.completedAt && now - s.completedAt > 3 * 60_000) return null;
             return s;
           }
 
-          if (now < entryTime + 2 * 60_000) return { ...s, outcome: "pending" as const };
-
+          // Janela de auditoria de 3 minutos: Horário -1, Exato, +1
           const rangeStart = entryTime - 60_000;
           const rangeEnd = entryTime + 60_000;
 
-          const matchedResult = (resultsForValidation || []).find(r => {
-            if (!r || r.roll !== 0) return false;
-            const rt = new Date(r.createdAt).getTime();
-            return rt >= rangeStart && rt <= rangeEnd;
-          });
+          // Se o tempo atual ainda não atingiu o final da janela (mais uma margem de segurança de processamento), mantém pendente
+          if (now < rangeEnd + 30_000) {
+            // Verificação em tempo real dentro da janela
+            const matchedResult = (resultsForValidation || []).find(r => {
+              if (!r || r.roll !== 0) return false;
+              const rt = new Date(r.createdAt).getTime();
+              return rt >= rangeStart && rt <= rangeEnd;
+            });
 
-          if (matchedResult) {
-            if (s.strategyKey) updateStats(s.strategyKey, "green");
-            return { ...s, outcome: "green" as const, resultTime: fmtTime(matchedResult.createdAt), label: "WIN", completedAt: now };
-          }
- 
-          if (now > rangeEnd + 60_000) {
-            if (s.strategyKey) updateStats(s.strategyKey, "red");
-            return { ...s, outcome: "red" as const, label: "LOSS", completedAt: now };
+            if (matchedResult) {
+              if (s.strategyKey) updateStats(s.strategyKey, "green");
+              return { ...s, outcome: "green" as const, resultTime: fmtTime(matchedResult.createdAt), label: "WIN", completedAt: now };
+            }
+            
+            return { ...s, outcome: "pending" as const };
           }
 
-          return s;
+          // Se passou da janela e não deu WIN, é LOSS
+          if (s.strategyKey) updateStats(s.strategyKey, "red");
+          return { ...s, outcome: "red" as const, label: "LOSS", completedAt: now };
         } catch (e) { return s; }
       }).filter((s): s is PredictiveSignal => s !== null);
       
