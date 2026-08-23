@@ -8,7 +8,7 @@ interface ServerContext {
 
 export const listUsers = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
-    const ctx = context as ServerContext;
+    const ctx = context as unknown as ServerContext;
     if (!ctx?.supabase) throw new Error("Internal Server Error: Missing context");
     
     // Only admins can list users
@@ -54,7 +54,7 @@ export const createUser = createServerFn({ method: "POST" })
     role: z.enum(["admin", "user"])
   }).parse(data))
   .handler(async ({ data, context }) => {
-    const ctx = context as ServerContext;
+    const ctx = context as unknown as ServerContext;
     if (!ctx?.supabase) throw new Error("Internal Server Error: Missing context");
     
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -95,7 +95,7 @@ export const updateUserStatus = createServerFn({ method: "POST" })
     active: z.boolean()
   }).parse(data))
   .handler(async ({ data, context }) => {
-    const ctx = context as ServerContext;
+    const ctx = context as unknown as ServerContext;
     if (!ctx?.supabase) throw new Error("Internal Server Error: Missing context");
     
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -123,7 +123,7 @@ export const deleteUser = createServerFn({ method: "POST" })
     userId: z.string().uuid()
   }).parse(data))
   .handler(async ({ data, context }) => {
-    const ctx = context as ServerContext;
+    const ctx = context as unknown as ServerContext;
     if (!ctx?.supabase) throw new Error("Internal Server Error: Missing context");
     
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -150,7 +150,7 @@ export const updateUserRole = createServerFn({ method: "POST" })
     role: z.enum(["admin", "user"])
   }).parse(data))
   .handler(async ({ data, context }) => {
-    const ctx = context as ServerContext;
+    const ctx = context as unknown as ServerContext;
     if (!ctx?.supabase) throw new Error("Internal Server Error: Missing context");
     
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
