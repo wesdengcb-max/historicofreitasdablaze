@@ -345,7 +345,7 @@ function Index() {
 
   // Protect current section if VIP is lost
   useEffect(() => {
-    if (section !== "dashboard" && section !== "videos" && section !== "hostman" && !isVip) {
+    if (section !== "dashboard" && section !== "videos" && section !== "hostman" && !isVip && localStorage.getItem("freitas_white_vip_level") !== 'admin') {
       setSection("dashboard");
       toast.error("Membro VIP Expirado", {
         description: "Você foi redirecionado para o Histórico pois não possui acesso VIP.",
