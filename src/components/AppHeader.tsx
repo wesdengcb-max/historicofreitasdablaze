@@ -107,7 +107,7 @@ export const AppHeader = memo(function AppHeader() {
           }}
           className={`flex items-center gap-2 rounded-xl px-4 py-2 text-[11px] font-black uppercase tracking-widest transition ${
             isVip 
-              ? "bg-red-500 text-white shadow-[0_4px_15px_rgba(239,68,68,0.3)] hover:bg-red-600"
+              ? "bg-red-600 text-white shadow-[0_4px_15px_rgba(239,68,68,0.3)] hover:bg-red-700"
               : "border border-white/10 bg-white/5 text-muted-foreground hover:bg-white/10"
           }`}
         >
