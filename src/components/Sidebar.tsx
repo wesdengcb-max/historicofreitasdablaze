@@ -105,7 +105,7 @@ export const Sidebar = memo(function Sidebar() {
   const handleLogout = () => {
     logoutVip();
     toast.success("Sessão encerrada");
-    // navigate({ to: "/" }); // Removido: usuário permanece na plataforma ao sair do VIP
+    window.location.reload(); // Recarrega para aplicar a proteção de rota e manter o usuário onde está
   };
 
   return (
