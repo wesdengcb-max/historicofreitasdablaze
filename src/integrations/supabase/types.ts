@@ -178,6 +178,7 @@ export type Database = {
           created_at: string | null
           expires_at: string | null
           id: string
+          level: Database["public"]["Enums"]["vip_level"]
           member_name: string
           status: string
           token: string
@@ -186,6 +187,7 @@ export type Database = {
           created_at?: string | null
           expires_at?: string | null
           id?: string
+          level?: Database["public"]["Enums"]["vip_level"]
           member_name: string
           status?: string
           token: string
@@ -194,6 +196,7 @@ export type Database = {
           created_at?: string | null
           expires_at?: string | null
           id?: string
+          level?: Database["public"]["Enums"]["vip_level"]
           member_name?: string
           status?: string
           token?: string
@@ -227,6 +230,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      vip_level: "member" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -355,6 +359,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      vip_level: ["member", "admin"],
     },
   },
 } as const
