@@ -20,7 +20,6 @@ export const validateToken = createServerFn({ method: "POST" })
       .from("vip_tokens")
       .select("*")
       .eq("token", data.token)
-      .eq("status", "active")
       .single();
 
     if (error || !tokenData) {
