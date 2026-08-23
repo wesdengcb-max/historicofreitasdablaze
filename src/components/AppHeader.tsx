@@ -15,23 +15,9 @@ export const AppHeader = memo(function AppHeader() {
   const { isCollapsed, toggle } = useSidebarStore();
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const navigate = useNavigate();
-  const [isSupabaseAdmin, setIsSupabaseAdmin] = useState(false);
 
-  const isAdmin = isSupabaseAdmin || vipLevel === 'admin';
-
-  useEffect(() => {
-    const checkAdmin = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        const { data } = await supabase.rpc('has_role', {
-          _user_id: session.user.id,
-          _role: 'admin'
-        });
-        setIsSupabaseAdmin(!!data);
-      }
-    };
-    checkAdmin();
-  }, []);
+  // Removed Supabase session check to rely purely on VIP tokens for admin access as requested
+  const isAdmin = vipLevel === 'admin';
 
   const handleLogout = () => {
     logoutVip();
