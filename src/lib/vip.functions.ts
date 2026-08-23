@@ -46,6 +46,7 @@ export const validateToken = createServerFn({ method: "POST" })
       success: true, 
       member_name: tokenData.member_name, 
       token: tokenData.token,
+      level: tokenData.level as "member" | "admin",
       expires_at: tokenData.expires_at
     };
   });

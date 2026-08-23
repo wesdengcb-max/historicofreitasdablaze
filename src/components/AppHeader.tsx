@@ -4,18 +4,20 @@ import { memo, useState, useEffect } from "react";
 import { ChevronLeft, Menu, Clock, Crown, PanelLeftOpen, PanelLeftClose, BarChart3, Sun, Moon, LogOut, ShieldAlert } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, Link } from "@tanstack/react-router";
-import { useVipStatus, setVipStatus, logoutVip, useMemberName } from "@/lib/auth/vipStore";
+import { useVipStatus, logoutVip, useMemberName, useVipLevel } from "@/lib/auth/vipStore";
 import { useSidebarStore } from "@/lib/sidebarStore";
 import { toast } from "sonner";
 
 export const AppHeader = memo(function AppHeader() {
   const isVip = useVipStatus();
+  const vipLevel = useVipLevel();
   const memberName = useMemberName();
   const { isCollapsed, toggle } = useSidebarStore();
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const navigate = useNavigate();
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isSupabaseAdmin, setIsSupabaseAdmin] = useState(false);
 
+  const isAdmin = isSupabaseAdmin || vipLevel === 'admin';
 
   useEffect(() => {
     const checkAdmin = async () => {
@@ -25,7 +27,7 @@ export const AppHeader = memo(function AppHeader() {
           _user_id: session.user.id,
           _role: 'admin'
         });
-        setIsAdmin(!!data);
+        setIsSupabaseAdmin(!!data);
       }
     };
     checkAdmin();
@@ -107,10 +109,11 @@ export const AppHeader = memo(function AppHeader() {
         {isAdmin && (
           <Link
             to="/admin"
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-surface text-amber-500 transition-all duration-300 hover:bg-amber-500/10 active:scale-90"
+            className="flex items-center gap-2 rounded-xl border border-amber-500/50 bg-amber-500/10 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-amber-500 transition-all duration-300 hover:bg-amber-500/20 active:scale-95"
             title="Painel Administrativo"
           >
-            <ShieldAlert className="h-4 w-4" />
+            <ShieldAlert className="h-3.5 w-3.5" />
+            <span>🛡️ PAINEL ADMIN</span>
           </Link>
         )}
 
