@@ -4,7 +4,8 @@ import { persist } from 'zustand/middleware';
 interface VipState {
   isVip: boolean;
   memberName: string | null;
-  setVip: (status: boolean, name?: string | null) => void;
+  vipLevel: 'member' | 'admin' | null;
+  setVip: (status: boolean, name?: string | null, level?: 'member' | 'admin' | null) => void;
   logout: () => void;
 }
 
@@ -13,8 +14,9 @@ export const useVipStore = create<VipState>()(
     (set) => ({
       isVip: false,
       memberName: null,
-      setVip: (status, name = null) => set({ isVip: status, memberName: name }),
-      logout: () => set({ isVip: false, memberName: null }),
+      vipLevel: null,
+      setVip: (status, name = null, level = 'member') => set({ isVip: status, memberName: name, vipLevel: level }),
+      logout: () => set({ isVip: false, memberName: null, vipLevel: null }),
     }),
     {
       name: 'vip-storage',

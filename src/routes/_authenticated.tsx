@@ -1,27 +1,32 @@
 import { createFileRoute, redirect, Outlet } from '@tanstack/react-router'
 import { supabase } from '@/integrations/supabase/client'
-import { useVipStore } from '@/lib/vipStore'
 
 export const Route = createFileRoute('/_authenticated')({ 
   component: () => <Outlet />,
   beforeLoad: async ({ location }) => {
-    // We check Supabase session first (for Admins)
+    // Check Supabase session (traditional admin login)
     const { data: { session } } = await supabase.auth.getSession()
     
-    // In beforeLoad, we can check localStorage if in browser
-    const isVip = typeof window !== 'undefined' 
-      ? localStorage.getItem("freitas_white_vip_status") === "true"
-      : false;
+    // Check VIP token access (hybrid flow)
+    let isVip = false;
+    let vipLevel: 'member' | 'admin' | null = null;
+    
+    if (typeof window !== 'undefined') {
+      isVip = localStorage.getItem("freitas_white_vip_status") === "true";
+      vipLevel = localStorage.getItem("freitas_white_vip_level") as any;
+    }
 
-    // Admin routes REQUIRE Supabase session
+    const hasAdminAccess = !!session || vipLevel === 'admin';
+
+    // Admin routes REQUIRE admin privileges (Supabase OR Admin Token)
     if (location.pathname.startsWith('/admin')) {
-      if (!session) {
+      if (!hasAdminAccess) {
         throw redirect({
-          to: '/auth' as any,
+          to: '/vip-login' as any,
           search: { redirect: location.href } as any,
         })
       }
-      return { session, user: session.user, authType: 'admin' }
+      return { session, user: session?.user || null, authType: 'admin' }
     }
 
     // VIP area (like /app, /sinais, etc) allows either Supabase session OR VIP token
@@ -35,7 +40,7 @@ export const Route = createFileRoute('/_authenticated')({
     return {
       session,
       user: session?.user || null,
-      authType: session ? 'admin' : 'vip'
+      authType: hasAdminAccess ? 'admin' : 'vip'
     }
   },
 })

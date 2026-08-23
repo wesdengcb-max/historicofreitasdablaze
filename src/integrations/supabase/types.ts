@@ -173,6 +173,33 @@ export type Database = {
         }
         Relationships: []
       }
+      vip_tokens: {
+        Row: {
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          member_name: string
+          status: string
+          token: string
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          member_name: string
+          status?: string
+          token: string
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          member_name?: string
+          status?: string
+          token?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

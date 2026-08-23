@@ -46,6 +46,7 @@ export const validateToken = createServerFn({ method: "POST" })
       success: true, 
       member_name: tokenData.member_name, 
       token: tokenData.token,
+      level: tokenData.level as "member" | "admin",
       expires_at: tokenData.expires_at
     };
   });
@@ -68,7 +69,8 @@ export const createVipToken = createServerFn({ method: "POST" })
   .validator((data: unknown) => z.object({
     member_name: z.string().min(1),
     expires_at: z.string().optional(),
-    token: z.string().optional()
+    token: z.string().optional(),
+    level: z.enum(["member", "admin"]).default("member")
   }).parse(data))
   .handler(async ({ data, context }) => {
     const ctx = context as unknown as ServerContext;
@@ -82,6 +84,7 @@ export const createVipToken = createServerFn({ method: "POST" })
         token,
         member_name: data.member_name,
         expires_at: data.expires_at,
+        level: data.level,
         status: "active"
       })
       .select()
@@ -96,7 +99,8 @@ export const updateVipToken = createServerFn({ method: "POST" })
     id: z.string().uuid(),
     member_name: z.string().optional(),
     status: z.enum(["active", "inactive", "expired"]).optional(),
-    expires_at: z.string().optional()
+    expires_at: z.string().optional(),
+    level: z.enum(["member", "admin"]).optional()
   }).parse(data))
   .handler(async ({ data, context }) => {
     const ctx = context as unknown as ServerContext;
