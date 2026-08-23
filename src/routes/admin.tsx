@@ -1,34 +1,22 @@
 import { createFileRoute, redirect, Outlet } from '@tanstack/react-router'
-import { supabase } from '@/integrations/supabase/client'
 
 export const Route = createFileRoute('/admin')({
   beforeLoad: async ({ location }) => {
-    const { data: { session } } = await supabase.auth.getSession()
-    
-    if (!session) {
-      throw redirect({
-        to: '/auth' as any,
-        search: {
-          redirect: location.href,
-        } as any,
-      })
-    }
+    // Check VIP token access on the client
+    if (typeof window !== 'undefined') {
+      const isVip = localStorage.getItem("freitas_white_vip_status") === "true";
+      const vipLevel = localStorage.getItem("freitas_white_vip_level") as "member" | "admin" | null;
 
-    // Check for admin role
-    const { data: isAdmin, error } = await supabase.rpc('has_role', {
-      _user_id: session.user.id,
-      _role: 'admin'
-    })
-
-    if (error || !isAdmin) {
-      throw redirect({
-        to: '/app' as any
-      })
+      if (!isVip || vipLevel !== 'admin') {
+        console.log("[Admin Gate] Access denied: Not an admin token.");
+        throw redirect({
+          to: '/' as any,
+        })
+      }
     }
     
     return {
-      session,
-      user: session.user,
+      authType: 'admin'
     }
   },
   component: () => <Outlet />

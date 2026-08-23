@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Key, Crown, LogOut, Loader2, ShieldCheck, ArrowRight, User, Lock } from "lucide-react";
 import { useVipStatus, setVipStatus, logoutVip, useMemberName, useVipToken } from "@/lib/auth/vipStore";
-import { validateToken } from "@/lib/vip.functions";
+import { validateToken, MASTER_ADMIN_TOKEN } from "@/lib/vip.functions";
 import { toast } from "sonner";
 
 export function VipModal() {
@@ -34,14 +34,8 @@ export function VipModal() {
     if (!inputToken) return;
 
     // Direct check for master admin token
-    if (inputToken === 'admin87850424') {
+    if (inputToken === MASTER_ADMIN_TOKEN) {
       console.log("[VipModal] Force activating master admin token.");
-      if (typeof window !== 'undefined') {
-        localStorage.setItem("freitas_white_vip_status", "true");
-        localStorage.setItem("freitas_white_vip_level", "admin");
-        localStorage.setItem("freitas_white_member_name", "Administrador Geral");
-        localStorage.setItem("freitas_white_vip_token", inputToken);
-      }
       setVipStatus(true, "Administrador Geral", "admin", inputToken);
       toast.success(`Modo VIP Ativado: Bem-vindo, Administrador!`);
       setOpen(false);
