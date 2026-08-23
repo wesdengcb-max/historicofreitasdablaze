@@ -1,8 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-// Token mestre administrativo hardcoded para garantia de acesso
-export const MASTER_ADMIN_TOKEN = 'admin87850424';
 
 // Generate a random token in format FW-XXXX-XXXX
 export const generateVipToken = () => {

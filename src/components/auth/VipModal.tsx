@@ -33,22 +33,15 @@ export function VipModal() {
     const inputToken = token.trim();
     if (!inputToken) return;
 
-    // Direct check for master admin token
-    if (inputToken === MASTER_ADMIN_TOKEN) {
-      console.log("[VipModal] Force activating master admin token.");
-      setVipStatus(true, "Administrador Geral", "admin", inputToken);
-      toast.success(`Modo VIP Ativado: Bem-vindo, Administrador!`);
-      setOpen(false);
-      setToken('');
-      return;
-    }
-
+    console.log("[VipModal] Initiating validation for token:", inputToken);
     setIsLoading(true);
+    
     try {
       const result = await validateToken({ data: { token: inputToken } });
+      console.log("[VipModal] Server response:", result);
       
       if (result && result.success) {
-        setVipStatus(true, result.member_name, result.level, inputToken);
+        setVipStatus(true, result.member_name, result.level, result.token);
         toast.success(`Modo VIP Ativado: Bem-vindo, ${result.member_name}!`);
         setOpen(false);
         setToken('');
@@ -56,7 +49,9 @@ export function VipModal() {
         throw new Error("Resposta inválida do servidor");
       }
     } catch (error: any) {
-      toast.error(error.message || 'Token inválido');
+      console.error("[VipModal] Validation failed:", error);
+      const errorMessage = error.message || 'Token inválido ou expirado';
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
