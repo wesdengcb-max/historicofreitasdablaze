@@ -4,8 +4,8 @@ import { supabase } from '@/integrations/supabase/client'
 export const Route = createFileRoute('/_authenticated')({ 
   component: () => <Outlet />,
   beforeLoad: async ({ location }) => {
-    // Check Supabase session (traditional admin login)
-    const { data: { session } } = await supabase.auth.getSession()
+    // Check Supabase session (traditional admin login - disabled by user request, using hybrid flow only)
+    const session = null;
     
     // Check VIP token access (hybrid flow)
     let isVip = false;
@@ -25,15 +25,15 @@ export const Route = createFileRoute('/_authenticated')({
           to: '/' as any, // Admin strictly goes back to home if not admin
         })
       }
-      return { session, user: session?.user || null, authType: 'admin' }
+      return { session: null, user: null, authType: 'admin' }
     }
 
     // VIP area (like /app, /sinais, etc) is now public by default
     // Access to specific tabs/features is controlled inside Sidebar.tsx and components
     
     return {
-      session,
-      user: session?.user || null,
+      session: null,
+      user: null,
       authType: hasAdminAccess ? 'admin' : (isVip ? 'vip' : 'public')
     }
   },
