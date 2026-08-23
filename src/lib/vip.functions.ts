@@ -1,10 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import type { SupabaseClient } from "@supabase/supabase-js";
-
-interface ServerContext {
-  supabase: SupabaseClient;
-}
 
 // Generate a random token in format FW-XXXX-XXXX
 export const generateVipToken = () => {
@@ -15,15 +10,13 @@ export const generateVipToken = () => {
 };
 
 export const validateToken = createServerFn({ method: "POST" })
-  .middleware([])
   .validator((data: unknown) => z.object({
     token: z.string().min(1)
   }).parse(data))
-  .handler(async ({ data, context }) => {
-    const ctx = context as unknown as ServerContext;
-    if (!ctx?.supabase) throw new Error("Internal Server Error: Missing context");
+  .handler(async ({ data }: { data: { token: string } }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const { data: tokenData, error } = await ctx.supabase
+    const { data: tokenData, error } = await supabaseAdmin
       .from("vip_tokens")
       .select("*")
       .eq("token", data.token)
@@ -36,7 +29,7 @@ export const validateToken = createServerFn({ method: "POST" })
 
     // Check expiration
     if (tokenData.expires_at && new Date(tokenData.expires_at) < new Date()) {
-      await ctx.supabase
+      await supabaseAdmin
         .from("vip_tokens")
         .update({ status: "expired" })
         .eq("id", tokenData.id);
@@ -53,11 +46,10 @@ export const validateToken = createServerFn({ method: "POST" })
   });
 
 export const listVipTokens = createServerFn({ method: "GET" })
-  .handler(async ({ context }) => {
-    const ctx = context as unknown as ServerContext;
-    if (!ctx?.supabase) throw new Error("Internal Server Error: Missing context");
+  .handler(async () => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     
-    const { data, error } = await ctx.supabase
+    const { data, error } = await supabaseAdmin
       .from("vip_tokens")
       .select("*")
       .order("created_at", { ascending: false });
@@ -73,13 +65,12 @@ export const createVipToken = createServerFn({ method: "POST" })
     token: z.string().optional(),
     level: z.enum(["member", "admin"]).default("member")
   }).parse(data))
-  .handler(async ({ data, context }) => {
-    const ctx = context as unknown as ServerContext;
-    if (!ctx?.supabase) throw new Error("Internal Server Error: Missing context");
+  .handler(async ({ data }: { data: { member_name: string; expires_at?: string; token?: string; level: "member" | "admin" } }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const token = data.token || generateVipToken();
     
-    const { data: newToken, error } = await ctx.supabase
+    const { data: newToken, error } = await supabaseAdmin
       .from("vip_tokens")
       .insert({
         token,
@@ -103,11 +94,10 @@ export const updateVipToken = createServerFn({ method: "POST" })
     expires_at: z.string().optional(),
     level: z.enum(["member", "admin"]).optional()
   }).parse(data))
-  .handler(async ({ data, context }) => {
-    const ctx = context as unknown as ServerContext;
-    if (!ctx?.supabase) throw new Error("Internal Server Error: Missing context");
+  .handler(async ({ data }: { data: { id: string; member_name?: string; status?: "active" | "inactive" | "expired"; expires_at?: string; level?: "member" | "admin" } }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const { data: updated, error } = await ctx.supabase
+    const { data: updated, error } = await supabaseAdmin
       .from("vip_tokens")
       .update(data)
       .eq("id", data.id)
@@ -122,11 +112,10 @@ export const deleteVipToken = createServerFn({ method: "POST" })
   .validator((data: unknown) => z.object({
     id: z.string().uuid()
   }).parse(data))
-  .handler(async ({ data, context }) => {
-    const ctx = context as unknown as ServerContext;
-    if (!ctx?.supabase) throw new Error("Internal Server Error: Missing context");
+  .handler(async ({ data }: { data: { id: string } }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const { error } = await ctx.supabase
+    const { error } = await supabaseAdmin
       .from("vip_tokens")
       .delete()
       .eq("id", data.id);

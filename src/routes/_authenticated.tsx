@@ -13,7 +13,7 @@ export const Route = createFileRoute('/_authenticated')({
     
     if (typeof window !== 'undefined') {
       isVip = localStorage.getItem("freitas_white_vip_status") === "true";
-      vipLevel = localStorage.getItem("freitas_white_vip_level") as any;
+      vipLevel = localStorage.getItem("freitas_white_vip_level") as "member" | "admin" | null;
     }
 
     const hasAdminAccess = vipLevel === 'admin';

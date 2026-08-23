@@ -14,6 +14,7 @@ export const AppHeader = memo(function AppHeader() {
   const memberName = useMemberName();
   const { isCollapsed, toggle } = useSidebarStore();
   const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [time, setTime] = useState("");
   const navigate = useNavigate();
 
   // Removed Supabase session check to rely purely on VIP tokens for admin access as requested
@@ -33,6 +34,20 @@ export const AppHeader = memo(function AppHeader() {
       document.documentElement.classList.add(saved);
       document.documentElement.classList.remove(saved === "dark" ? "light" : "dark");
     }
+    
+    const updateTime = () => {
+      setTime(new Date().toLocaleTimeString('pt-BR', { 
+        timeZone: 'America/Sao_Paulo', 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit', 
+        hour12: false 
+      }));
+    };
+    
+    updateTime();
+    const timer = setInterval(updateTime, 1000);
+    return () => clearInterval(timer);
   }, []);
 
   const toggleTheme = () => {
@@ -48,7 +63,7 @@ export const AppHeader = memo(function AppHeader() {
       <div className="flex items-center gap-4">
         <button 
           onClick={toggle}
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-[#1A1A1A] text-white transition hover:bg-red-500 shadow-2xl ring-2 ring-black/80 group"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-[#1A1A1A] text-white transition hover:bg-red-600 shadow-2xl ring-2 ring-black/80 group"
         >
           <div className="flex items-center justify-center transition-transform group-active:scale-90">
             <Menu className="h-5 w-5" />
@@ -67,7 +82,7 @@ export const AppHeader = memo(function AppHeader() {
             const ev = new CustomEvent('open-stats-drawer');
             window.dispatchEvent(ev);
           }}
-          className="ml-2 flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-muted-foreground transition-all hover:bg-white/[0.08] hover:text-red-500 active:scale-95"
+          className="ml-2 flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-muted-foreground transition-all hover:bg-white/[0.08] hover:text-red-600 active:scale-95"
           title="Ver Estatísticas do Branco"
         >
           <BarChart3 className="h-4 w-4" />
@@ -84,8 +99,8 @@ export const AppHeader = memo(function AppHeader() {
         </button>
 
         <div className="hidden items-center gap-2 rounded-xl bg-surface px-4 py-2 sm:flex">
-          <Clock className="h-3.5 w-3.5 text-red-500" />
-          <span className="text-[12px] font-bold tabular-nums text-foreground">16:39:49</span>
+          <Clock className="h-3.5 w-3.5 text-red-600" />
+          <span className="text-[12px] font-bold tabular-nums text-foreground">{time}</span>
         </div>
 
         {isAdmin && (
@@ -107,7 +122,7 @@ export const AppHeader = memo(function AppHeader() {
           }}
           className={`flex items-center gap-2 rounded-xl px-4 py-2 text-[11px] font-black uppercase tracking-widest transition ${
             isVip 
-              ? "bg-red-500 text-white shadow-[0_4px_15px_rgba(239,68,68,0.3)] hover:bg-red-600"
+              ? "bg-red-600 text-white shadow-[0_4px_15px_rgba(239,68,68,0.3)] hover:bg-red-700"
               : "border border-white/10 bg-white/5 text-muted-foreground hover:bg-white/10"
           }`}
         >
@@ -118,7 +133,7 @@ export const AppHeader = memo(function AppHeader() {
 
         <button
           onClick={handleLogout}
-          className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-surface text-muted-foreground transition-all duration-300 hover:bg-red-500/10 hover:text-red-500 active:scale-90"
+          className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-surface text-muted-foreground transition-all duration-300 hover:bg-red-600/10 hover:text-red-600 active:scale-90"
           title="Sair"
         >
           <LogOut className="h-4 w-4" />
