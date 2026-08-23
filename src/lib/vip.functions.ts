@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { setCookie, getCookie } from "vinxi/http";
+import { getEvent, setResponseHeader, parseCookies, serializeCookie } from "vinxi/http";
 
 interface ServerContext {
   supabase: SupabaseClient;
@@ -45,30 +45,35 @@ export const validateToken = createServerFn({ method: "POST" })
       throw new Error("Este token expirou");
     }
 
-    // Set a session cookie for VIP access
-    // In TanStack Start/Vinxi, we use setCookie from vinxi/http
-    setCookie(VIP_ACCESS_COOKIE, JSON.stringify({
+    const event = getEvent();
+    const cookieValue = JSON.stringify({
       token: tokenData.token,
       member_name: tokenData.member_name,
       expires_at: tokenData.expires_at
-    }), {
+    });
+
+    const cookie = serializeCookie(VIP_ACCESS_COOKIE, cookieValue, {
       maxAge: 60 * 60 * 24 * 7, // 1 week
       path: "/",
       httpOnly: true,
       sameSite: "lax"
     });
 
+    setResponseHeader(event, "Set-Cookie", cookie);
+
     return { success: true, member_name: tokenData.member_name };
   });
 
 export const checkVipSession = createServerFn({ method: "GET" })
   .handler(async () => {
-    const cookie = getCookie(VIP_ACCESS_COOKIE);
+    const event = getEvent();
+    const cookies = parseCookies(event);
+    const cookie = cookies[VIP_ACCESS_COOKIE];
+    
     if (!cookie) return { isVip: false };
     
     try {
-      const session = JSON.parse(cookie);
-      // Optional: Re-verify against DB here if needed for high security
+      const session = JSON.parse(decodeURIComponent(cookie));
       return { isVip: true, member_name: session.member_name };
     } catch {
       return { isVip: false };
@@ -93,7 +98,7 @@ export const createVipToken = createServerFn({ method: "POST" })
   .validator((data: unknown) => z.object({
     member_name: z.string().min(1),
     expires_at: z.string().optional(),
-    token: z.string().optional() // If not provided, will be generated
+    token: z.string().optional()
   }).parse(data))
   .handler(async ({ data, context }) => {
     const ctx = context as unknown as ServerContext;
