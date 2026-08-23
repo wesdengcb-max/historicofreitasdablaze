@@ -22,25 +22,19 @@ export const Route = createFileRoute('/_authenticated')({
     if (location.pathname.startsWith('/admin')) {
       if (!hasAdminAccess) {
         throw redirect({
-          to: '/vip-login' as any,
-          search: { redirect: location.href } as any,
+          to: '/' as any, // Admin strictly goes back to home if not admin
         })
       }
       return { session, user: session?.user || null, authType: 'admin' }
     }
 
-    // VIP area (like /app, /sinais, etc) allows either Supabase session OR VIP token
-    if (!session && !isVip) {
-      throw redirect({
-        to: '/vip-login' as any,
-        search: { redirect: location.href } as any,
-      })
-    }
+    // VIP area (like /app, /sinais, etc) is now public by default
+    // Access to specific tabs/features is controlled inside Sidebar.tsx and components
     
     return {
       session,
       user: session?.user || null,
-      authType: hasAdminAccess ? 'admin' : 'vip'
+      authType: hasAdminAccess ? 'admin' : (isVip ? 'vip' : 'public')
     }
   },
 })
