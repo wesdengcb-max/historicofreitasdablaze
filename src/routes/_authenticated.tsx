@@ -16,7 +16,7 @@ export const Route = createFileRoute('/_authenticated')({
         
         if (!hasAccess) {
           console.warn("[Route Gate] Acesso negado:", location.pathname);
-          throw redirect({ to: '/' as any });
+          throw redirect({ to: location.pathname as any });
         }
       }
       
