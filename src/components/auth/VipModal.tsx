@@ -96,8 +96,8 @@ export function VipModal() {
                     type="text"
                     placeholder="Digite seu Token VIP"
                     value={token}
-                    onChange={(e) => setToken(e.target.value.toUpperCase())}
-                    className="bg-black/50 border-white/10 h-12 pl-10 text-white placeholder:text-gray-600 focus:border-red-600/50 transition-colors uppercase font-mono tracking-widest"
+                    onChange={(e) => setToken(e.target.value)}
+                    className="bg-black/50 border-white/10 h-12 pl-10 text-white placeholder:text-gray-600 focus:border-red-600/50 transition-colors font-mono tracking-widest"
                     disabled={isLoading}
                   />
                 </div>

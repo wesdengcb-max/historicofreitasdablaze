@@ -24,7 +24,7 @@ export const validateToken = createServerFn({ method: "POST" })
     const { data: tokenData, error } = await supabaseAdmin
       .from("vip_tokens")
       .select("id, token, member_name, status, expires_at, level")
-      .eq("token", inputToken)
+      .ilike("token", inputToken)
       .maybeSingle();
 
     if (error) {
