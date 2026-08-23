@@ -3,6 +3,7 @@ import { ResultCircle } from "./ResultCircle";
 import { cn } from "@/lib/utils";
 import fwLogoAsset from "@/assets/fw-logo-link.png.asset.json";
 import { RefreshCcw } from "lucide-react";
+import { ClientOnly } from "@/components/ClientOnly";
 
 interface StatsCardProps {
   title: string;
@@ -33,8 +34,6 @@ const StatsCard = ({ title, titleSuffix, children, footer, className }: StatsCar
   </div>
 );
 
-import { ClientOnly } from "@/components/ClientOnly";
-
 const PessoasEntrandoSuffix = ({ countdown }: { countdown: number }) => {
   const [val, setVal] = React.useState(0);
   React.useEffect(() => {
@@ -43,8 +42,39 @@ const PessoasEntrandoSuffix = ({ countdown }: { countdown: number }) => {
   return <span className="text-[13px] font-bold text-[#FBBF24]">→ {val}</span>;
 };
 
-export const LiveStats = memo(function LiveStats({ 
+const PessoasEntrandoContent = () => {
+  const [vals, setVals] = React.useState<{count: number, val: string}[]>([]);
+  
+  React.useEffect(() => {
+    setVals([
+      { count: Math.floor(Math.random() * 200) + 50, val: `R$ ${(Math.random() * 5000 + 1000).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` },
+      { count: Math.floor(Math.random() * 600) + 100, val: `R$ ${(Math.random() * 8000 + 2000).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` },
+      { count: Math.floor(Math.random() * 200) + 50, val: `R$ ${(Math.random() * 3000 + 500).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` }
+    ]);
+  }, []);
 
+  if (vals.length === 0) return null;
+
+  return (
+    <div className="flex justify-between px-2 pt-1">
+      {[
+        { color: "red", ...vals[0] },
+        { color: "white", ...vals[1] },
+        { color: "black", ...vals[2] }
+      ].map((item, i) => (
+        <div key={i} className="flex flex-col items-center gap-1.5">
+          <span className="text-[10px] font-bold text-white bg-[#1A1A1A] px-2 py-0.5 rounded min-w-[32px] text-center">{item.count}</span>
+          <div className="h-8 w-8 rounded-lg overflow-hidden border border-white/10">
+            <ResultCircle color={item.color as any} size="fluid" animate={false} />
+          </div>
+          <span className="text-[9px] font-medium text-[#888888] tabular-nums">{item.val}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export const LiveStats = memo(function LiveStats({ 
   total, 
   reds, 
   blacks, 
@@ -116,41 +146,6 @@ export const LiveStats = memo(function LiveStats({
         <ClientOnly>
           <PessoasEntrandoContent />
         </ClientOnly>
-      </StatsCard>
-    );
-});
-
-const PessoasEntrandoContent = () => {
-  const [vals, setVals] = React.useState<{count: number, val: string}[]>([]);
-  
-  React.useEffect(() => {
-    setVals([
-      { count: Math.floor(Math.random() * 200) + 50, val: `R$ ${(Math.random() * 5000 + 1000).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` },
-      { count: Math.floor(Math.random() * 600) + 100, val: `R$ ${(Math.random() * 8000 + 2000).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` },
-      { count: Math.floor(Math.random() * 200) + 50, val: `R$ ${(Math.random() * 3000 + 500).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` }
-    ]);
-  }, []);
-
-  if (vals.length === 0) return null;
-
-  return (
-    <div className="flex justify-between px-2 pt-1">
-      {[
-        { color: "red", ...vals[0] },
-        { color: "white", ...vals[1] },
-        { color: "black", ...vals[2] }
-      ].map((item, i) => (
-        <div key={i} className="flex flex-col items-center gap-1.5">
-          <span className="text-[10px] font-bold text-white bg-[#1A1A1A] px-2 py-0.5 rounded min-w-[32px] text-center">{item.count}</span>
-          <div className="h-8 w-8 rounded-lg overflow-hidden border border-white/10">
-            <ResultCircle color={item.color as any} size="fluid" animate={false} />
-          </div>
-          <span className="text-[9px] font-medium text-[#888888] tabular-nums">{item.val}</span>
-        </div>
-      ))}
-    </div>
-  );
-};
       </StatsCard>
 
       {/* 3. Proporção de Cores */}
