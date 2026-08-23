@@ -43,8 +43,10 @@ export default function SinaisSection() {
   const [resultsForValidation, setResultsForValidation] = useState<Result[]>([]);
   const [robotOn, setRobotOn] = useState(getRobotEnabled());
   const [predictiveList, setPredictiveList] = useState<PredictiveSignal[]>(getPredictiveSignals());
+  const [auditFilter, setAuditFilter] = useState<'geral' | 'hoje'>('geral');
   const updateStats = useSignalStatsStore(state => state.updateStats);
   const getAssertivity = useSignalStatsStore(state => state.getAssertivity);
+  const [strategyStats, setStrategyStats] = useState<any[]>([]);
 
   useEffect(() => {
     const load = async () => {
@@ -53,6 +55,16 @@ export default function SinaisSection() {
     };
     load();
     const interval = setInterval(load, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const loadStats = async () => {
+      const { data, error } = await supabase.rpc('get_strategy_stats', { lookback_hours: 24 });
+      if (data) setStrategyStats(data.sort((a, b) => b.assertividade - a.assertividade).slice(0, 10));
+    };
+    loadStats();
+    const interval = setInterval(loadStats, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -70,15 +82,12 @@ export default function SinaisSection() {
           if (Number.isNaN(entryTime)) return s;
 
           if (s.outcome && s.outcome !== "pending") {
-            // Regra C: Descarte automático após 3 minutos
             if (s.completedAt && now - s.completedAt > 3 * 60_000) return null;
             return s;
           }
 
-          // Regra A: Delay da Auditoria (Horário Alvo + 2 minutos)
           if (now < entryTime + 2 * 60_000) return { ...s, outcome: "pending" as const };
 
-          // Regra B: Janela de ±1 minuto (Anterior -1, Exato 0, Posterior +1)
           const rangeStart = entryTime - 60_000;
           const rangeEnd = entryTime + 60_000;
 
@@ -93,7 +102,6 @@ export default function SinaisSection() {
             return { ...s, outcome: "green" as const, resultTime: fmtTime(matchedResult.createdAt), label: "WIN", completedAt: now };
           }
  
-          // Se passou da janela e não deu WIN, marca RED
           if (now > rangeEnd + 60_000) {
             if (s.strategyKey) updateStats(s.strategyKey, "red");
             return { ...s, outcome: "red" as const, label: "LOSS", completedAt: now };
@@ -110,8 +118,28 @@ export default function SinaisSection() {
     update();
     const sub = subscribePredictive(update);
     const interval = setInterval(update, 5000);
-    return () => { sub(); clearInterval(interval); };
+
+    const handleSwitchFilter = (e: any) => {
+      if (e.detail === 'hoje') setAuditFilter('hoje');
+    };
+    window.addEventListener('switch-audit-filter', handleSwitchFilter);
+
+    return () => { 
+      sub(); 
+      clearInterval(interval); 
+      window.removeEventListener('switch-audit-filter', handleSwitchFilter);
+    };
   }, [resultsForValidation]);
+
+  // Estatísticas das Rodadas Atuais
+  const activeStats = useMemo(() => {
+    const finished = predictiveList.filter(s => s.outcome && s.outcome !== 'pending');
+    const wins = finished.filter(s => s.outcome === 'green').length;
+    const losses = finished.filter(s => s.outcome === 'red').length;
+    const total = wins + losses;
+    const pct = total > 0 ? (wins / total) * 100 : 100;
+    return { wins, losses, pct };
+  }, [predictiveList]);
 
   return (
     <div className="mx-auto min-h-screen max-w-[1440px] bg-[#090909] px-4 py-6 space-y-8">
