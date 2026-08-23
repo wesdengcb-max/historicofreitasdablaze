@@ -4,12 +4,11 @@ import {
   DialogContent, 
   DialogHeader, 
   DialogTitle, 
-  DialogDescription,
-  DialogFooter
+  DialogDescription
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Key, Crown, LogOut, Loader2, ShieldCheck, ArrowRight, User } from "lucide-react";
+import { Key, Crown, LogOut, Loader2, ShieldCheck, ArrowRight, User, Lock } from "lucide-react";
 import { useVipStatus, setVipStatus, logoutVip, useMemberName } from "@/lib/auth/vipStore";
 import { validateToken } from "@/lib/vip.functions";
 import { toast } from "sonner";
