@@ -16,20 +16,32 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiPublicRecentRouteImport } from './routes/api/public/recent'
 import { Route as ApiPublicCollectRouteImport } from './routes/api/public/collect'
 
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SinaisRoute = SinaisRouteImport.update({
   id: '/sinais',
   path: '/sinais',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const EstrategiasRoute = EstrategiasRouteImport.update({
   id: '/estrategias',
   path: '/estrategias',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AppRoute = AppRouteImport.update({
   id: '/app',
   path: '/app',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -49,6 +61,8 @@ const ApiPublicCollectRoute = ApiPublicCollectRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '': typeof AuthenticatedRoute
   '/app': typeof AppRoute
   '/estrategias': typeof EstrategiasRoute
   '/sinais': typeof SinaisRoute
@@ -57,6 +71,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/app': typeof AppRoute
   '/estrategias': typeof EstrategiasRoute
   '/sinais': typeof SinaisRoute
@@ -66,6 +81,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRoute
+  '/auth': typeof AuthRoute
   '/app': typeof AppRoute
   '/estrategias': typeof EstrategiasRoute
   '/sinais': typeof SinaisRoute
@@ -110,26 +127,40 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sinais': {
       id: '/sinais'
       path: '/sinais'
       fullPath: '/sinais'
       preLoaderRoute: typeof SinaisRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteImport
     }
     '/estrategias': {
       id: '/estrategias'
       path: '/estrategias'
       fullPath: '/estrategias'
       preLoaderRoute: typeof EstrategiasRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteImport
     }
     '/app': {
       id: '/app'
       path: '/app'
       fullPath: '/app'
       preLoaderRoute: typeof AppRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteImport
     }
     '/': {
       id: '/'
@@ -157,9 +188,12 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AppRoute: AppRoute,
-  EstrategiasRoute: EstrategiasRoute,
-  SinaisRoute: SinaisRoute,
+  AuthenticatedRoute: AuthenticatedRoute._addFileChildren({
+    AppRoute,
+    EstrategiasRoute,
+    SinaisRoute,
+  }),
+  AuthRoute: AuthRoute,
   ApiPublicCollectRoute: ApiPublicCollectRoute,
   ApiPublicRecentRoute: ApiPublicRecentRoute,
 }
