@@ -97,7 +97,17 @@ export const AppHeader = memo(function AppHeader() {
           <span className="text-[12px] font-bold tabular-nums text-foreground">16:39:49</span>
         </div>
 
-        <button 
+        {isAdmin && (
+          <Link
+            to="/admin"
+            className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-surface text-amber-500 transition-all duration-300 hover:bg-amber-500/10 active:scale-90"
+            title="Painel Administrativo"
+          >
+            <ShieldAlert className="h-4 w-4" />
+          </Link>
+        )}
+
+        <button
           onClick={() => {
             const next = !isVip;
             setVipStatus(next);
