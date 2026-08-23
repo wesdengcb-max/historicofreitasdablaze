@@ -9,56 +9,32 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as VipLoginRouteImport } from './routes/vip-login'
-import { Route as AdminRouteImport } from './routes/admin'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as SinaisRouteImport } from './routes/sinais'
+import { Route as EstrategiasRouteImport } from './routes/estrategias'
+import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as AuthenticatedSinaisRouteImport } from './routes/_authenticated.sinais'
-import { Route as AuthenticatedEstrategiasRouteImport } from './routes/_authenticated.estrategias'
-import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated.app'
 import { Route as ApiPublicRecentRouteImport } from './routes/api/public/recent'
 import { Route as ApiPublicCollectRouteImport } from './routes/api/public/collect'
 
-const VipLoginRoute = VipLoginRouteImport.update({
-  id: '/vip-login',
-  path: '/vip-login',
+const SinaisRoute = SinaisRouteImport.update({
+  id: '/sinais',
+  path: '/sinais',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const EstrategiasRoute = EstrategiasRouteImport.update({
+  id: '/estrategias',
+  path: '/estrategias',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: '/_authenticated',
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
-} as any)
-const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AuthenticatedSinaisRoute = AuthenticatedSinaisRouteImport.update({
-  id: '/sinais',
-  path: '/sinais',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedEstrategiasRoute =
-  AuthenticatedEstrategiasRouteImport.update({
-    id: '/estrategias',
-    path: '/estrategias',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
-  id: '/app',
-  path: '/app',
-  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const ApiPublicRecentRoute = ApiPublicRecentRouteImport.update({
   id: '/api/public/recent',
@@ -73,35 +49,26 @@ const ApiPublicCollectRoute = ApiPublicCollectRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteWithChildren
-  '/vip-login': typeof VipLoginRoute
-  '/app': typeof AuthenticatedAppRoute
-  '/estrategias': typeof AuthenticatedEstrategiasRoute
-  '/sinais': typeof AuthenticatedSinaisRoute
-  '/admin/': typeof AdminIndexRoute
+  '/app': typeof AppRoute
+  '/estrategias': typeof EstrategiasRoute
+  '/sinais': typeof SinaisRoute
   '/api/public/collect': typeof ApiPublicCollectRoute
   '/api/public/recent': typeof ApiPublicRecentRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/vip-login': typeof VipLoginRoute
-  '/app': typeof AuthenticatedAppRoute
-  '/estrategias': typeof AuthenticatedEstrategiasRoute
-  '/sinais': typeof AuthenticatedSinaisRoute
-  '/admin': typeof AdminIndexRoute
+  '/app': typeof AppRoute
+  '/estrategias': typeof EstrategiasRoute
+  '/sinais': typeof SinaisRoute
   '/api/public/collect': typeof ApiPublicCollectRoute
   '/api/public/recent': typeof ApiPublicRecentRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/_authenticated': typeof AuthenticatedRouteWithChildren
-  '/admin': typeof AdminRouteWithChildren
-  '/vip-login': typeof VipLoginRoute
-  '/_authenticated/app': typeof AuthenticatedAppRoute
-  '/_authenticated/estrategias': typeof AuthenticatedEstrategiasRoute
-  '/_authenticated/sinais': typeof AuthenticatedSinaisRoute
-  '/admin/': typeof AdminIndexRoute
+  '/app': typeof AppRoute
+  '/estrategias': typeof EstrategiasRoute
+  '/sinais': typeof SinaisRoute
   '/api/public/collect': typeof ApiPublicCollectRoute
   '/api/public/recent': typeof ApiPublicRecentRoute
 }
@@ -109,68 +76,59 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/admin'
-    | '/vip-login'
     | '/app'
     | '/estrategias'
     | '/sinais'
-    | '/admin/'
     | '/api/public/collect'
     | '/api/public/recent'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/vip-login'
     | '/app'
     | '/estrategias'
     | '/sinais'
-    | '/admin'
     | '/api/public/collect'
     | '/api/public/recent'
   id:
     | '__root__'
     | '/'
-    | '/_authenticated'
-    | '/admin'
-    | '/vip-login'
-    | '/_authenticated/app'
-    | '/_authenticated/estrategias'
-    | '/_authenticated/sinais'
-    | '/admin/'
+    | '/app'
+    | '/estrategias'
+    | '/sinais'
     | '/api/public/collect'
     | '/api/public/recent'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
-  AdminRoute: typeof AdminRouteWithChildren
-  VipLoginRoute: typeof VipLoginRoute
+  AppRoute: typeof AppRoute
+  EstrategiasRoute: typeof EstrategiasRoute
+  SinaisRoute: typeof SinaisRoute
   ApiPublicCollectRoute: typeof ApiPublicCollectRoute
   ApiPublicRecentRoute: typeof ApiPublicRecentRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/vip-login': {
-      id: '/vip-login'
-      path: '/vip-login'
-      fullPath: '/vip-login'
-      preLoaderRoute: typeof VipLoginRouteImport
+    '/sinais': {
+      id: '/sinais'
+      path: '/sinais'
+      fullPath: '/sinais'
+      preLoaderRoute: typeof SinaisRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
+    '/estrategias': {
+      id: '/estrategias'
+      path: '/estrategias'
+      fullPath: '/estrategias'
+      preLoaderRoute: typeof EstrategiasRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedRouteImport
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -179,34 +137,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/admin/': {
-      id: '/admin/'
-      path: '/'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/_authenticated/sinais': {
-      id: '/_authenticated/sinais'
-      path: '/sinais'
-      fullPath: '/sinais'
-      preLoaderRoute: typeof AuthenticatedSinaisRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/estrategias': {
-      id: '/_authenticated/estrategias'
-      path: '/estrategias'
-      fullPath: '/estrategias'
-      preLoaderRoute: typeof AuthenticatedEstrategiasRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/app': {
-      id: '/_authenticated/app'
-      path: '/app'
-      fullPath: '/app'
-      preLoaderRoute: typeof AuthenticatedAppRouteImport
-      parentRoute: typeof AuthenticatedRoute
     }
     '/api/public/recent': {
       id: '/api/public/recent'
@@ -225,37 +155,11 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AuthenticatedRouteChildren {
-  AuthenticatedAppRoute: typeof AuthenticatedAppRoute
-  AuthenticatedEstrategiasRoute: typeof AuthenticatedEstrategiasRoute
-  AuthenticatedSinaisRoute: typeof AuthenticatedSinaisRoute
-}
-
-const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedAppRoute: AuthenticatedAppRoute,
-  AuthenticatedEstrategiasRoute: AuthenticatedEstrategiasRoute,
-  AuthenticatedSinaisRoute: AuthenticatedSinaisRoute,
-}
-
-const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
-  AuthenticatedRouteChildren,
-)
-
-interface AdminRouteChildren {
-  AdminIndexRoute: typeof AdminIndexRoute
-}
-
-const AdminRouteChildren: AdminRouteChildren = {
-  AdminIndexRoute: AdminIndexRoute,
-}
-
-const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AuthenticatedRoute: AuthenticatedRouteWithChildren,
-  AdminRoute: AdminRouteWithChildren,
-  VipLoginRoute: VipLoginRoute,
+  AppRoute: AppRoute,
+  EstrategiasRoute: EstrategiasRoute,
+  SinaisRoute: SinaisRoute,
   ApiPublicCollectRoute: ApiPublicCollectRoute,
   ApiPublicRecentRoute: ApiPublicRecentRoute,
 }

@@ -1,115 +1,28 @@
 import { useSyncExternalStore } from "react";
 
-const STATUS_KEY = "freitas_white_vip_status";
-const NAME_KEY = "freitas_white_member_name";
-const LEVEL_KEY = "freitas_white_vip_level";
-const TOKEN_KEY = "freitas_white_vip_token";
-const EXPIRES_KEY = "freitas_white_vip_expires_at";
+const STORAGE_KEY = "freitas_white_vip_status";
 
-let isVip = typeof window !== "undefined" ? localStorage.getItem(STATUS_KEY) === "true" : false;
-let memberName = typeof window !== "undefined" ? localStorage.getItem(NAME_KEY) : null;
-let vipLevel = (typeof window !== "undefined" ? localStorage.getItem(LEVEL_KEY) : null) as "member" | "admin" | null;
-let vipToken = typeof window !== "undefined" ? localStorage.getItem(TOKEN_KEY) : null;
-let vipExpiresAt = typeof window !== "undefined" ? localStorage.getItem(EXPIRES_KEY) : null;
-
+let isVip = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) === "true" : false;
 const listeners = new Set<() => void>();
 
 function subscribe(cb: () => void) {
   listeners.add(cb);
-  
-  // Listen for storage changes from other tabs
-  const handleStorage = (e: StorageEvent) => {
-    if (e.key === STATUS_KEY || e.key === LEVEL_KEY || e.key === NAME_KEY || e.key === TOKEN_KEY || e.key === EXPIRES_KEY) {
-      if (typeof window !== "undefined") {
-        isVip = localStorage.getItem(STATUS_KEY) === "true";
-        memberName = localStorage.getItem(NAME_KEY);
-        vipLevel = localStorage.getItem(LEVEL_KEY) as "member" | "admin" | null;
-        vipToken = localStorage.getItem(TOKEN_KEY);
-        vipExpiresAt = localStorage.getItem(EXPIRES_KEY);
-        cb();
-      }
-    }
-  };
-  
-  if (typeof window !== "undefined") {
-    window.addEventListener("storage", handleStorage);
-  }
-  
-  return () => {
-    listeners.delete(cb);
-    if (typeof window !== "undefined") {
-      window.removeEventListener("storage", handleStorage);
-    }
-  };
+  return () => listeners.delete(cb);
 }
 
 function getSnapshot() {
   return isVip;
 }
 
-function getNameSnapshot() {
-  return memberName;
-}
-
-function getLevelSnapshot() {
-  return vipLevel;
-}
-
-function getTokenSnapshot() {
-  return vipToken;
-}
-
-function getExpiresSnapshot() {
-  return vipExpiresAt;
-}
-
-export function setVipStatus(status: boolean, name: string | null = null, level: "member" | "admin" | null = "member", token: string | null = null, expiresAt: string | null = null) {
+export function setVipStatus(status: boolean) {
+  if (status === isVip) return;
   isVip = status;
-  memberName = name;
-  vipLevel = level;
-  vipToken = token;
-  vipExpiresAt = expiresAt;
-  
   if (typeof window !== "undefined") {
-    localStorage.setItem(STATUS_KEY, String(status));
-    
-    if (name) localStorage.setItem(NAME_KEY, name);
-    else localStorage.removeItem(NAME_KEY);
-    
-    if (level) localStorage.setItem(LEVEL_KEY, level);
-    else localStorage.removeItem(LEVEL_KEY);
-
-    if (token) localStorage.setItem(TOKEN_KEY, token);
-    else localStorage.removeItem(TOKEN_KEY);
-
-    if (expiresAt) localStorage.setItem(EXPIRES_KEY, expiresAt);
-    else localStorage.removeItem(EXPIRES_KEY);
-
-    // Force re-render of components using the store and triggers state hydration across tabs
-    listeners.forEach((l) => l());
+    localStorage.setItem(STORAGE_KEY, String(status));
   }
+  listeners.forEach((l) => l());
 }
 
 export function useVipStatus() {
   return useSyncExternalStore(subscribe, getSnapshot, () => false);
-}
-
-export function useMemberName() {
-  return useSyncExternalStore(subscribe, getNameSnapshot, () => null);
-}
-
-export function useVipLevel() {
-  return useSyncExternalStore(subscribe, getLevelSnapshot, () => null);
-}
-
-export function useVipToken() {
-  return useSyncExternalStore(subscribe, getTokenSnapshot, () => null);
-}
-
-export function useVipExpiresAt() {
-  return useSyncExternalStore(subscribe, getExpiresSnapshot, () => null);
-}
-
-export function logoutVip() {
-  setVipStatus(false, null, null, null, null);
 }

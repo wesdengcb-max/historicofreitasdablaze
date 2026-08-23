@@ -1,4 +1,4 @@
-import { createFileRoute, Link, redirect } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 /* __LK_NOOP_eabb5bd3-7fd1-48db-8dd9-25f5213934bd__ */
 import { Crown } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -8,7 +8,6 @@ import logoTextWhite from "@/assets/logo-text-white.png.asset.json";
 import bgAsset from "@/assets/homepage-bg.png.asset.json";
 import fwLogoAsset from "@/assets/fw-logo-link.png.asset.json";
 import { useState, useEffect } from "react";
-import { supabase } from '@/integrations/supabase/client';
 
 export const Route = createFileRoute('/')({
   component: LandingPage,
@@ -85,7 +84,7 @@ function LandingPage() {
         <Link to="/app" className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
           <Button className="h-14 px-10 bg-gradient-to-r from-[#ff4b5c] to-[#e63946] hover:from-[#ff5c6c] hover:to-[#f74a57] text-white font-black uppercase tracking-widest text-xs rounded-md flex items-center gap-3 shadow-[0px_4px_20px_rgba(230,57,70,0.4)] transition-all hover:scale-105 active:scale-95 border-none">
             <span className="text-lg leading-none mt-[2px]">▷</span>
-            ENTRAR NA PLATAFORMA
+            CONHECENDO AS FERRAMENTAS
           </Button>
         </Link>
       </main>

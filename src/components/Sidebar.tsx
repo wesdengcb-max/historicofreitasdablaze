@@ -16,11 +16,10 @@ import {
   Crown,
   ChevronLeft,
   ChevronRight,
-  Camera,
-  LogOut
+  Camera
 } from "lucide-react";
 import { setSection, useSection, type SectionId } from "@/lib/sectionStore";
-import { useVipStatus, useMemberName, logoutVip } from "@/lib/auth/vipStore";
+import { useVipStatus } from "@/lib/auth/vipStore";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { useSidebarStore } from "@/lib/sidebarStore";
@@ -53,20 +52,14 @@ const FERRAMENTAS: MenuItem[] = [
 ];
 
 import { useAvatar, setAvatar } from "@/lib/avatarStore";
-import { useVipLevel } from "@/lib/auth/vipStore";
-import { useNavigate } from "@tanstack/react-router";
 
 export const Sidebar = memo(function Sidebar() {
 
   const active = useSection();
   const isVip = useVipStatus();
-  const vipLevel = useVipLevel();
-  const memberName = useMemberName();
-
   const { isCollapsed, toggle } = useSidebarStore();
   const avatar = useAvatar();
   const fileRef = useRef<HTMLInputElement>(null);
-  const navigate = useNavigate();
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -93,19 +86,13 @@ export const Sidebar = memo(function Sidebar() {
        return;
     }
 
-    // Bloqueia acesso a seções restritas para usuários não-VIP
-    if (item.id !== "dashboard" && item.id !== "videos" && item.id !== "hostman" && !isVip && vipLevel !== 'admin') {
-      const ev = new CustomEvent('open-vip-modal');
-      window.dispatchEvent(ev);
+    if (item.id !== "dashboard" && item.id !== "videos" && !isVip) {
+      toast.error("Área Exclusiva", {
+        description: "Você precisa ser Membro VIP para acessar esta aba.",
+      });
       return;
     }
     setSection(item.id as SectionId);
-  };
-
-  const handleLogout = () => {
-    logoutVip();
-    toast.success("Sessão encerrada");
-    window.location.reload(); // Recarrega para aplicar a proteção de rota e manter o usuário onde está
   };
 
   return (
@@ -142,17 +129,17 @@ export const Sidebar = memo(function Sidebar() {
             className="hidden"
             onChange={handleFile}
           />
-          {(isVip || vipLevel === 'admin') && (
-            <div className="pointer-events-none absolute -bottom-1 -right-1 rounded-full bg-red-600 p-1 shadow-[0_0_12px_rgba(239,68,68,0.7)] ring-2 ring-surface">
+          {isVip && (
+            <div className="pointer-events-none absolute -bottom-1 -right-1 rounded-full bg-red-500 p-1 shadow-[0_0_12px_rgba(239,68,68,0.7)] ring-2 ring-surface">
                <Crown className="h-3 w-3 text-white" />
             </div>
           )}
         </div>
         {!isCollapsed && (
           <div className="text-center">
-            <h2 className="text-lg font-black tracking-tight text-foreground font-outfit">{(isVip || vipLevel === 'admin') ? (memberName || "Membro VIP") : "Freitas da Blaze"}</h2>
+            <h2 className="text-lg font-black tracking-tight text-foreground font-outfit">Freitas da Blaze</h2>
             <div className="mt-1 flex items-center justify-center gap-2">
-              <span className="rounded bg-red-600/10 px-2 py-0.5 text-[10px] font-bold text-red-600 uppercase tracking-widest">{vipLevel === 'admin' ? 'ADMIN' : 'VIP'}</span>
+              <span className="rounded bg-red-500/10 px-2 py-0.5 text-[10px] font-bold text-red-500 uppercase tracking-widest">VIP</span>
               <span className="text-[11px] text-muted-foreground">Analista Premium</span>
             </div>
           </div>
@@ -172,7 +159,6 @@ export const Sidebar = memo(function Sidebar() {
                 item={item} 
                 active={active === item.id} 
                 isVip={isVip} 
-                vipLevel={vipLevel}
                 isCollapsed={isCollapsed}
                 onClick={() => handleItemClick(item)} 
               />
@@ -192,38 +178,21 @@ export const Sidebar = memo(function Sidebar() {
                 item={item} 
                 active={false} 
                 isVip={isVip} 
-                vipLevel={vipLevel}
                 isCollapsed={isCollapsed}
                 onClick={() => handleItemClick(item)} 
               />
             ))}
           </div>
         </div>
-
-        {/* Logout (Visible when VIP) */}
-        {(isVip || vipLevel === 'admin') && (
-          <div className="pt-4 border-t border-white/5">
-            <button
-              onClick={handleLogout}
-              className={cn(
-                "group flex items-center gap-3 rounded-xl py-3 text-sm font-bold text-red-500/60 transition-all duration-200 hover:bg-red-500/5 hover:text-red-500",
-                isCollapsed ? "justify-center px-0 w-full" : "px-4 w-full"
-              )}
-            >
-              <LogOut className="h-4 w-4" />
-              {!isCollapsed && <span className="flex-1 text-left text-[12px] uppercase tracking-widest font-black">Sair da Conta</span>}
-            </button>
-          </div>
-        )}
       </nav>
 
       {/* VIP Upgrade Card */}
       {!isCollapsed && (
         <div className="p-4">
-          <div className="rounded-2xl border border-red-600/10 bg-red-600/[0.03] p-5 text-center shadow-sm">
+          <div className="rounded-2xl border border-red-500/10 bg-red-500/[0.03] p-5 text-center shadow-sm">
             <div className="mb-3 flex justify-center">
               <div className="rounded-full bg-red-500/10 p-2">
-                <Crown className="h-5 w-5 text-red-600" />
+                <Crown className="h-5 w-5 text-red-500" />
               </div>
             </div>
             <h4 className="text-xs font-bold text-foreground uppercase tracking-widest">Seja VIP</h4>
@@ -232,7 +201,7 @@ export const Sidebar = memo(function Sidebar() {
               href="https://t.me/freitaswhite" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="mt-4 flex w-full items-center justify-center rounded-xl bg-red-600 py-2.5 text-[11px] font-black uppercase tracking-widest text-white transition hover:bg-red-700 active:scale-95 shadow-[0_4px_15px_rgba(239,68,68,0.3)]"
+              className="mt-4 flex w-full items-center justify-center rounded-xl bg-red-500 py-2.5 text-[11px] font-black uppercase tracking-widest text-white transition hover:bg-red-600 active:scale-95 shadow-[0_4px_15px_rgba(239,68,68,0.3)]"
             >
               Quero ser VIP
             </a>
@@ -245,7 +214,7 @@ export const Sidebar = memo(function Sidebar() {
             href="https://t.me/freitaswhite" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="rounded-xl bg-red-600 p-2 text-white shadow-lg transition hover:bg-red-700 active:scale-95"
+            className="rounded-xl bg-red-500 p-2 text-white shadow-lg transition hover:bg-red-600 active:scale-95"
           >
             <Crown className="h-4 w-4" />
           </a>
@@ -255,9 +224,9 @@ export const Sidebar = memo(function Sidebar() {
   );
 });
 
-function SidebarItem({ item, active, isVip, vipLevel, isCollapsed, onClick }: { item: MenuItem; active: boolean; isVip: boolean; vipLevel: string | null; isCollapsed: boolean; onClick: () => void }) {
+function SidebarItem({ item, active, isVip, isCollapsed, onClick }: { item: MenuItem; active: boolean; isVip: boolean; isCollapsed: boolean; onClick: () => void }) {
   const Icon = item.icon;
-  const isLocked = !item.isTool && item.id !== "dashboard" && item.id !== "videos" && !isVip && vipLevel !== 'admin';
+  const isLocked = !item.isTool && item.id !== "dashboard" && item.id !== "videos" && item.id !== "hostman" && !isVip;
 
   return (
     <button
@@ -268,14 +237,14 @@ function SidebarItem({ item, active, isVip, vipLevel, isCollapsed, onClick }: { 
         "group flex items-center gap-3 rounded-xl py-3 text-sm font-bold transition-all duration-200",
         isCollapsed ? "justify-center px-0 w-full" : "px-4 w-full",
         active 
-          ? "bg-red-600/10 text-white shadow-[inset_0_0_0_1px_rgba(239,68,68,0.2)]" 
+          ? "bg-red-500/10 text-white shadow-[inset_0_0_0_1px_rgba(239,68,68,0.2)]" 
           : "text-muted-foreground hover:bg-white/[0.03] hover:text-white",
         item.soon ? "opacity-40 cursor-not-allowed" : "",
         isLocked ? "opacity-60" : ""
       )}
     >
       <div className="relative">
-        <Icon className={cn("h-4 w-4", active ? "text-red-600" : "group-hover:text-white")} />
+        <Icon className={cn("h-4 w-4", active ? "text-red-500" : "group-hover:text-white")} />
         {isLocked && (
           <div className="absolute -right-1 -top-1 rounded-full bg-black/80 p-0.5">
             <Lock className="h-2 w-2 text-red-500" />
@@ -292,7 +261,7 @@ function SidebarItem({ item, active, isVip, vipLevel, isCollapsed, onClick }: { 
         <span className="rounded bg-white/5 px-1.5 py-0.5 text-[8px] font-bold text-muted-foreground">BREVE</span>
       )}
       {!isCollapsed && active && (
-        <div className="h-1 w-1 rounded-full bg-red-600 shadow-[0_0_8px_rgba(239,68,68,1)]" />
+        <div className="h-1 w-1 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,1)]" />
       )}
     </button>
   );

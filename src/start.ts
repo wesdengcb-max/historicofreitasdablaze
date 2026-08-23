@@ -1,18 +1,24 @@
-import { QueryClient } from '@tanstack/react-query'
-import { createStart } from '@tanstack/react-start'
-import { attachSupabaseAuth } from '@/integrations/supabase/auth-attacher';
+import { createStart, createMiddleware } from "@tanstack/react-start";
 
-export const startInstance = createStart(() => {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        staleTime: 1000 * 60 * 5,
-      },
-    },
-  })
+import { renderErrorPage } from "./lib/error-page";
+import { attachSupabaseAuth } from "@/integrations/supabase/auth-attacher";
 
-  return {
-    queryClient,
-    functionMiddleware: [attachSupabaseAuth],
+const errorMiddleware = createMiddleware().server(async ({ next }) => {
+  try {
+    return await next();
+  } catch (error) {
+    if (error != null && typeof error === "object" && "statusCode" in error) {
+      throw error;
+    }
+    console.error(error);
+    return new Response(renderErrorPage(), {
+      status: 500,
+      headers: { "content-type": "text/html; charset=utf-8" },
+    });
   }
-})
+});
+
+export const startInstance = createStart(() => ({
+  functionMiddleware: [attachSupabaseAuth],
+  requestMiddleware: [errorMiddleware],
+}));
