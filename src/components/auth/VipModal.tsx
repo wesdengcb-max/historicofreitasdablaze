@@ -8,8 +8,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Key, Crown, LogOut, Loader2, ShieldCheck, ArrowRight, User, Lock } from "lucide-react";
-import { useVipStatus, setVipStatus, logoutVip, useMemberName, useVipToken } from "@/lib/auth/vipStore";
+import { Key, Crown, LogOut, Loader2, ShieldCheck, ArrowRight, User, Lock, Calendar, AlertCircle, Clock } from "lucide-react";
+import { useVipStatus, setVipStatus, logoutVip, useMemberName, useVipToken, useVipExpiresAt } from "@/lib/auth/vipStore";
 import { validateToken } from "@/lib/vip.functions";
 import { toast } from "sonner";
 
@@ -21,6 +21,7 @@ export function VipModal() {
   const isVip = useVipStatus();
   const memberName = useMemberName();
   const activeToken = useVipToken();
+  const expiresAt = useVipExpiresAt();
 
   useEffect(() => {
     const handleOpen = () => setOpen(true);
@@ -41,7 +42,7 @@ export function VipModal() {
       console.log("[VipModal] Server response:", result);
       
       if (result && result.success) {
-        setVipStatus(true, result.member_name, result.level, result.token);
+        setVipStatus(true, result.member_name, result.level, result.token, result.expires_at);
         toast.success(`Modo VIP Ativado: Bem-vindo, ${result.member_name}!`);
         setOpen(false);
         setToken('');
@@ -63,6 +64,7 @@ export function VipModal() {
       localStorage.removeItem("freitas_white_vip_status");
       localStorage.removeItem("freitas_white_member_name");
       localStorage.removeItem("freitas_white_vip_level");
+      localStorage.removeItem("freitas_white_vip_expires_at");
     }
     logoutVip();
     toast.success("Modo VIP desativado");
@@ -126,47 +128,85 @@ export function VipModal() {
         ) : (
           <>
             <DialogHeader className="space-y-4 pt-4">
-              <div className="mx-auto w-16 h-16 bg-red-600/10 rounded-full flex items-center justify-center border border-red-600/20">
-                <Crown className="w-8 h-8 text-red-500 animate-pulse" />
+              <div className="mx-auto w-20 h-20 bg-red-600/10 rounded-full flex items-center justify-center border border-red-600/20 shadow-[0_0_20px_rgba(239,68,68,0.2)]">
+                <Crown className="w-10 h-10 text-red-500 animate-pulse" />
               </div>
-              <DialogTitle className="text-2xl font-black text-center uppercase tracking-tighter">
+              <DialogTitle className="text-2xl font-black text-center uppercase tracking-tighter bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent">
                 ⭐ MODO VIP ATIVO
               </DialogTitle>
             </DialogHeader>
 
             <div className="space-y-4 py-4 px-2">
-              <div className="bg-white/5 rounded-xl p-4 border border-white/10 space-y-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-red-600/20 flex items-center justify-center">
-                    <User className="w-5 h-5 text-red-500" />
+              <div className="bg-white/[0.03] backdrop-blur-md rounded-2xl p-5 border border-white/10 space-y-4 shadow-xl">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-red-600/20 flex items-center justify-center border border-red-600/30">
+                      <User className="w-6 h-6 text-red-500" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-gray-500 font-black uppercase tracking-[0.2em]">Membro</p>
+                      <p className="text-base font-black text-white">{memberName}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Membro</p>
-                    <p className="text-sm font-black text-white">{memberName}</p>
+                  <div className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
+                    <span className="text-[10px] font-black text-emerald-500 uppercase">Verificado</span>
                   </div>
                 </div>
                 
                 <div className="h-px bg-white/5 w-full" />
                 
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-emerald-600/20 flex items-center justify-center">
-                    <Key className="w-5 h-5 text-emerald-500" />
+                <div className="grid grid-cols-1 gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/5">
+                      <Key className="w-5 h-5 text-gray-400" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-gray-500 font-black uppercase tracking-[0.2em]">Token Ativo</p>
+                      <p className="text-xs font-mono text-white tracking-widest">{activeToken}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Token</p>
-                    <p className="text-sm font-mono text-white tracking-widest">{activeToken}</p>
+
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/5">
+                      <Calendar className="w-5 h-5 text-gray-400" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-gray-500 font-black uppercase tracking-[0.2em]">Expiração</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-xs font-bold text-white">
+                          {expiresAt ? new Date(expiresAt).toLocaleDateString('pt-BR') : 'Acesso Vitalício'}
+                        </p>
+                        {expiresAt && (
+                          <div className="flex items-center gap-1 px-2 py-0.5 bg-red-600/10 border border-red-600/20 rounded-md">
+                            <Clock className="w-3 h-3 text-red-500" />
+                            <span className="text-[9px] font-black text-red-500">
+                              {Math.max(0, Math.ceil((new Date(expiresAt).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)))} DIAS
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <Button 
-                onClick={handleDeactivate}
-                variant="outline"
-                className="w-full h-12 border-red-600/20 bg-red-600/5 hover:bg-red-600/20 text-red-500 font-bold uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2"
-              >
-                <LogOut className="w-4 h-4" />
-                SAIR DO MODO VIP
-              </Button>
+              <div className="flex flex-col gap-2">
+                <Button 
+                  onClick={() => setOpen(false)}
+                  className="w-full h-12 bg-white text-black hover:bg-gray-200 font-black uppercase tracking-widest text-[11px] transition-all rounded-xl"
+                >
+                  ACESSAR PLATAFORMA
+                </Button>
+                
+                <Button 
+                  onClick={handleDeactivate}
+                  variant="ghost"
+                  className="w-full h-10 text-gray-500 hover:text-red-500 hover:bg-red-500/5 font-bold uppercase tracking-widest text-[10px] transition-all flex items-center justify-center gap-2"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  SAIR DO MODO VIP
+                </Button>
+              </div>
             </div>
           </>
         )}

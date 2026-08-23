@@ -16,10 +16,11 @@ import {
   Crown,
   ChevronLeft,
   ChevronRight,
-  Camera
+  Camera,
+  LogOut
 } from "lucide-react";
 import { setSection, useSection, type SectionId } from "@/lib/sectionStore";
-import { useVipStatus, useMemberName } from "@/lib/auth/vipStore";
+import { useVipStatus, useMemberName, logoutVip } from "@/lib/auth/vipStore";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { useSidebarStore } from "@/lib/sidebarStore";
@@ -53,6 +54,7 @@ const FERRAMENTAS: MenuItem[] = [
 
 import { useAvatar, setAvatar } from "@/lib/avatarStore";
 import { useVipLevel } from "@/lib/auth/vipStore";
+import { useNavigate } from "@tanstack/react-router";
 
 export const Sidebar = memo(function Sidebar() {
 
@@ -64,6 +66,7 @@ export const Sidebar = memo(function Sidebar() {
   const { isCollapsed, toggle } = useSidebarStore();
   const avatar = useAvatar();
   const fileRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -96,6 +99,12 @@ export const Sidebar = memo(function Sidebar() {
       return;
     }
     setSection(item.id as SectionId);
+  };
+
+  const handleLogout = () => {
+    logoutVip();
+    toast.success("Sessão encerrada");
+    navigate({ to: "/" });
   };
 
   return (
@@ -189,6 +198,22 @@ export const Sidebar = memo(function Sidebar() {
             ))}
           </div>
         </div>
+
+        {/* Logout (Visible when VIP) */}
+        {(isVip || vipLevel === 'admin') && (
+          <div className="pt-4 border-t border-white/5">
+            <button
+              onClick={handleLogout}
+              className={cn(
+                "group flex items-center gap-3 rounded-xl py-3 text-sm font-bold text-red-500/60 transition-all duration-200 hover:bg-red-500/5 hover:text-red-500",
+                isCollapsed ? "justify-center px-0 w-full" : "px-4 w-full"
+              )}
+            >
+              <LogOut className="h-4 w-4" />
+              {!isCollapsed && <span className="flex-1 text-left text-[12px] uppercase tracking-widest font-black">Sair da Conta</span>}
+            </button>
+          </div>
+        )}
       </nav>
 
       {/* VIP Upgrade Card */}
