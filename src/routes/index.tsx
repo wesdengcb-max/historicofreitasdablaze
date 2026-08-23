@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 /* __LK_NOOP_eabb5bd3-7fd1-48db-8dd9-25f5213934bd__ */
 import { Crown } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -8,8 +8,15 @@ import logoTextWhite from "@/assets/logo-text-white.png.asset.json";
 import bgAsset from "@/assets/homepage-bg.png.asset.json";
 import fwLogoAsset from "@/assets/fw-logo-link.png.asset.json";
 import { useState, useEffect } from "react";
+import { supabase } from '@/integrations/supabase/client';
 
 export const Route = createFileRoute('/')({
+  beforeLoad: async () => {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (session) {
+      throw redirect({ to: '/app' as any })
+    }
+  },
   component: LandingPage,
 })
 
