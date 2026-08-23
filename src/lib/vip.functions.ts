@@ -1,4 +1,4 @@
-import { createServerFn } from "@tanstack/react-stack-modern";
+import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 // Generate a random token in format FW-XXXX-XXXX
