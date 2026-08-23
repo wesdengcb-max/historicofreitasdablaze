@@ -14,6 +14,7 @@ export const AppHeader = memo(function AppHeader() {
   const memberName = useMemberName();
   const { isCollapsed, toggle } = useSidebarStore();
   const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [time, setTime] = useState("");
   const navigate = useNavigate();
 
   // Removed Supabase session check to rely purely on VIP tokens for admin access as requested
@@ -33,6 +34,20 @@ export const AppHeader = memo(function AppHeader() {
       document.documentElement.classList.add(saved);
       document.documentElement.classList.remove(saved === "dark" ? "light" : "dark");
     }
+    
+    const updateTime = () => {
+      setTime(new Date().toLocaleTimeString('pt-BR', { 
+        timeZone: 'America/Sao_Paulo', 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit', 
+        hour12: false 
+      }));
+    };
+    
+    updateTime();
+    const timer = setInterval(updateTime, 1000);
+    return () => clearInterval(timer);
   }, []);
 
   const toggleTheme = () => {
@@ -85,7 +100,7 @@ export const AppHeader = memo(function AppHeader() {
 
         <div className="hidden items-center gap-2 rounded-xl bg-surface px-4 py-2 sm:flex">
           <Clock className="h-3.5 w-3.5 text-red-600" />
-          <span className="text-[12px] font-bold tabular-nums text-foreground">16:39:49</span>
+          <span className="text-[12px] font-bold tabular-nums text-foreground">{time}</span>
         </div>
 
         {isAdmin && (
