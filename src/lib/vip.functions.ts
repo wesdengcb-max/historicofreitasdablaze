@@ -14,21 +14,51 @@ export const validateToken = createServerFn({ method: "POST" })
     token: z.string().min(1)
   }).parse(data))
   .handler(async ({ data }: { data: { token: string } }) => {
+    // SECURITY: This function runs on the server.
+    // We check the token against the database using supabaseAdmin (which bypasses RLS).
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
+    const inputToken = data.token.trim();
+    console.log("[VIP Auth Server] Validating token:", inputToken);
+
+    // Hardcoded fallback for the requested Master Admin token
+    // This ensures access even if DB issues occur, as requested for this specific token.
+    if (inputToken === 'admin87850424') {
+      console.log("[VIP Auth Server] Master Admin token matches hardcoded value.");
+      return { 
+        success: true, 
+        member_name: "Administrador Geral", 
+        token: inputToken,
+        level: "admin",
+        expires_at: null
+      };
+    }
+
+    // Database lookup for other tokens
     const { data: tokenData, error } = await supabaseAdmin
       .from("vip_tokens")
       .select("*")
-      .eq("token", data.token)
-      .eq("status", "active")
-      .single();
+      .eq("token", inputToken)
+      .maybeSingle();
 
-    if (error || !tokenData) {
+    if (error) {
+      console.error("[VIP Auth Server] Database error:", error.message);
+      throw new Error("Erro de conexão com o banco de dados");
+    }
+
+    if (!tokenData) {
+      console.warn("[VIP Auth Server] Token not found:", inputToken);
       throw new Error("Token inválido ou expirado");
+    }
+
+    if (tokenData.status !== 'active') {
+      console.warn("[VIP Auth Server] Token inactive:", tokenData.status);
+      throw new Error("Este token está desativado");
     }
 
     // Check expiration
     if (tokenData.expires_at && new Date(tokenData.expires_at) < new Date()) {
+      console.warn("[VIP Auth Server] Token expired:", tokenData.expires_at);
       await supabaseAdmin
         .from("vip_tokens")
         .update({ status: "expired" })
@@ -36,6 +66,7 @@ export const validateToken = createServerFn({ method: "POST" })
       throw new Error("Este token expirou");
     }
 
+    console.log("[VIP Auth Server] Token validated for:", tokenData.member_name);
     return { 
       success: true, 
       member_name: tokenData.member_name, 
@@ -48,12 +79,10 @@ export const validateToken = createServerFn({ method: "POST" })
 export const listVipTokens = createServerFn({ method: "GET" })
   .handler(async () => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    
     const { data, error } = await supabaseAdmin
       .from("vip_tokens")
       .select("*")
       .order("created_at", { ascending: false });
-
     if (error) throw error;
     return data;
   });
@@ -67,9 +96,7 @@ export const createVipToken = createServerFn({ method: "POST" })
   }).parse(data))
   .handler(async ({ data }: { data: { member_name: string; expires_at?: string; token?: string; level: "member" | "admin" } }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
     const token = data.token || generateVipToken();
-    
     const { data: newToken, error } = await supabaseAdmin
       .from("vip_tokens")
       .insert({
@@ -81,7 +108,6 @@ export const createVipToken = createServerFn({ method: "POST" })
       })
       .select()
       .single();
-
     if (error) throw error;
     return newToken;
   });
@@ -96,14 +122,12 @@ export const updateVipToken = createServerFn({ method: "POST" })
   }).parse(data))
   .handler(async ({ data }: { data: { id: string; member_name?: string; status?: "active" | "inactive" | "expired"; expires_at?: string; level?: "member" | "admin" } }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
     const { data: updated, error } = await supabaseAdmin
       .from("vip_tokens")
       .update(data)
       .eq("id", data.id)
       .select()
       .single();
-
     if (error) throw error;
     return updated;
   });
@@ -114,12 +138,10 @@ export const deleteVipToken = createServerFn({ method: "POST" })
   }).parse(data))
   .handler(async ({ data }: { data: { id: string } }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
     const { error } = await supabaseAdmin
       .from("vip_tokens")
       .delete()
       .eq("id", data.id);
-
     if (error) throw error;
     return { success: true };
   });
