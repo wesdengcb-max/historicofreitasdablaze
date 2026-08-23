@@ -117,16 +117,20 @@ export const AppHeader = memo(function AppHeader() {
           </Link>
         )}
 
-        <div
+        <button
+          onClick={() => {
+            const ev = new CustomEvent('open-vip-modal');
+            window.dispatchEvent(ev);
+          }}
           className={`flex items-center gap-2 rounded-xl px-4 py-2 text-[11px] font-black uppercase tracking-widest transition ${
             isVip 
-              ? "bg-red-500 text-white shadow-[0_4px_15px_rgba(239,68,68,0.3)]"
-              : "border border-white/10 bg-white/5 text-muted-foreground"
+              ? "bg-red-500 text-white shadow-[0_4px_15px_rgba(239,68,68,0.3)] hover:bg-red-600"
+              : "border border-white/10 bg-white/5 text-muted-foreground hover:bg-white/10"
           }`}
         >
           <Crown className="h-3.5 w-3.5" />
           <span>{isVip ? (memberName || "VIP") : "VIP"}</span>
-        </div>
+        </button>
 
 
         <button

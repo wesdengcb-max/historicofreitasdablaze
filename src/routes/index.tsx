@@ -85,7 +85,7 @@ function LandingPage() {
         <Link to="/app" className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
           <Button className="h-14 px-10 bg-gradient-to-r from-[#ff4b5c] to-[#e63946] hover:from-[#ff5c6c] hover:to-[#f74a57] text-white font-black uppercase tracking-widest text-xs rounded-md flex items-center gap-3 shadow-[0px_4px_20px_rgba(230,57,70,0.4)] transition-all hover:scale-105 active:scale-95 border-none">
             <span className="text-lg leading-none mt-[2px]">▷</span>
-            CONHECENDO AS FERRAMENTAS
+            ENTRAR NA PLATAFORMA
           </Button>
         </Link>
       </main>

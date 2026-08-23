@@ -15,6 +15,7 @@ export const generateVipToken = () => {
 };
 
 export const validateToken = createServerFn({ method: "POST" })
+  .middleware([])
   .validator((data: unknown) => z.object({
     token: z.string().min(1)
   }).parse(data))
