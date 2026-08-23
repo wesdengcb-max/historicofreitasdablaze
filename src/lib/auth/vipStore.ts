@@ -14,7 +14,30 @@ const listeners = new Set<() => void>();
 
 function subscribe(cb: () => void) {
   listeners.add(cb);
-  return () => listeners.delete(cb);
+  
+  // Listen for storage changes from other tabs
+  const handleStorage = (e: StorageEvent) => {
+    if (e.key === STATUS_KEY || e.key === LEVEL_KEY || e.key === NAME_KEY || e.key === TOKEN_KEY) {
+      if (typeof window !== "undefined") {
+        isVip = localStorage.getItem(STATUS_KEY) === "true";
+        memberName = localStorage.getItem(NAME_KEY);
+        vipLevel = localStorage.getItem(LEVEL_KEY) as "member" | "admin" | null;
+        vipToken = localStorage.getItem(TOKEN_KEY);
+        cb();
+      }
+    }
+  };
+  
+  if (typeof window !== "undefined") {
+    window.addEventListener("storage", handleStorage);
+  }
+  
+  return () => {
+    listeners.delete(cb);
+    if (typeof window !== "undefined") {
+      window.removeEventListener("storage", handleStorage);
+    }
+  };
 }
 
 function getSnapshot() {
