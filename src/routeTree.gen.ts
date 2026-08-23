@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SinaisRouteImport } from './routes/sinais'
 import { Route as EstrategiasRouteImport } from './routes/estrategias'
 import { Route as AppRouteImport } from './routes/app'
-import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiPublicRecentRouteImport } from './routes/api/public/recent'
 import { Route as ApiPublicCollectRouteImport } from './routes/api/public/collect'
 
@@ -31,11 +30,6 @@ const AppRoute = AppRouteImport.update({
   path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiPublicRecentRoute = ApiPublicRecentRouteImport.update({
   id: '/api/public/recent',
   path: '/api/public/recent',
@@ -48,7 +42,6 @@ const ApiPublicCollectRoute = ApiPublicCollectRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
   '/app': typeof AppRoute
   '/estrategias': typeof EstrategiasRoute
   '/sinais': typeof SinaisRoute
@@ -56,7 +49,6 @@ export interface FileRoutesByFullPath {
   '/api/public/recent': typeof ApiPublicRecentRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
   '/app': typeof AppRoute
   '/estrategias': typeof EstrategiasRoute
   '/sinais': typeof SinaisRoute
@@ -65,7 +57,6 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
   '/app': typeof AppRoute
   '/estrategias': typeof EstrategiasRoute
   '/sinais': typeof SinaisRoute
@@ -75,7 +66,6 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
     | '/app'
     | '/estrategias'
     | '/sinais'
@@ -83,7 +73,6 @@ export interface FileRouteTypes {
     | '/api/public/recent'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
     | '/app'
     | '/estrategias'
     | '/sinais'
@@ -91,7 +80,6 @@ export interface FileRouteTypes {
     | '/api/public/recent'
   id:
     | '__root__'
-    | '/'
     | '/app'
     | '/estrategias'
     | '/sinais'
@@ -100,7 +88,6 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRoute
   EstrategiasRoute: typeof EstrategiasRoute
   SinaisRoute: typeof SinaisRoute
@@ -131,13 +118,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/public/recent': {
       id: '/api/public/recent'
       path: '/api/public/recent'
@@ -156,7 +136,6 @@ declare module '@tanstack/react-router' {
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
   AppRoute: AppRoute,
   EstrategiasRoute: EstrategiasRoute,
   SinaisRoute: SinaisRoute,
