@@ -133,11 +133,11 @@ export const deleteUser = createServerFn({ method: "POST" })
     
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     
-    const { data: { session } } = await ctx.supabase.auth.getSession();
-    if (!session) throw new Error("Unauthorized");
+    const userId = (context as any).userId;
+    if (!userId) throw new Error("Unauthorized");
     
     const { data: isAdmin } = await ctx.supabase.rpc("has_role", {
-      _user_id: session.user.id,
+      _user_id: userId,
       _role: "admin"
     });
     
