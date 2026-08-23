@@ -32,6 +32,6 @@ Implement a token-based access system for the VIP area while keeping the homepag
 - Implement UI for generating, activating, and revoking tokens.
 
 ## Technical Details
-- Use `vinxi/http` (or standard Web Request/Response) for secure cookie handling in server functions.
+- Use standard Web Request/Response cookies in server functions.
 - Tokens will be generated in format `FW-XXXX-XXXX`.
 - VIP session status will be synced via a client-side store (Zustand) for UI reactivity.
