@@ -1,4 +1,4 @@
-import { memo } from "react";
+import React, { memo } from "react";
 import { ResultCircle } from "./ResultCircle";
 import { cn } from "@/lib/utils";
 import fwLogoAsset from "@/assets/fw-logo-link.png.asset.json";
@@ -33,7 +33,18 @@ const StatsCard = ({ title, titleSuffix, children, footer, className }: StatsCar
   </div>
 );
 
+import { ClientOnly } from "@/components/ClientOnly";
+
+const PessoasEntrandoSuffix = ({ countdown }: { countdown: number }) => {
+  const [val, setVal] = React.useState(0);
+  React.useEffect(() => {
+    setVal(Math.floor(Math.random() * 900) + 100);
+  }, []);
+  return <span className="text-[13px] font-bold text-[#FBBF24]">→ {val}</span>;
+};
+
 export const LiveStats = memo(function LiveStats({ 
+
   total, 
   reds, 
   blacks, 
@@ -84,7 +95,7 @@ export const LiveStats = memo(function LiveStats({
       {/* 2. Pessoas Entrando */}
       <StatsCard 
         title="Pessoas Entrando" 
-        titleSuffix={<span className="text-[13px] font-bold text-[#FBBF24]">→ {countdown > 3 ? "---" : "---"}</span>}
+        titleSuffix={<ClientOnly><PessoasEntrandoSuffix countdown={countdown} /></ClientOnly>}
         footer={
           <div className="flex items-center justify-between px-1">
             <span className="text-[10px] font-medium text-[#999999]">
@@ -102,21 +113,44 @@ export const LiveStats = memo(function LiveStats({
           </div>
         }
       >
-        <div className="flex justify-between px-2 pt-1">
-          {[
-            { color: "red", count: 142, val: "R$ 2.036,35" },
-            { color: "white", count: 538, val: "R$ 4.432,03" },
-            { color: "black", count: 111, val: "R$ 1.112,80" }
-          ].map((item, i) => (
-            <div key={i} className="flex flex-col items-center gap-1.5">
-              <span className="text-[10px] font-bold text-white bg-[#1A1A1A] px-2 py-0.5 rounded min-w-[32px] text-center">{item.count}</span>
-              <div className="h-8 w-8 rounded-lg overflow-hidden border border-white/10">
-                <ResultCircle color={item.color as any} size="fluid" animate={false} />
-              </div>
-              <span className="text-[9px] font-medium text-[#888888] tabular-nums">{item.val}</span>
-            </div>
-          ))}
+        <ClientOnly>
+          <PessoasEntrandoContent />
+        </ClientOnly>
+      </StatsCard>
+    );
+});
+
+const PessoasEntrandoContent = () => {
+  const [vals, setVals] = React.useState<{count: number, val: string}[]>([]);
+  
+  React.useEffect(() => {
+    setVals([
+      { count: Math.floor(Math.random() * 200) + 50, val: `R$ ${(Math.random() * 5000 + 1000).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` },
+      { count: Math.floor(Math.random() * 600) + 100, val: `R$ ${(Math.random() * 8000 + 2000).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` },
+      { count: Math.floor(Math.random() * 200) + 50, val: `R$ ${(Math.random() * 3000 + 500).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` }
+    ]);
+  }, []);
+
+  if (vals.length === 0) return null;
+
+  return (
+    <div className="flex justify-between px-2 pt-1">
+      {[
+        { color: "red", ...vals[0] },
+        { color: "white", ...vals[1] },
+        { color: "black", ...vals[2] }
+      ].map((item, i) => (
+        <div key={i} className="flex flex-col items-center gap-1.5">
+          <span className="text-[10px] font-bold text-white bg-[#1A1A1A] px-2 py-0.5 rounded min-w-[32px] text-center">{item.count}</span>
+          <div className="h-8 w-8 rounded-lg overflow-hidden border border-white/10">
+            <ResultCircle color={item.color as any} size="fluid" animate={false} />
+          </div>
+          <span className="text-[9px] font-medium text-[#888888] tabular-nums">{item.val}</span>
         </div>
+      ))}
+    </div>
+  );
+};
       </StatsCard>
 
       {/* 3. Proporção de Cores */}
