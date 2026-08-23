@@ -213,39 +213,55 @@ export function PredictiveSignals() {
 
   // 1. FILTRAGEM DOS ARRAYS NO ESTADO REACT
   const activeSignals = useMemo(() => {
-    const combined = [
-      ...(mode1 || []).map(s => ({ ...s, isTop1: true, top1Count: s.analysisCount, hasTop5Confluence: false, rank: 1, category: 'isolado' })),
-      ...(mode2 || []).map(s => ({ ...s, isTop1: false, top1Count: 0, hasTop5Confluence: true, rank: s.sources[0]?.top5 ? 2 : 6, category: 'confluencia', at: s.times[0] }))
-    ];
-    return combined;
+    const m1Signals = (mode1 || []).map(s => {
+      // Logic to assign category for M1 signals
+      let category = 'top1_isolated';
+      if (s.isConsecutive && s.levelOffset && s.levelOffset >= 4) {
+        category = 'winn';
+      } else if (s.isRare || (s.analysisCount && s.analysisCount >= 2)) {
+        category = 'rare';
+      } else if (s.isVerified || (s.analysisCount && s.analysisCount >= 1 && s.isVerified)) {
+        // Technically top1_top5 if it has verification (Selu Azul)
+        category = 'top1_top5';
+      }
+      
+      return { 
+        ...s, 
+        isTop1: true, 
+        top1Count: s.analysisCount, 
+        hasTop5Confluence: !!s.isVerified, 
+        category,
+        at: s.at 
+      };
+    });
+
+    const m2Signals = (mode2 || []).map(s => {
+      // Logic to assign category for M2 signals (Confluence)
+      let category = 'top5_only';
+      if (s.analysisCount >= 2) {
+        // If it's a Mode 2 signal with high confluence, it might be top1_top5 or top5_only
+        // Based on instructions, top5_only is "Top 2 ao Top 5"
+        category = 'top5_only';
+      }
+      
+      return { 
+        ...s, 
+        isTop1: false, 
+        top1Count: 0, 
+        hasTop5Confluence: true, 
+        category, 
+        at: s.times[0] 
+      };
+    });
+
+    return [...m1Signals, ...m2Signals];
   }, [mode1, mode2]);
 
-  const rareSignals = useMemo(() => activeSignals.filter(s => 
-    s.isRare || (s.top1Count && s.top1Count >= 2)
-  ), [activeSignals]);
-
-  const top1Top5Signals = useMemo(() => activeSignals.filter(s => 
-    (s.isTop1 || s.title?.includes('Top 1')) && 
-    s.hasTop5Confluence && 
-    (!s.top1Count || s.top1Count < 2) && 
-    !s.isRare
-  ), [activeSignals]);
-
-  const top1IsolatedSignals = useMemo(() => activeSignals.filter(s => 
-    (s.isTop1 || s.title?.includes('Isolado')) && 
-    !s.hasTop5Confluence && 
-    (!s.top1Count || s.top1Count < 2) && 
-    !s.isRare
-  ), [activeSignals]);
-
-  const top5OnlySignals = useMemo(() => activeSignals.filter(s => 
-    !s.isTop1 && 
-    !s.title?.includes('Isolado') && 
-    s.category !== 'isolado' && 
-    !s.isRare && 
-    (!s.top1Count || s.top1Count === 0) &&
-    (s.rank >= 2 && s.rank <= 5)
-  ), [activeSignals]);
+  const winnSignals = useMemo(() => activeSignals.filter(s => s.category === 'winn'), [activeSignals]);
+  const rareSignals = useMemo(() => activeSignals.filter(s => s.category === 'rare'), [activeSignals]);
+  const top1Top5Signals = useMemo(() => activeSignals.filter(s => s.category === 'top1_top5'), [activeSignals]);
+  const top1IsolatedSignals = useMemo(() => activeSignals.filter(s => s.category === 'top1_isolated'), [activeSignals]);
+  const top5OnlySignals = useMemo(() => activeSignals.filter(s => s.category === 'top5_only'), [activeSignals]);
 
 
 
@@ -826,7 +842,21 @@ export function PredictiveSignals() {
 
         {!err && (
           <div className="space-y-8">
-            {/* SEÇÃO 1: 💎 RARO */}
+            {/* 1. 🏆 WINN (Super Confluência Suprema) */}
+            {winnSignals.length > 0 && (
+              <section className="space-y-3">
+                <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-purple-400">
+                  <Sparkles className="h-3.5 w-3.5" /> 🏆 WINN (Super Confluência Suprema)
+                </div>
+                <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                  {winnSignals.map((s) => (
+                    <SignalCard key={s.key} signal={s} />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* 2. 💎 RARO (Múltiplas análises Top 1) */}
             {rareSignals.length > 0 && (
               <section className="space-y-3">
                 <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-400">
@@ -840,11 +870,11 @@ export function PredictiveSignals() {
               </section>
             )}
 
-            {/* SEÇÃO 2: ⚡ TOP 1 + TOP 5 */}
+            {/* 3. ⚡ TOP 1 & TOP 5 (Confluência Principal + Secundária) */}
             {top1Top5Signals.length > 0 && (
               <section className="space-y-3">
                 <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-primary">
-                  <Layers className="h-3.5 w-3.5" /> ⚡ TOP 1 + TOP 5 (Confluência Top 1 e Top 5)
+                  <Layers className="h-3.5 w-3.5" /> ⚡ TOP 1 & TOP 5 (Confluência Principal + Secundária)
                 </div>
                 <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                   {top1Top5Signals.map((s) => (
@@ -854,11 +884,11 @@ export function PredictiveSignals() {
               </section>
             )}
 
-            {/* SEÇÃO 3: 🎯 TOP 1 ISOLADO */}
+            {/* 4. 🎯 TOP 1 ISOLADO (Análise Principal Única) */}
             {top1IsolatedSignals.length > 0 && (
               <section className="space-y-3">
                 <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                  <Target className="h-3.5 w-3.5" /> 🎯 TOP 1 ISOLADO
+                  <Target className="h-3.5 w-3.5" /> 🎯 TOP 1 ISOLADO (Análise Principal Única)
                 </div>
                 <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                   {top1IsolatedSignals.map((s) => (
@@ -868,16 +898,17 @@ export function PredictiveSignals() {
               </section>
             )}
 
-            {/* SEÇÃO 4: 📊 COINCIDÊNCIA TOP 5 */}
+            {/* 5. 📊 COINCIDÊNCIA TOP 5 (Análises Secundárias Top 2 ao Top 5) */}
             {top5OnlySignals.length > 0 && (
               <section className="space-y-3">
                 <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/70">
-                  <Layers className="h-3.5 w-3.5" /> 📊 COINCIDÊNCIA TOP 5 (Top 2 ao Top 5)
+                  <Layers className="h-3.5 w-3.5" /> 📊 COINCIDÊNCIA TOP 5 (Análises Secundárias Top 2 ao Top 5)
                 </div>
                 <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                  {top5OnlySignals.map((s) => (
-                    <SignalCard key={s.key} signal={s} />
-                  ))}
+                  {top5OnlySignals
+                    .filter(s => s.category === 'top5_only')
+                    .map(signal => <SignalCard key={signal.key} signal={signal} />)
+                  }
                 </div>
               </section>
             )}
