@@ -33,7 +33,7 @@ export const Route = createFileRoute('/admin/')({
 
 function AdminDashboard() {
   const queryClient = useQueryClient()
-  const [activeTab, setActiveTab] = useState<'users' | 'tokens'>('users')
+  const [activeTab, setActiveTab] = useState<'tokens'>('tokens')
   
   // User Management Functions
   const fetchUsers = useServerFn(listUsers)
@@ -154,21 +154,7 @@ function AdminDashboard() {
 
         <div className="flex items-center gap-2 bg-black/40 p-1 rounded-lg border border-white/5">
           <button
-            onClick={() => setActiveTab('users')}
-            className={cn(
-              "px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-md transition-all flex items-center gap-2",
-              activeTab === 'users' ? "bg-red-600 text-white" : "text-muted-foreground hover:text-white"
-            )}
-          >
-            <Users className="w-3.5 h-3.5" />
-            Membros
-          </button>
-          <button
-            onClick={() => setActiveTab('tokens')}
-            className={cn(
-              "px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-md transition-all flex items-center gap-2",
-              activeTab === 'tokens' ? "bg-red-600 text-white" : "text-muted-foreground hover:text-white"
-            )}
+            className="px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-md transition-all flex items-center gap-2 bg-red-600 text-white"
           >
             <Key className="w-3.5 h-3.5" />
             Tokens VIP
@@ -176,146 +162,6 @@ function AdminDashboard() {
         </div>
       </div>
 
-      {activeTab === 'users' && (
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-bold uppercase tracking-tighter flex items-center gap-2">
-              <Users className="w-5 h-5 text-red-500" />
-              Gestão de Usuários (Admin)
-            </h2>
-            <Button 
-              onClick={() => setIsAdding(!isAdding)}
-              className="bg-red-600 hover:bg-red-700 text-white font-bold gap-2 text-xs uppercase tracking-widest h-9"
-            >
-              <UserPlus className="w-4 h-4" />
-              Novo Admin
-            </Button>
-          </div>
-
-          {isAdding && (
-            <Card className="max-w-xl animate-in fade-in slide-in-from-top-4 duration-300">
-              <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-white uppercase tracking-tighter">
-                Adicionar Novo Usuário
-              </h2>
-              <form 
-                onSubmit={(e) => {
-                  e.preventDefault()
-                  createMutation.mutate({ email: newEmail, password: newPassword, role: newRole })
-                }}
-                className="space-y-4"
-              >
-                <div className="space-y-2">
-                  <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">E-mail</label>
-                  <Input 
-                    type="email" 
-                    value={newEmail} 
-                    onChange={e => setNewEmail(e.target.value)}
-                    placeholder="email@exemplo.com"
-                    required
-                    className="bg-white/5 border-white/10"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Senha Inicial</label>
-                  <Input 
-                    type="password" 
-                    value={newPassword} 
-                    onChange={e => setNewPassword(e.target.value)}
-                    placeholder="••••••••"
-                    required
-                    className="bg-white/5 border-white/10"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Cargo</label>
-                  <select 
-                    value={newRole}
-                    onChange={(e) => setNewRole(e.target.value as any)}
-                    className="w-full h-10 rounded-md border border-white/10 bg-white/5 px-3 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-red-500"
-                  >
-                    <option value="user">Membro Normal</option>
-                    <option value="admin">Administrador</option>
-                  </select>
-                </div>
-                <div className="flex justify-end gap-3 pt-2">
-                  <Button type="button" variant="ghost" onClick={() => setIsAdding(false)}>Cancelar</Button>
-                  <Button 
-                    type="submit" 
-                    disabled={createMutation.isPending}
-                    className="bg-red-600 hover:bg-red-700"
-                  >
-                    {createMutation.isPending ? 'Criando...' : 'Confirmar Cadastro'}
-                  </Button>
-                </div>
-              </form>
-            </Card>
-          )}
-
-          <div className="grid grid-cols-1 gap-4">
-            {usersLoading ? (
-              <div className="text-center py-12 text-muted-foreground animate-pulse">Carregando membros...</div>
-            ) : users?.map((user: any) => (
-              <Card key={user.id} className="hover:border-white/20 transition-colors border-white/5 bg-white/[0.02]">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className={`p-3 rounded-full ${user.role === 'admin' ? 'bg-amber-500/20 text-amber-500' : 'bg-blue-500/20 text-blue-500'}`}>
-                      {user.role === 'admin' ? <Shield className="w-6 h-6" /> : <Users className="w-6 h-6" />}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-lg">{user.email}</span>
-                        {user.status === 'inactive' && (
-                          <span className="text-[10px] bg-red-500/20 text-red-500 px-2 py-0.5 rounded-full font-black uppercase">Bloqueado</span>
-                        )}
-                      </div>
-                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground mt-1">
-                        <span className="flex items-center gap-1"><Mail className="w-3 h-3" /> {user.id}</span>
-                        <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> Criado em: {new Date(user.created_at).toLocaleDateString()}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      title={user.role === 'admin' ? 'Remover Admin' : 'Tornar Admin'}
-                      onClick={() => roleMutation.mutate({ userId: user.id, role: user.role === 'admin' ? 'user' : 'admin' })}
-                      className={user.role === 'admin' ? 'text-amber-500 hover:text-amber-400' : 'text-muted-foreground'}
-                    >
-                      <Shield className="w-4 h-4" />
-                    </Button>
-                    
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      title={user.status === 'active' ? 'Desativar Conta' : 'Ativar Conta'}
-                      onClick={() => statusMutation.mutate({ userId: user.id, active: user.status !== 'active' })}
-                      className={user.status === 'active' ? 'text-emerald-500 hover:text-emerald-400' : 'text-red-500 hover:text-red-400'}
-                    >
-                      {user.status === 'active' ? <CheckCircle className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
-                    </Button>
-
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      title="Excluir Usuário"
-                      onClick={() => {
-                        if (confirm('Tem certeza que deseja excluir este usuário permanentemente?')) {
-                          deleteMutation.mutate(user.id)
-                        }
-                      }}
-                      className="text-red-500 hover:text-red-400 hover:bg-red-500/10"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </div>
-      )}
 
       {activeTab === 'tokens' && (
         <div className="space-y-6">

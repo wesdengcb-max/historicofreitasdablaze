@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VipLoginRouteImport } from './routes/vip-login'
-import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
@@ -24,11 +23,6 @@ import { Route as ApiPublicCollectRouteImport } from './routes/api/public/collec
 const VipLoginRoute = VipLoginRouteImport.update({
   id: '/vip-login',
   path: '/vip-login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -80,7 +74,6 @@ const ApiPublicCollectRoute = ApiPublicCollectRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
-  '/auth': typeof AuthRoute
   '/vip-login': typeof VipLoginRoute
   '/app': typeof AuthenticatedAppRoute
   '/estrategias': typeof AuthenticatedEstrategiasRoute
@@ -91,7 +84,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
   '/vip-login': typeof VipLoginRoute
   '/app': typeof AuthenticatedAppRoute
   '/estrategias': typeof AuthenticatedEstrategiasRoute
@@ -105,7 +97,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
-  '/auth': typeof AuthRoute
   '/vip-login': typeof VipLoginRoute
   '/_authenticated/app': typeof AuthenticatedAppRoute
   '/_authenticated/estrategias': typeof AuthenticatedEstrategiasRoute
@@ -119,7 +110,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
-    | '/auth'
     | '/vip-login'
     | '/app'
     | '/estrategias'
@@ -130,7 +120,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/auth'
     | '/vip-login'
     | '/app'
     | '/estrategias'
@@ -143,7 +132,6 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/admin'
-    | '/auth'
     | '/vip-login'
     | '/_authenticated/app'
     | '/_authenticated/estrategias'
@@ -157,7 +145,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AdminRoute: typeof AdminRouteWithChildren
-  AuthRoute: typeof AuthRoute
   VipLoginRoute: typeof VipLoginRoute
   ApiPublicCollectRoute: typeof ApiPublicCollectRoute
   ApiPublicRecentRoute: typeof ApiPublicRecentRoute
@@ -170,13 +157,6 @@ declare module '@tanstack/react-router' {
       path: '/vip-login'
       fullPath: '/vip-login'
       preLoaderRoute: typeof VipLoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -275,7 +255,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AdminRoute: AdminRouteWithChildren,
-  AuthRoute: AuthRoute,
   VipLoginRoute: VipLoginRoute,
   ApiPublicCollectRoute: ApiPublicCollectRoute,
   ApiPublicRecentRoute: ApiPublicRecentRoute,

@@ -4,8 +4,8 @@ import { supabase } from '@/integrations/supabase/client'
 export const Route = createFileRoute('/_authenticated')({ 
   component: () => <Outlet />,
   beforeLoad: async ({ location }) => {
-    // Check Supabase session (traditional admin login)
-    const { data: { session } } = await supabase.auth.getSession()
+    // Check Supabase session (traditional admin login - disabled by user request, using hybrid flow only)
+    const session = null;
     
     // Check VIP token access (hybrid flow)
     let isVip = false;

@@ -33,11 +33,7 @@ export const AppHeader = memo(function AppHeader() {
     checkAdmin();
   }, []);
 
-  const handleLogout = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-      await supabase.auth.signOut();
-    }
+  const handleLogout = () => {
     logoutVip();
     toast.success("Sessão encerrada");
     navigate({ to: "/" });
