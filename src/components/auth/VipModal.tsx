@@ -42,7 +42,7 @@ export function VipModal() {
       console.log("[VipModal] Server response:", result);
       
       if (result && result.success) {
-        setVipStatus(true, result.member_name, result.level, result.token, result.expires_at);
+        setVipStatus(true, result.member_name, result.level, inputToken, result.expires_at);
         toast.success(`Modo VIP Ativado: Bem-vindo, ${result.member_name}!`);
         setOpen(false);
         setToken('');

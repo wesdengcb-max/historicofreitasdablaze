@@ -1,13 +1,31 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-
 // Generate a random token in format FW-XXXX-XXXX
 export const generateVipToken = () => {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   const part1 = Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
   const part2 = Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
   return `FW-${part1}-${part2}`;
+};
+
+// Helper to verify admin token server-side
+const verifyAdminToken = async (token: string | undefined) => {
+  if (!token) throw new Error("Acesso negado: Token não fornecido");
+  
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  
+  const { data, error } = await supabaseAdmin
+    .from("vip_tokens")
+    .select("level, status")
+    .ilike("token", token.trim())
+    .maybeSingle();
+
+  if (error || !data || data.status !== 'active' || data.level !== 'admin') {
+    throw new Error("Acesso negado: Token administrativo inválido");
+  }
+  
+  return true;
 };
 
 export const validateToken = createServerFn({ method: "POST" })
@@ -18,7 +36,6 @@ export const validateToken = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const inputToken = data.token.trim();
-    console.log("[VIP Auth Server] Starting database lookup...");
 
     // Database lookup
     const { data: tokenData, error } = await supabaseAdmin
@@ -28,66 +45,71 @@ export const validateToken = createServerFn({ method: "POST" })
       .maybeSingle();
 
     if (error) {
-      console.error("[VIP Auth Server] Database error:", error.message);
       throw new Error(`Erro de banco: ${error.message}`);
     }
 
     if (!tokenData) {
-      console.warn("[VIP Auth Server] Token not found in database.");
       throw new Error("Token inválido ou expirado");
     }
 
-    console.log("[VIP Auth Server] Found valid record.");
-
     if (tokenData.status !== 'active') {
-      console.warn("[VIP Auth Server] Status not active:", tokenData.status);
       throw new Error("Este token está desativado");
     }
 
+    let daysRemaining = null;
     if (tokenData.expires_at) {
       const expirationDate = new Date(tokenData.expires_at);
       const now = new Date();
       if (expirationDate < now) {
-        console.warn("[VIP Auth Server] Expired at:", tokenData.expires_at);
         await supabaseAdmin
           .from("vip_tokens")
           .update({ status: "expired" })
           .eq("id", tokenData.id);
         throw new Error("Este token expirou");
       }
+      daysRemaining = Math.max(0, Math.ceil((expirationDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
     }
 
     const level = (tokenData.level === 'admin' ? 'admin' : 'member') as "member" | "admin";
     
-    console.log("[VIP Auth Server] SUCCESS for:", tokenData.member_name);
+    // Retorna apenas os campos necessários, omitindo o token e IDs internos
     return { 
       success: true, 
       member_name: tokenData.member_name, 
-      token: tokenData.token,
       level: level,
-      expires_at: tokenData.expires_at
+      expires_at: tokenData.expires_at,
+      days_remaining: daysRemaining
     };
   });
 
-export const listVipTokens = createServerFn({ method: "GET" })
-  .handler(async () => {
+export const listVipTokens = createServerFn({ method: "POST" })
+  .validator((data: unknown) => z.object({
+    adminToken: z.string().min(1)
+  }).parse(data))
+  .handler(async ({ data }) => {
+    await verifyAdminToken(data.adminToken);
+    
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data, error } = await supabaseAdmin
+    const { data: tokens, error } = await supabaseAdmin
       .from("vip_tokens")
       .select("*")
       .order("created_at", { ascending: false });
+      
     if (error) throw error;
-    return data;
+    return tokens;
   });
 
 export const createVipToken = createServerFn({ method: "POST" })
   .validator((data: unknown) => z.object({
+    adminToken: z.string().min(1),
     member_name: z.string().min(1),
     expires_at: z.string().optional(),
     token: z.string().optional(),
     level: z.enum(["member", "admin"]).default("member")
   }).parse(data))
-  .handler(async ({ data }: { data: { member_name: string; expires_at?: string; token?: string; level: "member" | "admin" } }) => {
+  .handler(async ({ data }) => {
+    await verifyAdminToken(data.adminToken);
+    
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const token = data.token || generateVipToken();
     const { data: newToken, error } = await supabaseAdmin
@@ -107,17 +129,21 @@ export const createVipToken = createServerFn({ method: "POST" })
 
 export const updateVipToken = createServerFn({ method: "POST" })
   .validator((data: unknown) => z.object({
+    adminToken: z.string().min(1),
     id: z.string().uuid(),
     member_name: z.string().optional(),
     status: z.enum(["active", "inactive", "expired"]).optional(),
     expires_at: z.string().optional(),
     level: z.enum(["member", "admin"]).optional()
   }).parse(data))
-  .handler(async ({ data }: { data: { id: string; member_name?: string; status?: "active" | "inactive" | "expired"; expires_at?: string; level?: "member" | "admin" } }) => {
+  .handler(async ({ data }) => {
+    await verifyAdminToken(data.adminToken);
+    
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { adminToken, ...updateData } = data;
     const { data: updated, error } = await supabaseAdmin
       .from("vip_tokens")
-      .update(data)
+      .update(updateData)
       .eq("id", data.id)
       .select()
       .single();
@@ -127,9 +153,12 @@ export const updateVipToken = createServerFn({ method: "POST" })
 
 export const deleteVipToken = createServerFn({ method: "POST" })
   .validator((data: unknown) => z.object({
+    adminToken: z.string().min(1),
     id: z.string().uuid()
   }).parse(data))
-  .handler(async ({ data }: { data: { id: string } }) => {
+  .handler(async ({ data }) => {
+    await verifyAdminToken(data.adminToken);
+    
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin
       .from("vip_tokens")

@@ -21,6 +21,7 @@ import {
   User
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useVipToken } from '@/lib/auth/vipStore'
 
 export const Route = createFileRoute('/admin/')({
   component: AdminDashboard,
@@ -29,8 +30,8 @@ export const Route = createFileRoute('/admin/')({
 function AdminDashboard() {
   const queryClient = useQueryClient()
   const [activeTab, setActiveTab] = useState<'tokens'>('tokens')
+  const adminToken = useVipToken()
   
-
   // Token Management Functions
   const fetchTokens = useServerFn(listVipTokens)
   const doCreateToken = useServerFn(createVipToken)
@@ -48,12 +49,12 @@ function AdminDashboard() {
 
   const { data: tokens, isLoading: tokensLoading } = useQuery({
     queryKey: ['admin', 'tokens'],
-    queryFn: () => fetchTokens(),
+    queryFn: () => fetchTokens({ data: { adminToken: adminToken || '' } }),
     enabled: activeTab === 'tokens'
   })
 
   const createTokenMutation = useMutation({
-    mutationFn: (data: any) => doCreateToken({ data }),
+    mutationFn: (data: any) => doCreateToken({ data: { ...data, adminToken: adminToken || '' } }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'tokens'] })
       setIsAddingToken(false)
@@ -68,7 +69,7 @@ function AdminDashboard() {
   })
 
   const deleteTokenMutation = useMutation({
-    mutationFn: (id: string) => doDeleteToken({ data: { id } }),
+    mutationFn: (id: string) => doDeleteToken({ data: { id, adminToken: adminToken || '' } }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'tokens'] })
       toast.success('Token revogado')
@@ -76,7 +77,7 @@ function AdminDashboard() {
   })
 
   const updateTokenStatusMutation = useMutation({
-    mutationFn: (data: any) => doUpdateToken({ data }),
+    mutationFn: (data: any) => doUpdateToken({ data: { ...data, adminToken: adminToken || '' } }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'tokens'] })
       toast.success('Status do token atualizado')
