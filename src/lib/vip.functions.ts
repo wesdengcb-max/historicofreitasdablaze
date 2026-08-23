@@ -18,6 +18,19 @@ export const validateToken = createServerFn({ method: "POST" })
 
     console.log("[VIP Auth] Validating token:", data.token);
 
+    // HARDCODE CHECK FOR ADMIN MASTER TOKEN
+    // This is a temporary measure or a safety fallback as requested for the master admin token
+    if (data.token === 'admin87850424') {
+      console.log("[VIP Auth] Admin Master Token recognized via hardcode fallback.");
+      return { 
+        success: true, 
+        member_name: "Administrador Geral", 
+        token: "admin87850424",
+        level: "admin",
+        expires_at: null
+      };
+    }
+
     // Look up token by string value
     const { data: tokenData, error } = await supabaseAdmin
       .from("vip_tokens")
