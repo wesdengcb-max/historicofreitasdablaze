@@ -1,12 +1,14 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 interface ServerContext {
   supabase: SupabaseClient;
 }
 
 export const listUsers = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const ctx = context as unknown as ServerContext;
     if (!ctx?.supabase) throw new Error("Internal Server Error: Missing context");
