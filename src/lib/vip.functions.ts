@@ -23,18 +23,18 @@ export const validateToken = createServerFn({ method: "POST" })
       .single();
 
     if (error || !tokenData) {
-      console.error("Token lookup failed or no token found:", { token: data.token, error: error?.message });
+      console.error("Token lookup failed:", { token: data.token, error: error?.message, tokenData: !!tokenData });
       throw new Error("Token inválido ou expirado");
     }
 
     if (tokenData.status !== 'active') {
+      console.log("Token is not active:", { token: data.token, status: tokenData.status });
       throw new Error("Este token está desativado");
     }
 
-    console.log("Token record found:", { 
+    console.log("Token record validated:", { 
       token: tokenData.token, 
       status: tokenData.status, 
-      expires_at: tokenData.expires_at,
       level: tokenData.level
     });
 
