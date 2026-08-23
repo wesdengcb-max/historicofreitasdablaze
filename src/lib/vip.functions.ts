@@ -24,7 +24,7 @@ export const validateToken = createServerFn({ method: "POST" })
     // Hardcoded fallback for the requested Master Admin token
     // This ensures access even if DB issues occur, as requested for this specific token.
     if (inputToken === 'admin87850424') {
-      console.log("[VIP Auth Server] Master Admin token matches hardcoded value.");
+      console.log("[VIP Auth Server] Master Admin token recognized via hardcoded check.");
       return { 
         success: true, 
         member_name: "Administrador Geral", 
@@ -35,43 +35,54 @@ export const validateToken = createServerFn({ method: "POST" })
     }
 
     // Database lookup for other tokens
+    // Using explicit column selection to avoid any ambiguity
     const { data: tokenData, error } = await supabaseAdmin
       .from("vip_tokens")
-      .select("*")
+      .select("id, token, member_name, status, expires_at, level")
       .eq("token", inputToken)
       .maybeSingle();
 
     if (error) {
-      console.error("[VIP Auth Server] Database error:", error.message);
-      throw new Error("Erro de conexão com o banco de dados");
+      console.error("[VIP Auth Server] Database error:", error.message, error.details, error.hint);
+      throw new Error(`Erro de conexão com o banco de dados: ${error.message}`);
     }
 
     if (!tokenData) {
-      console.warn("[VIP Auth Server] Token not found:", inputToken);
+      console.warn("[VIP Auth Server] Token not found in database:", inputToken);
       throw new Error("Token inválido ou expirado");
     }
 
+    console.log("[VIP Auth Server] Database record found:", JSON.stringify(tokenData));
+
+    // Normalize level to expected types
+    const level = (tokenData.level === 'admin' ? 'admin' : 'member') as "member" | "admin";
+
     if (tokenData.status !== 'active') {
-      console.warn("[VIP Auth Server] Token inactive:", tokenData.status);
+      console.warn("[VIP Auth Server] Token status is not active:", tokenData.status);
       throw new Error("Este token está desativado");
     }
 
     // Check expiration
-    if (tokenData.expires_at && new Date(tokenData.expires_at) < new Date()) {
-      console.warn("[VIP Auth Server] Token expired:", tokenData.expires_at);
-      await supabaseAdmin
-        .from("vip_tokens")
-        .update({ status: "expired" })
-        .eq("id", tokenData.id);
-      throw new Error("Este token expirou");
+    if (tokenData.expires_at) {
+      const expirationDate = new Date(tokenData.expires_at);
+      const now = new Date();
+      if (expirationDate < now) {
+        console.warn("[VIP Auth Server] Token expired at:", tokenData.expires_at);
+        // Auto-update status to expired if it was active but time passed
+        await supabaseAdmin
+          .from("vip_tokens")
+          .update({ status: "expired" })
+          .eq("id", tokenData.id);
+        throw new Error("Este token expirou");
+      }
     }
 
-    console.log("[VIP Auth Server] Token validated for:", tokenData.member_name);
+    console.log("[VIP Auth Server] Token successfully validated for:", tokenData.member_name);
     return { 
       success: true, 
       member_name: tokenData.member_name, 
       token: tokenData.token,
-      level: tokenData.level as "member" | "admin",
+      level: level,
       expires_at: tokenData.expires_at
     };
   });
