@@ -1,7 +1,7 @@
 "use client";
 
 import { memo, useState, useEffect } from "react";
-import { ChevronLeft, Menu, Clock, Crown, PanelLeftOpen, PanelLeftClose, BarChart3, Sun, Moon, LogOut, ShieldAlert } from "lucide-react";
+import { ChevronLeft, Menu, Clock, Crown, PanelLeftOpen, PanelLeftClose, BarChart3, Sun, Moon, LogOut, ShieldAlert, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, Link } from "@tanstack/react-router";
 import { useVipStatus, logoutVip, useMemberName, useVipLevel } from "@/lib/auth/vipStore";
@@ -15,23 +15,9 @@ export const AppHeader = memo(function AppHeader() {
   const { isCollapsed, toggle } = useSidebarStore();
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const navigate = useNavigate();
-  const [isSupabaseAdmin, setIsSupabaseAdmin] = useState(false);
 
-  const isAdmin = isSupabaseAdmin || vipLevel === 'admin';
-
-  useEffect(() => {
-    const checkAdmin = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        const { data } = await supabase.rpc('has_role', {
-          _user_id: session.user.id,
-          _role: 'admin'
-        });
-        setIsSupabaseAdmin(!!data);
-      }
-    };
-    checkAdmin();
-  }, []);
+  // Removed Supabase session check to rely purely on VIP tokens for admin access as requested
+  const isAdmin = vipLevel === 'admin';
 
   const handleLogout = () => {
     logoutVip();
@@ -105,11 +91,12 @@ export const AppHeader = memo(function AppHeader() {
         {isAdmin && (
           <Link
             to="/admin"
-            className="flex items-center gap-2 rounded-xl border border-amber-500/50 bg-amber-500/10 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-amber-500 transition-all duration-300 hover:bg-amber-500/20 active:scale-95"
+            className="flex items-center gap-2 rounded-xl border border-amber-500/50 bg-[#1A1100] px-4 py-2 text-[11px] font-black uppercase tracking-widest text-amber-500 transition-all duration-300 hover:bg-amber-500/20 active:scale-95"
             title="Painel Administrativo"
           >
-            <ShieldAlert className="h-3.5 w-3.5" />
-            <span>🛡️ PAINEL ADMIN</span>
+            <Shield className="h-3.5 w-3.5 text-foreground/60" />
+            <div className="h-3 w-2.5 bg-blue-500 rounded-l-full rounded-r-[2px] opacity-80 shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+            <span>PAINEL ADMIN</span>
           </Link>
         )}
 

@@ -16,7 +16,7 @@ export const Route = createFileRoute('/_authenticated')({
       vipLevel = localStorage.getItem("freitas_white_vip_level") as any;
     }
 
-    const hasAdminAccess = !!session || vipLevel === 'admin';
+    const hasAdminAccess = vipLevel === 'admin';
 
     // Admin routes REQUIRE admin privileges (Supabase OR Admin Token)
     if (location.pathname.startsWith('/admin')) {
