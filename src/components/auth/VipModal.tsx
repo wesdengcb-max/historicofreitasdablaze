@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Key, Crown, LogOut, Loader2, ShieldCheck, ArrowRight, User, Lock } from "lucide-react";
 import { useVipStatus, setVipStatus, logoutVip, useMemberName, useVipToken } from "@/lib/auth/vipStore";
-import { validateToken } from "@/lib/vip.functions";
+import { validateToken, MASTER_ADMIN_TOKEN } from "@/lib/vip.functions";
 import { toast } from "sonner";
 
 export function VipModal() {
