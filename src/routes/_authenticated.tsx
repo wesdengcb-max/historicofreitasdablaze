@@ -18,14 +18,15 @@ export const Route = createFileRoute('/_authenticated')({
 
     const hasAdminAccess = vipLevel === 'admin';
 
-    // Admin routes REQUIRE admin privileges (Supabase OR Admin Token)
+    // Admin routes REQUIRE admin privileges
     if (location.pathname.startsWith('/admin')) {
       if (!hasAdminAccess) {
+        console.log("[Route Gate] Non-admin attempting to access admin route:", location.pathname);
         throw redirect({
-          to: '/' as any, // Admin strictly goes back to home if not admin
+          to: '/' as any,
         })
       }
-      return { session: null, user: null, authType: 'admin' }
+      return { authType: 'admin' }
     }
 
     // VIP area (like /app, /sinais, etc) is now public by default
