@@ -628,18 +628,35 @@ function Index() {
     if (!whiteAlert) return;
     setWhiteFlash(newestWhite);
     try {
-      // Usando a nova voz feminina solicitada pelo usuário
-      const audio = new Audio("/audio/voz-feminina-branco.mp3");
-      audio.volume = 1.0;
-      audio.play().catch(e => {
-        console.error("Audio play failed, trying fallback:", e);
-        // Fallback para o som antigo se o novo falhar por algum motivo
-        const fallback = new Audio("/branco-som.mp3");
-        fallback.volume = 0.8;
-        fallback.play().catch(err => console.error("Fallback audio failed:", err));
-      });
-    } catch (e) {
-      console.error("Audio error:", e);
+      // Assinatura premium: um chime luminoso acompanha o início dos fogos.
+      const AudioContextClass = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      if (AudioContextClass) {
+        const context = new AudioContextClass();
+        const now = context.currentTime;
+        const master = context.createGain();
+        master.gain.setValueAtTime(0.0001, now);
+        master.gain.exponentialRampToValueAtTime(0.16, now + 0.02);
+        master.gain.exponentialRampToValueAtTime(0.0001, now + 1.8);
+        master.connect(context.destination);
+        [659.25, 783.99, 987.77].forEach((frequency, index) => {
+          const oscillator = context.createOscillator();
+          const gain = context.createGain();
+          oscillator.type = "sine";
+          oscillator.frequency.value = frequency;
+          gain.gain.setValueAtTime(0.0001, now + index * 0.09);
+          gain.gain.exponentialRampToValueAtTime(0.42, now + index * 0.09 + 0.03);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.7);
+          oscillator.connect(gain).connect(master);
+          oscillator.start(now + index * 0.09);
+          oscillator.stop(now + 1.85);
+        });
+        window.setTimeout(() => void context.close(), 2200);
+      }
+      const voice = new Audio("/audio/voz-feminina-branco.mp3");
+      voice.volume = 0.72;
+      void voice.play();
+    } catch (error) {
+      console.error("White alert audio failed:", error);
     }
     const t = setTimeout(() => setWhiteFlash(null), 3000); // Reduzido para 3 segundos para sumir mais rápido
     return () => clearTimeout(t);
