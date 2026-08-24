@@ -1502,21 +1502,21 @@ function Index() {
                   (() => {
                     return (
                        <div
-                         className="history-scroll flex w-max min-w-full flex-nowrap gap-2 overflow-x-auto p-1 sm:p-3 lg:p-4"
+                         className="history-scroll grid w-full grid-cols-2 gap-x-2 gap-y-5 overflow-x-auto p-1 sm:grid-cols-5 sm:gap-x-3 sm:p-3 lg:grid-cols-10 lg:p-4"
                          style={{ direction: inverse ? "rtl" : "ltr" }}
                        >
                          {visibleSpins.map((spin, i) => {
-                           const hasSel = highlightN.size > 0;
-                           const hit = highlightN.has(spin.n);
-                           return (
-                             <div key={spin.id} style={{ direction: "ltr" }}>
-                               <BlazeResultCard
-                                 n={spin.n}
-                                 color={spin.color}
-                                 time={exibirSegundos ? spTimeWithSeconds(spin) : spin.time}
-                                 numbered={numerado}
-                                 position={i + 1}
-                                 timeHighlight={destaqueHorario}
+                            const hasSel = highlightN.size > 0;
+                            const hit = highlightN.has(spin.n);
+                            return (
+                              <div key={spin.id} className="flex justify-center rounded-lg border border-white/5 p-1" style={{ direction: "ltr" }}>
+                                <BlazeResultCard
+                                  n={spin.n}
+                                  color={spin.color}
+                                  time={exibirSegundos ? spTimeWithSeconds(spin) : spin.time}
+                                  numbered={numerado}
+                                  position={i + 1}
+                                  timeHighlight={destaqueHorario}
                                  selected={hit}
                                  dimmed={hasSel && !hit}
                                  delay={i < 20 ? i * 0.015 : 0}
