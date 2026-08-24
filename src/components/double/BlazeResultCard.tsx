@@ -19,7 +19,6 @@ type Props = {
   color: Color;
   time?: string;
   numbered?: boolean;
-  position?: number;
   timeHighlight?: boolean;
   dimmed?: boolean;
   selected?: boolean;
@@ -34,7 +33,6 @@ export const BlazeResultCard = memo(function BlazeResultCard({
   color,
   time,
   numbered = false,
-  position,
   timeHighlight = false,
   dimmed = false,
   selected = false,
@@ -47,16 +45,12 @@ export const BlazeResultCard = memo(function BlazeResultCard({
 
   return (
     <div
-      className="blaze-result-card relative flex animate-in flex-col items-center rounded-md border border-white/[0.06] bg-[#11151b] px-1.5 pb-1.5 pt-1 shadow-none outline-none fade-in slide-in-from-bottom-2"
-      aria-label={position ? `Posição ${position}, ${color}` : undefined}
+      className="blaze-result-card relative flex animate-in flex-col items-center bg-transparent border-none shadow-none outline-none fade-in slide-in-from-bottom-2"
       style={{
         width: `var(--blaze-card-w, ${BLAZE_CARD_W}px)`,
         animationDelay: delay > 0 ? `${delay}s` : undefined,
       }}
     >
-      {position !== undefined && (
-        <span className="mb-1 text-[9px] font-bold leading-none tabular-nums text-white/50">{position}</span>
-      )}
       <button
         type="button"
         onClick={onClick}
@@ -70,14 +64,7 @@ export const BlazeResultCard = memo(function BlazeResultCard({
           opacity: dimmed ? 0.25 : 1,
         }}
       >
-        {isWhite && position !== undefined ? (
-          <img
-            src={BRANCO_IMG}
-            alt="Branco"
-            className="h-full w-full object-cover"
-            draggable={false}
-          />
-        ) : isWhite && !numbered ? (
+        {isWhite && !numbered ? (
           <img
             src={BRANCO_IMG}
             alt="Branco"
