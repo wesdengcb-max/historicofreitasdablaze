@@ -19,6 +19,7 @@ type Props = {
   color: Color;
   time?: string;
   numbered?: boolean;
+  sequence?: number;
   timeHighlight?: boolean;
   dimmed?: boolean;
   selected?: boolean;
@@ -33,6 +34,7 @@ export const BlazeResultCard = memo(function BlazeResultCard({
   color,
   time,
   numbered = false,
+  sequence,
   timeHighlight = false,
   dimmed = false,
   selected = false,
@@ -51,6 +53,11 @@ export const BlazeResultCard = memo(function BlazeResultCard({
         animationDelay: delay > 0 ? `${delay}s` : undefined,
       }}
     >
+      {sequence !== undefined && (
+        <span className="mb-1 h-3 text-[9px] font-semibold leading-3 tabular-nums text-muted-foreground">
+          {sequence}
+        </span>
+      )}
       <button
         type="button"
         onClick={onClick}
