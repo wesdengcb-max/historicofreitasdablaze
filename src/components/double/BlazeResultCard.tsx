@@ -47,7 +47,8 @@ export const BlazeResultCard = memo(function BlazeResultCard({
 
   return (
     <div
-      className="blaze-result-card relative flex animate-in flex-col items-center bg-transparent border-none shadow-none outline-none fade-in slide-in-from-bottom-2"
+      className="blaze-result-card relative flex animate-in flex-col items-center rounded-md border border-white/[0.06] bg-[#11151b] px-1.5 pb-1.5 pt-1 shadow-none outline-none fade-in slide-in-from-bottom-2"
+      aria-label={position ? `Posição ${position}, ${color}` : undefined}
       style={{
         width: `var(--blaze-card-w, ${BLAZE_CARD_W}px)`,
         animationDelay: delay > 0 ? `${delay}s` : undefined,
