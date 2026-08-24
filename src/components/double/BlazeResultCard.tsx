@@ -34,6 +34,7 @@ export const BlazeResultCard = memo(function BlazeResultCard({
   color,
   time,
   numbered = false,
+  position,
   timeHighlight = false,
   dimmed = false,
   selected = false,
