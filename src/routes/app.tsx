@@ -1439,19 +1439,19 @@ function Index() {
                                       const p = slotPredictions[slotKey];
                                       const isSlotActive = highlightKey ? (highlightKey === `col-${ci}`) : (highlightN.size === 0);
                                       return (
-                                        <div key={`e-${ci}-${i}`} className="flex flex-col items-center" style={{ opacity: isSlotActive ? 1 : 0.25 }}>
-                                          <button
-                                            type="button"
-                                            onClick={() => {
-                                              if (isLocked) {
-                                                toast.error("Recurso VIP", {
-                                                  description: "A criação de alertas manuais é exclusiva para membros VIP.",
-                                                });
-                                                return;
-                                              }
-                                              cycleSlotPrediction(slotKey);
-                                            }}
-                                            className={`relative flex h-[50px] w-[52px] items-center justify-center rounded-[4px] border border-slate-700/50 bg-[#181e2a] transition-colors shadow-none ${
+                                         <div key={`e-${ci}-${i}`} className="flex h-[74px] w-[52px] flex-col items-center" style={{ opacity: isSlotActive ? 1 : 0.25 }}>
+                                           <button
+                                             type="button"
+                                             onClick={() => {
+                                               if (isLocked) {
+                                                 toast.error("Recurso VIP", {
+                                                   description: "A criação de alertas manuais é exclusiva para membros VIP.",
+                                                 });
+                                                 return;
+                                               }
+                                               cycleSlotPrediction(slotKey);
+                                             }}
+                                             className={`relative flex h-[50px] w-[52px] shrink-0 items-center justify-center rounded-[4px] border border-slate-700/50 bg-[#181e2a] transition-colors shadow-none ${
                                               isLocked
                                                 ? "opacity-50 cursor-not-allowed"
                                                 : "cursor-pointer"
