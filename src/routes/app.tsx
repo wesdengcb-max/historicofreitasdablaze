@@ -1287,8 +1287,8 @@ function Index() {
                       : "Nenhum resultado no período selecionado."}
                   </div>
                 ) : viewMode === "colunas" ? (
-                   <div className="history-scroll w-full overflow-x-auto rounded-lg border border-border bg-background/40 p-1 sm:p-2 lg:p-3 no-scrollbar">
-                     <div className="flex flex-col gap-0 min-w-[1200px] w-full">
+                  <div className="history-scroll w-full overflow-x-auto p-1 sm:p-2 lg:p-3 no-scrollbar">
+                    <div className="flex flex-col gap-0 min-w-[1200px] w-full">
                       {/* Cabeçalho 0-9 interno para Colunas Fixas */}
                       <div className="grid grid-cols-10 gap-[8px] mb-2 sticky top-0 z-10 bg-[#090B0D]/90 backdrop-blur-sm w-full">
                         {Array.from({ length: 10 }).map((_, ci) => (
@@ -1375,8 +1375,8 @@ function Index() {
 
                                       if (spin) {
                                         return (
-                                           <div key={(spin as Spin).id} className="flex h-[74px] w-[52px] flex-col items-center">
-                                             <BlazeResultCard
+                                          <div key={(spin as Spin).id} className="flex flex-col items-center">
+                                            <BlazeResultCard
                                               n={(spin as Spin).n}
                                               color={(spin as Spin).color}
                                               time={exibirSegundos ? spTimeWithSeconds(spin as Spin) : (spin as Spin).time}
@@ -1412,8 +1412,8 @@ function Index() {
                                       if (pending && i === 0) {
                                          const isSlotActive = highlightKey ? (highlightKey === `col-${ci}`) : (highlightN.size === 0);
                                          return (
-                                           <div key={`p-${ci}-${i}`} className="flex h-[74px] w-[52px] flex-col items-center" style={{ opacity: isSlotActive ? 1 : 0.25 }}>
-                                             <div className="relative flex h-[50px] w-[52px] shrink-0 items-center justify-center overflow-hidden rounded-[4px] border border-slate-700/50 bg-[#181e2a] shadow-none">
+                                          <div key={`p-${ci}-${i}`} className="flex flex-col items-center" style={{ opacity: isSlotActive ? 1 : 0.25 }}>
+                                            <div className="relative flex h-[50px] w-[52px] items-center justify-center overflow-hidden rounded-[4px] border border-slate-700/50 bg-[#181e2a] shadow-none">
                                               <img
                                                 src={BRANCO_IMG}
                                                 alt="Sinal"
@@ -1439,19 +1439,19 @@ function Index() {
                                       const p = slotPredictions[slotKey];
                                       const isSlotActive = highlightKey ? (highlightKey === `col-${ci}`) : (highlightN.size === 0);
                                       return (
-                                         <div key={`e-${ci}-${i}`} className="flex h-[74px] w-[52px] flex-col items-center" style={{ opacity: isSlotActive ? 1 : 0.25 }}>
-                                           <button
-                                             type="button"
-                                             onClick={() => {
-                                               if (isLocked) {
-                                                 toast.error("Recurso VIP", {
-                                                   description: "A criação de alertas manuais é exclusiva para membros VIP.",
-                                                 });
-                                                 return;
-                                               }
-                                               cycleSlotPrediction(slotKey);
-                                             }}
-                                             className={`relative flex h-[50px] w-[52px] shrink-0 items-center justify-center rounded-[4px] border border-slate-700/50 bg-[#181e2a] transition-colors shadow-none ${
+                                        <div key={`e-${ci}-${i}`} className="flex flex-col items-center" style={{ opacity: isSlotActive ? 1 : 0.25 }}>
+                                          <button
+                                            type="button"
+                                            onClick={() => {
+                                              if (isLocked) {
+                                                toast.error("Recurso VIP", {
+                                                  description: "A criação de alertas manuais é exclusiva para membros VIP.",
+                                                });
+                                                return;
+                                              }
+                                              cycleSlotPrediction(slotKey);
+                                            }}
+                                            className={`relative flex h-[50px] w-[52px] items-center justify-center rounded-[4px] border border-slate-700/50 bg-[#181e2a] transition-colors shadow-none ${
                                               isLocked
                                                 ? "opacity-50 cursor-not-allowed"
                                                 : "cursor-pointer"
