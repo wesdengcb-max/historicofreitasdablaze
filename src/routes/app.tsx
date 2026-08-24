@@ -652,9 +652,6 @@ function Index() {
         });
         window.setTimeout(() => void context.close(), 2200);
       }
-      const voice = new Audio("/audio/voz-feminina-branco.mp3");
-      voice.volume = 0.72;
-      void voice.play();
     } catch (error) {
       console.error("White alert audio failed:", error);
     }
