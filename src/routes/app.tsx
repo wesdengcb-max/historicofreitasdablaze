@@ -1515,6 +1515,7 @@ function Index() {
                                  color={spin.color}
                                  time={exibirSegundos ? spTimeWithSeconds(spin) : spin.time}
                                  numbered={numerado}
+                                 position={i + 1}
                                  timeHighlight={destaqueHorario}
                                  selected={hit}
                                  dimmed={hasSel && !hit}
