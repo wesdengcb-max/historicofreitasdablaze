@@ -1379,9 +1379,10 @@ function Index() {
                                             <BlazeResultCard
                                               n={(spin as Spin).n}
                                               color={(spin as Spin).color}
-                                              time={exibirSegundos ? spTimeWithSeconds(spin as Spin) : (spin as Spin).time}
-                                              numbered={numerado}
-                                              timeHighlight={destaqueHorario}
+                                               time={exibirSegundos ? spTimeWithSeconds(spin as Spin) : (spin as Spin).time}
+                                               numbered={numerado}
+                                               position={visibleSpins.findIndex((item) => item.id === (spin as Spin).id) + 1}
+                                               timeHighlight={destaqueHorario}
                                               signal={robotOn ? signalsByHM.get(`${hm}-${i}`)?.[0] : undefined}
                                               dimmed={
                                                 (highlightKey !== null && highlightKey !== `col-${ci}`) ||
