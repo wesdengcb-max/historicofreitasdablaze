@@ -1375,8 +1375,8 @@ function Index() {
 
                                       if (spin) {
                                         return (
-                                          <div key={(spin as Spin).id} className="flex flex-col items-center">
-                                            <BlazeResultCard
+                                           <div key={(spin as Spin).id} className="flex h-[74px] w-[52px] flex-col items-center">
+                                             <BlazeResultCard
                                               n={(spin as Spin).n}
                                               color={(spin as Spin).color}
                                               time={exibirSegundos ? spTimeWithSeconds(spin as Spin) : (spin as Spin).time}
