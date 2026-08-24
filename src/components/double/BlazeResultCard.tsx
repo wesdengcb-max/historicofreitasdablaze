@@ -3,10 +3,10 @@ const BRANCO_IMG = "/images/branco.svg";
 import type { Color } from "./types";
 import type { StoredSignal } from "@/lib/signalsStore";
 
-export const BLAZE_CARD_W = 52;
-export const BLAZE_CARD_TOP_H = 50;
-export const BLAZE_GAP_X = 6;
-export const BLAZE_GAP_Y = 8;
+export const BLAZE_CARD_W = 62;
+export const BLAZE_CARD_TOP_H = 60;
+export const BLAZE_GAP_X = 4;
+export const BLAZE_GAP_Y = 6;
 
 const PALETTE: Record<Color, { bg: string; border: string; ring: string; fg: string; shadow?: string }> = {
   red: { bg: "#f12c4c", border: "transparent", ring: "#ffffff", fg: "#ffffff" },
