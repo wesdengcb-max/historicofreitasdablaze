@@ -54,6 +54,9 @@ export const BlazeResultCard = memo(function BlazeResultCard({
         animationDelay: delay > 0 ? `${delay}s` : undefined,
       }}
     >
+      {position !== undefined && (
+        <span className="mb-1 text-[9px] font-bold leading-none tabular-nums text-white/50">{position}</span>
+      )}
       <button
         type="button"
         onClick={onClick}
