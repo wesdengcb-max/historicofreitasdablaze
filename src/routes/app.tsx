@@ -246,7 +246,7 @@ const ColumnBlock = memo(function ColumnBlock({
       className={`flex flex-col gap-y-2 rounded-lg border border-transparent p-1 transition-colors duration-300`}
     >
       {rows.map((pair: any[], rIdx: number) => (
-        <div key={rIdx} className="flex gap-x-[8px]">
+        <div key={rIdx} className="flex gap-x-[4px]">
           <BlazeResultCardWrapper
             item={pair[0]}
             isActive={isActive}
@@ -1197,7 +1197,7 @@ function Index() {
             {/* Cabeçalho das estatísticas por coluna */}
             {viewMode === "colunas" && contarColunas && (
               <div className="mb-3 w-full border-b border-white/5 pb-3 overflow-x-auto scrollbar-none">
-                <div className="grid grid-cols-10 gap-[6px] min-w-[1200px] w-full">
+                <div className="grid grid-cols-10 gap-[4px] min-w-[1200px] w-full">
                   {Array.from({ length: 10 }).map((_, ci) => {
                     const stats = colStats[ci];
                     return (
@@ -1304,7 +1304,7 @@ function Index() {
                   <div className="history-scroll w-full overflow-x-auto p-1 sm:p-2 lg:p-3 no-scrollbar">
                     <div className="flex flex-col gap-0 min-w-[1200px] w-full">
                       {/* Cabeçalho 0-9 interno para Colunas Fixas */}
-                      <div className="grid grid-cols-10 gap-[8px] mb-2 sticky top-0 z-10 bg-[#090B0D]/90 backdrop-blur-sm w-full">
+                      <div className="grid grid-cols-10 gap-[4px] mb-2 sticky top-0 z-10 bg-[#090B0D]/90 backdrop-blur-sm w-full">
                         {Array.from({ length: 10 }).map((_, ci) => (
                           <button
                             key={`header-inner-${ci}`}
@@ -1335,7 +1335,7 @@ function Index() {
 
                       {gridRows.map((row) => (
                         <div key={row.key} className="flex flex-col gap-0 border-none py-1">
-                          <div className="grid grid-cols-10 gap-[8px] relative w-full border-none">
+                          <div className="grid grid-cols-10 gap-[4px] relative w-full border-none">
                             {row.cells.map((cell: any, ci: number) => {
                             const [hh, mmPrefix] = row.label.split(":");
                             const hm = `${hh}:${mmPrefix[0]}${ci}`;
@@ -1366,7 +1366,7 @@ function Index() {
                               <div
                                 key={ci}
                                 className="flex flex-col items-center justify-center p-0 bg-transparent border-0 shadow-none outline-none"
-                                style={{ width: "100%", height: "76px", direction: "ltr" }}
+                                style={{ width: "100%", height: "88px", direction: "ltr" }}
                               >
                                 <div 
                                   className="relative flex flex-col items-center pt-2 transition-all duration-300 bg-transparent border-0 shadow-none outline-none"
@@ -1376,7 +1376,7 @@ function Index() {
                                       {badge.label}
                                     </span>
                                   )}
-                                  <div className="relative flex h-[50px] items-start gap-[8px]">
+                                  <div className="relative flex h-[60px] items-start gap-[4px]">
                                     {(cell.length >= 2
                                       ? [cell[0], cell[1]]
                                       : cell.length === 1
@@ -1427,7 +1427,7 @@ function Index() {
                                          const isSlotActive = highlightKey ? (highlightKey === `col-${ci}`) : (highlightN.size === 0);
                                          return (
                                           <div key={`p-${ci}-${i}`} className="flex flex-col items-center" style={{ opacity: isSlotActive ? 1 : 0.25 }}>
-                                            <div className="relative flex h-[50px] w-[52px] items-center justify-center overflow-hidden rounded-[4px] border border-slate-700/50 bg-[#181e2a] shadow-none">
+                                            <div className="relative flex h-[60px] w-[62px] items-center justify-center overflow-hidden rounded-[4px] border border-slate-700/50 bg-[#181e2a] shadow-none">
                                               <img
                                                 src={BRANCO_IMG}
                                                 alt="Sinal"
@@ -1465,7 +1465,7 @@ function Index() {
                                               }
                                               cycleSlotPrediction(slotKey);
                                             }}
-                                            className={`relative flex h-[50px] w-[52px] items-center justify-center rounded-[4px] border border-slate-700/50 bg-[#181e2a] transition-colors shadow-none ${
+                                            className={`relative flex h-[60px] w-[62px] items-center justify-center rounded-[4px] border border-slate-700/50 bg-[#181e2a] transition-colors shadow-none ${
                                               isLocked
                                                 ? "opacity-50 cursor-not-allowed"
                                                 : "cursor-pointer"
