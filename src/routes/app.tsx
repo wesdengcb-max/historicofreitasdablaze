@@ -1335,7 +1335,7 @@ function Index() {
 
                       {gridRows.map((row) => (
                         <div key={row.key} className="flex flex-col gap-0 border-none py-1">
-                          <div className="grid grid-cols-10 gap-x-[2px] gap-y-0 relative w-full border-none">
+                          <div className="grid grid-cols-10 gap-x-0 gap-y-0 relative w-full border-none">
                             {row.cells.map((cell: any, ci: number) => {
                             const [hh, mmPrefix] = row.label.split(":");
                             const hm = `${hh}:${mmPrefix[0]}${ci}`;
