@@ -1197,7 +1197,7 @@ function Index() {
             {/* Cabeçalho das estatísticas por coluna */}
             {viewMode === "colunas" && contarColunas && (
               <div className="mb-3 w-full border-b border-white/5 pb-3 overflow-x-auto scrollbar-none">
-                <div className="grid grid-cols-10 gap-x-[2px] gap-y-0 min-w-[1200px] w-full">
+                <div className="grid grid-cols-10 gap-x-0 gap-y-0 min-w-[1200px] w-full">
                   {Array.from({ length: 10 }).map((_, ci) => {
                     const stats = colStats[ci];
                     return (
