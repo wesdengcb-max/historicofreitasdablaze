@@ -246,7 +246,7 @@ const ColumnBlock = memo(function ColumnBlock({
       className={`flex flex-col gap-y-2 rounded-lg border border-transparent p-1 transition-colors duration-300`}
     >
       {rows.map((pair: any[], rIdx: number) => (
-        <div key={rIdx} className="flex gap-x-[4px]">
+        <div key={rIdx} className="flex gap-x-[2px]">
           <BlazeResultCardWrapper
             item={pair[0]}
             isActive={isActive}
