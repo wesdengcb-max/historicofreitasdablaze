@@ -1412,8 +1412,8 @@ function Index() {
                                       if (pending && i === 0) {
                                          const isSlotActive = highlightKey ? (highlightKey === `col-${ci}`) : (highlightN.size === 0);
                                          return (
-                                          <div key={`p-${ci}-${i}`} className="flex flex-col items-center" style={{ opacity: isSlotActive ? 1 : 0.25 }}>
-                                            <div className="relative flex h-[50px] w-[52px] items-center justify-center overflow-hidden rounded-[4px] border border-slate-700/50 bg-[#181e2a] shadow-none">
+                                           <div key={`p-${ci}-${i}`} className="flex h-[74px] w-[52px] flex-col items-center" style={{ opacity: isSlotActive ? 1 : 0.25 }}>
+                                             <div className="relative flex h-[50px] w-[52px] shrink-0 items-center justify-center overflow-hidden rounded-[4px] border border-slate-700/50 bg-[#181e2a] shadow-none">
                                               <img
                                                 src={BRANCO_IMG}
                                                 alt="Sinal"
