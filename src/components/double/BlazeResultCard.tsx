@@ -19,6 +19,7 @@ type Props = {
   color: Color;
   time?: string;
   numbered?: boolean;
+  position?: number;
   timeHighlight?: boolean;
   dimmed?: boolean;
   selected?: boolean;
