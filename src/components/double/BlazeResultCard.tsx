@@ -70,7 +70,14 @@ export const BlazeResultCard = memo(function BlazeResultCard({
           opacity: dimmed ? 0.25 : 1,
         }}
       >
-        {isWhite && !numbered ? (
+        {isWhite && position !== undefined ? (
+          <img
+            src={BRANCO_IMG}
+            alt="Branco"
+            className="h-full w-full object-cover"
+            draggable={false}
+          />
+        ) : isWhite && !numbered ? (
           <img
             src={BRANCO_IMG}
             alt="Branco"
