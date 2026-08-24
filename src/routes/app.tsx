@@ -1502,13 +1502,8 @@ function Index() {
                   (() => {
                     return (
                        <div
-                         className="history-scroll grid p-1 sm:p-3 lg:p-4"
-                         style={{
-                            gridTemplateColumns: `repeat(auto-fill, minmax(52px, 1fr))`,
-                            columnGap: "8px",
-                            rowGap: "12px",
-                           direction: inverse ? "rtl" : "ltr",
-                         }}
+                         className="history-scroll flex w-max min-w-full flex-nowrap gap-2 overflow-x-auto p-1 sm:p-3 lg:p-4"
+                         style={{ direction: inverse ? "rtl" : "ltr" }}
                        >
                          {visibleSpins.map((spin, i) => {
                            const hasSel = highlightN.size > 0;
@@ -1520,6 +1515,7 @@ function Index() {
                                  color={spin.color}
                                  time={exibirSegundos ? spTimeWithSeconds(spin) : spin.time}
                                  numbered={numerado}
+                                 position={i + 1}
                                  timeHighlight={destaqueHorario}
                                  selected={hit}
                                  dimmed={hasSel && !hit}
