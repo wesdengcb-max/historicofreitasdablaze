@@ -1320,7 +1320,7 @@ function Index() {
                       </div>
 
                       {gridRows.map((row) => (
-                        <div key={row.key} className="flex flex-col gap-0 border-none py-1">
+                        <div key={row.key} className="flex flex-col gap-0 rounded-md border border-border/60 py-1">
                           <div className="grid grid-cols-10 gap-[8px] relative w-full border-none">
                             {row.cells.map((cell: any, ci: number) => {
                             const [hh, mmPrefix] = row.label.split(":");
@@ -1378,6 +1378,7 @@ function Index() {
                                           <div key={(spin as Spin).id} className="flex flex-col items-center">
                                             <BlazeResultCard
                                               n={(spin as Spin).n}
+                                              sequence={deferredSpins.findIndex((item) => item.id === (spin as Spin).id) + 1}
                                               color={(spin as Spin).color}
                                               time={exibirSegundos ? spTimeWithSeconds(spin as Spin) : (spin as Spin).time}
                                               numbered={numerado}
@@ -1517,6 +1518,7 @@ function Index() {
                              <div key={spin.id} style={{ direction: "ltr" }}>
                                <BlazeResultCard
                                  n={spin.n}
+                                 sequence={i + 1}
                                  color={spin.color}
                                  time={exibirSegundos ? spTimeWithSeconds(spin) : spin.time}
                                  numbered={numerado}

@@ -19,6 +19,7 @@ type Props = {
   color: Color;
   time?: string;
   numbered?: boolean;
+  sequence?: number;
   timeHighlight?: boolean;
   dimmed?: boolean;
   selected?: boolean;
@@ -33,6 +34,7 @@ export const BlazeResultCard = memo(function BlazeResultCard({
   color,
   time,
   numbered = false,
+  sequence,
   timeHighlight = false,
   dimmed = false,
   selected = false,
