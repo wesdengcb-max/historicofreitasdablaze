@@ -53,6 +53,11 @@ export const BlazeResultCard = memo(function BlazeResultCard({
         animationDelay: delay > 0 ? `${delay}s` : undefined,
       }}
     >
+      {sequence !== undefined && (
+        <span className="mb-1 h-3 text-[9px] font-semibold leading-3 tabular-nums text-muted-foreground">
+          {sequence}
+        </span>
+      )}
       <button
         type="button"
         onClick={onClick}
